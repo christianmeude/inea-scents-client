@@ -35,3 +35,6 @@ jobs:
         with:
           commit_message: "chore: auto-regenerate API client from latest schema"
           file_pattern: "lib/api/**"
+          
+      - name: Verify generated code compiles
+        run: flutter analyze
