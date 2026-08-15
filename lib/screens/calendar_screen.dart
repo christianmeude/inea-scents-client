@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../models/index.dart';
+
 import '../providers/index.dart';
 import '../widgets/index.dart';
 
@@ -14,7 +14,6 @@ class CalendarScreen extends ConsumerStatefulWidget {
 }
 
 class _CalendarScreenState extends ConsumerState<CalendarScreen> {
-  DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
   // ============================================================
@@ -34,9 +33,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final availabilityAsync = ref.watch(
-      availabilityProvider((month: _focusedDay.month, year: _focusedDay.year)),
-    );
+    final availabilityAsync = ref.watch(availabilityProvider);
 
     return Scaffold(
       backgroundColor: backgroundTop,
@@ -59,9 +56,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.42),
+                color: Colors.white.withValues(alpha: 0.42),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.65)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
@@ -71,12 +68,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   color: primaryDark,
                 ),
                 onPressed: () {
-                  ref.invalidate(
-                    availabilityProvider((
-                      month: _focusedDay.month,
-                      year: _focusedDay.year,
-                    )),
-                  );
+                  ref.read(availabilityProvider.notifier).refresh();
                 },
               ),
             ),
@@ -110,7 +102,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             left: -120,
             child: _BlurCircle(
               size: 390,
-              color: const Color(0xFFEBC9B8).withOpacity(0.72),
+              color: const Color(0xFFEBC9B8).withValues(alpha: 0.72),
             ),
           ),
 
@@ -119,7 +111,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             right: -160,
             child: _BlurCircle(
               size: 360,
-              color: const Color(0xFFD3A4AF).withOpacity(0.60),
+              color: const Color(0xFFD3A4AF).withValues(alpha: 0.60),
             ),
           ),
 
@@ -128,7 +120,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             left: -130,
             child: _BlurCircle(
               size: 430,
-              color: const Color(0xFF9C8491).withOpacity(0.48),
+              color: const Color(0xFF9C8491).withValues(alpha: 0.48),
             ),
           ),
 
@@ -150,18 +142,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 return _CalendarError(
                   error: error.toString(),
                   onRetry: () {
-                    ref.invalidate(
-                      availabilityProvider((
-                        month: _focusedDay.month,
-                        year: _focusedDay.year,
-                      )),
-                    );
+                    ref.read(availabilityProvider.notifier).refresh();
                   },
                 );
               },
 
-              data: (availability) {
-                return _buildCalendar(availability);
+              data: (availabilityState) {
+                return _buildCalendar(availabilityState);
               },
             ),
           ),
@@ -179,9 +166,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   // CALENDAR CONTENT
   // ============================================================
 
-  Widget _buildCalendar(List<Availability> availability) {
+  Widget _buildCalendar(AvailabilityState availabilityState) {
+    final availability = availabilityState.data;
+    final focusedDay = DateTime(availabilityState.year, availabilityState.month, 1);
+
     final dates = <DateTime, String>{
-      for (final item in availability) _dateOnly(item.date): item.status,
+      for (final item in availability)
+        if (item.date != null) _dayOnly(item.date!): item.status ?? 'available',
     };
 
     final selectedStatus = _selectedDay == null
@@ -191,13 +182,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     return RefreshIndicator(
       color: primary,
       onRefresh: () async {
-        final provider = availabilityProvider((
-          month: _focusedDay.month,
-          year: _focusedDay.year,
-        ));
-
-        ref.invalidate(provider);
-        await ref.read(provider.future);
+        ref.read(availabilityProvider.notifier).refresh();
       },
 
       child: ListView(
@@ -237,17 +222,17 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           // ====================================================
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.93),
+              color: Colors.white.withValues(alpha: 0.93),
               borderRadius: BorderRadius.circular(24),
 
               border: Border.all(
-                color: Colors.white.withOpacity(0.85),
+                color: Colors.white.withValues(alpha: 0.85),
                 width: 1,
               ),
 
               boxShadow: [
                 BoxShadow(
-                  color: primary.withOpacity(0.10),
+                  color: primary.withValues(alpha: 0.10),
                   blurRadius: 22,
                   offset: const Offset(0, 10),
                 ),
@@ -262,7 +247,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                 lastDay: DateTime(DateTime.now().year + 1, 12, 31),
 
-                focusedDay: _focusedDay,
+                focusedDay: focusedDay,
 
                 selectedDayPredicate: (day) {
                   return isSameDay(_selectedDay, day);
@@ -293,15 +278,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                   setState(() {
                     _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
                   });
+                  ref.read(availabilityProvider.notifier).setMonth(focusedDay.month, focusedDay.year);
                 },
 
-                onPageChanged: (focusedDay) {
+                onPageChanged: (newFocusedDay) {
                   setState(() {
-                    _focusedDay = focusedDay;
                     _selectedDay = null;
                   });
+                  ref.read(availabilityProvider.notifier).setMonth(newFocusedDay.month, newFocusedDay.year);
                 },
 
                 // ==================================================
@@ -393,10 +378,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
 
                   todayDecoration: BoxDecoration(
-                    color: primary.withOpacity(0.13),
+                    color: primary.withValues(alpha: 0.13),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: primary.withOpacity(0.35),
+                      color: primary.withValues(alpha: 0.35),
                       width: 1,
                     ),
                   ),
@@ -462,10 +447,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
 
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.48),
+              color: Colors.white.withValues(alpha: 0.48),
               borderRadius: BorderRadius.circular(18),
 
-              border: Border.all(color: Colors.white.withOpacity(0.65)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
             ),
 
             child: const Row(
@@ -491,14 +476,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               padding: const EdgeInsets.all(17),
 
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.92),
+                color: Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(20),
 
-                border: Border.all(color: available.withOpacity(0.25)),
+                border: Border.all(color: available.withValues(alpha: 0.25)),
 
                 boxShadow: [
                   BoxShadow(
-                    color: primary.withOpacity(0.07),
+                    color: primary.withValues(alpha: 0.07),
                     blurRadius: 16,
                     offset: const Offset(0, 7),
                   ),
@@ -586,22 +571,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     return DateTime(date.year, date.month, date.day);
   }
 
-  DateTime _dateOnly(String date) {
-    final parts = date.split('-');
-
-    if (parts.length >= 3) {
-      return DateTime(
-        int.parse(parts[0]),
-        int.parse(parts[1]),
-        int.parse(parts[2].substring(0, 2)),
-      );
-    }
-
-    final parsed = DateTime.parse(date);
-
-    return DateTime(parsed.year, parsed.month, parsed.day);
-  }
-
   String _formatDate(DateTime date) {
     const months = [
       'January',
@@ -653,7 +622,7 @@ class _BrandName extends StatelessWidget {
               color: brandColor,
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -676,7 +645,7 @@ class _BrandName extends StatelessWidget {
               color: brandColor,
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -728,13 +697,13 @@ class _CalendarDay extends StatelessWidget {
         color: selected
             ? primary
             : isToday
-            ? primary.withOpacity(0.10)
+            ? primary.withValues(alpha: 0.10)
             : Colors.transparent,
 
         shape: BoxShape.circle,
 
         border: isToday && !selected
-            ? Border.all(color: primary.withOpacity(0.35), width: 1)
+            ? Border.all(color: primary.withValues(alpha: 0.35), width: 1)
             : null,
       ),
 
@@ -767,7 +736,7 @@ class _CalendarDay extends StatelessWidget {
                 height: 5,
 
                 decoration: BoxDecoration(
-                  color: selected ? Colors.white.withOpacity(0.9) : statusColor,
+                  color: selected ? Colors.white.withValues(alpha: 0.9) : statusColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -839,14 +808,14 @@ class _CalendarError extends StatelessWidget {
           padding: const EdgeInsets.all(25),
 
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.90),
+            color: Colors.white.withValues(alpha: 0.90),
             borderRadius: BorderRadius.circular(24),
 
-            border: Border.all(color: Colors.white.withOpacity(0.85)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.85)),
 
             boxShadow: [
               BoxShadow(
-                color: primary.withOpacity(0.08),
+                color: primary.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
