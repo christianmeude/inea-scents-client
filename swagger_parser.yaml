@@ -1,0 +1,8 @@
+swagger_parser:
+  schema_path: api-docs.json
+  output_directory: lib/api
+  language: dart
+  client_postfix: ApiClient
+  path_method_name: true
+  squash_clients: true
+  json_serializer: freezed

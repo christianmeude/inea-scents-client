@@ -1,5 +1,7 @@
-export 'auth_response.dart';
-export 'booking.dart';
-export 'package.dart';
-export 'scent.dart';
-export 'availability.dart';
+// Note: Manual models have been replaced by OpenAPI generated models.
+export '../api/export.dart';
+
+import '../api/export.dart';
+
+typedef Booking = Data;
+typedef Availability = GetApiAvailabilityResponse;

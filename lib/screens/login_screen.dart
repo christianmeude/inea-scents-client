@@ -112,8 +112,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurCircle(
                 size: 400,
                 color: isDarkMode
-                    ? const Color(0xFF71485D).withOpacity(0.45)
-                    : const Color(0xFFEBC9B8).withOpacity(0.75),
+                    ? const Color(0xFF71485D).withValues(alpha: 0.45)
+                    : const Color(0xFFEBC9B8).withValues(alpha: 0.75),
               ),
             ),
 
@@ -123,8 +123,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurCircle(
                 size: 380,
                 color: isDarkMode
-                    ? const Color(0xFF87556C).withOpacity(0.35)
-                    : const Color(0xFFD3A4AF).withOpacity(0.75),
+                    ? const Color(0xFF87556C).withValues(alpha: 0.35)
+                    : const Color(0xFFD3A4AF).withValues(alpha: 0.75),
               ),
             ),
 
@@ -134,8 +134,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurCircle(
                 size: 430,
                 color: isDarkMode
-                    ? const Color(0xFF4A3541).withOpacity(0.60)
-                    : const Color(0xFF9C8491).withOpacity(0.70),
+                    ? const Color(0xFF4A3541).withValues(alpha: 0.60)
+                    : const Color(0xFF9C8491).withValues(alpha: 0.70),
               ),
             ),
 
@@ -145,8 +145,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurCircle(
                 size: 420,
                 color: isDarkMode
-                    ? const Color(0xFF6D3D55).withOpacity(0.45)
-                    : const Color(0xFF69384F).withOpacity(0.70),
+                    ? const Color(0xFF6D3D55).withValues(alpha: 0.45)
+                    : const Color(0xFF69384F).withValues(alpha: 0.70),
               ),
             ),
 
@@ -291,7 +291,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               backgroundColor: primaryColor,
                               foregroundColor: Colors.white,
                               elevation: 4,
-                              shadowColor: primaryColor.withOpacity(0.35),
+                              shadowColor: primaryColor.withValues(alpha: 0.35),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(28),
                               ),
@@ -493,12 +493,12 @@ class _CustomTextField extends StatelessWidget {
 
           suffixIcon: suffixIcon,
 
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.75)),
+          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.75)),
 
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide(
-              color: Colors.white.withOpacity(isDarkMode ? 0.35 : 0.75),
+              color: Colors.white.withValues(alpha: isDarkMode ? 0.35 : 0.75),
               width: 1.1,
             ),
           ),

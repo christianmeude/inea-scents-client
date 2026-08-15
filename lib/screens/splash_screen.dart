@@ -101,7 +101,7 @@ class _SplashScreenState extends State<SplashScreen>
                 left: -140,
                 child: _BlurCircle(
                   size: 420,
-                  color: Colors.white.withOpacity(0.30),
+                  color: Colors.white.withValues(alpha: 0.30),
                 ),
               ),
 
@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                 right: -170,
                 child: _BlurCircle(
                   size: 400,
-                  color: const Color(0xFFECCBD4).withOpacity(0.45),
+                  color: const Color(0xFFECCBD4).withValues(alpha: 0.45),
                 ),
               ),
 
@@ -125,7 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
                 left: MediaQuery.of(context).size.width * 0.12,
                 child: _BlurCircle(
                   size: 430,
-                  color: Colors.white.withOpacity(_glowAnimation.value),
+                  color: Colors.white.withValues(alpha: _glowAnimation.value),
                 ),
               ),
 
@@ -137,7 +137,7 @@ class _SplashScreenState extends State<SplashScreen>
                 left: -150,
                 child: _BlurCircle(
                   size: 450,
-                  color: const Color(0xFFB78C9C).withOpacity(0.50),
+                  color: const Color(0xFFB78C9C).withValues(alpha: 0.50),
                 ),
               ),
 
@@ -149,7 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                 right: -130,
                 child: _BlurCircle(
                   size: 440,
-                  color: const Color(0xFF5E344A).withOpacity(0.40),
+                  color: const Color(0xFF5E344A).withValues(alpha: 0.40),
                 ),
               ),
 
@@ -160,7 +160,7 @@ class _SplashScreenState extends State<SplashScreen>
                 child: IgnorePointer(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-                    child: Container(color: Colors.white.withOpacity(0.015)),
+                    child: Container(color: Colors.white.withValues(alpha: 0.015)),
                   ),
                 ),
               ),
@@ -185,7 +185,7 @@ class _SplashScreenState extends State<SplashScreen>
                             Container(
                               width: 42,
                               height: 1,
-                              color: Colors.white.withOpacity(0.55),
+                              color: Colors.white.withValues(alpha: 0.55),
                             ),
 
                             const SizedBox(width: 12),
@@ -194,7 +194,7 @@ class _SplashScreenState extends State<SplashScreen>
                               width: 5,
                               height: 5,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.75),
+                                color: Colors.white.withValues(alpha: 0.75),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -204,7 +204,7 @@ class _SplashScreenState extends State<SplashScreen>
                             Container(
                               width: 42,
                               height: 1,
-                              color: Colors.white.withOpacity(0.55),
+                              color: Colors.white.withValues(alpha: 0.55),
                             ),
                           ],
                         ),
@@ -228,7 +228,7 @@ class _SplashScreenState extends State<SplashScreen>
                               Shadow(
                                 color: const Color(
                                   0xFF4C283A,
-                                ).withOpacity(0.25),
+                                ).withValues(alpha: 0.25),
                                 blurRadius: 12,
                                 offset: const Offset(0, 5),
                               ),
@@ -251,12 +251,12 @@ class _SplashScreenState extends State<SplashScreen>
                               fontWeight: FontWeight.w300,
                               letterSpacing: 1.5,
                               height: 1,
-                              color: Colors.white.withOpacity(0.96),
+                              color: Colors.white.withValues(alpha: 0.96),
                               shadows: [
                                 Shadow(
                                   color: const Color(
                                     0xFF4C283A,
-                                  ).withOpacity(0.25),
+                                  ).withValues(alpha: 0.25),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -273,7 +273,7 @@ class _SplashScreenState extends State<SplashScreen>
                         Container(
                           width: 125,
                           height: 1,
-                          color: Colors.white.withOpacity(0.55),
+                          color: Colors.white.withValues(alpha: 0.55),
                         ),
 
                         const SizedBox(height: 15),
@@ -287,7 +287,7 @@ class _SplashScreenState extends State<SplashScreen>
                             fontSize: 9,
                             fontWeight: FontWeight.w500,
                             letterSpacing: 2.4,
-                            color: Colors.white.withOpacity(0.82),
+                            color: Colors.white.withValues(alpha: 0.82),
                           ),
                         ),
                       ],
@@ -313,7 +313,7 @@ class _SplashScreenState extends State<SplashScreen>
                           fontSize: 8,
                           letterSpacing: 2,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.55),
+                          color: Colors.white.withValues(alpha: 0.55),
                         ),
                       ),
 
@@ -324,7 +324,7 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 4,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.45),
+                          color: Colors.white.withValues(alpha: 0.45),
                         ),
                       ),
                     ],

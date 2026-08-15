@@ -35,14 +35,14 @@ class PackageCard extends StatelessWidget {
               child: Container(
                 height: 150,
                 color: Colors.grey[200],
-                child: package.images.isNotEmpty
+                child: (package.images != null && package.images!.isNotEmpty)
                     ? Image.network(
-                        package.images[0],
+                        package.images![0],
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Center(
                             child: Text(
-                              package.name,
+                              package.name ?? '',
                               textAlign: TextAlign.center,
                               style: const TextStyle(fontSize: 12),
                             ),
@@ -51,7 +51,7 @@ class PackageCard extends StatelessWidget {
                       )
                     : Center(
                         child: Text(
-                          package.name,
+                          package.name ?? '',
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontSize: 12),
                         ),
@@ -65,7 +65,7 @@ class PackageCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    package.name,
+                    package.name ?? '',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -79,14 +79,14 @@ class PackageCard extends StatelessWidget {
                       const Icon(Icons.star, size: 14, color: Colors.amber),
                       const SizedBox(width: 4),
                       Text(
-                        '${package.rating} (${package.reviews_count} reviews)',
+                        '${package.rating ?? 0} (${package.reviewsCount ?? 0} reviews)',
                         style: TextStyle(fontSize: 11, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Php. ${package.price.toStringAsFixed(2)}',
+                    'Php. ${(package.price ?? 0).toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

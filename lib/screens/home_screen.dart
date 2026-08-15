@@ -57,7 +57,7 @@ class HomeScreen extends ConsumerWidget {
             left: -120,
             child: _SoftCircle(
               size: 390,
-              color: const Color(0xFFEBC9B8).withOpacity(0.72),
+              color: const Color(0xFFEBC9B8).withValues(alpha: 0.72),
             ),
           ),
 
@@ -69,7 +69,7 @@ class HomeScreen extends ConsumerWidget {
             right: -145,
             child: _SoftCircle(
               size: 370,
-              color: const Color(0xFFD3A4AF).withOpacity(0.68),
+              color: const Color(0xFFD3A4AF).withValues(alpha: 0.68),
             ),
           ),
 
@@ -81,7 +81,7 @@ class HomeScreen extends ConsumerWidget {
             left: 80,
             child: _SoftCircle(
               size: 390,
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
             ),
           ),
 
@@ -93,7 +93,7 @@ class HomeScreen extends ConsumerWidget {
             left: -130,
             child: _SoftCircle(
               size: 430,
-              color: const Color(0xFF9C8491).withOpacity(0.42),
+              color: const Color(0xFF9C8491).withValues(alpha: 0.42),
             ),
           ),
 
@@ -105,7 +105,7 @@ class HomeScreen extends ConsumerWidget {
             right: -120,
             child: _SoftCircle(
               size: 430,
-              color: const Color(0xFF69384F).withOpacity(0.28),
+              color: const Color(0xFF69384F).withValues(alpha: 0.28),
             ),
           ),
 
@@ -276,7 +276,7 @@ class HomeScreen extends ConsumerWidget {
                                   vertical: 8,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.60),
+                                  color: Colors.white.withValues(alpha: 0.60),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(color: borderColor),
                                 ),
@@ -396,7 +396,7 @@ class _BrandName extends StatelessWidget {
             child: Text(
               'Scents',
               style: TextStyle(
-                color: HomeScreen.primaryColor.withOpacity(0.82),
+                color: HomeScreen.primaryColor.withValues(alpha: 0.82),
                 fontSize: 19,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w300,
@@ -433,12 +433,12 @@ class _HeaderIconButton extends StatelessWidget {
           width: 47,
           height: 47,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.62),
+            color: Colors.white.withValues(alpha: 0.62),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: HomeScreen.borderColor, width: 1),
             boxShadow: [
               BoxShadow(
-                color: HomeScreen.primaryColor.withOpacity(0.07),
+                color: HomeScreen.primaryColor.withValues(alpha: 0.07),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -463,12 +463,12 @@ class _SearchBar extends StatelessWidget {
     return Container(
       height: 55,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.72),
+        color: Colors.white.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(29),
         border: Border.all(color: HomeScreen.borderColor, width: 1),
         boxShadow: [
           BoxShadow(
-            color: HomeScreen.primaryColor.withOpacity(0.08),
+            color: HomeScreen.primaryColor.withValues(alpha: 0.08),
             blurRadius: 17,
             offset: const Offset(0, 6),
           ),
@@ -480,7 +480,7 @@ class _SearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: 'Search "Perfume" here',
           hintStyle: TextStyle(
-            color: HomeScreen.secondaryTextColor.withOpacity(0.65),
+            color: HomeScreen.secondaryTextColor.withValues(alpha: 0.65),
             fontSize: 13,
           ),
           prefixIcon: const Icon(
@@ -497,7 +497,7 @@ class _SearchBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: HomeScreen.primaryColor.withOpacity(0.20),
+                  color: HomeScreen.primaryColor.withValues(alpha: 0.20),
                   blurRadius: 7,
                   offset: const Offset(0, 3),
                 ),
@@ -545,12 +545,12 @@ class _QuickActionCard extends StatelessWidget {
         child: Container(
           height: 60,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.58),
+            color: Colors.white.withValues(alpha: 0.58),
             borderRadius: BorderRadius.circular(17),
             border: Border.all(color: HomeScreen.borderColor),
             boxShadow: [
               BoxShadow(
-                color: HomeScreen.primaryColor.withOpacity(0.05),
+                color: HomeScreen.primaryColor.withValues(alpha: 0.05),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -563,7 +563,7 @@ class _QuickActionCard extends StatelessWidget {
                 width: 35,
                 height: 35,
                 decoration: BoxDecoration(
-                  color: HomeScreen.primaryColor.withOpacity(0.10),
+                  color: HomeScreen.primaryColor.withValues(alpha: 0.10),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: HomeScreen.primaryColor, size: 18),
@@ -603,7 +603,7 @@ class _FeaturedBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(23),
         boxShadow: [
           BoxShadow(
-            color: HomeScreen.primaryColor.withOpacity(0.18),
+            color: HomeScreen.primaryColor.withValues(alpha: 0.18),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -627,8 +627,8 @@ class _FeaturedBanner extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF5D3B46).withOpacity(0.28),
-                    const Color(0xFF3B1F2B).withOpacity(0.82),
+                    const Color(0xFF5D3B46).withValues(alpha: 0.28),
+                    const Color(0xFF3B1F2B).withValues(alpha: 0.82),
                   ],
                 ),
               ),
@@ -646,7 +646,7 @@ class _FeaturedBanner extends StatelessWidget {
               height: 170,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -774,9 +774,9 @@ class _FeatureTag extends StatelessWidget {
       child: Container(
         height: 34,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.14),
+          color: Colors.white.withValues(alpha: 0.14),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withOpacity(0.20)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.20)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -813,7 +813,7 @@ class _EmptyPackages extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 45, horizontal: 20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.55),
+        color: Colors.white.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: HomeScreen.borderColor),
       ),
@@ -822,7 +822,7 @@ class _EmptyPackages extends StatelessWidget {
           Icon(
             Icons.local_florist_outlined,
             size: 40,
-            color: HomeScreen.primaryLight.withOpacity(0.65),
+            color: HomeScreen.primaryLight.withValues(alpha: 0.65),
           ),
 
           const SizedBox(height: 12),
@@ -866,7 +866,7 @@ class _ErrorPackages extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.55),
+        color: Colors.white.withValues(alpha: 0.55),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: HomeScreen.borderColor),
       ),
