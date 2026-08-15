@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
 import '../widgets/index.dart';
 
@@ -75,7 +75,7 @@ class MyBookingsScreen extends ConsumerWidget {
                 left: -120,
                 child: _SoftCircle(
                   size: 300,
-                  color: const Color(0xFFEBC9B8).withOpacity(0.50),
+                  color: const Color(0xFFEBC9B8).withValues(alpha: 0.50),
                 ),
               ),
 
@@ -84,7 +84,7 @@ class MyBookingsScreen extends ConsumerWidget {
                 right: -150,
                 child: _SoftCircle(
                   size: 330,
-                  color: const Color(0xFFD3A4AF).withOpacity(0.30),
+                  color: const Color(0xFFD3A4AF).withValues(alpha: 0.30),
                 ),
               ),
 
@@ -93,7 +93,7 @@ class MyBookingsScreen extends ConsumerWidget {
                 left: -120,
                 child: _SoftCircle(
                   size: 360,
-                  color: const Color(0xFFB78C9C).withOpacity(0.22),
+                  color: const Color(0xFFB78C9C).withValues(alpha: 0.22),
                 ),
               ),
 
@@ -208,7 +208,7 @@ class _BrandName extends StatelessWidget {
               color: brandColor,
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -234,7 +234,7 @@ class _BrandName extends StatelessWidget {
               color: brandColor,
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -265,14 +265,14 @@ class _BookingCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 18),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.94),
+        color: Colors.white.withValues(alpha: 0.94),
         borderRadius: BorderRadius.circular(22),
 
-        border: Border.all(color: Colors.white.withOpacity(0.85), width: 1),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.85), width: 1),
 
         boxShadow: [
           BoxShadow(
-            color: MyBookingsScreen.primaryColor.withOpacity(0.10),
+            color: MyBookingsScreen.primaryColor.withValues(alpha: 0.10),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -427,7 +427,7 @@ class _BookingCard extends StatelessWidget {
                 color: MyBookingsScreen.backgroundTop,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: MyBookingsScreen.borderColor.withOpacity(0.65),
+                  color: MyBookingsScreen.borderColor.withValues(alpha: 0.65),
                 ),
               ),
 
@@ -545,9 +545,9 @@ class _StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
 
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.22), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.22), width: 1),
       ),
 
       child: Row(
@@ -598,12 +598,12 @@ class _EmptyBookings extends StatelessWidget {
               height: 90,
 
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.75),
+                color: Colors.white.withValues(alpha: 0.75),
                 shape: BoxShape.circle,
 
                 boxShadow: [
                   BoxShadow(
-                    color: MyBookingsScreen.primaryColor.withOpacity(0.08),
+                    color: MyBookingsScreen.primaryColor.withValues(alpha: 0.08),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -638,6 +638,30 @@ class _EmptyBookings extends StatelessWidget {
                 fontSize: 13,
                 height: 1.5,
                 color: MyBookingsScreen.secondaryTextColor,
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            ElevatedButton(
+              onPressed: () {
+                context.go('/');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MyBookingsScreen.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Explore Packages',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

@@ -26,7 +26,7 @@ class ProfileScreen extends ConsumerWidget {
     const primaryColor = Color(0xFF74445C);
     const textColor = Color(0xFF633E50);
     const secondaryTextColor = Color(0xFF765867);
-    const inputColor = Color(0xFF95647E);
+
 
     final userName = authState.user?.name ?? 'User';
     final userEmail = authState.user?.email ?? '';
@@ -57,10 +57,10 @@ class ProfileScreen extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.35),
+                color: Colors.white.withValues(alpha: 0.35),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.55),
+                  color: Colors.white.withValues(alpha: 0.55),
                   width: 1,
                 ),
               ),
@@ -104,7 +104,7 @@ class ProfileScreen extends ConsumerWidget {
             left: -120,
             child: _BlurCircle(
               size: 390,
-              color: const Color(0xFFEBC9B8).withOpacity(0.75),
+              color: const Color(0xFFEBC9B8).withValues(alpha: 0.75),
             ),
           ),
 
@@ -116,7 +116,7 @@ class ProfileScreen extends ConsumerWidget {
             right: -150,
             child: _BlurCircle(
               size: 370,
-              color: const Color(0xFFD3A4AF).withOpacity(0.72),
+              color: const Color(0xFFD3A4AF).withValues(alpha: 0.72),
             ),
           ),
 
@@ -128,7 +128,7 @@ class ProfileScreen extends ConsumerWidget {
             left: -130,
             child: _BlurCircle(
               size: 430,
-              color: const Color(0xFF9C8491).withOpacity(0.65),
+              color: const Color(0xFF9C8491).withValues(alpha: 0.65),
             ),
           ),
 
@@ -140,7 +140,7 @@ class ProfileScreen extends ConsumerWidget {
             right: -120,
             child: _BlurCircle(
               size: 420,
-              color: const Color(0xFF69384F).withOpacity(0.55),
+              color: const Color(0xFF69384F).withValues(alpha: 0.55),
             ),
           ),
 
@@ -152,7 +152,7 @@ class ProfileScreen extends ConsumerWidget {
             left: MediaQuery.of(context).size.width * 0.18,
             child: _BlurCircle(
               size: 420,
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
             ),
           ),
 
@@ -198,17 +198,17 @@ class ProfileScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(20),
 
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.34),
+                      color: Colors.white.withValues(alpha: 0.34),
                       borderRadius: BorderRadius.circular(24),
 
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.60),
+                        color: Colors.white.withValues(alpha: 0.60),
                         width: 1,
                       ),
 
                       boxShadow: [
                         BoxShadow(
-                          color: primaryColor.withOpacity(0.10),
+                          color: primaryColor.withValues(alpha: 0.10),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -235,7 +235,7 @@ class ProfileScreen extends ConsumerWidget {
 
                             boxShadow: [
                               BoxShadow(
-                                color: primaryColor.withOpacity(0.25),
+                                color: primaryColor.withValues(alpha: 0.25),
                                 blurRadius: 12,
                                 offset: const Offset(0, 5),
                               ),
@@ -301,7 +301,7 @@ class ProfileScreen extends ConsumerWidget {
                                 ),
 
                                 decoration: BoxDecoration(
-                                  color: primaryColor.withOpacity(0.10),
+                                  color: primaryColor.withValues(alpha: 0.10),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
 
@@ -328,10 +328,10 @@ class ProfileScreen extends ConsumerWidget {
                           height: 38,
 
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.40),
+                            color: Colors.white.withValues(alpha: 0.40),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.55),
+                              color: Colors.white.withValues(alpha: 0.55),
                             ),
                           ),
 
@@ -430,14 +430,14 @@ class ProfileScreen extends ConsumerWidget {
                     width: double.infinity,
 
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.34),
+                      color: Colors.white.withValues(alpha: 0.34),
                       borderRadius: BorderRadius.circular(24),
 
-                      border: Border.all(color: Colors.white.withOpacity(0.60)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.60)),
 
                       boxShadow: [
                         BoxShadow(
-                          color: primaryColor.withOpacity(0.08),
+                          color: primaryColor.withValues(alpha: 0.08),
                           blurRadius: 18,
                           offset: const Offset(0, 7),
                         ),
@@ -570,7 +570,7 @@ class _BrandName extends StatelessWidget {
 
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -595,7 +595,7 @@ class _BrandName extends StatelessWidget {
 
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -636,10 +636,10 @@ class _SectionHeader extends StatelessWidget {
           height: 42,
 
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.38),
+            color: Colors.white.withValues(alpha: 0.38),
             shape: BoxShape.circle,
 
-            border: Border.all(color: Colors.white.withOpacity(0.60)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.60)),
           ),
 
           child: Icon(icon, color: primaryColor, size: 20),
@@ -730,8 +730,8 @@ class _ProfileSettingTile extends StatelessWidget {
 
                 decoration: BoxDecoration(
                   color: isDestructive
-                      ? const Color(0xFF9A4F5D).withOpacity(0.10)
-                      : primaryColor.withOpacity(0.10),
+                      ? const Color(0xFF9A4F5D).withValues(alpha: 0.10)
+                      : primaryColor.withValues(alpha: 0.10),
 
                   borderRadius: BorderRadius.circular(13),
                 ),
@@ -807,7 +807,7 @@ class _SettingDivider extends StatelessWidget {
       child: Divider(
         height: 1,
         thickness: 0.7,
-        color: Colors.white.withOpacity(0.55),
+        color: Colors.white.withValues(alpha: 0.55),
       ),
     );
   }
@@ -832,10 +832,10 @@ class _EmptyWishlist extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 38),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.30),
+        color: Colors.white.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(24),
 
-        border: Border.all(color: Colors.white.withOpacity(0.55)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.55)),
       ),
 
       child: Column(
@@ -845,7 +845,7 @@ class _EmptyWishlist extends StatelessWidget {
             height: 58,
 
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.10),
+              color: primaryColor.withValues(alpha: 0.10),
               shape: BoxShape.circle,
             ),
 
@@ -878,6 +878,34 @@ class _EmptyWishlist extends StatelessWidget {
               height: 1.4,
             ),
           ),
+
+          const SizedBox(height: 24),
+
+          ElevatedButton(
+            onPressed: () {
+              // Usually the BottomNavBar is used, but if we need a direct action:
+              // context.go('/packages');
+              // The routing in this app for the packages tab is likely the initial route or /packages.
+              // Assuming go_router is available, let's just go to the home/packages tab.
+              context.go('/');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
+              elevation: 0,
+            ),
+            child: const Text(
+              'Explore Packages',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -904,10 +932,10 @@ class _WishlistError extends StatelessWidget {
       padding: const EdgeInsets.all(24),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.30),
+        color: Colors.white.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(22),
 
-        border: Border.all(color: Colors.white.withOpacity(0.55)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.55)),
       ),
 
       child: Column(

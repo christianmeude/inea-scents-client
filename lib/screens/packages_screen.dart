@@ -2,16 +2,77 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/index.dart';
 import '../widgets/index.dart';
+import '../models/index.dart';
 
-class PackagesScreen extends ConsumerWidget {
+final packagesSearchQueryProvider = StateProvider<String>((ref) => '');
+final packagesSortProvider = StateProvider<String>((ref) => 'none');
+final packagesCategoryProvider = StateProvider<String>((ref) => 'All');
+
+final filteredPackagesProvider = Provider<AsyncValue<List<Package>>>((ref) {
+  final asyncPackages = ref.watch(packagesProvider);
+  final query = ref.watch(packagesSearchQueryProvider).toLowerCase();
+  final sort = ref.watch(packagesSortProvider);
+  final category = ref.watch(packagesCategoryProvider);
+
+  return asyncPackages.whenData((packages) {
+    var filtered = packages.where((p) {
+      final nameMatches = p.name?.toLowerCase().contains(query) ?? false;
+      final categoryMatches = category == 'All' || 
+          (p.name?.toLowerCase().contains(category.toLowerCase()) ?? false) || 
+          (p.description?.toLowerCase().contains(category.toLowerCase()) ?? false);
+      return nameMatches && categoryMatches;
+    }).toList();
+
+    if (sort == 'price_asc') {
+      filtered.sort((a, b) => (a.price ?? 0).compareTo(b.price ?? 0));
+    } else if (sort == 'price_desc') {
+      filtered.sort((a, b) => (b.price ?? 0).compareTo(a.price ?? 0));
+    } else if (sort == 'rating_desc') {
+      filtered.sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
+    }
+
+    return filtered;
+  });
+});
+
+class PackagesScreen extends ConsumerStatefulWidget {
   const PackagesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final packagesAsync = ref.watch(packagesProvider);
+  ConsumerState<PackagesScreen> createState() => _PackagesScreenState();
+}
+
+class _PackagesScreenState extends ConsumerState<PackagesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFirstLaunch();
+    });
+  }
+
+  Future<void> _checkFirstLaunch() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isFirstLaunch = prefs.getBool('first_launch') ?? true;
+
+    if (isFirstLaunch) {
+      await prefs.setBool('first_launch', false);
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const WelcomeModal(),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final packagesAsync = ref.watch(filteredPackagesProvider);
 
     // ============================================================
     // COLORS
@@ -49,10 +110,10 @@ class PackagesScreen extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.35),
+                color: Colors.white.withValues(alpha: 0.35),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.55),
+                  color: Colors.white.withValues(alpha: 0.55),
                   width: 1,
                 ),
               ),
@@ -98,7 +159,7 @@ class PackagesScreen extends ConsumerWidget {
             left: -120,
             child: _BlurCircle(
               size: 390,
-              color: const Color(0xFFEBC9B8).withOpacity(0.75),
+              color: const Color(0xFFEBC9B8).withValues(alpha: 0.75),
             ),
           ),
 
@@ -110,7 +171,7 @@ class PackagesScreen extends ConsumerWidget {
             right: -150,
             child: _BlurCircle(
               size: 370,
-              color: const Color(0xFFD3A4AF).withOpacity(0.72),
+              color: const Color(0xFFD3A4AF).withValues(alpha: 0.72),
             ),
           ),
 
@@ -122,7 +183,7 @@ class PackagesScreen extends ConsumerWidget {
             left: -130,
             child: _BlurCircle(
               size: 430,
-              color: const Color(0xFF9C8491).withOpacity(0.65),
+              color: const Color(0xFF9C8491).withValues(alpha: 0.65),
             ),
           ),
 
@@ -134,7 +195,7 @@ class PackagesScreen extends ConsumerWidget {
             right: -120,
             child: _BlurCircle(
               size: 420,
-              color: const Color(0xFF69384F).withOpacity(0.55),
+              color: const Color(0xFF69384F).withValues(alpha: 0.55),
             ),
           ),
 
@@ -146,7 +207,7 @@ class PackagesScreen extends ConsumerWidget {
             left: MediaQuery.of(context).size.width * 0.20,
             child: _BlurCircle(
               size: 420,
-              color: Colors.white.withOpacity(0.25),
+              color: Colors.white.withValues(alpha: 0.25),
             ),
           ),
 
@@ -197,12 +258,12 @@ class PackagesScreen extends ConsumerWidget {
                       color: inputColor,
                       borderRadius: BorderRadius.circular(30),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.80),
+                        color: Colors.white.withValues(alpha: 0.80),
                         width: 1.1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: primaryColor.withOpacity(0.12),
+                          color: primaryColor.withValues(alpha: 0.12),
                           blurRadius: 14,
                           offset: const Offset(0, 6),
                         ),
@@ -213,11 +274,12 @@ class PackagesScreen extends ConsumerWidget {
                       style: const TextStyle(color: Colors.white, fontSize: 14),
 
                       cursorColor: Colors.white,
+                      onChanged: (val) => ref.read(packagesSearchQueryProvider.notifier).state = val,
 
                       decoration: InputDecoration(
                         hintText: 'Search "Perfume" here',
                         hintStyle: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withValues(alpha: 0.75),
                           fontSize: 14,
                         ),
 
@@ -238,6 +300,57 @@ class PackagesScreen extends ConsumerWidget {
                   ),
 
                   const SizedBox(height: 26),
+
+                  // ==================================================
+                  // CATEGORY CHIPS
+                  // ==================================================
+                  SizedBox(
+                    height: 40,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: ['All', 'Wedding', 'Birthday', 'Corporate'].map((cat) {
+                        final isSelected = ref.watch(packagesCategoryProvider) == cat;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: FilterChip(
+                            label: Text(cat),
+                            selected: isSelected,
+                            onSelected: (val) {
+                              ref.read(packagesCategoryProvider.notifier).state = cat;
+                            },
+                            backgroundColor: Colors.white.withValues(alpha: 0.3),
+                            selectedColor: primaryColor,
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.white : textColor,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                            side: BorderSide(
+                              color: isSelected ? primaryColor : Colors.white.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ==================================================
+                  // SORT CHIPS
+                  // ==================================================
+                  SizedBox(
+                    height: 40,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: const [
+                        _SortChip(label: 'Price: Low to High', value: 'price_asc'),
+                        _SortChip(label: 'Price: High to Low', value: 'price_desc'),
+                        _SortChip(label: 'Top Rated', value: 'rating_desc'),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
 
                   // ==================================================
                   // SECTION HEADER
@@ -264,7 +377,7 @@ class PackagesScreen extends ConsumerWidget {
                           ),
                         ),
                         loading: () => const SizedBox.shrink(),
-                        error: (_, __) => const SizedBox.shrink(),
+                        error: (_, _) => const SizedBox.shrink(),
                       ),
                     ],
                   ),
@@ -309,14 +422,20 @@ class PackagesScreen extends ConsumerWidget {
                     // LOADING
                     // ==================================================
                     loading: () {
-                      return const SizedBox(
-                        height: 300,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: primaryColor,
-                          ),
+                      return GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.72,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 16,
                         ),
+                        itemCount: 4,
+                        itemBuilder: (context, index) {
+                          return const SkeletonPackageCard();
+                        },
                       );
                     },
 
@@ -379,7 +498,7 @@ class _BrandName extends StatelessWidget {
 
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -407,7 +526,7 @@ class _BrandName extends StatelessWidget {
 
               shadows: [
                 Shadow(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -437,9 +556,9 @@ class _EmptyPackages extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 55, horizontal: 25),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.28),
+        color: Colors.white.withValues(alpha: 0.28),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.50)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.50)),
       ),
 
       child: const Column(
@@ -491,9 +610,9 @@ class _ErrorState extends StatelessWidget {
       padding: const EdgeInsets.all(24),
 
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.30),
+        color: Colors.white.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.55)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.55)),
       ),
 
       child: Column(
@@ -565,6 +684,43 @@ class _BlurCircle extends StatelessWidget {
         height: size,
 
         decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// SORT CHIP
+// ============================================================================
+
+class _SortChip extends ConsumerWidget {
+  final String label;
+  final String value;
+
+  const _SortChip({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentSort = ref.watch(packagesSortProvider);
+    final isSelected = currentSort == value;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: FilterChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: (_) {
+          ref.read(packagesSortProvider.notifier).state = isSelected ? 'none' : value;
+        },
+        backgroundColor: Colors.white.withValues(alpha: 0.3),
+        selectedColor: const Color(0xFF95647E),
+        labelStyle: TextStyle(
+          color: isSelected ? Colors.white : const Color(0xFF633E50),
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+        side: BorderSide(
+          color: isSelected ? const Color(0xFF95647E) : Colors.white.withValues(alpha: 0.5),
+        ),
       ),
     );
   }
