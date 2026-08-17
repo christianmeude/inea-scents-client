@@ -3,5 +3,4 @@ export '../api/export.dart';
 
 import '../api/export.dart';
 
-typedef Booking = Data;
 typedef Availability = GetApiAvailabilityResponse;

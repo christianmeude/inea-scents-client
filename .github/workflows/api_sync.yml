@@ -27,6 +27,9 @@ jobs:
       - name: Run Swagger Parser
         run: dart run swagger_parser
         
+      - name: Fix Freezed 3 Code Generation
+        run: find lib/api/models -name "*.dart" -type f -exec sed -i 's/^class \([A-Za-z0-9_]*\) with/abstract class \1 with/g' {} +
+        
       - name: Run Build Runner
         run: dart run build_runner build -d
         

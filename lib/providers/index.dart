@@ -205,7 +205,7 @@ final availabilityProvider = AsyncNotifierProvider<AvailabilityNotifier, Availab
 );
 
 // Bookings provider
-final bookingsProvider = FutureProvider<List<Data>>((ref) async {
+final bookingsProvider = FutureProvider<List<Booking>>((ref) async {
   final apiClient = ref.watch(apiClientProvider);
   final response = await apiClient.bookings.getApiBookings();
   return response.data ?? [];
@@ -352,13 +352,13 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
         body: ApiBookingsRequestBody(
           packageId: state.selectedPackage!.id!,
           customerName: state.customerName!,
-          customerEmail: state.customerEmail,
+          customerEmail: state.customerEmail ?? '',
           customerPhone: state.customerPhone,
-          pax: state.selectedPax,
+          pax: state.selectedPax ?? 0,
           eventDate: state.selectedDate!,
           eventTime: null,
           venueAddress: state.venueAddress!,
-          paymentMethod: state.paymentMethod!,
+          paymentMethod: PaymentMethod.fromJson(state.paymentMethod!),
           scentIds: state.selectedScentIds.isNotEmpty
               ? state.selectedScentIds
               : null,
