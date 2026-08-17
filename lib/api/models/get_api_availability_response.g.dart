@@ -6,15 +6,15 @@ part of 'get_api_availability_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GetApiAvailabilityResponseImpl _$$GetApiAvailabilityResponseImplFromJson(
+_GetApiAvailabilityResponse _$GetApiAvailabilityResponseFromJson(
   Map<String, dynamic> json,
-) => _$GetApiAvailabilityResponseImpl(
+) => _GetApiAvailabilityResponse(
   date: json['date'] == null ? null : DateTime.parse(json['date'] as String),
   status: json['status'] as String?,
 );
 
-Map<String, dynamic> _$$GetApiAvailabilityResponseImplToJson(
-  _$GetApiAvailabilityResponseImpl instance,
+Map<String, dynamic> _$GetApiAvailabilityResponseToJson(
+  _GetApiAvailabilityResponse instance,
 ) => <String, dynamic>{
   'date': instance.date?.toIso8601String(),
   'status': instance.status,
