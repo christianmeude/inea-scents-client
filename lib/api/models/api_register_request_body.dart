@@ -8,7 +8,7 @@ part 'api_register_request_body.freezed.dart';
 part 'api_register_request_body.g.dart';
 
 @Freezed()
-class ApiRegisterRequestBody with _$ApiRegisterRequestBody {
+abstract class ApiRegisterRequestBody with _$ApiRegisterRequestBody {
   const factory ApiRegisterRequestBody({
     required String name,
     required String email,

@@ -10,14 +10,14 @@ export 'packages/packages_api_client.dart';
 export 'wishlist/wishlist_api_client.dart';
 // Data classes
 export 'models/auth_response.dart';
+export 'models/booking.dart';
 export 'models/package.dart';
 export 'models/scent.dart';
 export 'models/api_register_request_body.dart';
 export 'models/api_login_request_body.dart';
 export 'models/get_api_availability_response.dart';
-export 'models/data.dart';
+export 'models/get_api_ping_response.dart';
 export 'models/get_api_bookings_response.dart';
-export 'models/data2.dart';
 export 'models/post_api_bookings_response.dart';
 export 'models/api_bookings_request_body.dart';
 export 'models/get_api_packages_response.dart';
@@ -26,6 +26,7 @@ export 'models/get_api_wishlist_response.dart';
 export 'models/post_api_wishlist_toggle_response.dart';
 export 'models/api_wishlist_toggle_request_body.dart';
 export 'models/user.dart';
+export 'models/payment_method.dart';
 // Root client
 export 'rest_client.dart';
 

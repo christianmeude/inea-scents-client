@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../models/get_api_availability_response.dart';
+import '../models/get_api_ping_response.dart';
 
 part 'availability_api_client.g.dart';
 
@@ -25,4 +26,10 @@ abstract class AvailabilityApiClient {
     @Query('month') int? month,
     @Query('year') int? year,
   });
+
+  /// Ping the API.
+  ///
+  /// Returns a simple pong response for health checking.
+  @GET('/api/ping')
+  Future<GetApiPingResponse> getApiPing();
 }

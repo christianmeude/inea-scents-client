@@ -4,27 +4,29 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'payment_method.dart';
+
 part 'api_bookings_request_body.freezed.dart';
 part 'api_bookings_request_body.g.dart';
 
 @Freezed()
-class ApiBookingsRequestBody with _$ApiBookingsRequestBody {
+abstract class ApiBookingsRequestBody with _$ApiBookingsRequestBody {
   const factory ApiBookingsRequestBody({
     @JsonKey(name: 'package_id')
     required int packageId,
     @JsonKey(name: 'customer_name')
     required String customerName,
+    @JsonKey(name: 'customer_email')
+    required String customerEmail,
+    required int pax,
     @JsonKey(name: 'event_date')
     required DateTime eventDate,
     @JsonKey(name: 'venue_address')
     required String venueAddress,
     @JsonKey(name: 'payment_method')
-    required String paymentMethod,
-    @JsonKey(name: 'customer_email')
-    String? customerEmail,
+    required PaymentMethod paymentMethod,
     @JsonKey(name: 'customer_phone')
     String? customerPhone,
-    int? pax,
     @JsonKey(name: 'event_time')
     String? eventTime,
     @JsonKey(name: 'scent_ids')
