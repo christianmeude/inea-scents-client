@@ -1,7 +1,9 @@
 name: Sync API Client
 
 on:
-  pull_request:
+  push:
+    branches:
+      - 'api-sync-*'
     paths:
       - 'api-docs.json'
 
