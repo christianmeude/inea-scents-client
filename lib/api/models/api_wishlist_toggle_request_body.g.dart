@@ -6,12 +6,12 @@ part of 'api_wishlist_toggle_request_body.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ApiWishlistToggleRequestBodyImpl _$$ApiWishlistToggleRequestBodyImplFromJson(
+_ApiWishlistToggleRequestBody _$ApiWishlistToggleRequestBodyFromJson(
   Map<String, dynamic> json,
-) => _$ApiWishlistToggleRequestBodyImpl(
+) => _ApiWishlistToggleRequestBody(
   packageId: (json['package_id'] as num).toInt(),
 );
 
-Map<String, dynamic> _$$ApiWishlistToggleRequestBodyImplToJson(
-  _$ApiWishlistToggleRequestBodyImpl instance,
+Map<String, dynamic> _$ApiWishlistToggleRequestBodyToJson(
+  _ApiWishlistToggleRequestBody instance,
 ) => <String, dynamic>{'package_id': instance.packageId};

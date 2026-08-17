@@ -4,7 +4,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'data.dart';
+import 'booking.dart';
 
 part 'get_api_bookings_response.freezed.dart';
 part 'get_api_bookings_response.g.dart';
@@ -12,7 +12,7 @@ part 'get_api_bookings_response.g.dart';
 @Freezed()
 class GetApiBookingsResponse with _$GetApiBookingsResponse {
   const factory GetApiBookingsResponse({
-    List<Data>? data,
+    List<Booking>? data,
   }) = _GetApiBookingsResponse;
   
   factory GetApiBookingsResponse.fromJson(Map<String, Object?> json) => _$GetApiBookingsResponseFromJson(json);

@@ -6,16 +6,16 @@ part of 'api_register_request_body.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ApiRegisterRequestBodyImpl _$$ApiRegisterRequestBodyImplFromJson(
+_ApiRegisterRequestBody _$ApiRegisterRequestBodyFromJson(
   Map<String, dynamic> json,
-) => _$ApiRegisterRequestBodyImpl(
+) => _ApiRegisterRequestBody(
   name: json['name'] as String,
   email: json['email'] as String,
   password: json['password'] as String,
 );
 
-Map<String, dynamic> _$$ApiRegisterRequestBodyImplToJson(
-  _$ApiRegisterRequestBodyImpl instance,
+Map<String, dynamic> _$ApiRegisterRequestBodyToJson(
+  _ApiRegisterRequestBody instance,
 ) => <String, dynamic>{
   'name': instance.name,
   'email': instance.email,
