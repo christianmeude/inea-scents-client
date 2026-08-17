@@ -8,7 +8,7 @@ part 'get_api_availability_response.freezed.dart';
 part 'get_api_availability_response.g.dart';
 
 @Freezed()
-class GetApiAvailabilityResponse with _$GetApiAvailabilityResponse {
+abstract class GetApiAvailabilityResponse with _$GetApiAvailabilityResponse {
   const factory GetApiAvailabilityResponse({
     DateTime? date,
     String? status,
