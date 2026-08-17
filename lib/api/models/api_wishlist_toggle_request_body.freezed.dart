@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'api_wishlist_toggle_request_body.dart';
@@ -9,190 +9,270 @@ part of 'api_wishlist_toggle_request_body.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-ApiWishlistToggleRequestBody _$ApiWishlistToggleRequestBodyFromJson(
-  Map<String, dynamic> json,
-) {
-  return _ApiWishlistToggleRequestBody.fromJson(json);
-}
 
 /// @nodoc
 mixin _$ApiWishlistToggleRequestBody {
-  @JsonKey(name: 'package_id')
-  int get packageId => throw _privateConstructorUsedError;
+
+@JsonKey(name: 'package_id') int get packageId;
+/// Create a copy of ApiWishlistToggleRequestBody
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$ApiWishlistToggleRequestBodyCopyWith<ApiWishlistToggleRequestBody> get copyWith => _$ApiWishlistToggleRequestBodyCopyWithImpl<ApiWishlistToggleRequestBody>(this as ApiWishlistToggleRequestBody, _$identity);
 
   /// Serializes this ApiWishlistToggleRequestBody to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of ApiWishlistToggleRequestBody
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ApiWishlistToggleRequestBodyCopyWith<ApiWishlistToggleRequestBody>
-  get copyWith => throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiWishlistToggleRequestBody&&(identical(other.packageId, packageId) || other.packageId == packageId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,packageId);
+
+@override
+String toString() {
+  return 'ApiWishlistToggleRequestBody(packageId: $packageId)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $ApiWishlistToggleRequestBodyCopyWith<$Res> {
-  factory $ApiWishlistToggleRequestBodyCopyWith(
-    ApiWishlistToggleRequestBody value,
-    $Res Function(ApiWishlistToggleRequestBody) then,
-  ) =
-      _$ApiWishlistToggleRequestBodyCopyWithImpl<
-        $Res,
-        ApiWishlistToggleRequestBody
-      >;
-  @useResult
-  $Res call({@JsonKey(name: 'package_id') int packageId});
-}
+abstract mixin class $ApiWishlistToggleRequestBodyCopyWith<$Res>  {
+  factory $ApiWishlistToggleRequestBodyCopyWith(ApiWishlistToggleRequestBody value, $Res Function(ApiWishlistToggleRequestBody) _then) = _$ApiWishlistToggleRequestBodyCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 'package_id') int packageId
+});
 
+
+
+
+}
 /// @nodoc
-class _$ApiWishlistToggleRequestBodyCopyWithImpl<
-  $Res,
-  $Val extends ApiWishlistToggleRequestBody
->
+class _$ApiWishlistToggleRequestBodyCopyWithImpl<$Res>
     implements $ApiWishlistToggleRequestBodyCopyWith<$Res> {
-  _$ApiWishlistToggleRequestBodyCopyWithImpl(this._value, this._then);
+  _$ApiWishlistToggleRequestBodyCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final ApiWishlistToggleRequestBody _self;
+  final $Res Function(ApiWishlistToggleRequestBody) _then;
 
-  /// Create a copy of ApiWishlistToggleRequestBody
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? packageId = null}) {
-    return _then(
-      _value.copyWith(
-            packageId: null == packageId
-                ? _value.packageId
-                : packageId // ignore: cast_nullable_to_non_nullable
-                      as int,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of ApiWishlistToggleRequestBody
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? packageId = null,}) {
+  return _then(ApiWishlistToggleRequestBody(
+packageId: null == packageId ? _self.packageId : packageId // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
 }
 
-/// @nodoc
-abstract class _$$ApiWishlistToggleRequestBodyImplCopyWith<$Res>
-    implements $ApiWishlistToggleRequestBodyCopyWith<$Res> {
-  factory _$$ApiWishlistToggleRequestBodyImplCopyWith(
-    _$ApiWishlistToggleRequestBodyImpl value,
-    $Res Function(_$ApiWishlistToggleRequestBodyImpl) then,
-  ) = __$$ApiWishlistToggleRequestBodyImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({@JsonKey(name: 'package_id') int packageId});
 }
 
-/// @nodoc
-class __$$ApiWishlistToggleRequestBodyImplCopyWithImpl<$Res>
-    extends
-        _$ApiWishlistToggleRequestBodyCopyWithImpl<
-          $Res,
-          _$ApiWishlistToggleRequestBodyImpl
-        >
-    implements _$$ApiWishlistToggleRequestBodyImplCopyWith<$Res> {
-  __$$ApiWishlistToggleRequestBodyImplCopyWithImpl(
-    _$ApiWishlistToggleRequestBodyImpl _value,
-    $Res Function(_$ApiWishlistToggleRequestBodyImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of ApiWishlistToggleRequestBody
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? packageId = null}) {
-    return _then(
-      _$ApiWishlistToggleRequestBodyImpl(
-        packageId: null == packageId
-            ? _value.packageId
-            : packageId // ignore: cast_nullable_to_non_nullable
-                  as int,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [ApiWishlistToggleRequestBody].
+extension ApiWishlistToggleRequestBodyPatterns on ApiWishlistToggleRequestBody {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _ApiWishlistToggleRequestBody value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _ApiWishlistToggleRequestBody() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _ApiWishlistToggleRequestBody value)  $default,){
+final _that = this;
+switch (_that) {
+case _ApiWishlistToggleRequestBody():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _ApiWishlistToggleRequestBody value)?  $default,){
+final _that = this;
+switch (_that) {
+case _ApiWishlistToggleRequestBody() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'package_id')  int packageId)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _ApiWishlistToggleRequestBody() when $default != null:
+return $default(_that.packageId);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'package_id')  int packageId)  $default,) {final _that = this;
+switch (_that) {
+case _ApiWishlistToggleRequestBody():
+return $default(_that.packageId);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'package_id')  int packageId)?  $default,) {final _that = this;
+switch (_that) {
+case _ApiWishlistToggleRequestBody() when $default != null:
+return $default(_that.packageId);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ApiWishlistToggleRequestBodyImpl
-    implements _ApiWishlistToggleRequestBody {
-  const _$ApiWishlistToggleRequestBodyImpl({
-    @JsonKey(name: 'package_id') required this.packageId,
-  });
 
-  factory _$ApiWishlistToggleRequestBodyImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$ApiWishlistToggleRequestBodyImplFromJson(json);
+class _ApiWishlistToggleRequestBody implements ApiWishlistToggleRequestBody {
+  const _ApiWishlistToggleRequestBody({@JsonKey(name: 'package_id') required this.packageId});
+  factory _ApiWishlistToggleRequestBody.fromJson(Map<String, dynamic> json) => _$ApiWishlistToggleRequestBodyFromJson(json);
 
-  @override
-  @JsonKey(name: 'package_id')
-  final int packageId;
+@override@JsonKey(name: 'package_id') final  int packageId;
 
-  @override
-  String toString() {
-    return 'ApiWishlistToggleRequestBody(packageId: $packageId)';
-  }
+/// Create a copy of ApiWishlistToggleRequestBody
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ApiWishlistToggleRequestBodyCopyWith<_ApiWishlistToggleRequestBody> get copyWith => __$ApiWishlistToggleRequestBodyCopyWithImpl<_ApiWishlistToggleRequestBody>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$ApiWishlistToggleRequestBodyImpl &&
-            (identical(other.packageId, packageId) ||
-                other.packageId == packageId));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, packageId);
-
-  /// Create a copy of ApiWishlistToggleRequestBody
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$ApiWishlistToggleRequestBodyImplCopyWith<
-    _$ApiWishlistToggleRequestBodyImpl
-  >
-  get copyWith =>
-      __$$ApiWishlistToggleRequestBodyImplCopyWithImpl<
-        _$ApiWishlistToggleRequestBodyImpl
-      >(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ApiWishlistToggleRequestBodyImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$ApiWishlistToggleRequestBodyToJson(this, );
 }
 
-abstract class _ApiWishlistToggleRequestBody
-    implements ApiWishlistToggleRequestBody {
-  const factory _ApiWishlistToggleRequestBody({
-    @JsonKey(name: 'package_id') required final int packageId,
-  }) = _$ApiWishlistToggleRequestBodyImpl;
-
-  factory _ApiWishlistToggleRequestBody.fromJson(Map<String, dynamic> json) =
-      _$ApiWishlistToggleRequestBodyImpl.fromJson;
-
-  @override
-  @JsonKey(name: 'package_id')
-  int get packageId;
-
-  /// Create a copy of ApiWishlistToggleRequestBody
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ApiWishlistToggleRequestBodyImplCopyWith<
-    _$ApiWishlistToggleRequestBodyImpl
-  >
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ApiWishlistToggleRequestBody&&(identical(other.packageId, packageId) || other.packageId == packageId));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,packageId);
+
+@override
+String toString() {
+  return 'ApiWishlistToggleRequestBody(packageId: $packageId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ApiWishlistToggleRequestBodyCopyWith<$Res> implements $ApiWishlistToggleRequestBodyCopyWith<$Res> {
+  factory _$ApiWishlistToggleRequestBodyCopyWith(_ApiWishlistToggleRequestBody value, $Res Function(_ApiWishlistToggleRequestBody) _then) = __$ApiWishlistToggleRequestBodyCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 'package_id') int packageId
+});
+
+
+
+
+}
+/// @nodoc
+class __$ApiWishlistToggleRequestBodyCopyWithImpl<$Res>
+    implements _$ApiWishlistToggleRequestBodyCopyWith<$Res> {
+  __$ApiWishlistToggleRequestBodyCopyWithImpl(this._self, this._then);
+
+  final _ApiWishlistToggleRequestBody _self;
+  final $Res Function(_ApiWishlistToggleRequestBody) _then;
+
+/// Create a copy of ApiWishlistToggleRequestBody
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? packageId = null,}) {
+  return _then(_ApiWishlistToggleRequestBody(
+packageId: null == packageId ? _self.packageId : packageId // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+// dart format on
