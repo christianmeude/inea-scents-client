@@ -1,6 +1,6 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
-// ignore_for_file: type=lint
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'get_api_availability_response.dart';
@@ -9,194 +9,273 @@ part of 'get_api_availability_response.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-  'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
-);
-
-GetApiAvailabilityResponse _$GetApiAvailabilityResponseFromJson(
-  Map<String, dynamic> json,
-) {
-  return _GetApiAvailabilityResponse.fromJson(json);
-}
 
 /// @nodoc
 mixin _$GetApiAvailabilityResponse {
-  DateTime? get date => throw _privateConstructorUsedError;
-  String? get status => throw _privateConstructorUsedError;
+
+ DateTime? get date; String? get status;
+/// Create a copy of GetApiAvailabilityResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$GetApiAvailabilityResponseCopyWith<GetApiAvailabilityResponse> get copyWith => _$GetApiAvailabilityResponseCopyWithImpl<GetApiAvailabilityResponse>(this as GetApiAvailabilityResponse, _$identity);
 
   /// Serializes this GetApiAvailabilityResponse to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic> toJson();
 
-  /// Create a copy of GetApiAvailabilityResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $GetApiAvailabilityResponseCopyWith<GetApiAvailabilityResponse>
-  get copyWith => throw _privateConstructorUsedError;
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GetApiAvailabilityResponse&&(identical(other.date, date) || other.date == date)&&(identical(other.status, status) || other.status == status));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,date,status);
+
+@override
+String toString() {
+  return 'GetApiAvailabilityResponse(date: $date, status: $status)';
+}
+
+
 }
 
 /// @nodoc
-abstract class $GetApiAvailabilityResponseCopyWith<$Res> {
-  factory $GetApiAvailabilityResponseCopyWith(
-    GetApiAvailabilityResponse value,
-    $Res Function(GetApiAvailabilityResponse) then,
-  ) =
-      _$GetApiAvailabilityResponseCopyWithImpl<
-        $Res,
-        GetApiAvailabilityResponse
-      >;
-  @useResult
-  $Res call({DateTime? date, String? status});
-}
+abstract mixin class $GetApiAvailabilityResponseCopyWith<$Res>  {
+  factory $GetApiAvailabilityResponseCopyWith(GetApiAvailabilityResponse value, $Res Function(GetApiAvailabilityResponse) _then) = _$GetApiAvailabilityResponseCopyWithImpl;
+@useResult
+$Res call({
+ DateTime? date, String? status
+});
 
+
+
+
+}
 /// @nodoc
-class _$GetApiAvailabilityResponseCopyWithImpl<
-  $Res,
-  $Val extends GetApiAvailabilityResponse
->
+class _$GetApiAvailabilityResponseCopyWithImpl<$Res>
     implements $GetApiAvailabilityResponseCopyWith<$Res> {
-  _$GetApiAvailabilityResponseCopyWithImpl(this._value, this._then);
+  _$GetApiAvailabilityResponseCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final GetApiAvailabilityResponse _self;
+  final $Res Function(GetApiAvailabilityResponse) _then;
 
-  /// Create a copy of GetApiAvailabilityResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? date = freezed, Object? status = freezed}) {
-    return _then(
-      _value.copyWith(
-            date: freezed == date
-                ? _value.date
-                : date // ignore: cast_nullable_to_non_nullable
-                      as DateTime?,
-            status: freezed == status
-                ? _value.status
-                : status // ignore: cast_nullable_to_non_nullable
-                      as String?,
-          )
-          as $Val,
-    );
-  }
+/// Create a copy of GetApiAvailabilityResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? date = freezed,Object? status = freezed,}) {
+  return _then(GetApiAvailabilityResponse(
+date: freezed == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
 }
 
-/// @nodoc
-abstract class _$$GetApiAvailabilityResponseImplCopyWith<$Res>
-    implements $GetApiAvailabilityResponseCopyWith<$Res> {
-  factory _$$GetApiAvailabilityResponseImplCopyWith(
-    _$GetApiAvailabilityResponseImpl value,
-    $Res Function(_$GetApiAvailabilityResponseImpl) then,
-  ) = __$$GetApiAvailabilityResponseImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({DateTime? date, String? status});
 }
 
-/// @nodoc
-class __$$GetApiAvailabilityResponseImplCopyWithImpl<$Res>
-    extends
-        _$GetApiAvailabilityResponseCopyWithImpl<
-          $Res,
-          _$GetApiAvailabilityResponseImpl
-        >
-    implements _$$GetApiAvailabilityResponseImplCopyWith<$Res> {
-  __$$GetApiAvailabilityResponseImplCopyWithImpl(
-    _$GetApiAvailabilityResponseImpl _value,
-    $Res Function(_$GetApiAvailabilityResponseImpl) _then,
-  ) : super(_value, _then);
 
-  /// Create a copy of GetApiAvailabilityResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({Object? date = freezed, Object? status = freezed}) {
-    return _then(
-      _$GetApiAvailabilityResponseImpl(
-        date: freezed == date
-            ? _value.date
-            : date // ignore: cast_nullable_to_non_nullable
-                  as DateTime?,
-        status: freezed == status
-            ? _value.status
-            : status // ignore: cast_nullable_to_non_nullable
-                  as String?,
-      ),
-    );
-  }
+/// Adds pattern-matching-related methods to [GetApiAvailabilityResponse].
+extension GetApiAvailabilityResponsePatterns on GetApiAvailabilityResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _GetApiAvailabilityResponse value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _GetApiAvailabilityResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _GetApiAvailabilityResponse value)  $default,){
+final _that = this;
+switch (_that) {
+case _GetApiAvailabilityResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _GetApiAvailabilityResponse value)?  $default,){
+final _that = this;
+switch (_that) {
+case _GetApiAvailabilityResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( DateTime? date,  String? status)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _GetApiAvailabilityResponse() when $default != null:
+return $default(_that.date,_that.status);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( DateTime? date,  String? status)  $default,) {final _that = this;
+switch (_that) {
+case _GetApiAvailabilityResponse():
+return $default(_that.date,_that.status);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( DateTime? date,  String? status)?  $default,) {final _that = this;
+switch (_that) {
+case _GetApiAvailabilityResponse() when $default != null:
+return $default(_that.date,_that.status);case _:
+  return null;
+
+}
+}
+
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$GetApiAvailabilityResponseImpl implements _GetApiAvailabilityResponse {
-  const _$GetApiAvailabilityResponseImpl({this.date, this.status});
 
-  factory _$GetApiAvailabilityResponseImpl.fromJson(
-    Map<String, dynamic> json,
-  ) => _$$GetApiAvailabilityResponseImplFromJson(json);
+class _GetApiAvailabilityResponse implements GetApiAvailabilityResponse {
+  const _GetApiAvailabilityResponse({this.date, this.status});
+  factory _GetApiAvailabilityResponse.fromJson(Map<String, dynamic> json) => _$GetApiAvailabilityResponseFromJson(json);
 
-  @override
-  final DateTime? date;
-  @override
-  final String? status;
+@override final  DateTime? date;
+@override final  String? status;
 
-  @override
-  String toString() {
-    return 'GetApiAvailabilityResponse(date: $date, status: $status)';
-  }
+/// Create a copy of GetApiAvailabilityResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$GetApiAvailabilityResponseCopyWith<_GetApiAvailabilityResponse> get copyWith => __$GetApiAvailabilityResponseCopyWithImpl<_GetApiAvailabilityResponse>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is _$GetApiAvailabilityResponseImpl &&
-            (identical(other.date, date) || other.date == date) &&
-            (identical(other.status, status) || other.status == status));
-  }
-
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  int get hashCode => Object.hash(runtimeType, date, status);
-
-  /// Create a copy of GetApiAvailabilityResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$GetApiAvailabilityResponseImplCopyWith<_$GetApiAvailabilityResponseImpl>
-  get copyWith =>
-      __$$GetApiAvailabilityResponseImplCopyWithImpl<
-        _$GetApiAvailabilityResponseImpl
-      >(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$GetApiAvailabilityResponseImplToJson(this);
-  }
+@override
+Map<String, dynamic> toJson() {
+  return _$GetApiAvailabilityResponseToJson(this, );
 }
 
-abstract class _GetApiAvailabilityResponse
-    implements GetApiAvailabilityResponse {
-  const factory _GetApiAvailabilityResponse({
-    final DateTime? date,
-    final String? status,
-  }) = _$GetApiAvailabilityResponseImpl;
-
-  factory _GetApiAvailabilityResponse.fromJson(Map<String, dynamic> json) =
-      _$GetApiAvailabilityResponseImpl.fromJson;
-
-  @override
-  DateTime? get date;
-  @override
-  String? get status;
-
-  /// Create a copy of GetApiAvailabilityResponse
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$GetApiAvailabilityResponseImplCopyWith<_$GetApiAvailabilityResponseImpl>
-  get copyWith => throw _privateConstructorUsedError;
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetApiAvailabilityResponse&&(identical(other.date, date) || other.date == date)&&(identical(other.status, status) || other.status == status));
 }
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,date,status);
+
+@override
+String toString() {
+  return 'GetApiAvailabilityResponse(date: $date, status: $status)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$GetApiAvailabilityResponseCopyWith<$Res> implements $GetApiAvailabilityResponseCopyWith<$Res> {
+  factory _$GetApiAvailabilityResponseCopyWith(_GetApiAvailabilityResponse value, $Res Function(_GetApiAvailabilityResponse) _then) = __$GetApiAvailabilityResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ DateTime? date, String? status
+});
+
+
+
+
+}
+/// @nodoc
+class __$GetApiAvailabilityResponseCopyWithImpl<$Res>
+    implements _$GetApiAvailabilityResponseCopyWith<$Res> {
+  __$GetApiAvailabilityResponseCopyWithImpl(this._self, this._then);
+
+  final _GetApiAvailabilityResponse _self;
+  final $Res Function(_GetApiAvailabilityResponse) _then;
+
+/// Create a copy of GetApiAvailabilityResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? date = freezed,Object? status = freezed,}) {
+  return _then(_GetApiAvailabilityResponse(
+date: freezed == date ? _self.date : date // ignore: cast_nullable_to_non_nullable
+as DateTime?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+// dart format on
