@@ -2,11 +2,13 @@
 
 part of 'bookings_api_client.dart';
 
+// dart format off
+
 // **************************************************************************
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main,avoid_redundant_argument_values
 
 class _BookingsApiClient implements BookingsApiClient {
   _BookingsApiClient(this._dio, {this.baseUrl, this.errorLogger});
@@ -18,9 +20,10 @@ class _BookingsApiClient implements BookingsApiClient {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<GetApiBookingsResponse> getApiBookings() async {
+  Future<GetApiBookingsResponse> getApiBookings({String? status}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'status': status};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<GetApiBookingsResponse>(
@@ -33,12 +36,12 @@ class _BookingsApiClient implements BookingsApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    final _result = await _dio.fetch<Map<String, Object?>>(_options);
     late GetApiBookingsResponse _value;
     try {
       _value = GetApiBookingsResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
+      errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
     }
     return _value;
@@ -62,12 +65,12 @@ class _BookingsApiClient implements BookingsApiClient {
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
-    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    final _result = await _dio.fetch<Map<String, Object?>>(_options);
     late PostApiBookingsResponse _value;
     try {
       _value = PostApiBookingsResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
+      errorLogger?.logError(e, s, _options, response: _result);
       rethrow;
     }
     return _value;
@@ -100,3 +103,5 @@ class _BookingsApiClient implements BookingsApiClient {
     return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
+
+// dart format on

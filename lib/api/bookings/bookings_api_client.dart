@@ -18,8 +18,12 @@ abstract class BookingsApiClient {
   /// Get user's bookings.
   ///
   /// Returns a list of all bookings for the authenticated user.
+  ///
+  /// [status] - Filter bookings by status.
   @GET('/api/bookings')
-  Future<GetApiBookingsResponse> getApiBookings();
+  Future<GetApiBookingsResponse> getApiBookings({
+    @Query('status') String? status,
+  });
 
   /// Create a new booking.
   ///
