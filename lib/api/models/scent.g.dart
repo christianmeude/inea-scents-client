@@ -6,7 +6,7 @@ part of 'scent.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ScentImpl _$$ScentImplFromJson(Map<String, dynamic> json) => _$ScentImpl(
+_Scent _$ScentFromJson(Map<String, dynamic> json) => _Scent(
   id: (json['id'] as num?)?.toInt(),
   name: json['name'] as String?,
   description: json['description'] as String?,
@@ -20,13 +20,12 @@ _$ScentImpl _$$ScentImplFromJson(Map<String, dynamic> json) => _$ScentImpl(
       : DateTime.parse(json['updated_at'] as String),
 );
 
-Map<String, dynamic> _$$ScentImplToJson(_$ScentImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'description': instance.description,
-      'image_url': instance.imageUrl,
-      'is_available': instance.isAvailable,
-      'created_at': instance.createdAt?.toIso8601String(),
-      'updated_at': instance.updatedAt?.toIso8601String(),
-    };
+Map<String, dynamic> _$ScentToJson(_Scent instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'image_url': instance.imageUrl,
+  'is_available': instance.isAvailable,
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+};

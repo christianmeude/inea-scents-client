@@ -7,12 +7,12 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package.dart';
 import 'scent.dart';
 
-part 'data2.freezed.dart';
-part 'data2.g.dart';
+part 'booking.freezed.dart';
+part 'booking.g.dart';
 
 @Freezed()
-abstract class Data2 with _$Data2 {
-  const factory Data2({
+abstract class Booking with _$Booking {
+  const factory Booking({
     int? id,
     @JsonKey(name: 'booking_reference')
     String? bookingReference,
@@ -20,14 +20,23 @@ abstract class Data2 with _$Data2 {
     int? userId,
     @JsonKey(name: 'customer_name')
     String? customerName,
-    String? status,
+    @JsonKey(name: 'customer_email')
+    String? customerEmail,
+    @JsonKey(name: 'customer_phone')
+    String? customerPhone,
+    int? pax,
     @JsonKey(name: 'event_date')
     DateTime? eventDate,
+    @JsonKey(name: 'event_time')
+    String? eventTime,
+    @JsonKey(name: 'venue_address')
+    String? venueAddress,
     @JsonKey(name: 'payment_method')
     String? paymentMethod,
+    String? status,
     Package? package,
     List<Scent>? scents,
-  }) = _Data2;
+  }) = _Booking;
   
-  factory Data2.fromJson(Map<String, Object?> json) => _$Data2FromJson(json);
+  factory Booking.fromJson(Map<String, Object?> json) => _$BookingFromJson(json);
 }
