@@ -215,6 +215,7 @@ final bookingsProvider = FutureProvider<List<Booking>>((ref) async {
 class BookingFlowState {
   final Package? selectedPackage;
   final DateTime? selectedDate;
+  final String? selectedTime;
   final int? selectedPax;
   final List<int> selectedScentIds;
   final String? customerName;
@@ -229,6 +230,7 @@ class BookingFlowState {
   BookingFlowState({
     this.selectedPackage,
     this.selectedDate,
+    this.selectedTime,
     this.selectedPax,
     this.selectedScentIds = const [],
     this.customerName,
@@ -248,6 +250,7 @@ class BookingFlowState {
   BookingFlowState copyWith({
     Package? selectedPackage,
     DateTime? selectedDate,
+    String? selectedTime,
     int? selectedPax,
     List<int>? selectedScentIds,
     String? customerName,
@@ -262,6 +265,7 @@ class BookingFlowState {
     return BookingFlowState(
       selectedPackage: selectedPackage ?? this.selectedPackage,
       selectedDate: selectedDate ?? this.selectedDate,
+      selectedTime: selectedTime ?? this.selectedTime,
       selectedPax: selectedPax ?? this.selectedPax,
       selectedScentIds: selectedScentIds ?? this.selectedScentIds,
       customerName: customerName ?? this.customerName,
@@ -305,6 +309,10 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
     state = state.copyWith(selectedDate: date);
   }
 
+  void setSelectedTime(String time) {
+    state = state.copyWith(selectedTime: time);
+  }
+
   void setSelectedPax(int pax) {
     state = state.copyWith(selectedPax: pax);
   }
@@ -342,6 +350,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
   Future<dynamic> submitBooking() async {
     if (state.selectedPackage == null ||
         state.selectedDate == null ||
+        state.selectedTime == null ||
         state.selectedPax == null ||
         state.customerName == null ||
         state.venueAddress == null ||
@@ -362,7 +371,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
           customerPhone: state.customerPhone,
           pax: state.selectedPax ?? 0,
           eventDate: state.selectedDate!,
-          eventTime: null,
+          eventTime: state.selectedTime,
           venueAddress: state.venueAddress!,
           paymentMethod: PaymentMethod.fromJson(state.paymentMethod!),
           scentIds: state.selectedScentIds.isNotEmpty

@@ -290,6 +290,27 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         if (bookingFlow.selectedDate != null) Text('Selected Date: ${bookingFlow.selectedDate!.toLocal().toString().split(' ')[0]}', style: const TextStyle(color: secondary, fontSize: 13)),
         const SizedBox(height: 16),
         TextFormField(
+          readOnly: true,
+          decoration: const InputDecoration(labelText: 'Event Time', border: OutlineInputBorder(), hintText: 'Tap to select time'),
+          controller: TextEditingController(text: bookingFlow.selectedTime),
+          onTap: () async {
+            final TimeOfDay? time = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.now(),
+            );
+            if (time != null && context.mounted) {
+              ref.read(bookingFlowProvider.notifier).setSelectedTime(time.format(context));
+            }
+          },
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Event time is required';
+            }
+            return null;
+          },
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
           initialValue: bookingFlow.customerName,
           decoration: const InputDecoration(labelText: 'Customer Name', border: OutlineInputBorder(), hintText: 'John Doe'),
           onChanged: (value) => ref.read(bookingFlowProvider.notifier).setCustomerName(value),
