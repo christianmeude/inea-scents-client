@@ -6,14 +6,14 @@ part of 'get_api_packages_package_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GetApiPackagesPackageResponseImpl
-_$$GetApiPackagesPackageResponseImplFromJson(Map<String, dynamic> json) =>
-    _$GetApiPackagesPackageResponseImpl(
-      data: json['data'] == null
-          ? null
-          : Package.fromJson(json['data'] as Map<String, dynamic>),
-    );
+_GetApiPackagesPackageResponse _$GetApiPackagesPackageResponseFromJson(
+  Map<String, dynamic> json,
+) => _GetApiPackagesPackageResponse(
+  data: json['data'] == null
+      ? null
+      : Package.fromJson(json['data'] as Map<String, dynamic>),
+);
 
-Map<String, dynamic> _$$GetApiPackagesPackageResponseImplToJson(
-  _$GetApiPackagesPackageResponseImpl instance,
+Map<String, dynamic> _$GetApiPackagesPackageResponseToJson(
+  _GetApiPackagesPackageResponse instance,
 ) => <String, dynamic>{'data': instance.data};

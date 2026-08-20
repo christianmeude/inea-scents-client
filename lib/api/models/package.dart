@@ -11,7 +11,7 @@ part 'package.g.dart';
 
 /// Package model
 @Freezed()
-class Package with _$Package {
+abstract class Package with _$Package {
   const factory Package({
     int? id,
     String? name,

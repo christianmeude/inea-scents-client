@@ -8,7 +8,7 @@ part 'api_wishlist_toggle_request_body.freezed.dart';
 part 'api_wishlist_toggle_request_body.g.dart';
 
 @Freezed()
-class ApiWishlistToggleRequestBody with _$ApiWishlistToggleRequestBody {
+abstract class ApiWishlistToggleRequestBody with _$ApiWishlistToggleRequestBody {
   const factory ApiWishlistToggleRequestBody({
     @JsonKey(name: 'package_id')
     required int packageId,
