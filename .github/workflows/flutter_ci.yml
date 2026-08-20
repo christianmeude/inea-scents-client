@@ -5,11 +5,8 @@ on:
     branches: [ "main", "master" ]
   pull_request:
     branches: [ "main", "master" ]
-  workflow_call:
-
 jobs:
   build:
-    if: ${{ github.event_name == 'workflow_call' || !startsWith(github.head_ref, 'api-sync-') }}
     runs-on: ubuntu-latest
 
     steps:
