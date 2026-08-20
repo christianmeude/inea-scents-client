@@ -15,8 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
           
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -40,6 +38,10 @@ jobs:
         with:
           commit_message: "chore: auto-regenerate API client from latest schema"
           file_pattern: "lib/api/**"
+          commit_user_name: "Christian Meude"
+          commit_user_email: "christianmeude17@gmail.com"
+          commit_author: "Christian Meude <christianmeude17@gmail.com>"
           
-      - name: Verify generated code compiles
-        run: flutter analyze
+  ci:
+    needs: generate
+    uses: ./.github/workflows/flutter_ci.yml
