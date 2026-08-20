@@ -292,7 +292,13 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
   }
 
   void setSelectedPackage(Package package) {
-    state = state.copyWith(selectedPackage: package);
+    int? defaultPax = 1;
+    if (package.paxOptions != null && package.paxOptions!.isNotEmpty) {
+      if (!package.paxOptions!.contains(1)) {
+        defaultPax = package.paxOptions!.first;
+      }
+    }
+    state = state.copyWith(selectedPackage: package, selectedPax: defaultPax);
   }
 
   void setSelectedDate(DateTime date) {

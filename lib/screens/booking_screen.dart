@@ -298,7 +298,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         TextFormField(
           initialValue: bookingFlow.customerEmail,
           decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder(), hintText: 'john@example.com'),
-          onChanged: (value) => ref.read(bookingFlowProvider.notifier).setCustomerEmail(value),
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Email is required';
+            }
+            final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+            if (!emailRegex.hasMatch(value.trim())) {
+              return 'Please enter a valid email address';
+            }
+            return null;
+          },
+          onChanged: (value) => ref.read(bookingFlowProvider.notifier).setCustomerEmail(value.trim()),
         ),
         const SizedBox(height: 12),
         TextFormField(
@@ -311,6 +321,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           initialValue: bookingFlow.venueAddress,
           decoration: const InputDecoration(labelText: 'Venue Address', border: OutlineInputBorder()),
           maxLines: 2,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Venue address is required';
+            }
+            return null;
+          },
           onChanged: (value) => ref.read(bookingFlowProvider.notifier).setVenueAddress(value),
         ),
       ],
@@ -366,9 +382,30 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           flex: 2,
           child: ElevatedButton(
             onPressed: bookingFlow.currentStep < 4
-                ? () => ref.read(bookingFlowProvider.notifier).nextStep()
+                ? () {
+                    if (bookingFlow.currentStep == 1) {
+                      if (bookingFlow.selectedPax == null || bookingFlow.selectedPax == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please select a valid number of guests (PAX)')),
+                        );
+                        return;
+                      }
+                    }
+                    if (bookingFlow.currentStep == 3) {
+                      if (!_formKey.currentState!.validate()) {
+                        return;
+                      }
+                    }
+                    ref.read(bookingFlowProvider.notifier).nextStep();
+                  }
                 : () async {
                     if (_formKey.currentState!.validate()) {
+                      if (bookingFlow.selectedPax == null || bookingFlow.selectedPax == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Invalid PAX selection.')),
+                        );
+                        return;
+                      }
                       final booking = await ref.read(bookingFlowProvider.notifier).submitBooking();
                       if (booking != null && mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking submitted successfully!')));
