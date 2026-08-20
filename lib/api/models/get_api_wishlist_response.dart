@@ -10,7 +10,7 @@ part 'get_api_wishlist_response.freezed.dart';
 part 'get_api_wishlist_response.g.dart';
 
 @Freezed()
-class GetApiWishlistResponse with _$GetApiWishlistResponse {
+abstract class GetApiWishlistResponse with _$GetApiWishlistResponse {
   const factory GetApiWishlistResponse({
     List<Package>? data,
   }) = _GetApiWishlistResponse;

@@ -11,7 +11,7 @@ part 'data.freezed.dart';
 part 'data.g.dart';
 
 @Freezed()
-class Data with _$Data {
+abstract class Data with _$Data {
   const factory Data({
     int? id,
     @JsonKey(name: 'booking_reference')
