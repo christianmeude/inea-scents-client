@@ -9,7 +9,7 @@ part 'scent.g.dart';
 
 /// Scent model
 @Freezed()
-class Scent with _$Scent {
+abstract class Scent with _$Scent {
   const factory Scent({
     int? id,
     String? name,
