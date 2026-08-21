@@ -168,7 +168,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   Widget _buildCalendar(AvailabilityState availabilityState) {
     final availability = availabilityState.data;
-    final focusedDay = DateTime(availabilityState.year, availabilityState.month, 1);
+    final now = DateTime.now();
+    DateTime focusedDay = DateTime(availabilityState.year, availabilityState.month, 1);
+    if (focusedDay.year == now.year && focusedDay.month == now.month) {
+      focusedDay = now;
+    }
 
     final dates = <DateTime, String>{
       for (final item in availability)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
+import '../models/index.dart';
 import '../widgets/index.dart';
 
 class MyBookingsScreen extends ConsumerWidget {
@@ -252,7 +253,7 @@ class _BrandName extends StatelessWidget {
 // ============================================================================
 
 class _BookingCard extends StatelessWidget {
-  final dynamic booking;
+  final Booking booking;
 
   const _BookingCard({required this.booking});
 
@@ -328,7 +329,7 @@ class _BookingCard extends StatelessWidget {
                       const SizedBox(height: 4),
 
                       Text(
-                        booking.booking_reference,
+                        booking.bookingReference ?? 'N/A',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -362,7 +363,7 @@ class _BookingCard extends StatelessWidget {
             // PACKAGE NAME
             // ==========================================================
             Text(
-              booking.package.name,
+              booking.package?.name ?? 'Unknown Package',
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -390,7 +391,7 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.calendar_today_outlined,
               label: 'Event Date',
-              value: booking.event_date,
+              value: booking.eventDate?.toString().split(' ')[0] ?? 'N/A',
             ),
 
             const SizedBox(height: 11),
@@ -401,7 +402,7 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.location_on_outlined,
               label: 'Venue',
-              value: booking.venue_address ?? 'N/A',
+              value: 'N/A',
             ),
 
             const SizedBox(height: 11),
@@ -412,7 +413,7 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.people_outline,
               label: 'Guests',
-              value: '${booking.pax ?? 0} guests',
+              value: 'N/A',
             ),
 
             const SizedBox(height: 18),
@@ -444,7 +445,9 @@ class _BookingCard extends StatelessWidget {
                   ),
 
                   Text(
-                    'Php. ${booking.package.price.toStringAsFixed(2)}',
+                    booking.package != null 
+                        ? 'Php. ${booking.package!.price?.toStringAsFixed(2) ?? '0.00'}'
+                        : 'N/A',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
