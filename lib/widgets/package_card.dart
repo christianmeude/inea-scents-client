@@ -10,7 +10,7 @@ class PackageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.go('/package-details/${package.id}'),
+      onTap: () => context.push('/package-details/${package.id}'),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -100,7 +100,7 @@ class PackageCard extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () =>
-                          context.go('/package-details/${package.id}'),
+                          context.push('/package-details/${package.id}'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: const BorderSide(color: Color(0xFF8B6B7C)),

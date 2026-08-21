@@ -45,9 +45,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => context.pop(),
-          child: const Icon(Icons.arrow_back, color: primary),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primary),
+          onPressed: () => context.pop(),
         ),
         centerTitle: true,
         title: const Column(

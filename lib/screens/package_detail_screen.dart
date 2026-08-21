@@ -296,7 +296,7 @@ class PackageDetailScreen extends ConsumerWidget {
                   ref
                       .read(bookingFlowProvider.notifier)
                       .setSelectedPackage(package);
-                  context.go('/booking/${package.id}');
+                  context.push('/booking/${package.id}');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF8B6B7C),
