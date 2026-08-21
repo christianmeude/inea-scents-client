@@ -27,35 +27,37 @@ class PackageCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              child: Container(
-                height: 150,
-                color: Colors.grey[200],
-                child: (package.images != null && package.images!.isNotEmpty)
-                    ? Image.network(
-                        package.images![0],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Center(
-                            child: Text(
-                              package.name ?? '',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          );
-                        },
-                      )
-                    : Center(
-                        child: Text(
-                          package.name ?? '',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 12),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.grey[200],
+                  child: (package.images != null && package.images!.isNotEmpty)
+                      ? Image.network(
+                          package.images![0],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Text(
+                                package.name ?? '',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                            );
+                          },
+                        )
+                      : Center(
+                          child: Text(
+                            package.name ?? '',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 12),
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
             // Content
