@@ -6,9 +6,9 @@ part of 'api_bookings_request_body.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ApiBookingsRequestBodyImpl _$$ApiBookingsRequestBodyImplFromJson(
+_ApiBookingsRequestBody _$ApiBookingsRequestBodyFromJson(
   Map<String, dynamic> json,
-) => _$ApiBookingsRequestBodyImpl(
+) => _ApiBookingsRequestBody(
   packageId: (json['package_id'] as num).toInt(),
   customerName: json['customer_name'] as String,
   eventDate: DateTime.parse(json['event_date'] as String),
@@ -23,8 +23,8 @@ _$ApiBookingsRequestBodyImpl _$$ApiBookingsRequestBodyImplFromJson(
       .toList(),
 );
 
-Map<String, dynamic> _$$ApiBookingsRequestBodyImplToJson(
-  _$ApiBookingsRequestBodyImpl instance,
+Map<String, dynamic> _$ApiBookingsRequestBodyToJson(
+  _ApiBookingsRequestBody instance,
 ) => <String, dynamic>{
   'package_id': instance.packageId,
   'customer_name': instance.customerName,

@@ -84,6 +84,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _tokenStorage.deleteToken();
     state = AuthState();
   }
+
+  Future<void> refreshProfile() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final user = await _apiClient.auth.getApiUser();
+      state = state.copyWith(
+        user: user,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+    }
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {

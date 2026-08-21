@@ -6,14 +6,14 @@ part of 'get_api_bookings_response.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$GetApiBookingsResponseImpl _$$GetApiBookingsResponseImplFromJson(
+_GetApiBookingsResponse _$GetApiBookingsResponseFromJson(
   Map<String, dynamic> json,
-) => _$GetApiBookingsResponseImpl(
+) => _GetApiBookingsResponse(
   data: (json['data'] as List<dynamic>?)
       ?.map((e) => Data.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 
-Map<String, dynamic> _$$GetApiBookingsResponseImplToJson(
-  _$GetApiBookingsResponseImpl instance,
+Map<String, dynamic> _$GetApiBookingsResponseToJson(
+  _GetApiBookingsResponse instance,
 ) => <String, dynamic>{'data': instance.data};

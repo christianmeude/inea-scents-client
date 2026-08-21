@@ -6,7 +6,7 @@ part of 'data2.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$Data2Impl _$$Data2ImplFromJson(Map<String, dynamic> json) => _$Data2Impl(
+_Data2 _$Data2FromJson(Map<String, dynamic> json) => _Data2(
   id: (json['id'] as num?)?.toInt(),
   bookingReference: json['booking_reference'] as String?,
   userId: (json['user_id'] as num?)?.toInt(),
@@ -24,15 +24,14 @@ _$Data2Impl _$$Data2ImplFromJson(Map<String, dynamic> json) => _$Data2Impl(
       .toList(),
 );
 
-Map<String, dynamic> _$$Data2ImplToJson(_$Data2Impl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'booking_reference': instance.bookingReference,
-      'user_id': instance.userId,
-      'customer_name': instance.customerName,
-      'status': instance.status,
-      'event_date': instance.eventDate?.toIso8601String(),
-      'payment_method': instance.paymentMethod,
-      'package': instance.package,
-      'scents': instance.scents,
-    };
+Map<String, dynamic> _$Data2ToJson(_Data2 instance) => <String, dynamic>{
+  'id': instance.id,
+  'booking_reference': instance.bookingReference,
+  'user_id': instance.userId,
+  'customer_name': instance.customerName,
+  'status': instance.status,
+  'event_date': instance.eventDate?.toIso8601String(),
+  'payment_method': instance.paymentMethod,
+  'package': instance.package,
+  'scents': instance.scents,
+};
