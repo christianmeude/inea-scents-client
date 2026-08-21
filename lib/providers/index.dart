@@ -1,7 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/index.dart';
+import 'package:dio/dio.dart';
 import '../src/providers/core_providers.dart';
 import '../src/services/token_storage.dart';
+
+String _getErrorMessage(dynamic e) {
+  if (e is DioException) {
+    if (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.connectionTimeout) {
+      return 'Could not connect to the server. Please check your internet connection.';
+    }
+    if (e.response != null) {
+      if (e.response?.data is Map && e.response!.data['message'] != null) {
+        return e.response!.data['message'].toString();
+      }
+      return 'Server error: \${e.response?.statusCode}';
+    }
+    return e.message ?? 'An unexpected network error occurred';
+  }
+  return e.toString();
+}
 
 // Auth state
 class AuthState {
@@ -57,7 +74,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
     }
   }
 
@@ -76,7 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
     }
   }
 
@@ -94,7 +111,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
     }
   }
 }
@@ -395,7 +412,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
       state = state.copyWith(isLoading: false);
       return booking;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
       return null;
     }
   }
