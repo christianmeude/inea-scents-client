@@ -9,7 +9,6 @@ import '../models/api_login_request_body.dart';
 import '../models/api_register_request_body.dart';
 import '../models/auth_response.dart';
 import '../models/user.dart';
-import '../models/user.dart';
 
 part 'auth_api_client.g.dart';
 

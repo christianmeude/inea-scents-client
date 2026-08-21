@@ -386,7 +386,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
           eventDate: state.selectedDate!,
           eventTime: state.selectedTime,
           venueAddress: state.venueAddress!,
-          paymentMethod: PaymentMethod.fromJson(state.paymentMethod!),
+          paymentMethod: state.paymentMethod!,
           scentIds: state.selectedScentIds.isNotEmpty
               ? state.selectedScentIds
               : null,
