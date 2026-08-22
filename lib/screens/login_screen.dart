@@ -1,9 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../providers/index.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -19,9 +18,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   bool obscurePassword = true;
   bool rememberMe = false;
-
-  // The authentication screens use the app's light design only.
-  static const bool isDarkMode = false;
 
   @override
   void dispose() {
@@ -42,9 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           SnackBar(
             content: Text(next.errorMessage ?? 'Error'),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: isDarkMode
-                ? const Color(0xFF9A607B)
-                : const Color(0xFF74445C),
+            backgroundColor: const Color(0xFF6A4053),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -53,100 +47,102 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
-    // ============================================================
-    // COLORS
-    // ============================================================
-
-    final backgroundTop = isDarkMode
-        ? const Color(0xFF21171D)
-        : const Color(0xFFF8E9DF);
-
-    final backgroundMiddle = isDarkMode
-        ? const Color(0xFF4A3040)
-        : const Color(0xFFD8B0BA);
-
-    final backgroundBottom = isDarkMode
-        ? const Color(0xFF2B1D25)
-        : const Color(0xFFB78C9C);
-
-    final primaryColor = isDarkMode
-        ? const Color(0xFFB77D99)
-        : const Color(0xFF74445C);
-
-    final textColor = isDarkMode
-        ? const Color(0xFFF1DDE5)
-        : const Color(0xFF633E50);
-
-    final secondaryTextColor = isDarkMode
-        ? const Color(0xFFD0B5C1)
-        : const Color(0xFF765867);
-
-    final inputColor = isDarkMode
-        ? const Color(0xFF654656)
-        : const Color(0xFF95647E);
+    // Inertia theme colors
+    const bgColor = Color(0xFFFDF4F5); // brand-cream
+    const primaryColor = Color(0xFF6A4053); // brand-primary
 
     return Theme(
       data: ThemeData.light(useMaterial3: true),
       child: Scaffold(
+        backgroundColor: bgColor,
         body: Stack(
           children: [
             // ======================================================
-            // GRADIENT BACKGROUND
+            // MESH GRADIENT BLOBS
             // ======================================================
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [backgroundTop, backgroundMiddle, backgroundBottom],
-                ),
-              ),
-            ),
-
-            // ======================================================
-            // DECORATIVE BLURRED CIRCLES
-            // ======================================================
+            
+            // Top Left Peach
             Positioned(
-              top: -140,
-              left: -130,
-              child: _BlurCircle(
-                size: 400,
-                color: isDarkMode
-                    ? const Color(0xFF71485D).withValues(alpha: 0.45)
-                    : const Color(0xFFEBC9B8).withValues(alpha: 0.75),
+              top: -100,
+              left: -50,
+              child: _BlurBlob(
+                width: 300,
+                height: 600,
+                color: const Color(0xFFDABDAC),
+                angle: 30 * (3.14159 / 180),
               ),
             ),
-
             Positioned(
               top: 100,
-              right: -160,
-              child: _BlurCircle(
-                size: 380,
-                color: isDarkMode
-                    ? const Color(0xFF87556C).withValues(alpha: 0.35)
-                    : const Color(0xFFD3A4AF).withValues(alpha: 0.75),
+              left: 50,
+              child: _BlurBlob(
+                width: 600,
+                height: 300,
+                color: const Color(0xFFDABDAC),
+                angle: 15 * (3.14159 / 180),
+              ),
+            ),
+            
+            // Middle Left Mauve
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.3,
+              left: -100,
+              child: _BlurBlob(
+                width: 800,
+                height: 250,
+                color: const Color(0xFFC08D9E),
+                angle: 10 * (3.14159 / 180),
+              ),
+            ),
+            
+            // Bottom Left Gray-Purple
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.65,
+              left: -50,
+              child: _BlurBlob(
+                width: 500,
+                height: 400,
+                color: const Color(0xFF988088),
               ),
             ),
 
+            // Top Right Pale Rose
             Positioned(
-              bottom: -170,
-              left: -130,
-              child: _BlurCircle(
-                size: 430,
-                color: isDarkMode
-                    ? const Color(0xFF4A3541).withValues(alpha: 0.60)
-                    : const Color(0xFF9C8491).withValues(alpha: 0.70),
+              top: -100,
+              right: 50,
+              child: _BlurBlob(
+                width: 800,
+                height: 600,
+                color: const Color(0xFFC4A5A8),
+              ),
+            ),
+            Positioned(
+              top: 200,
+              right: 200,
+              child: _BlurBlob(
+                width: 500,
+                height: 400,
+                color: const Color(0xFFC4A5A8),
               ),
             ),
 
+            // Bottom Right Dark Plum
             Positioned(
-              bottom: -150,
-              right: -120,
-              child: _BlurCircle(
-                size: 420,
-                color: isDarkMode
-                    ? const Color(0xFF6D3D55).withValues(alpha: 0.45)
-                    : const Color(0xFF69384F).withValues(alpha: 0.70),
+              top: MediaQuery.of(context).size.height * 0.5,
+              right: -50,
+              child: _BlurBlob(
+                width: 300,
+                height: 500,
+                color: const Color(0xFF6E3C53),
+              ),
+            ),
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.75,
+              right: 50,
+              child: _BlurBlob(
+                width: 600,
+                height: 250,
+                color: const Color(0xFF6E3C53),
               ),
             ),
 
@@ -157,50 +153,60 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 28,
-                    vertical: 25,
+                    horizontal: 24,
+                    vertical: 48,
                   ),
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 380),
+                    constraints: const BoxConstraints(maxWidth: 384),
                     child: Column(
                       children: [
-                        const SizedBox(height: 25),
-
                         // ==================================================
-                        // INEA SCENTS BRAND NAME
+                        // APPLICATION LOGO
                         // ==================================================
-                        _BrandName(isDarkMode: isDarkMode),
+                        const _ApplicationLogo(),
 
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 40),
 
                         // ==================================================
                         // EMAIL
                         // ==================================================
-                        _InputLabel(text: 'Email', color: textColor),
-
-                        const SizedBox(height: 8),
+                        const _InputLabel(text: 'Email', color: Color(0xFF374151)), // gray-700
+                        const SizedBox(height: 4),
 
                         _CustomTextField(
                           controller: emailController,
-                          isDarkMode: isDarkMode,
-                          fillColor: inputColor,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                         ),
 
-                        const SizedBox(height: 22),
+                        const SizedBox(height: 24),
 
                         // ==================================================
                         // PASSWORD
                         // ==================================================
-                        _InputLabel(text: 'Password', color: textColor),
-
-                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const _InputLabel(text: 'Password', color: Color(0xFF374151)),
+                            GestureDetector(
+                              onTap: () {
+                                // Add forgot password later.
+                              },
+                              child: const Text(
+                                'Forgot password?',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
 
                         _CustomTextField(
                           controller: passwordController,
-                          isDarkMode: isDarkMode,
-                          fillColor: inputColor,
                           obscureText: obscurePassword,
                           suffixIcon: IconButton(
                             onPressed: () {
@@ -212,22 +218,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               obscurePassword
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
-                              color: Colors.white,
-                              size: 21,
+                              color: Colors.white.withValues(alpha: 0.7),
+                              size: 18,
                             ),
                           ),
                         ),
 
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 16),
 
                         // ==================================================
-                        // REMEMBER ME / FORGOT PASSWORD
+                        // REMEMBER ME
                         // ==================================================
                         Row(
                           children: [
                             SizedBox(
-                              width: 24,
-                              height: 24,
+                              width: 20,
+                              height: 20,
                               child: Checkbox(
                                 value: rememberMe,
                                 onChanged: (value) {
@@ -236,46 +242,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   });
                                 },
                                 activeColor: primaryColor,
-                                side: BorderSide(color: textColor, width: 1.5),
+                                side: const BorderSide(color: Color(0xFFD1D5DB), width: 1.5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
                               ),
                             ),
-
                             const SizedBox(width: 8),
-
-                            Text(
+                            const Text(
                               'Remember me',
                               style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 13,
-                              ),
-                            ),
-
-                            const Spacer(),
-
-                            GestureDetector(
-                              onTap: () {
-                                // Add forgot password later.
-                              },
-                              child: Text(
-                                'Forgot password?',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                color: primaryColor,
+                                fontSize: 14,
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 32),
 
                         // ==================================================
                         // LOGIN BUTTON
                         // ==================================================
                         SizedBox(
                           width: double.infinity,
-                          height: 52,
+                          height: 44,
                           child: ElevatedButton(
                             onPressed: authState.isLoading
                                 ? null
@@ -288,69 +279,82 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         );
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
+                              backgroundColor: const Color(0xFF1F2937), // gray-800
                               foregroundColor: Colors.white,
-                              elevation: 4,
-                              shadowColor: primaryColor.withValues(alpha: 0.35),
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(28),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
                             child: authState.isLoading
                                 ? const SizedBox(
-                                    height: 21,
-                                    width: 21,
+                                    height: 16,
+                                    width: 16,
                                     child: CircularProgressIndicator(
-                                      strokeWidth: 2.2,
+                                      strokeWidth: 2,
                                       color: Colors.white,
                                     ),
                                   )
                                 : const Text(
-                                    'LOG IN',
+                                    'Log In',
                                     style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 1.3,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 1.1,
                                     ),
                                   ),
                           ),
                         ),
 
-                        const SizedBox(height: 22),
+                        const SizedBox(height: 16),
 
                         // ==================================================
-                        // REGISTER
+                        // REGISTER & ADMIN LOG IN
                         // ==================================================
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account? ",
-                              style: TextStyle(
-                                color: secondaryTextColor,
-                                fontSize: 14,
-                              ),
-                            ),
-
-                            GestureDetector(
-                              onTap: () {
-                                context.go('/register');
-                              },
-                              child: Text(
-                                'Register',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: textColor,
-                                ),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          "Don't have an account?",
+                          style: const TextStyle(
+                            color: primaryColor,
+                            fontSize: 14,
+                          ),
                         ),
-
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 4),
+                        GestureDetector(
+                          onTap: () {
+                            context.go('/register');
+                          },
+                          child: const Text(
+                            'Register',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: primaryColor,
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        GestureDetector(
+                          onTap: () async {
+                            final url = Uri.parse('/admin/login');
+                            if (await canLaunchUrl(url)) {
+                              await launchUrl(url, webOnlyWindowName: '_self');
+                            }
+                          },
+                          child: const Text(
+                            'Log in as Admin',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: primaryColor,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -365,57 +369,74 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 }
 
 // ============================================================================
-// INEA SCENTS BRAND NAME
+// APPLICATION LOGO
 // ============================================================================
 
-class _BrandName extends StatelessWidget {
-  final bool isDarkMode;
-
-  const _BrandName({required this.isDarkMode});
+class _ApplicationLogo extends StatelessWidget {
+  const _ApplicationLogo();
 
   @override
   Widget build(BuildContext context) {
-    final brandColor = isDarkMode
-        ? const Color(0xFFE7C3D1)
-        : const Color(0xFF6D3E55);
+    const brandPrimary = Color(0xFF6A4053);
+    const strokeColor = Color(0xFFFDF4F5);
 
-    return SizedBox(
-      width: double.infinity,
-      height: 125,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // INEA
-          Text(
-            'INEA',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 52,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 9,
-              height: 0.9,
-              color: brandColor,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Stack(
+          children: [
+            Text(
+              'INEA',
+              style: TextStyle(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 9.0, // approx 0.15em of 60
+                foreground: Paint()
+                  ..style = PaintingStyle.stroke
+                  ..strokeWidth = 2
+                  ..color = strokeColor,
+              ),
             ),
-          ),
-
-          const SizedBox(height: 2),
-
-          // Scents
-          Text(
-            'Scents',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 48,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w300,
-              fontFamily: 'serif',
-              letterSpacing: 0.5,
-              height: 1.0,
-              color: brandColor,
+            const Text(
+              'INEA',
+              style: TextStyle(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 9.0,
+                color: brandPrimary,
+              ),
             ),
+          ],
+        ),
+        Transform.translate(
+          offset: const Offset(-25, 20),
+          child: Stack(
+            children: [
+              Text(
+                'Scents',
+                style: TextStyle(
+                  fontSize: 72,
+                  fontFamily: 'cursive', // fallback for great vibes
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 2
+                    ..color = strokeColor,
+                ),
+              ),
+              const Text(
+                'Scents',
+                style: TextStyle(
+                  fontSize: 72,
+                  fontFamily: 'cursive',
+                  color: brandPrimary,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -439,7 +460,7 @@ class _InputLabel extends StatelessWidget {
         style: TextStyle(
           color: color,
           fontSize: 14,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -447,24 +468,18 @@ class _InputLabel extends StatelessWidget {
 }
 
 // ============================================================================
-// CUSTOM TEXT FIELD
+// CUSTOM TEXT FIELD (INERTIA STYLE)
 // ============================================================================
 
-class _CustomTextField extends StatelessWidget {
+class _CustomTextField extends StatefulWidget {
   final TextEditingController controller;
-  final bool isDarkMode;
-  final Color fillColor;
-
   final bool obscureText;
   final Widget? suffixIcon;
-
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
 
   const _CustomTextField({
     required this.controller,
-    required this.isDarkMode,
-    required this.fillColor,
     this.obscureText = false,
     this.suffixIcon,
     this.keyboardType,
@@ -472,40 +487,83 @@ class _CustomTextField extends StatelessWidget {
   });
 
   @override
+  State<_CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<_CustomTextField> {
+  bool isFocused = false;
+  
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 54,
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        textInputAction: textInputAction,
-        style: const TextStyle(color: Colors.white, fontSize: 15),
-        cursorColor: Colors.white,
-        decoration: InputDecoration(
-          filled: true,
-          fillColor: fillColor,
-
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 15,
-          ),
-
-          suffixIcon: suffixIcon,
-
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.75)),
-
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide(
-              color: Colors.white.withValues(alpha: isDarkMode ? 0.35 : 0.75),
-              width: 1.1,
+    return Focus(
+      onFocusChange: (hasFocus) {
+        setState(() {
+          isFocused = hasFocus;
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0C6A4053), // rgba(106, 64, 83, 0.05)
+              blurRadius: 25,
+              offset: Offset(0, 10),
             ),
-          ),
-
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(color: Colors.white, width: 1.5),
+            BoxShadow(
+              color: Color(0x056A4053), // rgba(106, 64, 83, 0.02)
+              blurRadius: 10,
+              offset: Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: 48,
+              decoration: BoxDecoration(
+                color: isFocused 
+                    ? const Color(0xFF8B5D76).withValues(alpha: 0.90) 
+                    : const Color(0xFF8B5D76).withValues(alpha: 0.70),
+                borderRadius: BorderRadius.circular(30),
+                border: Border.all(
+                  color: isFocused 
+                      ? Colors.white 
+                      : Colors.white.withValues(alpha: 0.20),
+                  width: isFocused ? 1.5 : 1.0,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: widget.controller,
+                      obscureText: widget.obscureText,
+                      keyboardType: widget.keyboardType,
+                      textInputAction: widget.textInputAction,
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      cursorColor: Colors.white,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(
+                          left: 20,
+                          right: widget.suffixIcon != null ? 0 : 20,
+                          bottom: 2,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (widget.suffixIcon != null)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: widget.suffixIcon,
+                    ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -514,23 +572,36 @@ class _CustomTextField extends StatelessWidget {
 }
 
 // ============================================================================
-// BLURRED BACKGROUND CIRCLE
+// BLURRED BACKGROUND BLOB
 // ============================================================================
 
-class _BlurCircle extends StatelessWidget {
-  final double size;
+class _BlurBlob extends StatelessWidget {
+  final double width;
+  final double height;
   final Color color;
+  final double angle;
 
-  const _BlurCircle({required this.size, required this.color});
+  const _BlurBlob({
+    required this.width,
+    required this.height,
+    required this.color,
+    this.angle = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ImageFiltered(
-      imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+    return Transform.rotate(
+      angle: angle,
+      child: ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
+          ),
+        ),
       ),
     );
   }
