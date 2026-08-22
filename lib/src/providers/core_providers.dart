@@ -22,9 +22,9 @@ final dioClientProvider = Provider<DioClient>((ref) {
   final storage = ref.watch(tokenStorageProvider);
   
   // Automatically switch between local backend and live Render backend
-  final String baseUrl = kDebugMode 
-      ? _getLocalBackendUrl()
-      : 'https://inea-scents.onrender.com';
+  final String baseUrl = kIsWeb && !kDebugMode
+      ? '' // Use relative path when served by Laravel in production
+      : (kDebugMode ? _getLocalBackendUrl() : 'https://inea-scents.onrender.com');
       
   return DioClient(baseUrl: baseUrl, tokenStorage: storage);
 });

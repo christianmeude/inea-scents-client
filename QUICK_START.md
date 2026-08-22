@@ -4,7 +4,7 @@
 
 ### Step 1: Clean and Prepare (1 minute)
 ```bash
-cd flutter_application_sample
+cd inea_scents_client
 flutter clean
 flutter pub get
 ```

@@ -149,7 +149,7 @@ The app includes these fully-functional screens:
 ## 📊 Project Structure
 
 ```
-flutter_application_sample/
+inea_scents_client/
 ├── lib/
 │   ├── main.dart                 # Entry point
 │   ├── config/router.dart        # Navigation setup
@@ -169,7 +169,7 @@ See [FILE_INVENTORY.md](FILE_INVENTORY.md) for complete file listing.
 ### 1. First Time Setup
 
 ```bash
-cd flutter_application_sample
+cd inea_scents_client
 flutter pub get
 ```
 
