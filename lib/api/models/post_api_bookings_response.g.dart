@@ -11,7 +11,7 @@ _PostApiBookingsResponse _$PostApiBookingsResponseFromJson(
 ) => _PostApiBookingsResponse(
   data: json['data'] == null
       ? null
-      : Data2.fromJson(json['data'] as Map<String, dynamic>),
+      : Booking.fromJson(json['data'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PostApiBookingsResponseToJson(

@@ -10,7 +10,7 @@ _GetApiBookingsResponse _$GetApiBookingsResponseFromJson(
   Map<String, dynamic> json,
 ) => _GetApiBookingsResponse(
   data: (json['data'] as List<dynamic>?)
-      ?.map((e) => Data.fromJson(e as Map<String, dynamic>))
+      ?.map((e) => Booking.fromJson(e as Map<String, dynamic>))
       .toList(),
 );
 

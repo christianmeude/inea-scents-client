@@ -3,8 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/index.dart';
+import '../src/providers/core_providers.dart';
 import '../widgets/index.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -472,6 +474,34 @@ class ProfileScreen extends ConsumerWidget {
                         ),
 
                         const _SettingDivider(),
+
+                        if (authState.user?.isAdmin == true) ...[
+                          _ProfileSettingTile(
+                            icon: Icons.admin_panel_settings_outlined,
+                            title: 'Admin Dashboard',
+                            subtitle: 'Manage packages and bookings',
+                            onTap: () async {
+                              final dio = ref.read(dioClientProvider).dio;
+                              try {
+                                final response = await dio.post('/api/admin/magic-url');
+                                final url = response.data['url'] as String;
+                                if (url.isNotEmpty) {
+                                  final uri = Uri.parse(url);
+                                  if (await canLaunchUrl(uri)) {
+                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                  }
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to open admin panel')),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                          const _SettingDivider(),
+                        ],
 
                         _ProfileSettingTile(
                           icon: Icons.logout_rounded,

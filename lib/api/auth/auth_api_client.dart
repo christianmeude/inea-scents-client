@@ -28,6 +28,7 @@ abstract class AuthApiClient {
     @Body() required ApiLoginRequestBody body,
   });
 
+  /// Get authenticated user
   @GET('/api/user')
   Future<User> getApiUser();
 }

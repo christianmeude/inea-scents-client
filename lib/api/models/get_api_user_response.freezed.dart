@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'user.dart';
+part of 'get_api_user_response.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,22 +14,22 @@ part of 'user.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$User {
+mixin _$GetApiUserResponse {
 
  int? get id; String? get name; String? get email;@JsonKey(name: 'is_admin') bool? get isAdmin;
-/// Create a copy of User
+/// Create a copy of GetApiUserResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$UserCopyWith<User> get copyWith => _$UserCopyWithImpl<User>(this as User, _$identity);
+$GetApiUserResponseCopyWith<GetApiUserResponse> get copyWith => _$GetApiUserResponseCopyWithImpl<GetApiUserResponse>(this as GetApiUserResponse, _$identity);
 
-  /// Serializes this User to a JSON map.
+  /// Serializes this GetApiUserResponse to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is User&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GetApiUserResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -38,15 +38,15 @@ int get hashCode => Object.hash(runtimeType,id,name,email,isAdmin);
 
 @override
 String toString() {
-  return 'User(id: $id, name: $name, email: $email, isAdmin: $isAdmin)';
+  return 'GetApiUserResponse(id: $id, name: $name, email: $email, isAdmin: $isAdmin)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $UserCopyWith<$Res>  {
-  factory $UserCopyWith(User value, $Res Function(User) _then) = _$UserCopyWithImpl;
+abstract mixin class $GetApiUserResponseCopyWith<$Res>  {
+  factory $GetApiUserResponseCopyWith(GetApiUserResponse value, $Res Function(GetApiUserResponse) _then) = _$GetApiUserResponseCopyWithImpl;
 @useResult
 $Res call({
  int? id, String? name, String? email,@JsonKey(name: 'is_admin') bool? isAdmin
@@ -57,17 +57,17 @@ $Res call({
 
 }
 /// @nodoc
-class _$UserCopyWithImpl<$Res>
-    implements $UserCopyWith<$Res> {
-  _$UserCopyWithImpl(this._self, this._then);
+class _$GetApiUserResponseCopyWithImpl<$Res>
+    implements $GetApiUserResponseCopyWith<$Res> {
+  _$GetApiUserResponseCopyWithImpl(this._self, this._then);
 
-  final User _self;
-  final $Res Function(User) _then;
+  final GetApiUserResponse _self;
+  final $Res Function(GetApiUserResponse) _then;
 
-/// Create a copy of User
+/// Create a copy of GetApiUserResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? email = freezed,Object? isAdmin = freezed,}) {
-  return _then(User(
+  return _then(GetApiUserResponse(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -79,8 +79,8 @@ as bool?,
 }
 
 
-/// Adds pattern-matching-related methods to [User].
-extension UserPatterns on User {
+/// Adds pattern-matching-related methods to [GetApiUserResponse].
+extension GetApiUserResponsePatterns on GetApiUserResponse {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -93,10 +93,10 @@ extension UserPatterns on User {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _User value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _GetApiUserResponse value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _User() when $default != null:
+case _GetApiUserResponse() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -115,10 +115,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _User value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _GetApiUserResponse value)  $default,){
 final _that = this;
 switch (_that) {
-case _User():
+case _GetApiUserResponse():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -136,10 +136,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _User value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _GetApiUserResponse value)?  $default,){
 final _that = this;
 switch (_that) {
-case _User() when $default != null:
+case _GetApiUserResponse() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -159,7 +159,7 @@ return $default(_that);case _:
 
 @optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? name,  String? email, @JsonKey(name: 'is_admin')  bool? isAdmin)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _User() when $default != null:
+case _GetApiUserResponse() when $default != null:
 return $default(_that.id,_that.name,_that.email,_that.isAdmin);case _:
   return orElse();
 
@@ -180,7 +180,7 @@ return $default(_that.id,_that.name,_that.email,_that.isAdmin);case _:
 
 @optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? name,  String? email, @JsonKey(name: 'is_admin')  bool? isAdmin)  $default,) {final _that = this;
 switch (_that) {
-case _User():
+case _GetApiUserResponse():
 return $default(_that.id,_that.name,_that.email,_that.isAdmin);case _:
   throw StateError('Unexpected subclass');
 
@@ -200,7 +200,7 @@ return $default(_that.id,_that.name,_that.email,_that.isAdmin);case _:
 
 @optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? name,  String? email, @JsonKey(name: 'is_admin')  bool? isAdmin)?  $default,) {final _that = this;
 switch (_that) {
-case _User() when $default != null:
+case _GetApiUserResponse() when $default != null:
 return $default(_that.id,_that.name,_that.email,_that.isAdmin);case _:
   return null;
 
@@ -212,29 +212,29 @@ return $default(_that.id,_that.name,_that.email,_that.isAdmin);case _:
 /// @nodoc
 @JsonSerializable()
 
-class _User implements User {
-  const _User({this.id, this.name, this.email, @JsonKey(name: 'is_admin') this.isAdmin});
-  factory _User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+class _GetApiUserResponse implements GetApiUserResponse {
+  const _GetApiUserResponse({this.id, this.name, this.email, @JsonKey(name: 'is_admin') this.isAdmin});
+  factory _GetApiUserResponse.fromJson(Map<String, dynamic> json) => _$GetApiUserResponseFromJson(json);
 
 @override final  int? id;
 @override final  String? name;
 @override final  String? email;
 @override@JsonKey(name: 'is_admin') final  bool? isAdmin;
 
-/// Create a copy of User
+/// Create a copy of GetApiUserResponse
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$UserCopyWith<_User> get copyWith => __$UserCopyWithImpl<_User>(this, _$identity);
+_$GetApiUserResponseCopyWith<_GetApiUserResponse> get copyWith => __$GetApiUserResponseCopyWithImpl<_GetApiUserResponse>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$UserToJson(this, );
+  return _$GetApiUserResponseToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _User&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GetApiUserResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.email, email) || other.email == email)&&(identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -243,15 +243,15 @@ int get hashCode => Object.hash(runtimeType,id,name,email,isAdmin);
 
 @override
 String toString() {
-  return 'User(id: $id, name: $name, email: $email, isAdmin: $isAdmin)';
+  return 'GetApiUserResponse(id: $id, name: $name, email: $email, isAdmin: $isAdmin)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$UserCopyWith<$Res> implements $UserCopyWith<$Res> {
-  factory _$UserCopyWith(_User value, $Res Function(_User) _then) = __$UserCopyWithImpl;
+abstract mixin class _$GetApiUserResponseCopyWith<$Res> implements $GetApiUserResponseCopyWith<$Res> {
+  factory _$GetApiUserResponseCopyWith(_GetApiUserResponse value, $Res Function(_GetApiUserResponse) _then) = __$GetApiUserResponseCopyWithImpl;
 @override @useResult
 $Res call({
  int? id, String? name, String? email,@JsonKey(name: 'is_admin') bool? isAdmin
@@ -262,17 +262,17 @@ $Res call({
 
 }
 /// @nodoc
-class __$UserCopyWithImpl<$Res>
-    implements _$UserCopyWith<$Res> {
-  __$UserCopyWithImpl(this._self, this._then);
+class __$GetApiUserResponseCopyWithImpl<$Res>
+    implements _$GetApiUserResponseCopyWith<$Res> {
+  __$GetApiUserResponseCopyWithImpl(this._self, this._then);
 
-  final _User _self;
-  final $Res Function(_User) _then;
+  final _GetApiUserResponse _self;
+  final $Res Function(_GetApiUserResponse) _then;
 
-/// Create a copy of User
+/// Create a copy of GetApiUserResponse
 /// with the given fields replaced by the non-null parameter values.
 @override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? email = freezed,Object? isAdmin = freezed,}) {
-  return _then(_User(
+  return _then(_GetApiUserResponse(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable

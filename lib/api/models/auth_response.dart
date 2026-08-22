@@ -10,7 +10,7 @@ part 'auth_response.freezed.dart';
 part 'auth_response.g.dart';
 
 @Freezed()
-abstract class AuthResponse with _$AuthResponse {
+class AuthResponse with _$AuthResponse {
   const factory AuthResponse({
     User? user,
     @JsonKey(name: 'access_token')

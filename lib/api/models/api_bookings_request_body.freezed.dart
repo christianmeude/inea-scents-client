@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ApiBookingsRequestBody {
 
-@JsonKey(name: 'package_id') int get packageId;@JsonKey(name: 'customer_name') String get customerName;@JsonKey(name: 'event_date') DateTime get eventDate;@JsonKey(name: 'venue_address') String get venueAddress;@JsonKey(name: 'payment_method') String get paymentMethod;@JsonKey(name: 'customer_email') String? get customerEmail;@JsonKey(name: 'customer_phone') String? get customerPhone; int? get pax;@JsonKey(name: 'event_time') String? get eventTime;@JsonKey(name: 'scent_ids') List<int>? get scentIds;
+@JsonKey(name: 'package_id') int get packageId;@JsonKey(name: 'customer_name') String get customerName;@JsonKey(name: 'customer_email') String get customerEmail; int get pax;@JsonKey(name: 'event_date') DateTime get eventDate;@JsonKey(name: 'venue_address') String get venueAddress;@JsonKey(name: 'payment_method') PaymentMethod get paymentMethod;@JsonKey(name: 'customer_phone') String? get customerPhone;@JsonKey(name: 'event_time') String? get eventTime;@JsonKey(name: 'scent_ids') List<int>? get scentIds;
 /// Create a copy of ApiBookingsRequestBody
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,16 +29,16 @@ $ApiBookingsRequestBodyCopyWith<ApiBookingsRequestBody> get copyWith => _$ApiBoo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiBookingsRequestBody&&(identical(other.packageId, packageId) || other.packageId == packageId)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.eventDate, eventDate) || other.eventDate == eventDate)&&(identical(other.venueAddress, venueAddress) || other.venueAddress == venueAddress)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.customerEmail, customerEmail) || other.customerEmail == customerEmail)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.pax, pax) || other.pax == pax)&&(identical(other.eventTime, eventTime) || other.eventTime == eventTime)&&const DeepCollectionEquality().equals(other.scentIds, scentIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ApiBookingsRequestBody&&(identical(other.packageId, packageId) || other.packageId == packageId)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.customerEmail, customerEmail) || other.customerEmail == customerEmail)&&(identical(other.pax, pax) || other.pax == pax)&&(identical(other.eventDate, eventDate) || other.eventDate == eventDate)&&(identical(other.venueAddress, venueAddress) || other.venueAddress == venueAddress)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.eventTime, eventTime) || other.eventTime == eventTime)&&const DeepCollectionEquality().equals(other.scentIds, scentIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,packageId,customerName,eventDate,venueAddress,paymentMethod,customerEmail,customerPhone,pax,eventTime,const DeepCollectionEquality().hash(scentIds));
+int get hashCode => Object.hash(runtimeType,packageId,customerName,customerEmail,pax,eventDate,venueAddress,paymentMethod,customerPhone,eventTime,const DeepCollectionEquality().hash(scentIds));
 
 @override
 String toString() {
-  return 'ApiBookingsRequestBody(packageId: $packageId, customerName: $customerName, eventDate: $eventDate, venueAddress: $venueAddress, paymentMethod: $paymentMethod, customerEmail: $customerEmail, customerPhone: $customerPhone, pax: $pax, eventTime: $eventTime, scentIds: $scentIds)';
+  return 'ApiBookingsRequestBody(packageId: $packageId, customerName: $customerName, customerEmail: $customerEmail, pax: $pax, eventDate: $eventDate, venueAddress: $venueAddress, paymentMethod: $paymentMethod, customerPhone: $customerPhone, eventTime: $eventTime, scentIds: $scentIds)';
 }
 
 
@@ -49,7 +49,7 @@ abstract mixin class $ApiBookingsRequestBodyCopyWith<$Res>  {
   factory $ApiBookingsRequestBodyCopyWith(ApiBookingsRequestBody value, $Res Function(ApiBookingsRequestBody) _then) = _$ApiBookingsRequestBodyCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'package_id') int packageId,@JsonKey(name: 'customer_name') String customerName,@JsonKey(name: 'event_date') DateTime eventDate,@JsonKey(name: 'venue_address') String venueAddress,@JsonKey(name: 'payment_method') String paymentMethod,@JsonKey(name: 'customer_email') String? customerEmail,@JsonKey(name: 'customer_phone') String? customerPhone, int? pax,@JsonKey(name: 'event_time') String? eventTime,@JsonKey(name: 'scent_ids') List<int>? scentIds
+@JsonKey(name: 'package_id') int packageId,@JsonKey(name: 'customer_name') String customerName,@JsonKey(name: 'customer_email') String customerEmail, int pax,@JsonKey(name: 'event_date') DateTime eventDate,@JsonKey(name: 'venue_address') String venueAddress,@JsonKey(name: 'payment_method') PaymentMethod paymentMethod,@JsonKey(name: 'customer_phone') String? customerPhone,@JsonKey(name: 'event_time') String? eventTime,@JsonKey(name: 'scent_ids') List<int>? scentIds
 });
 
 
@@ -66,17 +66,17 @@ class _$ApiBookingsRequestBodyCopyWithImpl<$Res>
 
 /// Create a copy of ApiBookingsRequestBody
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? packageId = null,Object? customerName = null,Object? eventDate = null,Object? venueAddress = null,Object? paymentMethod = null,Object? customerEmail = freezed,Object? customerPhone = freezed,Object? pax = freezed,Object? eventTime = freezed,Object? scentIds = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? packageId = null,Object? customerName = null,Object? customerEmail = null,Object? pax = null,Object? eventDate = null,Object? venueAddress = null,Object? paymentMethod = null,Object? customerPhone = freezed,Object? eventTime = freezed,Object? scentIds = freezed,}) {
   return _then(ApiBookingsRequestBody(
 packageId: null == packageId ? _self.packageId : packageId // ignore: cast_nullable_to_non_nullable
 as int,customerName: null == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
-as String,eventDate: null == eventDate ? _self.eventDate : eventDate // ignore: cast_nullable_to_non_nullable
+as String,customerEmail: null == customerEmail ? _self.customerEmail : customerEmail // ignore: cast_nullable_to_non_nullable
+as String,pax: null == pax ? _self.pax : pax // ignore: cast_nullable_to_non_nullable
+as int,eventDate: null == eventDate ? _self.eventDate : eventDate // ignore: cast_nullable_to_non_nullable
 as DateTime,venueAddress: null == venueAddress ? _self.venueAddress : venueAddress // ignore: cast_nullable_to_non_nullable
 as String,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
-as String,customerEmail: freezed == customerEmail ? _self.customerEmail : customerEmail // ignore: cast_nullable_to_non_nullable
-as String?,customerPhone: freezed == customerPhone ? _self.customerPhone : customerPhone // ignore: cast_nullable_to_non_nullable
-as String?,pax: freezed == pax ? _self.pax : pax // ignore: cast_nullable_to_non_nullable
-as int?,eventTime: freezed == eventTime ? _self.eventTime : eventTime // ignore: cast_nullable_to_non_nullable
+as PaymentMethod,customerPhone: freezed == customerPhone ? _self.customerPhone : customerPhone // ignore: cast_nullable_to_non_nullable
+as String?,eventTime: freezed == eventTime ? _self.eventTime : eventTime // ignore: cast_nullable_to_non_nullable
 as String?,scentIds: freezed == scentIds ? _self.scentIds : scentIds // ignore: cast_nullable_to_non_nullable
 as List<int>?,
   ));
@@ -163,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'package_id')  int packageId, @JsonKey(name: 'customer_name')  String customerName, @JsonKey(name: 'event_date')  DateTime eventDate, @JsonKey(name: 'venue_address')  String venueAddress, @JsonKey(name: 'payment_method')  String paymentMethod, @JsonKey(name: 'customer_email')  String? customerEmail, @JsonKey(name: 'customer_phone')  String? customerPhone,  int? pax, @JsonKey(name: 'event_time')  String? eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'package_id')  int packageId, @JsonKey(name: 'customer_name')  String customerName, @JsonKey(name: 'customer_email')  String customerEmail,  int pax, @JsonKey(name: 'event_date')  DateTime eventDate, @JsonKey(name: 'venue_address')  String venueAddress, @JsonKey(name: 'payment_method')  PaymentMethod paymentMethod, @JsonKey(name: 'customer_phone')  String? customerPhone, @JsonKey(name: 'event_time')  String? eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ApiBookingsRequestBody() when $default != null:
-return $default(_that.packageId,_that.customerName,_that.eventDate,_that.venueAddress,_that.paymentMethod,_that.customerEmail,_that.customerPhone,_that.pax,_that.eventTime,_that.scentIds);case _:
+return $default(_that.packageId,_that.customerName,_that.customerEmail,_that.pax,_that.eventDate,_that.venueAddress,_that.paymentMethod,_that.customerPhone,_that.eventTime,_that.scentIds);case _:
   return orElse();
 
 }
@@ -184,10 +184,10 @@ return $default(_that.packageId,_that.customerName,_that.eventDate,_that.venueAd
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'package_id')  int packageId, @JsonKey(name: 'customer_name')  String customerName, @JsonKey(name: 'event_date')  DateTime eventDate, @JsonKey(name: 'venue_address')  String venueAddress, @JsonKey(name: 'payment_method')  String paymentMethod, @JsonKey(name: 'customer_email')  String? customerEmail, @JsonKey(name: 'customer_phone')  String? customerPhone,  int? pax, @JsonKey(name: 'event_time')  String? eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'package_id')  int packageId, @JsonKey(name: 'customer_name')  String customerName, @JsonKey(name: 'customer_email')  String customerEmail,  int pax, @JsonKey(name: 'event_date')  DateTime eventDate, @JsonKey(name: 'venue_address')  String venueAddress, @JsonKey(name: 'payment_method')  PaymentMethod paymentMethod, @JsonKey(name: 'customer_phone')  String? customerPhone, @JsonKey(name: 'event_time')  String? eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds)  $default,) {final _that = this;
 switch (_that) {
 case _ApiBookingsRequestBody():
-return $default(_that.packageId,_that.customerName,_that.eventDate,_that.venueAddress,_that.paymentMethod,_that.customerEmail,_that.customerPhone,_that.pax,_that.eventTime,_that.scentIds);case _:
+return $default(_that.packageId,_that.customerName,_that.customerEmail,_that.pax,_that.eventDate,_that.venueAddress,_that.paymentMethod,_that.customerPhone,_that.eventTime,_that.scentIds);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +204,10 @@ return $default(_that.packageId,_that.customerName,_that.eventDate,_that.venueAd
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'package_id')  int packageId, @JsonKey(name: 'customer_name')  String customerName, @JsonKey(name: 'event_date')  DateTime eventDate, @JsonKey(name: 'venue_address')  String venueAddress, @JsonKey(name: 'payment_method')  String paymentMethod, @JsonKey(name: 'customer_email')  String? customerEmail, @JsonKey(name: 'customer_phone')  String? customerPhone,  int? pax, @JsonKey(name: 'event_time')  String? eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'package_id')  int packageId, @JsonKey(name: 'customer_name')  String customerName, @JsonKey(name: 'customer_email')  String customerEmail,  int pax, @JsonKey(name: 'event_date')  DateTime eventDate, @JsonKey(name: 'venue_address')  String venueAddress, @JsonKey(name: 'payment_method')  PaymentMethod paymentMethod, @JsonKey(name: 'customer_phone')  String? customerPhone, @JsonKey(name: 'event_time')  String? eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds)?  $default,) {final _that = this;
 switch (_that) {
 case _ApiBookingsRequestBody() when $default != null:
-return $default(_that.packageId,_that.customerName,_that.eventDate,_that.venueAddress,_that.paymentMethod,_that.customerEmail,_that.customerPhone,_that.pax,_that.eventTime,_that.scentIds);case _:
+return $default(_that.packageId,_that.customerName,_that.customerEmail,_that.pax,_that.eventDate,_that.venueAddress,_that.paymentMethod,_that.customerPhone,_that.eventTime,_that.scentIds);case _:
   return null;
 
 }
@@ -219,17 +219,17 @@ return $default(_that.packageId,_that.customerName,_that.eventDate,_that.venueAd
 @JsonSerializable()
 
 class _ApiBookingsRequestBody implements ApiBookingsRequestBody {
-  const _ApiBookingsRequestBody({@JsonKey(name: 'package_id') required this.packageId, @JsonKey(name: 'customer_name') required this.customerName, @JsonKey(name: 'event_date') required this.eventDate, @JsonKey(name: 'venue_address') required this.venueAddress, @JsonKey(name: 'payment_method') required this.paymentMethod, @JsonKey(name: 'customer_email') this.customerEmail, @JsonKey(name: 'customer_phone') this.customerPhone, this.pax, @JsonKey(name: 'event_time') this.eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds}): _scentIds = scentIds;
+  const _ApiBookingsRequestBody({@JsonKey(name: 'package_id') required this.packageId, @JsonKey(name: 'customer_name') required this.customerName, @JsonKey(name: 'customer_email') required this.customerEmail, required this.pax, @JsonKey(name: 'event_date') required this.eventDate, @JsonKey(name: 'venue_address') required this.venueAddress, @JsonKey(name: 'payment_method') required this.paymentMethod, @JsonKey(name: 'customer_phone') this.customerPhone, @JsonKey(name: 'event_time') this.eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds}): _scentIds = scentIds;
   factory _ApiBookingsRequestBody.fromJson(Map<String, dynamic> json) => _$ApiBookingsRequestBodyFromJson(json);
 
 @override@JsonKey(name: 'package_id') final  int packageId;
 @override@JsonKey(name: 'customer_name') final  String customerName;
+@override@JsonKey(name: 'customer_email') final  String customerEmail;
+@override final  int pax;
 @override@JsonKey(name: 'event_date') final  DateTime eventDate;
 @override@JsonKey(name: 'venue_address') final  String venueAddress;
-@override@JsonKey(name: 'payment_method') final  String paymentMethod;
-@override@JsonKey(name: 'customer_email') final  String? customerEmail;
+@override@JsonKey(name: 'payment_method') final  PaymentMethod paymentMethod;
 @override@JsonKey(name: 'customer_phone') final  String? customerPhone;
-@override final  int? pax;
 @override@JsonKey(name: 'event_time') final  String? eventTime;
  final  List<int>? _scentIds;
 @override@JsonKey(name: 'scent_ids') List<int>? get scentIds {
@@ -254,16 +254,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ApiBookingsRequestBody&&(identical(other.packageId, packageId) || other.packageId == packageId)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.eventDate, eventDate) || other.eventDate == eventDate)&&(identical(other.venueAddress, venueAddress) || other.venueAddress == venueAddress)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.customerEmail, customerEmail) || other.customerEmail == customerEmail)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.pax, pax) || other.pax == pax)&&(identical(other.eventTime, eventTime) || other.eventTime == eventTime)&&const DeepCollectionEquality().equals(other._scentIds, _scentIds));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ApiBookingsRequestBody&&(identical(other.packageId, packageId) || other.packageId == packageId)&&(identical(other.customerName, customerName) || other.customerName == customerName)&&(identical(other.customerEmail, customerEmail) || other.customerEmail == customerEmail)&&(identical(other.pax, pax) || other.pax == pax)&&(identical(other.eventDate, eventDate) || other.eventDate == eventDate)&&(identical(other.venueAddress, venueAddress) || other.venueAddress == venueAddress)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.customerPhone, customerPhone) || other.customerPhone == customerPhone)&&(identical(other.eventTime, eventTime) || other.eventTime == eventTime)&&const DeepCollectionEquality().equals(other._scentIds, _scentIds));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,packageId,customerName,eventDate,venueAddress,paymentMethod,customerEmail,customerPhone,pax,eventTime,const DeepCollectionEquality().hash(_scentIds));
+int get hashCode => Object.hash(runtimeType,packageId,customerName,customerEmail,pax,eventDate,venueAddress,paymentMethod,customerPhone,eventTime,const DeepCollectionEquality().hash(_scentIds));
 
 @override
 String toString() {
-  return 'ApiBookingsRequestBody(packageId: $packageId, customerName: $customerName, eventDate: $eventDate, venueAddress: $venueAddress, paymentMethod: $paymentMethod, customerEmail: $customerEmail, customerPhone: $customerPhone, pax: $pax, eventTime: $eventTime, scentIds: $scentIds)';
+  return 'ApiBookingsRequestBody(packageId: $packageId, customerName: $customerName, customerEmail: $customerEmail, pax: $pax, eventDate: $eventDate, venueAddress: $venueAddress, paymentMethod: $paymentMethod, customerPhone: $customerPhone, eventTime: $eventTime, scentIds: $scentIds)';
 }
 
 
@@ -274,7 +274,7 @@ abstract mixin class _$ApiBookingsRequestBodyCopyWith<$Res> implements $ApiBooki
   factory _$ApiBookingsRequestBodyCopyWith(_ApiBookingsRequestBody value, $Res Function(_ApiBookingsRequestBody) _then) = __$ApiBookingsRequestBodyCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'package_id') int packageId,@JsonKey(name: 'customer_name') String customerName,@JsonKey(name: 'event_date') DateTime eventDate,@JsonKey(name: 'venue_address') String venueAddress,@JsonKey(name: 'payment_method') String paymentMethod,@JsonKey(name: 'customer_email') String? customerEmail,@JsonKey(name: 'customer_phone') String? customerPhone, int? pax,@JsonKey(name: 'event_time') String? eventTime,@JsonKey(name: 'scent_ids') List<int>? scentIds
+@JsonKey(name: 'package_id') int packageId,@JsonKey(name: 'customer_name') String customerName,@JsonKey(name: 'customer_email') String customerEmail, int pax,@JsonKey(name: 'event_date') DateTime eventDate,@JsonKey(name: 'venue_address') String venueAddress,@JsonKey(name: 'payment_method') PaymentMethod paymentMethod,@JsonKey(name: 'customer_phone') String? customerPhone,@JsonKey(name: 'event_time') String? eventTime,@JsonKey(name: 'scent_ids') List<int>? scentIds
 });
 
 
@@ -291,17 +291,17 @@ class __$ApiBookingsRequestBodyCopyWithImpl<$Res>
 
 /// Create a copy of ApiBookingsRequestBody
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? packageId = null,Object? customerName = null,Object? eventDate = null,Object? venueAddress = null,Object? paymentMethod = null,Object? customerEmail = freezed,Object? customerPhone = freezed,Object? pax = freezed,Object? eventTime = freezed,Object? scentIds = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? packageId = null,Object? customerName = null,Object? customerEmail = null,Object? pax = null,Object? eventDate = null,Object? venueAddress = null,Object? paymentMethod = null,Object? customerPhone = freezed,Object? eventTime = freezed,Object? scentIds = freezed,}) {
   return _then(_ApiBookingsRequestBody(
 packageId: null == packageId ? _self.packageId : packageId // ignore: cast_nullable_to_non_nullable
 as int,customerName: null == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
-as String,eventDate: null == eventDate ? _self.eventDate : eventDate // ignore: cast_nullable_to_non_nullable
+as String,customerEmail: null == customerEmail ? _self.customerEmail : customerEmail // ignore: cast_nullable_to_non_nullable
+as String,pax: null == pax ? _self.pax : pax // ignore: cast_nullable_to_non_nullable
+as int,eventDate: null == eventDate ? _self.eventDate : eventDate // ignore: cast_nullable_to_non_nullable
 as DateTime,venueAddress: null == venueAddress ? _self.venueAddress : venueAddress // ignore: cast_nullable_to_non_nullable
 as String,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
-as String,customerEmail: freezed == customerEmail ? _self.customerEmail : customerEmail // ignore: cast_nullable_to_non_nullable
-as String?,customerPhone: freezed == customerPhone ? _self.customerPhone : customerPhone // ignore: cast_nullable_to_non_nullable
-as String?,pax: freezed == pax ? _self.pax : pax // ignore: cast_nullable_to_non_nullable
-as int?,eventTime: freezed == eventTime ? _self.eventTime : eventTime // ignore: cast_nullable_to_non_nullable
+as PaymentMethod,customerPhone: freezed == customerPhone ? _self.customerPhone : customerPhone // ignore: cast_nullable_to_non_nullable
+as String?,eventTime: freezed == eventTime ? _self.eventTime : eventTime // ignore: cast_nullable_to_non_nullable
 as String?,scentIds: freezed == scentIds ? _self._scentIds : scentIds // ignore: cast_nullable_to_non_nullable
 as List<int>?,
   ));

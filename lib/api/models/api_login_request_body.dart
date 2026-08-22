@@ -8,7 +8,7 @@ part 'api_login_request_body.freezed.dart';
 part 'api_login_request_body.g.dart';
 
 @Freezed()
-abstract class ApiLoginRequestBody with _$ApiLoginRequestBody {
+class ApiLoginRequestBody with _$ApiLoginRequestBody {
   const factory ApiLoginRequestBody({
     required String email,
     required String password,

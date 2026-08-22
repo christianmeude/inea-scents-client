@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GetApiBookingsResponse {
 
- List<Data>? get data;
+ List<Booking>? get data;
 /// Create a copy of GetApiBookingsResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +49,7 @@ abstract mixin class $GetApiBookingsResponseCopyWith<$Res>  {
   factory $GetApiBookingsResponseCopyWith(GetApiBookingsResponse value, $Res Function(GetApiBookingsResponse) _then) = _$GetApiBookingsResponseCopyWithImpl;
 @useResult
 $Res call({
- List<Data>? data
+ List<Booking>? data
 });
 
 
@@ -69,7 +69,7 @@ class _$GetApiBookingsResponseCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? data = freezed,}) {
   return _then(GetApiBookingsResponse(
 data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as List<Data>?,
+as List<Booking>?,
   ));
 }
 
@@ -154,7 +154,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Data>? data)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Booking>? data)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GetApiBookingsResponse() when $default != null:
 return $default(_that.data);case _:
@@ -175,7 +175,7 @@ return $default(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Data>? data)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Booking>? data)  $default,) {final _that = this;
 switch (_that) {
 case _GetApiBookingsResponse():
 return $default(_that.data);case _:
@@ -195,7 +195,7 @@ return $default(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Data>? data)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Booking>? data)?  $default,) {final _that = this;
 switch (_that) {
 case _GetApiBookingsResponse() when $default != null:
 return $default(_that.data);case _:
@@ -210,11 +210,11 @@ return $default(_that.data);case _:
 @JsonSerializable()
 
 class _GetApiBookingsResponse implements GetApiBookingsResponse {
-  const _GetApiBookingsResponse({ List<Data>? data}): _data = data;
+  const _GetApiBookingsResponse({ List<Booking>? data}): _data = data;
   factory _GetApiBookingsResponse.fromJson(Map<String, dynamic> json) => _$GetApiBookingsResponseFromJson(json);
 
- final  List<Data>? _data;
-@override List<Data>? get data {
+ final  List<Booking>? _data;
+@override List<Booking>? get data {
   final value = _data;
   if (value == null) return null;
   if (_data is EqualUnmodifiableListView) return _data;
@@ -256,7 +256,7 @@ abstract mixin class _$GetApiBookingsResponseCopyWith<$Res> implements $GetApiBo
   factory _$GetApiBookingsResponseCopyWith(_GetApiBookingsResponse value, $Res Function(_GetApiBookingsResponse) _then) = __$GetApiBookingsResponseCopyWithImpl;
 @override @useResult
 $Res call({
- List<Data>? data
+ List<Booking>? data
 });
 
 
@@ -276,7 +276,7 @@ class __$GetApiBookingsResponseCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? data = freezed,}) {
   return _then(_GetApiBookingsResponse(
 data: freezed == data ? _self._data : data // ignore: cast_nullable_to_non_nullable
-as List<Data>?,
+as List<Booking>?,
   ));
 }
 

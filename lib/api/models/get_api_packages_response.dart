@@ -10,7 +10,7 @@ part 'get_api_packages_response.freezed.dart';
 part 'get_api_packages_response.g.dart';
 
 @Freezed()
-abstract class GetApiPackagesResponse with _$GetApiPackagesResponse {
+class GetApiPackagesResponse with _$GetApiPackagesResponse {
   const factory GetApiPackagesResponse({
     List<Package>? data,
   }) = _GetApiPackagesResponse;

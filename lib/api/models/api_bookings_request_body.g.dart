@@ -11,12 +11,12 @@ _ApiBookingsRequestBody _$ApiBookingsRequestBodyFromJson(
 ) => _ApiBookingsRequestBody(
   packageId: (json['package_id'] as num).toInt(),
   customerName: json['customer_name'] as String,
+  customerEmail: json['customer_email'] as String,
+  pax: (json['pax'] as num).toInt(),
   eventDate: DateTime.parse(json['event_date'] as String),
   venueAddress: json['venue_address'] as String,
-  paymentMethod: json['payment_method'] as String,
-  customerEmail: json['customer_email'] as String?,
+  paymentMethod: PaymentMethod.fromJson(json['payment_method'] as String),
   customerPhone: json['customer_phone'] as String?,
-  pax: (json['pax'] as num?)?.toInt(),
   eventTime: json['event_time'] as String?,
   scentIds: (json['scent_ids'] as List<dynamic>?)
       ?.map((e) => (e as num).toInt())
@@ -28,12 +28,19 @@ Map<String, dynamic> _$ApiBookingsRequestBodyToJson(
 ) => <String, dynamic>{
   'package_id': instance.packageId,
   'customer_name': instance.customerName,
+  'customer_email': instance.customerEmail,
+  'pax': instance.pax,
   'event_date': instance.eventDate.toIso8601String(),
   'venue_address': instance.venueAddress,
-  'payment_method': instance.paymentMethod,
-  'customer_email': instance.customerEmail,
+  'payment_method': _$PaymentMethodEnumMap[instance.paymentMethod]!,
   'customer_phone': instance.customerPhone,
-  'pax': instance.pax,
   'event_time': instance.eventTime,
   'scent_ids': instance.scentIds,
+};
+
+const _$PaymentMethodEnumMap = {
+  PaymentMethod.creditCard: 'credit_card',
+  PaymentMethod.cash: 'cash',
+  PaymentMethod.bankTransfer: 'bank_transfer',
+  PaymentMethod.$unknown: r'$unknown',
 };

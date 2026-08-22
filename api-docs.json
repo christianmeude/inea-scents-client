@@ -18,7 +18,7 @@
                     "Auth"
                 ],
                 "summary": "Register a new user",
-                "operationId": "5d4fa5d5607ed675ba93907e1fc94534",
+                "operationId": "8e4e3cb7b46126f4696379d3c7eeb4ad",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -73,7 +73,7 @@
                     "Auth"
                 ],
                 "summary": "Login user and return token",
-                "operationId": "67d6d0fdd54fba132e1b6f55ca254183",
+                "operationId": "222b2625838e3c57e017987f73598fda",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -111,10 +111,39 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Invalid credentials"
+                    "422": {
+                        "description": "Invalid credentials or Validation Error"
                     }
                 }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get authenticated user",
+                "operationId": "961ad57987905b44ae2e2f40b82e76de",
+                "responses": {
+                    "200": {
+                        "description": "User details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/availability": {
@@ -181,7 +210,7 @@
                     "Bookings"
                 ],
                 "summary": "Get user's bookings",
-                "description": "Returns a list of all bookings for the authenticated user",
+                "description": "Returns a list of all bookings for the authenticated user.",
                 "operationId": "4535e967ef15bc76dadf1efa40192f0d",
                 "responses": {
                     "200": {
@@ -193,40 +222,7 @@
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "booking_reference": {
-                                                        "type": "string"
-                                                    },
-                                                    "user_id": {
-                                                        "type": "integer"
-                                                    },
-                                                    "customer_name": {
-                                                        "type": "string"
-                                                    },
-                                                    "status": {
-                                                        "type": "string"
-                                                    },
-                                                    "event_date": {
-                                                        "type": "string",
-                                                        "format": "date"
-                                                    },
-                                                    "payment_method": {
-                                                        "type": "string"
-                                                    },
-                                                    "package": {
-                                                        "$ref": "#/components/schemas/Package"
-                                                    },
-                                                    "scents": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "$ref": "#/components/schemas/Scent"
-                                                        }
-                                                    }
-                                                },
-                                                "type": "object"
+                                                "$ref": "#/components/schemas/Booking"
                                             }
                                         }
                                     },
@@ -257,6 +253,8 @@
                                 "required": [
                                     "package_id",
                                     "customer_name",
+                                    "customer_email",
+                                    "pax",
                                     "event_date",
                                     "venue_address",
                                     "payment_method"
@@ -289,7 +287,12 @@
                                         "type": "string"
                                     },
                                     "payment_method": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "enum": [
+                                            "credit_card",
+                                            "cash",
+                                            "bank_transfer"
+                                        ]
                                     },
                                     "scent_ids": {
                                         "type": "array",
@@ -311,40 +314,7 @@
                                 "schema": {
                                     "properties": {
                                         "data": {
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "booking_reference": {
-                                                    "type": "string"
-                                                },
-                                                "user_id": {
-                                                    "type": "integer"
-                                                },
-                                                "customer_name": {
-                                                    "type": "string"
-                                                },
-                                                "status": {
-                                                    "type": "string"
-                                                },
-                                                "event_date": {
-                                                    "type": "string",
-                                                    "format": "date"
-                                                },
-                                                "payment_method": {
-                                                    "type": "string"
-                                                },
-                                                "package": {
-                                                    "$ref": "#/components/schemas/Package"
-                                                },
-                                                "scents": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/Scent"
-                                                    }
-                                                }
-                                            },
-                                            "type": "object"
+                                            "$ref": "#/components/schemas/Booking"
                                         }
                                     },
                                     "type": "object"
@@ -426,7 +396,19 @@
                         }
                     },
                     "404": {
-                        "description": "Package not found"
+                        "description": "Package not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -527,24 +509,31 @@
     },
     "components": {
         "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "john@example.com"
+                    },
+                    "is_admin": {
+                        "type": "boolean",
+                        "example": false
+                    }
+                },
+                "type": "object"
+            },
             "AuthResponse": {
                 "properties": {
                     "user": {
-                        "properties": {
-                            "id": {
-                                "type": "integer",
-                                "example": 1
-                            },
-                            "name": {
-                                "type": "string",
-                                "example": "John Doe"
-                            },
-                            "email": {
-                                "type": "string",
-                                "example": "john@example.com"
-                            }
-                        },
-                        "type": "object"
+                        "$ref": "#/components/schemas/User"
                     },
                     "access_token": {
                         "type": "string",
@@ -553,6 +542,61 @@
                     "token_type": {
                         "type": "string",
                         "example": "Bearer"
+                    }
+                },
+                "type": "object"
+            },
+            "Booking": {
+                "title": "Booking",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "booking_reference": {
+                        "type": "string"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "customer_name": {
+                        "type": "string"
+                    },
+                    "customer_email": {
+                        "type": "string"
+                    },
+                    "customer_phone": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "pax": {
+                        "type": "integer"
+                    },
+                    "event_date": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "event_time": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "venue_address": {
+                        "type": "string"
+                    },
+                    "payment_method": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "package": {
+                        "$ref": "#/components/schemas/Package"
+                    },
+                    "scents": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Scent"
+                        }
                     }
                 },
                 "type": "object"
@@ -571,7 +615,8 @@
                     },
                     "description": {
                         "type": "string",
-                        "example": "A nice package for couples."
+                        "example": "A nice package for couples.",
+                        "nullable": true
                     },
                     "inclusions": {
                         "type": "array",
@@ -625,11 +670,13 @@
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "nullable": true
                     },
                     "updated_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -648,11 +695,13 @@
                     },
                     "description": {
                         "type": "string",
-                        "example": "A calming floral scent."
+                        "example": "A calming floral scent.",
+                        "nullable": true
                     },
                     "image_url": {
                         "type": "string",
-                        "example": "https://example.com/lavender.jpg"
+                        "example": "https://example.com/lavender.jpg",
+                        "nullable": true
                     },
                     "is_available": {
                         "type": "boolean",
@@ -660,11 +709,13 @@
                     },
                     "created_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "nullable": true
                     },
                     "updated_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "nullable": true
                     }
                 },
                 "type": "object"

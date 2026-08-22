@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PostApiBookingsResponse {
 
- Data2? get data;
+ Booking? get data;
 /// Create a copy of PostApiBookingsResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,11 +49,11 @@ abstract mixin class $PostApiBookingsResponseCopyWith<$Res>  {
   factory $PostApiBookingsResponseCopyWith(PostApiBookingsResponse value, $Res Function(PostApiBookingsResponse) _then) = _$PostApiBookingsResponseCopyWithImpl;
 @useResult
 $Res call({
- Data2? data
+ Booking? data
 });
 
 
-$Data2CopyWith<$Res>? get data;
+$BookingCopyWith<$Res>? get data;
 
 }
 /// @nodoc
@@ -69,19 +69,19 @@ class _$PostApiBookingsResponseCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? data = freezed,}) {
   return _then(PostApiBookingsResponse(
 data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as Data2?,
+as Booking?,
   ));
 }
 /// Create a copy of PostApiBookingsResponse
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$Data2CopyWith<$Res>? get data {
+$BookingCopyWith<$Res>? get data {
     if (_self.data == null) {
     return null;
   }
 
-  return $Data2CopyWith<$Res>(_self.data!, (value) {
+  return $BookingCopyWith<$Res>(_self.data!, (value) {
     return _then(_self.copyWith(data: value));
   });
 }
@@ -166,7 +166,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Data2? data)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( Booking? data)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PostApiBookingsResponse() when $default != null:
 return $default(_that.data);case _:
@@ -187,7 +187,7 @@ return $default(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Data2? data)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( Booking? data)  $default,) {final _that = this;
 switch (_that) {
 case _PostApiBookingsResponse():
 return $default(_that.data);case _:
@@ -207,7 +207,7 @@ return $default(_that.data);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Data2? data)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( Booking? data)?  $default,) {final _that = this;
 switch (_that) {
 case _PostApiBookingsResponse() when $default != null:
 return $default(_that.data);case _:
@@ -225,7 +225,7 @@ class _PostApiBookingsResponse implements PostApiBookingsResponse {
   const _PostApiBookingsResponse({this.data});
   factory _PostApiBookingsResponse.fromJson(Map<String, dynamic> json) => _$PostApiBookingsResponseFromJson(json);
 
-@override final  Data2? data;
+@override final  Booking? data;
 
 /// Create a copy of PostApiBookingsResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -260,11 +260,11 @@ abstract mixin class _$PostApiBookingsResponseCopyWith<$Res> implements $PostApi
   factory _$PostApiBookingsResponseCopyWith(_PostApiBookingsResponse value, $Res Function(_PostApiBookingsResponse) _then) = __$PostApiBookingsResponseCopyWithImpl;
 @override @useResult
 $Res call({
- Data2? data
+ Booking? data
 });
 
 
-@override $Data2CopyWith<$Res>? get data;
+@override $BookingCopyWith<$Res>? get data;
 
 }
 /// @nodoc
@@ -280,7 +280,7 @@ class __$PostApiBookingsResponseCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? data = freezed,}) {
   return _then(_PostApiBookingsResponse(
 data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
-as Data2?,
+as Booking?,
   ));
 }
 
@@ -288,12 +288,12 @@ as Data2?,
 /// with the given fields replaced by the non-null parameter values.
 @override
 @pragma('vm:prefer-inline')
-$Data2CopyWith<$Res>? get data {
+$BookingCopyWith<$Res>? get data {
     if (_self.data == null) {
     return null;
   }
 
-  return $Data2CopyWith<$Res>(_self.data!, (value) {
+  return $BookingCopyWith<$Res>(_self.data!, (value) {
     return _then(_self.copyWith(data: value));
   });
 }

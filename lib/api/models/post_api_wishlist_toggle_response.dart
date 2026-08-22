@@ -8,7 +8,7 @@ part 'post_api_wishlist_toggle_response.freezed.dart';
 part 'post_api_wishlist_toggle_response.g.dart';
 
 @Freezed()
-abstract class PostApiWishlistToggleResponse with _$PostApiWishlistToggleResponse {
+class PostApiWishlistToggleResponse with _$PostApiWishlistToggleResponse {
   const factory PostApiWishlistToggleResponse({
     bool? attached,
     String? message,
