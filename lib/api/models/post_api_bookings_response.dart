@@ -10,7 +10,7 @@ part 'post_api_bookings_response.freezed.dart';
 part 'post_api_bookings_response.g.dart';
 
 @Freezed()
-class PostApiBookingsResponse with _$PostApiBookingsResponse {
+abstract class PostApiBookingsResponse with _$PostApiBookingsResponse {
   const factory PostApiBookingsResponse({
     Booking? data,
   }) = _PostApiBookingsResponse;

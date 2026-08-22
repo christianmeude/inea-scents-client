@@ -8,7 +8,7 @@ part 'user.freezed.dart';
 part 'user.g.dart';
 
 @Freezed()
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     int? id,
     String? name,

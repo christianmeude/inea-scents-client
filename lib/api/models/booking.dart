@@ -11,7 +11,7 @@ part 'booking.freezed.dart';
 part 'booking.g.dart';
 
 @Freezed()
-class Booking with _$Booking {
+abstract class Booking with _$Booking {
   const factory Booking({
     int? id,
     @JsonKey(name: 'booking_reference')

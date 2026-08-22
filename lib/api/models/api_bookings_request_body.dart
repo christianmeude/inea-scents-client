@@ -10,7 +10,7 @@ part 'api_bookings_request_body.freezed.dart';
 part 'api_bookings_request_body.g.dart';
 
 @Freezed()
-class ApiBookingsRequestBody with _$ApiBookingsRequestBody {
+abstract class ApiBookingsRequestBody with _$ApiBookingsRequestBody {
   const factory ApiBookingsRequestBody({
     @JsonKey(name: 'package_id')
     required int packageId,
