@@ -8,6 +8,7 @@ import 'package:retrofit/retrofit.dart';
 import '../models/api_login_request_body.dart';
 import '../models/api_register_request_body.dart';
 import '../models/auth_response.dart';
+import '../models/user.dart';
 
 part 'auth_api_client.g.dart';
 
@@ -26,4 +27,8 @@ abstract class AuthApiClient {
   Future<AuthResponse> postApiLogin({
     @Body() required ApiLoginRequestBody body,
   });
+
+  /// Get authenticated user
+  @GET('/api/user')
+  Future<User> getApiUser();
 }
