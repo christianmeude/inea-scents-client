@@ -43,7 +43,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: const Color(0xFF6A4053).withValues(alpha: 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -58,7 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.1),
+                  color: isDark ? Colors.white.withValues(alpha: 0.2) : const Color(0xFF6A4053).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -85,7 +85,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 style: GoogleFonts.figtree(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF151012),
+                  color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -97,7 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 style: GoogleFonts.figtree(
                   fontSize: 15,
                   height: 1.5,
-                  color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.7) : const Color(0xFF151012).withValues(alpha: 0.7),
+                  color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.7) : const Color(0xFF6A4053).withValues(alpha: 0.7),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -114,7 +114,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(9999),
                     ),
                   ),
                   child: Text(
@@ -173,7 +173,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
+    final bgColor = isDark ? const Color(0xFF6A4053) : const Color(0xFFFDF4F5);
     final primaryColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
     final inputLabelColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
 
@@ -196,7 +196,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 600,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFF99868C),
                 angle: 30 * (3.14159 / 180),
               ),
             ),
@@ -206,7 +206,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 300,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFF99868C),
                 angle: 15 * (3.14159 / 180),
               ),
             ),
@@ -216,7 +216,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 250,
-                color: isDark ? const Color(0x806A4053) : const Color(0xFFC08D9E),
+                color: isDark ? const Color(0x806A4053) : const Color(0xFFC4ACAC),
                 angle: 10 * (3.14159 / 180),
               ),
             ),
@@ -226,7 +226,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF988088),
+                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF99868C),
               ),
             ),
             Positioned(
@@ -235,7 +235,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 600,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4ACAC),
               ),
             ),
             Positioned(
@@ -244,7 +244,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4ACAC),
               ),
             ),
             Positioned(
@@ -253,7 +253,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 500,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6A4053),
               ),
             ),
             Positioned(
@@ -262,7 +262,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 250,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6A4053),
               ),
             ),
 
@@ -280,7 +280,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     constraints: const BoxConstraints(maxWidth: 336),
                     child: Column(
                       children: [
-                        const _ApplicationLogo(),
+                        AppLogo(),
                         const SizedBox(height: 44), // Adjusted to account for the visual overhang of the logo
 
                         _InputLabel(text: 'Email', color: inputLabelColor),
@@ -354,7 +354,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   if (states.contains(WidgetState.selected)) {
                                     return const Color(0xFF6A4053);
                                   }
-                                  return isDark ? const Color(0xFF151012) : Colors.white;
+                                  return isDark ? const Color(0xFF6A4053) : Colors.white;
                                 }),
                                 side: BorderSide(
                                   color: const Color(0xFF6A4053).withValues(alpha: 0.3),
@@ -395,7 +395,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(9999),
                               ),
                             ),
                             child: authState.isLoading
@@ -432,7 +432,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(9999),
                               ),
                             ),
                             child: Text(
@@ -472,129 +472,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
 // ============================================================================
 // APPLICATION LOGO
-// ============================================================================
-
-class _ApplicationLogo extends StatelessWidget {
-  const _ApplicationLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final brandPrimary = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
-    final strokeColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
-
-    final sw = MediaQuery.of(context).size.width;
-    final isDesktop = sw >= 640;
-
-    final ineaSize = isDesktop ? 72.0 : 60.0;
-    final ineaSpacing = ineaSize * 0.15;
-    final scentsSize = isDesktop ? 96.0 : 72.0;
-    
-    // Adjusted offset for perfect visual 1:1 match with Inertia Web Rendering
-    final scentsOffsetX = isDesktop ? -76.0 : -63.0; 
-    final scentsOffsetY = isDesktop ? 34.0 : 25.0; 
-
-    // Since Transform.translate only moves the visual layer, the layout bounding box
-    // still reserves the original width on the right. We shift the whole block right
-    // by half the offset to keep the logo perfectly centered.
-    final visualCenterOffset = isDesktop ? 38.0 : 31.5;
-
-    final ineaStroke = GoogleFonts.josefinSans(
-      fontSize: ineaSize,
-      fontWeight: FontWeight.w700,
-      letterSpacing: ineaSpacing,
-      foreground: Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..strokeJoin = StrokeJoin.round
-        ..color = strokeColor,
-    );
-
-    final ineaFill = GoogleFonts.josefinSans(
-      fontSize: ineaSize,
-      fontWeight: FontWeight.w700,
-      letterSpacing: ineaSpacing,
-      color: brandPrimary,
-    );
-
-    final scentsStroke = GoogleFonts.greatVibes(
-      fontSize: scentsSize,
-      foreground: Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..strokeJoin = StrokeJoin.round
-        ..color = strokeColor,
-    );
-
-    final scentsFill = GoogleFonts.greatVibes(
-      fontSize: scentsSize,
-      color: brandPrimary,
-    );
-
-    return FittedBox(
-      fit: BoxFit.fitWidth,
-      child: Transform.translate(
-        offset: Offset(visualCenterOffset, 0),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // ==============================================================
-            // 1. INEA STROKE (Base layer, sizes the Stack)
-            // ==============================================================
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('INEA', style: ineaStroke),
-                // Invisible untranslated Scents guarantees the Stack layout width 
-                // matches the natural flow of the two words.
-                Opacity(opacity: 0, child: Text('Scents', style: scentsStroke)),
-              ],
-            ),
-            
-            // ==============================================================
-            // 2. INEA FILL
-            // ==============================================================
-            Text('INEA', style: ineaFill),
-            
-            // ==============================================================
-            // 3. SCENTS STROKE (Knocks out the INEA Fill beneath it!)
-            // ==============================================================
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Opacity(opacity: 0, child: Text('INEA', style: ineaStroke)),
-                Transform.translate(
-                  offset: Offset(scentsOffsetX, scentsOffsetY),
-                  child: Text('Scents', style: scentsStroke),
-                ),
-              ],
-            ),
-            
-            // ==============================================================
-            // 4. SCENTS FILL
-            // ==============================================================
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Opacity(opacity: 0, child: Text('INEA', style: ineaStroke)),
-                Transform.translate(
-                  offset: Offset(scentsOffsetX, scentsOffsetY),
-                  child: Text('Scents', style: scentsFill),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// INPUT LABEL
 // ============================================================================
 
 class _InputLabel extends StatelessWidget {
@@ -653,10 +530,10 @@ class _CustomTextFieldState extends State<_CustomTextField> {
     
     final baseBg = isDark 
         ? const Color(0xFF6A4053).withValues(alpha: 0.40)
-        : const Color(0xFF8B5D76).withValues(alpha: 0.70);
+        : const Color(0xFF99868C).withValues(alpha: 0.70);
     final focusBg = isDark
         ? const Color(0xFF6A4053).withValues(alpha: 0.60)
-        : const Color(0xFF8B5D76).withValues(alpha: 0.90);
+        : const Color(0xFF99868C).withValues(alpha: 0.90);
 
     final baseBorder = isDark 
         ? Colors.white.withValues(alpha: 0.10)
@@ -673,7 +550,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: const [
             BoxShadow(
               color: Color(0x0D6A4053),
@@ -690,14 +567,14 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(12),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 color: isFocused ? focusBg : baseBg,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isFocused ? focusBorder : baseBorder,
                   width: 1.0,
@@ -795,8 +672,8 @@ class _ThemeToggle extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF261D21).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(30),
+        color: isDark ? const Color(0xFF6A4053).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0C000000),
@@ -805,7 +682,7 @@ class _ThemeToggle extends ConsumerWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(12),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Row(

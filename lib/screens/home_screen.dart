@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../providers/index.dart';
 import '../widgets/index.dart';
+import '../widgets/app_logo.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -13,7 +14,7 @@ class HomeScreen extends ConsumerWidget {
     final packagesAsync = ref.watch(packagesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF6F3), // Off-white cream color
+      backgroundColor: const Color(0xFFFDF4F5), // Off-white cream color
       body: SafeArea(
         child: Column(
           children: [
@@ -25,44 +26,7 @@ class HomeScreen extends ConsumerWidget {
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  Center(
-                    child: SizedBox(
-                      width: 140,
-                      height: 45,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            child: const Text(
-                              'INEA',
-                              style: TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
-                                height: 1,
-                                color: Color(0xFF5E3A52),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Text(
-                              'Scents',
-                              style: const TextStyle(
-                                fontFamily: 'GreatVibes',
-                                fontSize: 32,
-                                height: 1,
-                                color: Color(0xFF5E3A52),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Center(child: AppLogo()),
                 ],
               ),
             ),
@@ -86,18 +50,18 @@ class HomeScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.grey.withValues(alpha: 0.4)),
+                                border: Border.all(color: const Color(0x4D99868C)),
                               ),
                               child: Row(
                                 children: [
                                   const SizedBox(width: 12),
-                                  Icon(Icons.search, color: Colors.grey[400], size: 20),
+                                  Icon(Icons.search, color: const Color(0xFF99868C), size: 20),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       'Search "Perfume" here',
                                       style: TextStyle(
-                                        color: Colors.grey[400],
+                                        color: const Color(0xFF99868C),
                                         fontSize: 14,
                                       ),
                                       maxLines: 1,
@@ -109,9 +73,9 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 15),
-                          const Icon(Icons.chat_bubble_rounded, color: Color(0xFF5E3A52)),
+                          const Icon(Icons.chat_bubble_rounded, color: Color(0xFF6A4053)),
                           const SizedBox(width: 15),
-                          const Icon(Icons.calendar_today_rounded, color: Color(0xFF5E3A52)),
+                          const Icon(Icons.calendar_today_rounded, color: Color(0xFF6A4053)),
                         ],
                       ),
                     ),
@@ -128,10 +92,10 @@ class HomeScreen extends ConsumerWidget {
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: const Color(0xFFF3EBE1),
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
+                              color: const Color(0xFF6A4053).withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -213,7 +177,7 @@ class HomeScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: const Color(0xFF6A4053),
                         ),
                       ),
                     ),
@@ -247,7 +211,7 @@ class HomeScreen extends ConsumerWidget {
                           );
                         },
                         loading: () => const Center(
-                          child: CircularProgressIndicator(color: Color(0xFF5E3A52)),
+                          child: CircularProgressIndicator(color: Color(0xFF6A4053)),
                         ),
                         error: (err, stack) => Center(child: Text(err.toString())),
                       ),

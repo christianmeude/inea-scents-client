@@ -15,8 +15,8 @@ class BookingScreen extends ConsumerStatefulWidget {
 }
 
 class _BookingScreenState extends ConsumerState<BookingScreen> {
-  static const Color plum = Color(0xFF5E3A52);
-  static const Color cream = Color(0xFFFAF6F3);
+  static const Color plum = Color(0xFF6A4053);
+  static const Color cream = Color(0xFFFDF4F5);
 
   int currentStep = 2; // Default to Schedule based on prototype
 
@@ -56,10 +56,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+                      border: Border.all(color: const Color(0x4D99868C)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: const Color(0xFF6A4053).withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 5),
                         ),
@@ -79,18 +79,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         const SizedBox(height: 20),
                         const Text(
                           'Payment Successful',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF6A4053)),
                         ),
                         const SizedBox(height: 30),
                         const Text(
                           'Thank you for your booking.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          style: TextStyle(fontSize: 14, color: const Color(0x8A6A4053)),
                         ),
                         const Text(
                           'To check your status on go to your\nbooking settings.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
+                          style: TextStyle(fontSize: 14, color: const Color(0x8A6A4053)),
                         ),
                       ],
                     ),
@@ -106,7 +106,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     onPressed: () => context.go('/home'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: plum,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9999)),
                     ),
                     child: const Text('Done', style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
@@ -148,7 +148,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: plum,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9999)),
                   ),
                   child: Text(
                     currentStep == 4 ? 'Confirm & Pay' : currentStep == 3 ? 'Proceed to Payment' : 'Next',
@@ -239,17 +239,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 Row(
                   children: [
                     if (index == 0) const Expanded(child: SizedBox())
-                    else Expanded(child: Container(height: 3, color: isPast ? plum : Colors.grey[300])),
+                    else Expanded(child: Container(height: 3, color: isPast ? plum : const Color(0xFF99868C))),
                     Container(
                       width: 16,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: isPast ? plum : Colors.grey[300],
+                        color: isPast ? plum : const Color(0xFF99868C),
                         shape: BoxShape.circle,
                       ),
                     ),
                     if (index == steps.length - 1) const Expanded(child: SizedBox())
-                    else Expanded(child: Container(height: 3, color: index < currentStep ? plum : Colors.grey[300])),
+                    else Expanded(child: Container(height: 3, color: index < currentStep ? plum : const Color(0xFF99868C))),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -257,7 +257,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   steps[index],
                   style: TextStyle(
                     fontSize: 10,
-                    color: isCurrent ? plum : Colors.grey,
+                    color: isCurrent ? plum : const Color(0xFF99868C),
                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -298,7 +298,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+              border: Border.all(color: const Color(0x4D99868C)),
             ),
             child: TableCalendar(
               firstDay: DateTime.utc(2020, 10, 16),
@@ -313,7 +313,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
               calendarStyle: const CalendarStyle(
                 todayDecoration: BoxDecoration(color: Colors.transparent),
-                todayTextStyle: TextStyle(color: Colors.black),
+                todayTextStyle: TextStyle(color: const Color(0xFF6A4053)),
               ),
             ),
           ),
@@ -326,7 +326,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+              border: Border.all(color: const Color(0x4D99868C)),
             ),
           ),
         ],
@@ -348,28 +348,28 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+                    border: Border.all(color: const Color(0x4D99868C)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Details', style: TextStyle(fontSize: 14, color: Colors.black87)),
+                      const Text('Details', style: TextStyle(fontSize: 14, color: const Color(0xFF6A4053))),
                       const SizedBox(height: 15),
-                      Text('Package Variation: ${package.name}', style: const TextStyle(fontSize: 13, color: Colors.black54)),
+                      Text('Package Variation: ${package.name}', style: const TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
                       const SizedBox(height: 15),
-                      const Text('Inclusion/s:', style: TextStyle(fontSize: 13, color: Colors.black54)),
+                      const Text('Inclusion/s:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
                       const SizedBox(height: 5),
-                      ...(package.inclusions ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: Colors.black87))),
+                      ...(package.inclusions ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053)))),
                       const SizedBox(height: 15),
-                      const Text('Free:', style: TextStyle(fontSize: 13, color: Colors.black54)),
+                      const Text('Free:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
                       const SizedBox(height: 5),
-                      ...(package.freebies ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: Colors.black87))),
+                      ...(package.freebies ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053)))),
                       const SizedBox(height: 15),
-                      const Text('Selected Date:', style: TextStyle(fontSize: 13, color: Colors.black54)),
+                      const Text('Selected Date:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
                       const SizedBox(height: 5),
                       const Text('September 1, 2026', style: TextStyle(fontSize: 13, color: plum)),
                       const SizedBox(height: 15),
-                      const Text('Total Cost:', style: TextStyle(fontSize: 13, color: Colors.black54)),
+                      const Text('Total Cost:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
                       const SizedBox(height: 5),
                       Text('Php. ${(package.price ?? 4500).toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, color: plum)),
                     ],
@@ -383,7 +383,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+                    border: Border.all(color: const Color(0x4D99868C)),
                   ),
                   child: Column(
                     children: [
@@ -405,7 +405,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           children: [
                             Text(package.name ?? '', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                             const SizedBox(height: 8),
-                            Text(package.description ?? '', maxLines: 3, style: TextStyle(fontSize: 10, color: Colors.grey[500])),
+                            Text(package.description ?? '', maxLines: 3, style: TextStyle(fontSize: 10, color: const Color(0xFF99868C))),
                             const SizedBox(height: 12),
                             Text('Php. ${(package.price ?? 4499.0).toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, color: plum)),
                           ],
@@ -431,14 +431,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+              border: Border.all(color: const Color(0x4D99868C)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(package.name ?? '', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: plum)),
                 const SizedBox(height: 15),
-                const Text('Inclusion/s:', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const Text('Inclusion/s:', style: TextStyle(fontSize: 12, color: const Color(0xFF99868C))),
                 const SizedBox(height: 10),
                 ...[
                   {'label': 'Featuring your logo', 'val': '300'},
@@ -454,16 +454,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 3),
                     child: Row(
                       children: [
-                        Text('• ${item['label']}', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                        Text('• ${item['label']}', style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053))),
                         Expanded(child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 5),
-                              child: Text('- ' * (constraints.maxWidth / 8).floor(), maxLines: 1, overflow: TextOverflow.clip, style: TextStyle(color: Colors.grey[400])),
+                              child: Text('- ' * (constraints.maxWidth / 8).floor(), maxLines: 1, overflow: TextOverflow.clip, style: TextStyle(color: const Color(0xFF99868C))),
                             );
                           },
                         )),
-                        Text(item['val']!, style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                        Text(item['val']!, style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053))),
                       ],
                     ),
                   );
@@ -471,7 +471,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: Text('Total: Php, 4,500.00', style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                  child: Text('Total: Php, 4,500.00', style: const TextStyle(fontSize: 13, color: const Color(0xFF99868C))),
                 ),
               ],
             ),
@@ -482,7 +482,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+              border: Border.all(color: const Color(0x4D99868C)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

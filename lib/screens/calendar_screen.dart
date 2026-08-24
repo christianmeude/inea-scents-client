@@ -887,7 +887,7 @@ class _CalendarError extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 13),
 
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(9999),
                     ),
                   ),
 

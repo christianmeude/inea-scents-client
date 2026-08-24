@@ -256,7 +256,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     height: 54,
                     decoration: BoxDecoration(
                       color: inputColor,
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.80),
                         width: 1.1,
@@ -652,7 +652,7 @@ class _ErrorState extends StatelessWidget {
               foregroundColor: primaryColor,
               side: const BorderSide(color: primaryColor),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(9999),
               ),
             ),
 

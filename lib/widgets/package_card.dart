@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/index.dart';
+import '../config/theme.dart';
 
 class PackageCard extends StatelessWidget {
   final Package package;
@@ -15,7 +16,13 @@ class PackageCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primary.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +39,7 @@ class PackageCard extends StatelessWidget {
                     aspectRatio: 1.15,
                     child: Container(
                       width: double.infinity,
-                      color: const Color(0xFFF7F5F2),
+                      color: AppTheme.neutralBg,
                       child: (package.images != null && package.images!.isNotEmpty)
                           ? Image.network(
                               package.images![0],
@@ -42,7 +49,7 @@ class PackageCard extends StatelessWidget {
                                   child: Text(
                                     package.name ?? '',
                                     textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12, color: AppTheme.primary),
                                   ),
                                 );
                               },
@@ -51,7 +58,7 @@ class PackageCard extends StatelessWidget {
                               child: Text(
                                 package.name ?? '',
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 12, color: AppTheme.primary),
                               ),
                             ),
                     ),
@@ -73,7 +80,7 @@ class PackageCard extends StatelessWidget {
                       'View Package',
                       style: TextStyle(
                         fontSize: 10,
-                        color: Color(0xFF5E3A52), // Plum color
+                        color: AppTheme.primary, // Plum color
                       ),
                     ),
                   ),
@@ -90,8 +97,8 @@ class PackageCard extends StatelessWidget {
                     package.name ?? '',
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -103,13 +110,13 @@ class PackageCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${package.rating ?? 4.5}',
-                        style: const TextStyle(fontSize: 13, color: Colors.black87),
+                        style: const TextStyle(fontSize: 13, color: AppTheme.primary),
                       ),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           '(${package.reviewsCount ?? 232} reviews)',
-                          style: TextStyle(fontSize: 13, color: Colors.grey[400]),
+                          style: const TextStyle(fontSize: 13, color: AppTheme.secondary),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -119,9 +126,9 @@ class PackageCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     package.description ?? 'Perfect for intimate celebrations and small gatherings.',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
-                      color: Colors.grey[500],
+                      color: AppTheme.secondary,
                       height: 1.3,
                     ),
                     maxLines: 2,
@@ -132,7 +139,8 @@ class PackageCard extends StatelessWidget {
                     'Php. ${(package.price ?? 4499.0).toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 15,
-                      color: Color(0xFF5E3A52), // Plum
+                      color: AppTheme.primary, // Plum
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],

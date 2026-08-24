@@ -13,7 +13,7 @@ class PackageDetailScreen extends ConsumerWidget {
     final packageAsync = ref.watch(packageDetailsProvider(packageId));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF6F3),
+      backgroundColor: const Color(0xFFFDF4F5),
       body: SafeArea(
         child: packageAsync.when(
           data: (package) {
@@ -26,7 +26,7 @@ class PackageDetailScreen extends ConsumerWidget {
                     children: [
                       GestureDetector(
                         onTap: () => context.pop(),
-                        child: const Icon(Icons.arrow_back, color: Color(0xFF5E3A52)),
+                        child: const Icon(Icons.arrow_back, color: Color(0xFF6A4053)),
                       ),
                       const SizedBox(width: 15),
                       Expanded(
@@ -35,17 +35,17 @@ class PackageDetailScreen extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.grey.withValues(alpha: 0.4)),
+                            border: Border.all(color: const Color(0x4D99868C)),
                           ),
                           child: Row(
                             children: [
                               const SizedBox(width: 12),
-                              Icon(Icons.search, color: Colors.grey[400], size: 20),
+                              Icon(Icons.search, color: const Color(0xFF99868C), size: 20),
                               const SizedBox(width: 12),
                               Text(
                                 'Search "Perfume" here',
                                 style: TextStyle(
-                                  color: Colors.grey[400],
+                                  color: const Color(0xFF99868C),
                                   fontSize: 14,
                                 ),
                               ),
@@ -54,9 +54,9 @@ class PackageDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      const Icon(Icons.chat_bubble_rounded, color: Color(0xFF5E3A52)),
+                      const Icon(Icons.chat_bubble_rounded, color: Color(0xFF6A4053)),
                       const SizedBox(width: 15),
-                      const Icon(Icons.calendar_today_rounded, color: Color(0xFF5E3A52)),
+                      const Icon(Icons.calendar_today_rounded, color: Color(0xFF6A4053)),
                     ],
                   ),
                 ),
@@ -70,7 +70,7 @@ class PackageDetailScreen extends ConsumerWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                          border: Border.all(color: const Color(0x4D99868C)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +102,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                      color: const Color(0xFF6A4053),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -112,12 +112,12 @@ class PackageDetailScreen extends ConsumerWidget {
                                       const SizedBox(width: 4),
                                       Text(
                                         '${package.rating ?? 4.5}',
-                                        style: const TextStyle(fontSize: 14, color: Colors.black87),
+                                        style: const TextStyle(fontSize: 14, color: const Color(0xFF6A4053)),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '(${package.reviewsCount ?? 232} reviews)',
-                                        style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                                        style: TextStyle(fontSize: 14, color: const Color(0xFF99868C)),
                                       ),
                                     ],
                                   ),
@@ -126,7 +126,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                     package.description ?? 'Perfect for intimate celebrations...',
                                     style: TextStyle(
                                       fontSize: 13,
-                                      color: Colors.grey[500],
+                                      color: const Color(0xFF99868C),
                                       height: 1.4,
                                     ),
                                   ),
@@ -136,7 +136,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black87,
+                                      color: const Color(0xFF6A4053),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -151,7 +151,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                             inclusion,
                                             style: TextStyle(
                                               fontSize: 13,
-                                              color: Colors.black87,
+                                              color: const Color(0xFF6A4053),
                                               height: 1.3,
                                             ),
                                           ),
@@ -167,7 +167,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        color: Colors.black87,
+                                        color: const Color(0xFF6A4053),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
@@ -182,7 +182,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                               freebie,
                                               style: TextStyle(
                                                 fontSize: 13,
-                                                color: Colors.black87,
+                                                color: const Color(0xFF6A4053),
                                                 height: 1.3,
                                               ),
                                             ),
@@ -206,7 +206,7 @@ class PackageDetailScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border(top: BorderSide(color: Colors.grey.withValues(alpha: 0.2))),
+                    border: Border(top: BorderSide(color: const Color(0x4D99868C))),
                   ),
                   child: SafeArea(
                     top: false,
@@ -218,17 +218,17 @@ class PackageDetailScreen extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF5E3A52),
+                            color: Color(0xFF6A4053),
                           ),
                         ),
                         ElevatedButton(
                           onPressed: () => context.push('/calendar', extra: package.id),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF5E3A52), // Plum
+                            backgroundColor: const Color(0xFF6A4053), // Plum
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(9999),
                             ),
                           ),
                           child: const Text(
@@ -243,7 +243,7 @@ class PackageDetailScreen extends ConsumerWidget {
               ],
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF5E3A52))),
+          loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF6A4053))),
           error: (error, stack) => Center(child: Text('Error: $error')),
         ),
       ),

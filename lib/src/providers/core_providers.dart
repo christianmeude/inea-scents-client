@@ -25,12 +25,9 @@ final dioClientProvider = Provider<DioClient>((ref) {
   
   String baseUrl;
   
-  if (kIsWeb && !kDebugMode) {
-    // When served by Laravel in production, use a relative path
-    baseUrl = '';
-  } else if (!kDebugMode) {
-    // Release builds on mobile/desktop ALWAYS use the live backend
-    baseUrl = 'https://inea-scents.onrender.com';
+  if (!kDebugMode) {
+    // Release builds on all platforms use the live backend
+    baseUrl = const String.fromEnvironment('API_URL', defaultValue: 'https://inea-scents.onrender.com');
   } else {
     // Debug builds check the manual toggle
     baseUrl = currentEnvironment == Environment.local 

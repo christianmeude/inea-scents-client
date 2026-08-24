@@ -60,7 +60,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     });
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
+    final bgColor = isDark ? const Color(0xFF6A4053) : const Color(0xFFFDF4F5);
     final primaryColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
     final inputLabelColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
 
@@ -83,7 +83,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 600,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFF99868C),
                 angle: 30 * (3.14159 / 180),
               ),
             ),
@@ -93,7 +93,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 300,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFF99868C),
                 angle: 15 * (3.14159 / 180),
               ),
             ),
@@ -103,7 +103,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 250,
-                color: isDark ? const Color(0x806A4053) : const Color(0xFFC08D9E),
+                color: isDark ? const Color(0x806A4053) : const Color(0xFFC4ACAC),
                 angle: 10 * (3.14159 / 180),
               ),
             ),
@@ -113,7 +113,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF988088),
+                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF99868C),
               ),
             ),
             Positioned(
@@ -122,7 +122,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 600,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4ACAC),
               ),
             ),
             Positioned(
@@ -131,7 +131,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4ACAC),
               ),
             ),
             Positioned(
@@ -140,7 +140,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 500,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6A4053),
               ),
             ),
             Positioned(
@@ -149,7 +149,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 250,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6A4053),
               ),
             ),
 
@@ -215,7 +215,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(9999),
                               ),
                             ),
                             child: authState.isLoading
@@ -272,7 +272,7 @@ class _ApplicationLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final brandPrimary = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
-    final strokeColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
+    final strokeColor = isDark ? const Color(0xFF6A4053) : const Color(0xFFFDF4F5);
 
     final sw = MediaQuery.of(context).size.width;
     final isDesktop = sw >= 640;
@@ -444,10 +444,10 @@ class _CustomTextFieldState extends State<_CustomTextField> {
     
     final baseBg = isDark 
         ? const Color(0xFF6A4053).withValues(alpha: 0.40)
-        : const Color(0xFF8B5D76).withValues(alpha: 0.70);
+        : const Color(0xFF99868C).withValues(alpha: 0.70);
     final focusBg = isDark
         ? const Color(0xFF6A4053).withValues(alpha: 0.60)
-        : const Color(0xFF8B5D76).withValues(alpha: 0.90);
+        : const Color(0xFF99868C).withValues(alpha: 0.90);
 
     final baseBorder = isDark 
         ? Colors.white.withValues(alpha: 0.10)
@@ -464,7 +464,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(12),
           boxShadow: const [
             BoxShadow(
               color: Color(0x0D6A4053),
@@ -481,14 +481,14 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(12),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 color: isFocused ? focusBg : baseBg,
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isFocused ? focusBorder : baseBorder,
                   width: 1.0,
@@ -586,8 +586,8 @@ class _ThemeToggle extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF261D21).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(30),
+        color: isDark ? const Color(0xFF6A4053).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0C000000),
@@ -596,7 +596,7 @@ class _ThemeToggle extends ConsumerWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(12),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Row(
