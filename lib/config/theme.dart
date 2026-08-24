@@ -74,4 +74,64 @@ class AppTheme {
       useMaterial3: true,
     );
   }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primaryColor: primary,
+      scaffoldBackgroundColor: const Color(0xFF2C1923), // Very Dark Plum (no-black rule)
+      colorScheme: const ColorScheme.dark(
+        primary: Color(0xFFFDF4F5), // Light Cream for primary elements in dark mode
+        secondary: secondary,
+        surface: Color(0xFF3B232F), // Slightly lighter dark plum for surfaces
+        onPrimary: Color(0xFF2C1923),
+        onSecondary: Colors.white,
+        onSurface: Color(0xFFFDF4F5),
+        error: unavailable,
+      ),
+      textTheme: GoogleFonts.figtreeTextTheme(ThemeData.dark().textTheme).apply(
+        bodyColor: const Color(0xFFFDF4F5),
+        displayColor: const Color(0xFFFDF4F5),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF2C1923),
+        foregroundColor: Color(0xFFFDF4F5),
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFFFDF4F5)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFDF4F5),
+          foregroundColor: const Color(0xFF2C1923),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(9999),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          elevation: 0,
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.transparent,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        labelStyle: const TextStyle(color: Color(0xFFFDF4F5)),
+        hintStyle: TextStyle(color: secondary.withOpacity(0.7)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: secondary, width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: secondary, width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFFDF4F5), width: 2),
+        ),
+      ),
+      useMaterial3: true,
+    );
+  }
 }
+

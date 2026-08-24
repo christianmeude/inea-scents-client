@@ -61,7 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF6A4053) : const Color(0xFFFDF4F5);
+    final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
     final primaryColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
     final inputLabelColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
 
@@ -84,7 +84,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 600,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFF99868C),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
                 angle: 30 * (3.14159 / 180),
               ),
             ),
@@ -94,7 +94,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 300,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFF99868C),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
                 angle: 15 * (3.14159 / 180),
               ),
             ),
@@ -104,7 +104,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 250,
-                color: isDark ? const Color(0x806A4053) : const Color(0xFFC4ACAC),
+                color: isDark ? const Color(0x806A4053) : const Color(0xFFC08D9E),
                 angle: 10 * (3.14159 / 180),
               ),
             ),
@@ -114,7 +114,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF99868C),
+                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF988088),
               ),
             ),
             Positioned(
@@ -123,7 +123,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 600,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4ACAC),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
               ),
             ),
             Positioned(
@@ -132,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4ACAC),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
               ),
             ),
             Positioned(
@@ -141,7 +141,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 500,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6A4053),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
               ),
             ),
             Positioned(
@@ -150,7 +150,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 250,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6A4053),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
               ),
             ),
 
@@ -234,7 +234,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(9999),
+                                borderRadius: BorderRadius.circular(30),
                               ),
                             ),
                             child: authState.isLoading
@@ -271,7 +271,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(9999),
+                                borderRadius: BorderRadius.circular(30),
                               ),
                             ),
                             child: Text(
@@ -320,7 +320,7 @@ class _ApplicationLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final brandPrimary = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
-    final strokeColor = isDark ? const Color(0xFF6A4053) : const Color(0xFFFDF4F5);
+    final strokeColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
 
     final sw = MediaQuery.of(context).size.width;
     final isDesktop = sw >= 640;
@@ -492,10 +492,10 @@ class _CustomTextFieldState extends State<_CustomTextField> {
     
     final baseBg = isDark 
         ? const Color(0xFF6A4053).withValues(alpha: 0.40)
-        : const Color(0xFF99868C).withValues(alpha: 0.70);
+        : const Color(0xFF8B5D76).withValues(alpha: 0.70);
     final focusBg = isDark
         ? const Color(0xFF6A4053).withValues(alpha: 0.60)
-        : const Color(0xFF99868C).withValues(alpha: 0.90);
+        : const Color(0xFF8B5D76).withValues(alpha: 0.90);
 
     final baseBorder = isDark 
         ? Colors.white.withValues(alpha: 0.10)
@@ -512,7 +512,7 @@ class _CustomTextFieldState extends State<_CustomTextField> {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
           boxShadow: const [
             BoxShadow(
               color: Color(0x0D6A4053),
@@ -529,51 +529,59 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
                 color: isFocused ? focusBg : baseBg,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(30),
                 border: Border.all(
                   color: isFocused ? focusBorder : baseBorder,
                   width: 1.0,
                 ),
               ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: widget.controller,
-                      obscureText: widget.obscureText,
-                      keyboardType: widget.keyboardType,
-                      textInputAction: widget.textInputAction,
-                      autofillHints: widget.autofillHints,
-                      style: GoogleFonts.figtree(
-                        color: isDark ? const Color(0xFFFDF4F5) : Colors.white, 
-                        fontSize: 16
-                      ),
-                      cursorColor: isDark ? const Color(0xFFFDF4F5) : Colors.white,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.only(
-                          top: 12,
-                          bottom: 12,
-                          left: 20,
-                          right: widget.suffixIcon != null ? 0 : 20,
-                        ),
-                      ),
-                    ),
+              child: TextField(
+                controller: widget.controller,
+                obscureText: widget.obscureText,
+                keyboardType: widget.keyboardType,
+                textInputAction: widget.textInputAction,
+                autofillHints: widget.autofillHints,
+                style: GoogleFonts.figtree(
+                  color: isDark ? const Color(0xFFFDF4F5) : Colors.white, 
+                  fontSize: 16
+                ),
+                cursorColor: isDark ? const Color(0xFFFDF4F5) : Colors.white,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
                   ),
-                  if (widget.suffixIcon != null)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: widget.suffixIcon,
-                    ),
-                ],
-              ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.transparent,
+                  contentPadding: EdgeInsets.only(
+                    top: 12,
+                    bottom: 12,
+                    left: 20,
+                    right: widget.suffixIcon != null ? 0 : 20,
+                  ),
+                  suffixIcon: widget.suffixIcon != null 
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: widget.suffixIcon,
+                      ) 
+                    : null,
+                ),
+              )
             ),
           ),
         ),
@@ -634,8 +642,8 @@ class _ThemeToggle extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF6A4053).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
+        color: isDark ? const Color(0xFF261D21).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(30),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0C000000),
@@ -644,7 +652,7 @@ class _ThemeToggle extends ConsumerWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(30),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Row(
