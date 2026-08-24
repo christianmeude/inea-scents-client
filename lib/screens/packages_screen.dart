@@ -402,7 +402,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                               crossAxisCount: 2,
 
                               // Slightly taller cards so they don't feel cramped.
-                              childAspectRatio: 0.72,
+                              childAspectRatio: 0.52,
 
                               crossAxisSpacing: 14,
                               mainAxisSpacing: 16,
@@ -428,7 +428,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.72,
+                          childAspectRatio: 0.52,
                           crossAxisSpacing: 14,
                           mainAxisSpacing: 16,
                         ),

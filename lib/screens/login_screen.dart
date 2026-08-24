@@ -1,9 +1,12 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
+import '../src/providers/core_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -26,13 +29,135 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  void _showAdminRestrictedBottomSheet(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag indicator
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 32),
+              
+              // Warning Icon
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6A4053).withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.desktop_mac_outlined,
+                  color: Color(0xFF6A4053),
+                  size: 32,
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Title
+              Text(
+                'Admin Access Restricted',
+                style: GoogleFonts.figtree(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF151012),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              
+              // Subtitle
+              Text(
+                'The admin dashboard is heavily optimized for desktop displays. Please log in via the web portal to manage bookings, packages, and clients.',
+                style: GoogleFonts.figtree(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.7) : const Color(0xFF151012).withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              
+              // Primary Button
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6A4053),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                  ),
+                  child: Text(
+                    'UNDERSTOOD',
+                    style: GoogleFonts.figtree(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    ref.listen(authProvider, (previous, next) {
+    ref.listen(authProvider, (previous, next) async {
       if (next.isLoggedIn) {
-        context.go('/home');
+        if (next.user?.isAdmin == true) {
+          if (kIsWeb) {
+            final url = await ref.read(authProvider.notifier).getMagicUrl();
+            if (!context.mounted) return;
+            if (url != null) {
+              await launchUrl(Uri.parse(url), webOnlyWindowName: '_self');
+            } else {
+              context.go('/home'); // Fallback if magic URL fails
+            }
+          } else {
+            // Block mobile app admin logins and force logout
+            ref.read(authProvider.notifier).logout();
+            if (!context.mounted) return;
+            _showAdminRestrictedBottomSheet(context);
+          }
+        } else {
+          context.go('/home');
+        }
       } else if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -47,102 +172,97 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
-    // Inertia theme colors
-    const bgColor = Color(0xFFFDF4F5); // brand-cream
-    const primaryColor = Color(0xFF6A4053); // brand-primary
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
+    final primaryColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
+    final inputLabelColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
 
-    return Theme(
-      data: ThemeData.light(useMaterial3: true),
-      child: Scaffold(
-        backgroundColor: bgColor,
-        body: Stack(
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
+
+    return Scaffold(
+      backgroundColor: Colors.transparent, // Let AnimatedContainer handle background
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        color: bgColor,
+        child: Stack(
           children: [
             // ======================================================
             // MESH GRADIENT BLOBS
             // ======================================================
-            
-            // Top Left Peach
             Positioned(
-              top: -100,
-              left: -50,
+              top: -sh * 0.10,
+              left: -sw * 0.05,
               child: _BlurBlob(
                 width: 300,
                 height: 600,
-                color: const Color(0xFFDABDAC),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
                 angle: 30 * (3.14159 / 180),
               ),
             ),
             Positioned(
-              top: 100,
-              left: 50,
+              top: sh * 0.10,
+              left: sw * 0.05,
               child: _BlurBlob(
                 width: 600,
                 height: 300,
-                color: const Color(0xFFDABDAC),
+                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
                 angle: 15 * (3.14159 / 180),
               ),
             ),
-            
-            // Middle Left Mauve
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.3,
-              left: -100,
+              top: sh * 0.30,
+              left: -sw * 0.10,
               child: _BlurBlob(
                 width: 800,
                 height: 250,
-                color: const Color(0xFFC08D9E),
+                color: isDark ? const Color(0x806A4053) : const Color(0xFFC08D9E),
                 angle: 10 * (3.14159 / 180),
               ),
             ),
-            
-            // Bottom Left Gray-Purple
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.65,
-              left: -50,
+              top: sh * 0.65,
+              left: -sw * 0.05,
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: const Color(0xFF988088),
+                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF988088),
               ),
             ),
-
-            // Top Right Pale Rose
             Positioned(
-              top: -100,
-              right: 50,
+              top: -sh * 0.15,
+              right: sw * 0.05,
               child: _BlurBlob(
                 width: 800,
                 height: 600,
-                color: const Color(0xFFC4A5A8),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
               ),
             ),
             Positioned(
-              top: 200,
-              right: 200,
+              top: sh * 0.20,
+              right: sw * 0.20,
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: const Color(0xFFC4A5A8),
+                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
               ),
             ),
-
-            // Bottom Right Dark Plum
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.5,
-              right: -50,
+              top: sh * 0.50,
+              right: -sw * 0.05,
               child: _BlurBlob(
                 width: 300,
                 height: 500,
-                color: const Color(0xFF6E3C53),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
               ),
             ),
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.75,
-              right: 50,
+              top: sh * 0.75,
+              right: sw * 0.05,
               child: _BlurBlob(
                 width: 600,
                 height: 250,
-                color: const Color(0xFF6E3C53),
+                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
               ),
             ),
 
@@ -157,57 +277,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     vertical: 48,
                   ),
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 384),
+                    constraints: const BoxConstraints(maxWidth: 336),
                     child: Column(
                       children: [
-                        // ==================================================
-                        // APPLICATION LOGO
-                        // ==================================================
                         const _ApplicationLogo(),
+                        const SizedBox(height: 44), // Adjusted to account for the visual overhang of the logo
 
-                        const SizedBox(height: 40),
-
-                        // ==================================================
-                        // EMAIL
-                        // ==================================================
-                        const _InputLabel(text: 'Email', color: Color(0xFF374151)), // gray-700
+                        _InputLabel(text: 'Email', color: inputLabelColor),
                         const SizedBox(height: 4),
-
                         _CustomTextField(
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
+                          autofillHints: const [AutofillHints.email],
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 24), // gap-6
 
-                        // ==================================================
-                        // PASSWORD
-                        // ==================================================
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const _InputLabel(text: 'Password', color: Color(0xFF374151)),
+                            _InputLabel(text: 'Password', color: inputLabelColor),
                             GestureDetector(
                               onTap: () {
-                                // Add forgot password later.
+                                context.push('/forgot-password');
                               },
-                              child: const Text(
+                              child: Text(
                                 'Forgot password?',
-                                style: TextStyle(
-                                  color: primaryColor,
+                                style: GoogleFonts.figtree(
+                                  color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.8) : const Color(0xFF6A4053),
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 4),
-
                         _CustomTextField(
                           controller: passwordController,
                           obscureText: obscurePassword,
+                          autofillHints: const [AutofillHints.password],
                           suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -224,11 +334,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 32), // gap-6 (24px) + mt-2 (8px) = 32px
 
-                        // ==================================================
-                        // REMEMBER ME
-                        // ==================================================
                         Row(
                           children: [
                             SizedBox(
@@ -241,29 +348,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     rememberMe = value ?? false;
                                   });
                                 },
-                                activeColor: primaryColor,
-                                side: const BorderSide(color: Color(0xFFD1D5DB), width: 1.5),
+                                activeColor: const Color(0xFF6A4053),
+                                checkColor: Colors.white,
+                                fillColor: WidgetStateProperty.resolveWith((states) {
+                                  if (states.contains(WidgetState.selected)) {
+                                    return const Color(0xFF6A4053);
+                                  }
+                                  return isDark ? const Color(0xFF151012) : Colors.white;
+                                }),
+                                side: BorderSide(
+                                  color: const Color(0xFF6A4053).withValues(alpha: 0.3),
+                                  width: 1.0,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Text(
+                            Text(
                               'Remember me',
-                              style: TextStyle(
-                                color: primaryColor,
+                              style: GoogleFonts.figtree(
+                                color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.8) : const Color(0xFF6A4053),
                                 fontSize: 14,
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 32), // gap-6 (24px) + mt-2 (8px) = 32px
 
-                        // ==================================================
-                        // LOGIN BUTTON
-                        // ==================================================
                         SizedBox(
                           width: double.infinity,
                           height: 44,
@@ -271,19 +385,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onPressed: authState.isLoading
                                 ? null
                                 : () {
-                                    ref
-                                        .read(authProvider.notifier)
-                                        .login(
-                                          email: emailController.text.trim(),
-                                          password: passwordController.text,
-                                        );
+                                    ref.read(authProvider.notifier).login(
+                                      email: emailController.text.trim(),
+                                      password: passwordController.text,
+                                    );
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1F2937), // gray-800
+                              backgroundColor: const Color(0xFF6A4053),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(30),
                               ),
                             ),
                             child: authState.isLoading
@@ -295,63 +407,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text(
-                                    'Log In',
-                                    style: TextStyle(
+                                : Text(
+                                    'LOG IN',
+                                    style: GoogleFonts.figtree(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.1,
+                                      letterSpacing: 1.2,
                                     ),
                                   ),
                           ),
                         ),
 
-                        const SizedBox(height: 16),
-
-                        // ==================================================
-                        // REGISTER & ADMIN LOG IN
-                        // ==================================================
-                        Text(
-                          "Don't have an account?",
-                          style: const TextStyle(
-                            color: primaryColor,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        GestureDetector(
-                          onTap: () {
-                            context.go('/register');
-                          },
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline,
-                              decorationColor: primaryColor,
+                        const SizedBox(height: 32),
+                        
+                        SizedBox(
+                          width: double.infinity,
+                          height: 44,
+                          child: OutlinedButton(
+                            onPressed: () => context.go('/register'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF6A4053),
+                              side: BorderSide(
+                                color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.5) : const Color(0xFF6A4053), 
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
                             ),
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 24),
-                        
-                        GestureDetector(
-                          onTap: () async {
-                            final url = Uri.parse('/admin/login');
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url, webOnlyWindowName: '_self');
-                            }
-                          },
-                          child: const Text(
-                            'Log in as Admin',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline,
-                              decorationColor: primaryColor,
+                            child: Text(
+                              'CREATE NEW ACCOUNT',
+                              style: GoogleFonts.figtree(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
+                                color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053),
+                              ),
                             ),
                           ),
                         ),
@@ -359,6 +450,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ),
                 ),
+              ),
+            ),
+            
+            // ======================================================
+            // THEME TOGGLE
+            // ======================================================
+            const Positioned(
+              top: 24,
+              right: 24,
+              child: SafeArea(
+                child: _ThemeToggle(),
               ),
             ),
           ],
@@ -377,66 +479,116 @@ class _ApplicationLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const brandPrimary = Color(0xFF6A4053);
-    const strokeColor = Color(0xFFFDF4F5);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final brandPrimary = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
+    final strokeColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: [
-        Stack(
+    final sw = MediaQuery.of(context).size.width;
+    final isDesktop = sw >= 640;
+
+    final ineaSize = isDesktop ? 72.0 : 60.0;
+    final ineaSpacing = ineaSize * 0.15;
+    final scentsSize = isDesktop ? 96.0 : 72.0;
+    
+    // Adjusted offset for perfect visual 1:1 match with Inertia Web Rendering
+    final scentsOffsetX = isDesktop ? -76.0 : -63.0; 
+    final scentsOffsetY = isDesktop ? 34.0 : 25.0; 
+
+    // Since Transform.translate only moves the visual layer, the layout bounding box
+    // still reserves the original width on the right. We shift the whole block right
+    // by half the offset to keep the logo perfectly centered.
+    final visualCenterOffset = isDesktop ? 38.0 : 31.5;
+
+    final ineaStroke = GoogleFonts.josefinSans(
+      fontSize: ineaSize,
+      fontWeight: FontWeight.w700,
+      letterSpacing: ineaSpacing,
+      foreground: Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeJoin = StrokeJoin.round
+        ..color = strokeColor,
+    );
+
+    final ineaFill = GoogleFonts.josefinSans(
+      fontSize: ineaSize,
+      fontWeight: FontWeight.w700,
+      letterSpacing: ineaSpacing,
+      color: brandPrimary,
+    );
+
+    final scentsStroke = GoogleFonts.greatVibes(
+      fontSize: scentsSize,
+      foreground: Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeJoin = StrokeJoin.round
+        ..color = strokeColor,
+    );
+
+    final scentsFill = GoogleFonts.greatVibes(
+      fontSize: scentsSize,
+      color: brandPrimary,
+    );
+
+    return FittedBox(
+      fit: BoxFit.fitWidth,
+      child: Transform.translate(
+        offset: Offset(visualCenterOffset, 0),
+        child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            Text(
-              'INEA',
-              style: TextStyle(
-                fontSize: 60,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 9.0, // approx 0.15em of 60
-                foreground: Paint()
-                  ..style = PaintingStyle.stroke
-                  ..strokeWidth = 2
-                  ..color = strokeColor,
-              ),
+            // ==============================================================
+            // 1. INEA STROKE (Base layer, sizes the Stack)
+            // ==============================================================
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('INEA', style: ineaStroke),
+                // Invisible untranslated Scents guarantees the Stack layout width 
+                // matches the natural flow of the two words.
+                Opacity(opacity: 0, child: Text('Scents', style: scentsStroke)),
+              ],
             ),
-            const Text(
-              'INEA',
-              style: TextStyle(
-                fontSize: 60,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 9.0,
-                color: brandPrimary,
-              ),
+            
+            // ==============================================================
+            // 2. INEA FILL
+            // ==============================================================
+            Text('INEA', style: ineaFill),
+            
+            // ==============================================================
+            // 3. SCENTS STROKE (Knocks out the INEA Fill beneath it!)
+            // ==============================================================
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Opacity(opacity: 0, child: Text('INEA', style: ineaStroke)),
+                Transform.translate(
+                  offset: Offset(scentsOffsetX, scentsOffsetY),
+                  child: Text('Scents', style: scentsStroke),
+                ),
+              ],
+            ),
+            
+            // ==============================================================
+            // 4. SCENTS FILL
+            // ==============================================================
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Opacity(opacity: 0, child: Text('INEA', style: ineaStroke)),
+                Transform.translate(
+                  offset: Offset(scentsOffsetX, scentsOffsetY),
+                  child: Text('Scents', style: scentsFill),
+                ),
+              ],
             ),
           ],
         ),
-        Transform.translate(
-          offset: const Offset(-25, 20),
-          child: Stack(
-            children: [
-              Text(
-                'Scents',
-                style: TextStyle(
-                  fontSize: 72,
-                  fontFamily: 'cursive', // fallback for great vibes
-                  foreground: Paint()
-                    ..style = PaintingStyle.stroke
-                    ..strokeWidth = 2
-                    ..color = strokeColor,
-                ),
-              ),
-              const Text(
-                'Scents',
-                style: TextStyle(
-                  fontSize: 72,
-                  fontFamily: 'cursive',
-                  color: brandPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -457,10 +609,10 @@ class _InputLabel extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: TextStyle(
+        style: GoogleFonts.figtree(
           color: color,
+          fontWeight: FontWeight.w600,
           fontSize: 14,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -468,7 +620,7 @@ class _InputLabel extends StatelessWidget {
 }
 
 // ============================================================================
-// CUSTOM TEXT FIELD (INERTIA STYLE)
+// CUSTOM TEXT FIELD
 // ============================================================================
 
 class _CustomTextField extends StatefulWidget {
@@ -477,6 +629,7 @@ class _CustomTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final Iterable<String>? autofillHints;
 
   const _CustomTextField({
     required this.controller,
@@ -484,6 +637,7 @@ class _CustomTextField extends StatefulWidget {
     this.suffixIcon,
     this.keyboardType,
     this.textInputAction,
+    this.autofillHints,
   });
 
   @override
@@ -495,6 +649,22 @@ class _CustomTextFieldState extends State<_CustomTextField> {
   
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    final baseBg = isDark 
+        ? const Color(0xFF6A4053).withValues(alpha: 0.40)
+        : const Color(0xFF8B5D76).withValues(alpha: 0.70);
+    final focusBg = isDark
+        ? const Color(0xFF6A4053).withValues(alpha: 0.60)
+        : const Color(0xFF8B5D76).withValues(alpha: 0.90);
+
+    final baseBorder = isDark 
+        ? Colors.white.withValues(alpha: 0.10)
+        : Colors.white.withValues(alpha: 0.20);
+    final focusBorder = isDark
+        ? const Color(0xFF6A4053)
+        : Colors.white;
+
     return Focus(
       onFocusChange: (hasFocus) {
         setState(() {
@@ -506,14 +676,16 @@ class _CustomTextFieldState extends State<_CustomTextField> {
           borderRadius: BorderRadius.circular(30),
           boxShadow: const [
             BoxShadow(
-              color: Color(0x0C6A4053), // rgba(106, 64, 83, 0.05)
-              blurRadius: 25,
+              color: Color(0x0D6A4053),
               offset: Offset(0, 10),
+              blurRadius: 25,
+              spreadRadius: -5,
             ),
             BoxShadow(
-              color: Color(0x056A4053), // rgba(106, 64, 83, 0.02)
-              blurRadius: 10,
+              color: Color(0x056A4053),
               offset: Offset(0, 8),
+              blurRadius: 10,
+              spreadRadius: -6,
             ),
           ],
         ),
@@ -523,17 +695,12 @@ class _CustomTextFieldState extends State<_CustomTextField> {
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              height: 48,
               decoration: BoxDecoration(
-                color: isFocused 
-                    ? const Color(0xFF8B5D76).withValues(alpha: 0.90) 
-                    : const Color(0xFF8B5D76).withValues(alpha: 0.70),
+                color: isFocused ? focusBg : baseBg,
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(
-                  color: isFocused 
-                      ? Colors.white 
-                      : Colors.white.withValues(alpha: 0.20),
-                  width: isFocused ? 1.5 : 1.0,
+                  color: isFocused ? focusBorder : baseBorder,
+                  width: 1.0,
                 ),
               ),
               child: Row(
@@ -544,14 +711,19 @@ class _CustomTextFieldState extends State<_CustomTextField> {
                       obscureText: widget.obscureText,
                       keyboardType: widget.keyboardType,
                       textInputAction: widget.textInputAction,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                      cursorColor: Colors.white,
+                      autofillHints: widget.autofillHints,
+                      style: GoogleFonts.figtree(
+                        color: isDark ? const Color(0xFFFDF4F5) : Colors.white, 
+                        fontSize: 16
+                      ),
+                      cursorColor: isDark ? const Color(0xFFFDF4F5) : Colors.white,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.only(
+                          top: 12,
+                          bottom: 12,
                           left: 20,
                           right: widget.suffixIcon != null ? 0 : 20,
-                          bottom: 2,
                         ),
                       ),
                     ),
@@ -594,7 +766,8 @@ class _BlurBlob extends StatelessWidget {
       angle: angle,
       child: ImageFiltered(
         imageFilter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 500),
           width: width,
           height: height,
           decoration: BoxDecoration(
@@ -606,3 +779,101 @@ class _BlurBlob extends StatelessWidget {
     );
   }
 }
+
+// ============================================================================
+// THEME TOGGLE
+// ============================================================================
+
+class _ThemeToggle extends ConsumerWidget {
+  const _ThemeToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeModeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF261D21).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 10,
+          )
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildButton(
+                icon: Icons.light_mode_outlined,
+                isSelected: theme == ThemeMode.light,
+                isDarkEnv: isDark,
+                onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light,
+              ),
+              const SizedBox(width: 4),
+              _buildButton(
+                icon: Icons.dark_mode_outlined,
+                isSelected: theme == ThemeMode.dark,
+                isDarkEnv: isDark,
+                onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark,
+              ),
+              const SizedBox(width: 4),
+              _buildButton(
+                icon: Icons.monitor_outlined,
+                isSelected: theme == ThemeMode.system,
+                isDarkEnv: isDark,
+                onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.system,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required IconData icon,
+    required bool isSelected,
+    required bool isDarkEnv,
+    required VoidCallback onTap,
+  }) {
+    final selectedBg = isDarkEnv ? const Color(0xFF6A4053) : Colors.white;
+    final selectedIconColor = isDarkEnv ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
+    final unselectedIconColor = isDarkEnv 
+        ? const Color(0xFFFDF4F5).withValues(alpha: 0.6) 
+        : const Color(0xFF6A4053).withValues(alpha: 0.6);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: isSelected ? selectedBg : Colors.transparent,
+          shape: BoxShape.circle,
+          boxShadow: isSelected
+              ? const [
+                  BoxShadow(
+                    color: Color(0x0C000000),
+                    blurRadius: 4,
+                  )
+                ]
+              : [],
+        ),
+        child: Icon(
+          icon,
+          size: 14,
+          color: isSelected ? selectedIconColor : unselectedIconColor,
+        ),
+      ),
+    );
+  }
+}
+

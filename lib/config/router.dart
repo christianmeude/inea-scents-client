@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../screens/index.dart';
@@ -11,13 +12,40 @@ class AppRouter {
     },
     routes: [
       GoRoute(
+        path: '/',
+        redirect: (context, state) => '/home',
+      ),
+      GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/register',
-        builder: (context, state) => const RegisterScreen(),
+        pageBuilder: (context, state) {
+          return CustomTransitionPage(
+            key: state.pageKey,
+            child: const RegisterScreen(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              const begin = Offset(0.0, 1.0);
+              const end = Offset.zero;
+              const curve = Curves.easeOutCubic;
+
+              var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+              var offsetAnimation = animation.drive(tween);
+
+              return SlideTransition(
+                position: offsetAnimation,
+                child: child,
+              );
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
       GoRoute(

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/index.dart';
 import 'package:dio/dio.dart';
@@ -19,6 +20,9 @@ String _getErrorMessage(dynamic e) {
   }
   return e.toString();
 }
+
+// Theme state
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
 
 // Auth state
 class AuthState {
@@ -52,8 +56,18 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final RestClient _apiClient;
   final TokenStorage _tokenStorage;
+  final Dio _dio;
 
-  AuthNotifier(this._apiClient, this._tokenStorage) : super(AuthState());
+  AuthNotifier(this._apiClient, this._tokenStorage, this._dio) : super(AuthState());
+
+  Future<String?> getMagicUrl() async {
+    try {
+      final response = await _dio.post('/api/admin/magic-url');
+      return response.data['url'];
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future<void> register({
     required String name,
@@ -119,7 +133,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   final tokenStorage = ref.watch(tokenStorageProvider);
-  return AuthNotifier(apiClient, tokenStorage);
+  final dio = ref.watch(dioClientProvider).dio;
+  return AuthNotifier(apiClient, tokenStorage, dio);
 });
 
 // Packages providers

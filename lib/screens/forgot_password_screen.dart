@@ -7,23 +7,22 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
 import '../src/providers/core_providers.dart';
 
-class RegisterScreen extends ConsumerStatefulWidget {
-  const RegisterScreen({super.key});
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final nameController = TextEditingController();
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   bool obscurePassword = true;
+  bool rememberMe = false;
 
   @override
   void dispose() {
-    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -169,65 +168,47 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     child: Column(
                       children: [
                         const _ApplicationLogo(),
-                        const SizedBox(height: 44), // Adjusted to account for the visual overhang of the logo
-
-                        _InputLabel(text: 'Full Name', color: inputLabelColor),
-                        const SizedBox(height: 4),
-                        _CustomTextField(
-                          controller: nameController,
-                          keyboardType: TextInputType.name,
-                          textInputAction: TextInputAction.next,
-                          autofillHints: const [AutofillHints.name],
+                        const SizedBox(height: 44),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Enter your email address to receive a secure password reset link.',
+                            style: GoogleFonts.figtree(
+                              color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.8) : const Color(0xFF6A4053).withValues(alpha: 0.8),
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
-
-                        const SizedBox(height: 16),
-
+                        const SizedBox(height: 24),
                         _InputLabel(text: 'Email', color: inputLabelColor),
                         const SizedBox(height: 4),
                         _CustomTextField(
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.done,
                           autofillHints: const [AutofillHints.email],
                         ),
-
-                        const SizedBox(height: 16),
-
-                        _InputLabel(text: 'Password', color: inputLabelColor),
-                        const SizedBox(height: 4),
-                        _CustomTextField(
-                          controller: passwordController,
-                          obscureText: obscurePassword,
-                          autofillHints: const [AutofillHints.password],
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                obscurePassword = !obscurePassword;
-                              });
-                            },
-                            icon: Icon(
-                              obscurePassword
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.white.withValues(alpha: 0.7),
-                              size: 18,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 24),
                         SizedBox(
                           width: double.infinity,
                           height: 44,
                           child: ElevatedButton(
                             onPressed: authState.isLoading
                                 ? null
-                                : () {
-                                    ref.read(authProvider.notifier).register(
-                                      name: nameController.text.trim(),
-                                      email: emailController.text.trim(),
-                                      password: passwordController.text,
-                                    );
+                                : () async {
+                                    final dioClient = ref.read(dioClientProvider);
+                                    try {
+                                      await dioClient.dio.post('/forgot-password', data: {'email': emailController.text.trim()});
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Password reset link sent!')),
+                                      );
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Failed to send reset link')),
+                                      );
+                                    }
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6A4053),
@@ -247,42 +228,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     ),
                                   )
                                 : Text(
-                                    'REGISTER',
+                                    'EMAIL PASSWORD RESET LINK',
                                     style: GoogleFonts.figtree(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 1.2,
                                     ),
                                   ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 32),
-                        
-                        SizedBox(
-                          width: double.infinity,
-                          height: 44,
-                          child: OutlinedButton(
-                            onPressed: () => context.go('/login'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF6A4053),
-                              side: BorderSide(
-                                color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.5) : const Color(0xFF6A4053), 
-                                width: 1.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: Text(
-                              'ALREADY HAVE AN ACCOUNT? LOG IN',
-                              style: GoogleFonts.figtree(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
-                                color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053),
-                              ),
-                            ),
                           ),
                         ),
                       ],

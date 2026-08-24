@@ -481,17 +481,13 @@ class ProfileScreen extends ConsumerWidget {
                             title: 'Admin Dashboard',
                             subtitle: 'Manage packages and bookings',
                             onTap: () async {
-                              final dio = ref.read(dioClientProvider).dio;
-                              try {
-                                final response = await dio.post('/api/admin/magic-url');
-                                final url = response.data['url'] as String;
-                                if (url.isNotEmpty) {
-                                  final uri = Uri.parse(url);
-                                  if (await canLaunchUrl(uri)) {
-                                    await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                  }
+                              final url = await ref.read(authProvider.notifier).getMagicUrl();
+                              if (url != null) {
+                                final uri = Uri.parse(url);
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication, webOnlyWindowName: '_self');
                                 }
-                              } catch (e) {
+                              } else {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text('Failed to open admin panel')),
