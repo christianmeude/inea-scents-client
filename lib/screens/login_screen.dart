@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
+import '../widgets/app_logo.dart';
 import '../src/providers/core_providers.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {

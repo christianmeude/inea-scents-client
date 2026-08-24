@@ -12,4 +12,4 @@ export PATH="$PATH:`pwd`/flutter/bin"
 # Enable web and build
 flutter config --enable-web
 flutter pub get
-flutter build web --release
+flutter build web --release --dart-define=API_URL="$API_URL"
