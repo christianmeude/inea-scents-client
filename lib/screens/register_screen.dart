@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
-import '../src/providers/core_providers.dart';
+import '../widgets/index.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -62,7 +62,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
-    final primaryColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
     final inputLabelColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
 
     final sw = MediaQuery.of(context).size.width;
@@ -173,7 +172,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         _InputLabel(text: 'Full Name', color: inputLabelColor),
                         const SizedBox(height: 4),
-                        _CustomTextField(
+                        CustomTextField(
                           controller: nameController,
                           keyboardType: TextInputType.name,
                           textInputAction: TextInputAction.next,
@@ -184,7 +183,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         _InputLabel(text: 'Email', color: inputLabelColor),
                         const SizedBox(height: 4),
-                        _CustomTextField(
+                        CustomTextField(
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
@@ -195,11 +194,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         _InputLabel(text: 'Password', color: inputLabelColor),
                         const SizedBox(height: 4),
-                        _CustomTextField(
+                        CustomTextField(
                           controller: passwordController,
                           obscureText: obscurePassword,
                           autofillHints: const [AutofillHints.password],
                           suffixIcon: IconButton(
+                            mouseCursor: SystemMouseCursors.click,
                             onPressed: () {
                               setState(() {
                                 obscurePassword = !obscurePassword;
@@ -459,138 +459,6 @@ class _InputLabel extends StatelessWidget {
 }
 
 // ============================================================================
-// CUSTOM TEXT FIELD
-// ============================================================================
-
-class _CustomTextField extends StatefulWidget {
-  final TextEditingController controller;
-  final bool obscureText;
-  final Widget? suffixIcon;
-  final TextInputType? keyboardType;
-  final TextInputAction? textInputAction;
-  final Iterable<String>? autofillHints;
-
-  const _CustomTextField({
-    required this.controller,
-    this.obscureText = false,
-    this.suffixIcon,
-    this.keyboardType,
-    this.textInputAction,
-    this.autofillHints,
-  });
-
-  @override
-  State<_CustomTextField> createState() => _CustomTextFieldState();
-}
-
-class _CustomTextFieldState extends State<_CustomTextField> {
-  bool isFocused = false;
-  
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    final baseBg = isDark 
-        ? const Color(0xFF6A4053).withValues(alpha: 0.40)
-        : const Color(0xFF8B5D76).withValues(alpha: 0.70);
-    final focusBg = isDark
-        ? const Color(0xFF6A4053).withValues(alpha: 0.60)
-        : const Color(0xFF8B5D76).withValues(alpha: 0.90);
-
-    final baseBorder = isDark 
-        ? Colors.white.withValues(alpha: 0.10)
-        : Colors.white.withValues(alpha: 0.20);
-    final focusBorder = isDark
-        ? const Color(0xFF6A4053)
-        : Colors.white;
-
-    return Focus(
-      onFocusChange: (hasFocus) {
-        setState(() {
-          isFocused = hasFocus;
-        });
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x0D6A4053),
-              offset: Offset(0, 10),
-              blurRadius: 25,
-              spreadRadius: -5,
-            ),
-            BoxShadow(
-              color: Color(0x056A4053),
-              offset: Offset(0, 8),
-              blurRadius: 10,
-              spreadRadius: -6,
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              decoration: BoxDecoration(
-                color: isFocused ? focusBg : baseBg,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: isFocused ? focusBorder : baseBorder,
-                  width: 1.0,
-                ),
-              ),
-              child: TextField(
-                controller: widget.controller,
-                obscureText: widget.obscureText,
-                keyboardType: widget.keyboardType,
-                textInputAction: widget.textInputAction,
-                autofillHints: widget.autofillHints,
-                style: GoogleFonts.figtree(
-                  color: isDark ? const Color(0xFFFDF4F5) : Colors.white, 
-                  fontSize: 16
-                ),
-                cursorColor: isDark ? const Color(0xFFFDF4F5) : Colors.white,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.transparent,
-                  contentPadding: EdgeInsets.only(
-                    top: 12,
-                    bottom: 12,
-                    left: 20,
-                    right: widget.suffixIcon != null ? 0 : 20,
-                  ),
-                  suffixIcon: widget.suffixIcon != null 
-                    ? Padding(
-                        padding: const EdgeInsets.only(right: 4),
-                        child: widget.suffixIcon,
-                      ) 
-                    : null,
-                ),
-              )
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
 // BLURRED BACKGROUND BLOB
 // ============================================================================
 
@@ -658,21 +526,21 @@ class _ThemeToggle extends ConsumerWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildButton(
+              _ThemeToggleButton(
                 icon: Icons.light_mode_outlined,
                 isSelected: theme == ThemeMode.light,
                 isDarkEnv: isDark,
                 onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light,
               ),
               const SizedBox(width: 4),
-              _buildButton(
+              _ThemeToggleButton(
                 icon: Icons.dark_mode_outlined,
                 isSelected: theme == ThemeMode.dark,
                 isDarkEnv: isDark,
                 onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark,
               ),
               const SizedBox(width: 4),
-              _buildButton(
+              _ThemeToggleButton(
                 icon: Icons.monitor_outlined,
                 isSelected: theme == ThemeMode.system,
                 isDarkEnv: isDark,
@@ -684,40 +552,89 @@ class _ThemeToggle extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildButton({
-    required IconData icon,
-    required bool isSelected,
-    required bool isDarkEnv,
-    required VoidCallback onTap,
-  }) {
-    final selectedBg = isDarkEnv ? const Color(0xFF6A4053) : Colors.white;
-    final selectedIconColor = isDarkEnv ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
-    final unselectedIconColor = isDarkEnv 
-        ? const Color(0xFFFDF4F5).withValues(alpha: 0.6) 
+class _ThemeToggleButton extends StatefulWidget {
+  final IconData icon;
+  final bool isSelected;
+  final bool isDarkEnv;
+  final VoidCallback onTap;
+
+  const _ThemeToggleButton({
+    required this.icon,
+    required this.isSelected,
+    required this.isDarkEnv,
+    required this.onTap,
+  });
+
+  @override
+  State<_ThemeToggleButton> createState() => _ThemeToggleButtonState();
+}
+
+class _ThemeToggleButtonState extends State<_ThemeToggleButton> {
+  bool _isHovered = false;
+  bool _isFocused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedBg = widget.isDarkEnv ? const Color(0xFF6A4053) : Colors.white;
+    final hoverBg = widget.isDarkEnv
+        ? const Color(0xFF6A4053).withValues(alpha: 0.3)
+        : Colors.white.withValues(alpha: 0.3);
+    final selectedIconColor = widget.isDarkEnv ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
+    final unselectedIconColor = widget.isDarkEnv
+        ? const Color(0xFFFDF4F5).withValues(alpha: 0.6)
         : const Color(0xFF6A4053).withValues(alpha: 0.6);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: isSelected ? selectedBg : Colors.transparent,
-          shape: BoxShape.circle,
-          boxShadow: isSelected
-              ? const [
-                  BoxShadow(
-                    color: Color(0x0C000000),
-                    blurRadius: 4,
-                  )
-                ]
-              : [],
+    final bg = widget.isSelected
+        ? selectedBg
+        : (_isHovered ? hoverBg : Colors.transparent);
+
+    return FocusableActionDetector(
+      mouseCursor: SystemMouseCursors.click,
+      onShowHoverHighlight: (hovered) {
+        if (_isHovered != hovered) {
+          setState(() => _isHovered = hovered);
+        }
+      },
+      onShowFocusHighlight: (focused) {
+        if (_isFocused != focused) {
+          setState(() => _isFocused = focused);
+        }
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) => widget.onTap(),
         ),
-        child: Icon(
-          icon,
-          size: 14,
-          color: isSelected ? selectedIconColor : unselectedIconColor,
+      },
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: bg,
+            shape: BoxShape.circle,
+            border: _isFocused
+                ? Border.all(
+                    color: widget.isDarkEnv ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053),
+                    width: 2.0,
+                  )
+                : null,
+            boxShadow: widget.isSelected
+                ? const [
+                    BoxShadow(
+                      color: Color(0x0C000000),
+                      blurRadius: 4,
+                    )
+                  ]
+                : null,
+          ),
+          child: Icon(
+            widget.icon,
+            size: 14,
+            color: widget.isSelected ? selectedIconColor : unselectedIconColor,
+          ),
         ),
       ),
     );

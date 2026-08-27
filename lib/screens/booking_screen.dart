@@ -79,18 +79,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         const SizedBox(height: 20),
                         const Text(
                           'Payment Successful',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: const Color(0xFF6A4053)),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF6A4053)),
                         ),
                         const SizedBox(height: 30),
                         const Text(
                           'Thank you for your booking.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: const Color(0x8A6A4053)),
+                          style: TextStyle(fontSize: 14, color: Color(0x8A6A4053)),
                         ),
                         const Text(
                           'To check your status on go to your\nbooking settings.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 14, color: const Color(0x8A6A4053)),
+                          style: TextStyle(fontSize: 14, color: Color(0x8A6A4053)),
                         ),
                       ],
                     ),
@@ -170,20 +170,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           if (showBack)
-            GestureDetector(
-              onTap: () {
+            TextButton.icon(
+              onPressed: () {
                 if (currentStep > 0) {
                   setState(() => currentStep--);
                 } else {
                   context.pop();
                 }
               },
-              child: Row(
-                children: const [
-                  Icon(Icons.arrow_back, color: plum, size: 20),
-                  SizedBox(width: 5),
-                  Text('Back', style: TextStyle(color: plum, fontSize: 14)),
-                ],
+              icon: const Icon(Icons.arrow_back, color: plum, size: 20),
+              label: const Text('Back', style: TextStyle(color: plum, fontSize: 14)),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               ),
             )
           else
@@ -313,7 +311,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
               calendarStyle: const CalendarStyle(
                 todayDecoration: BoxDecoration(color: Colors.transparent),
-                todayTextStyle: TextStyle(color: const Color(0xFF6A4053)),
+                todayTextStyle: TextStyle(color: Color(0xFF6A4053)),
               ),
             ),
           ),
@@ -353,23 +351,23 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Details', style: TextStyle(fontSize: 14, color: const Color(0xFF6A4053))),
+                      const Text('Details', style: TextStyle(fontSize: 14, color: Color(0xFF6A4053))),
                       const SizedBox(height: 15),
-                      Text('Package Variation: ${package.name}', style: const TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
+                      Text('Package Variation: ${package.name}', style: const TextStyle(fontSize: 13, color: Color(0x8A6A4053))),
                       const SizedBox(height: 15),
-                      const Text('Inclusion/s:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
+                      const Text('Inclusion/s:', style: TextStyle(fontSize: 13, color: Color(0x8A6A4053))),
                       const SizedBox(height: 5),
-                      ...(package.inclusions ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053)))),
+                      ...(package.inclusions ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: Color(0xFF6A4053)))),
                       const SizedBox(height: 15),
-                      const Text('Free:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
+                      const Text('Free:', style: TextStyle(fontSize: 13, color: Color(0x8A6A4053))),
                       const SizedBox(height: 5),
-                      ...(package.freebies ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053)))),
+                      ...(package.freebies ?? []).map((e) => Text('• $e', style: const TextStyle(fontSize: 12, color: Color(0xFF6A4053)))),
                       const SizedBox(height: 15),
-                      const Text('Selected Date:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
+                      const Text('Selected Date:', style: TextStyle(fontSize: 13, color: Color(0x8A6A4053))),
                       const SizedBox(height: 5),
                       const Text('September 1, 2026', style: TextStyle(fontSize: 13, color: plum)),
                       const SizedBox(height: 15),
-                      const Text('Total Cost:', style: TextStyle(fontSize: 13, color: const Color(0x8A6A4053))),
+                      const Text('Total Cost:', style: TextStyle(fontSize: 13, color: Color(0x8A6A4053))),
                       const SizedBox(height: 5),
                       Text('Php. ${(package.price ?? 4500).toStringAsFixed(2)}', style: const TextStyle(fontSize: 13, color: plum)),
                     ],
@@ -438,7 +436,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               children: [
                 Text(package.name ?? '', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: plum)),
                 const SizedBox(height: 15),
-                const Text('Inclusion/s:', style: TextStyle(fontSize: 12, color: const Color(0xFF99868C))),
+                const Text('Inclusion/s:', style: TextStyle(fontSize: 12, color: Color(0xFF99868C))),
                 const SizedBox(height: 10),
                 ...[
                   {'label': 'Featuring your logo', 'val': '300'},
@@ -454,16 +452,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 3),
                     child: Row(
                       children: [
-                        Text('• ${item['label']}', style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053))),
+                        Text('• ${item['label']}', style: const TextStyle(fontSize: 12, color: Color(0xFF6A4053))),
                         Expanded(child: LayoutBuilder(
                           builder: (context, constraints) {
                             return Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 5),
-                              child: Text('- ' * (constraints.maxWidth / 8).floor(), maxLines: 1, overflow: TextOverflow.clip, style: TextStyle(color: const Color(0xFF99868C))),
+                              child: Text('- ' * (constraints.maxWidth / 8).floor(), maxLines: 1, overflow: TextOverflow.clip, style: TextStyle(color: Color(0xFF99868C))),
                             );
                           },
                         )),
-                        Text(item['val']!, style: const TextStyle(fontSize: 12, color: const Color(0xFF6A4053))),
+                        Text(item['val']!, style: const TextStyle(fontSize: 12, color: Color(0xFF6A4053))),
                       ],
                     ),
                   );
@@ -471,7 +469,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: Text('Total: Php, 4,500.00', style: const TextStyle(fontSize: 13, color: const Color(0xFF99868C))),
+                  child: Text('Total: Php, 4,500.00', style: const TextStyle(fontSize: 13, color: Color(0xFF99868C))),
                 ),
               ],
             ),

@@ -4,7 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 
 
 import '../providers/index.dart';
-import '../widgets/index.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -39,42 +38,44 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       backgroundColor: backgroundTop,
 
       // ========================================================
-      // APP BAR
+      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ========================================================
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
+      appBar: MediaQuery.of(context).size.width < 768
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: true,
 
-        title: const _BrandName(),
+              title: const _BrandName(),
 
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.42),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(
-                  Icons.refresh_rounded,
-                  size: 20,
-                  color: primaryDark,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 14),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.42),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        size: 20,
+                        color: primaryDark,
+                      ),
+                      onPressed: () {
+                        ref.read(availabilityProvider.notifier).refresh();
+                      },
+                    ),
+                  ),
                 ),
-                onPressed: () {
-                  ref.read(availabilityProvider.notifier).refresh();
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+              ],
+            )
+          : null,
 
       // ========================================================
       // BODY
@@ -154,11 +155,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
         ],
       ),
-
-      // ========================================================
-      // BOTTOM NAVIGATION
-      // ========================================================
-      bottomNavigationBar: const BottomNavBar(),
     );
   }
 

@@ -8,7 +8,7 @@ part 'get_api_user_response.freezed.dart';
 part 'get_api_user_response.g.dart';
 
 @Freezed()
-class GetApiUserResponse with _$GetApiUserResponse {
+abstract class GetApiUserResponse with _$GetApiUserResponse {
   const factory GetApiUserResponse({
     int? id,
     String? name,

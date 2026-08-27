@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/index.dart';
-import '../src/providers/core_providers.dart';
 import '../widgets/index.dart';
 
 class ProfileScreen extends ConsumerWidget {
@@ -42,43 +41,45 @@ class ProfileScreen extends ConsumerWidget {
       backgroundColor: backgroundTop,
 
       // ============================================================
-      // APP BAR
+      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
+      appBar: MediaQuery.of(context).size.width < 768
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: true,
 
-        title: const _BrandName(),
+              title: const _BrandName(),
 
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.35),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  width: 1,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.55),
+                        width: 1,
+                      ),
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(
+                        Icons.more_horiz_rounded,
+                        color: textColor,
+                        size: 22,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
                 ),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(
-                  Icons.more_horiz_rounded,
-                  color: textColor,
-                  size: 22,
-                ),
-                onPressed: () {},
-              ),
-            ),
-          ),
-        ],
-      ),
+              ],
+            )
+          : null,
 
       // ============================================================
       // BODY
@@ -555,11 +556,6 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ],
       ),
-
-      // ============================================================
-      // BOTTOM NAVIGATION
-      // ============================================================
-      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
@@ -739,7 +735,7 @@ class _ProfileSettingTile extends StatelessWidget {
 
       child: InkWell(
         onTap: onTap,
-
+        mouseCursor: SystemMouseCursors.click,
         borderRadius: BorderRadius.circular(24),
 
         child: Padding(

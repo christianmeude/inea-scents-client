@@ -85,53 +85,54 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
     const primaryColor = Color(0xFF74445C);
     const textColor = Color(0xFF633E50);
     const secondaryTextColor = Color(0xFF765867);
-    const inputColor = Color(0xFF95647E);
 
     return Scaffold(
       backgroundColor: backgroundTop,
 
       // ============================================================
-      // APP BAR
+      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
+      appBar: MediaQuery.of(context).size.width < 768
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: true,
 
-        title: const _BrandName(),
+              title: const _BrandName(),
 
-        leading: const SizedBox(),
+              leading: const SizedBox(),
 
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.35),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  width: 1,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.35),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.55),
+                        width: 1,
+                      ),
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(
+                        Icons.tune_rounded,
+                        color: textColor,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        // Add filters later.
+                      },
+                    ),
+                  ),
                 ),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(
-                  Icons.tune_rounded,
-                  color: textColor,
-                  size: 20,
-                ),
-                onPressed: () {
-                  // Add filters later.
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
+              ],
+            )
+          : null,
 
       // ============================================================
       // BODY
@@ -252,51 +253,8 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                   // ==================================================
                   // SEARCH BAR
                   // ==================================================
-                  Container(
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: inputColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.80),
-                        width: 1.1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withValues(alpha: 0.12),
-                          blurRadius: 14,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-
-                    child: TextField(
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
-
-                      cursorColor: Colors.white,
-                      onChanged: (val) => ref.read(packagesSearchQueryProvider.notifier).state = val,
-
-                      decoration: InputDecoration(
-                        hintText: 'Search "Perfume" here',
-                        hintStyle: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.75),
-                          fontSize: 14,
-                        ),
-
-                        prefixIcon: const Icon(
-                          Icons.search_rounded,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-
-                        border: InputBorder.none,
-
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 16,
-                        ),
-                      ),
-                    ),
+                  _SearchBar(
+                    onChanged: (val) => ref.read(packagesSearchQueryProvider.notifier).state = val,
                   ),
 
                   const SizedBox(height: 26),
@@ -313,6 +271,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                         return Padding(
                           padding: const EdgeInsets.only(right: 12),
                           child: FilterChip(
+                            mouseCursor: SystemMouseCursors.click,
                             label: Text(cat),
                             selected: isSelected,
                             onSelected: (val) {
@@ -456,9 +415,8 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
       ),
 
       // ============================================================
-      // BOTTOM NAVIGATION
+      // BODY WRAPPER END
       // ============================================================
-      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }
@@ -690,6 +648,92 @@ class _BlurCircle extends StatelessWidget {
 }
 
 // ============================================================================
+// SEARCH BAR (Interactive with hover and focus ring)
+// ============================================================================
+
+class _SearchBar extends StatefulWidget {
+  final ValueChanged<String> onChanged;
+
+  const _SearchBar({required this.onChanged});
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  bool _isHovered = false;
+  bool _isFocused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    const primaryColor = Color(0xFF74445C);
+    const inputColor = Color(0xFF95647E);
+
+    return FocusableActionDetector(
+      mouseCursor: SystemMouseCursors.text,
+      onShowHoverHighlight: (h) => setState(() => _isHovered = h),
+      onShowFocusHighlight: (f) => setState(() => _isFocused = f),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: 54,
+        decoration: BoxDecoration(
+          color: _isFocused
+              ? const Color(0xFFA5748E)
+              : (_isHovered ? const Color(0xFF9E6D87) : inputColor),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: _isFocused
+                ? Colors.white
+                : Colors.white.withValues(alpha: _isHovered ? 0.95 : 0.80),
+            width: _isFocused ? 2.0 : 1.1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withValues(alpha: 0.12),
+              blurRadius: 14,
+              offset: const Offset(0, 6),
+            ),
+            if (_isFocused)
+              BoxShadow(
+                color: Colors.white.withValues(alpha: 0.35),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+          ],
+        ),
+        child: Focus(
+          onFocusChange: (f) => setState(() => _isFocused = f),
+          child: TextField(
+            style: const TextStyle(color: Colors.white, fontSize: 14),
+            cursorColor: Colors.white,
+            onChanged: widget.onChanged,
+            decoration: const InputDecoration(
+              hintText: 'Search "Perfume" here',
+              hintStyle: TextStyle(
+                color: Color(0xBFFFFFFF),
+                fontSize: 14,
+              ),
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
 // SORT CHIP
 // ============================================================================
 
@@ -707,6 +751,7 @@ class _SortChip extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: FilterChip(
+        mouseCursor: SystemMouseCursors.click,
         label: Text(label),
         selected: isSelected,
         onSelected: (_) {

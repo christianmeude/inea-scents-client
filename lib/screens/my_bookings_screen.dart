@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
 import '../models/index.dart';
-import '../widgets/index.dart';
 
 class MyBookingsScreen extends ConsumerWidget {
   const MyBookingsScreen({super.key});
@@ -32,26 +31,28 @@ class MyBookingsScreen extends ConsumerWidget {
       backgroundColor: backgroundTop,
 
       // ============================================================
-      // APP BAR
+      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
+      appBar: MediaQuery.of(context).size.width < 768
+          ? AppBar(
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: true,
 
-        // ==========================================================
-        // BRAND
-        // Same alignment as PackagesScreen
-        // ==========================================================
-        title: const _BrandName(),
+              // ==========================================================
+              // BRAND
+              // Same alignment as PackagesScreen
+              // ==========================================================
+              title: const _BrandName(),
 
-        // Keep the left side empty so the brand remains centered.
-        leading: const SizedBox(),
+              // Keep the left side empty so the brand remains centered.
+              leading: const SizedBox(),
 
-        // Keep the AppBar balanced.
-        actions: const [SizedBox(width: 58)],
-      ),
+              // Keep the AppBar balanced.
+              actions: const [SizedBox(width: 58)],
+            )
+          : null,
 
       // ============================================================
       // BODY
@@ -168,11 +169,6 @@ class MyBookingsScreen extends ConsumerWidget {
           ),
         ),
       ),
-
-      // ============================================================
-      // BOTTOM NAVIGATION
-      // ============================================================
-      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }

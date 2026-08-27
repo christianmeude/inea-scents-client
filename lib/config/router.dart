@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../screens/index.dart';
+import '../widgets/index.dart';
 
 class AppRouter {
   static final router = GoRouter(
@@ -25,40 +25,45 @@ class AppRouter {
         path: '/forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-      GoRoute(
-        path: '/packages',
-        builder: (context, state) => const PackagesScreen(),
-      ),
-      GoRoute(
-        path: '/package-details/:id',
-        builder: (context, state) {
-          final packageId = int.parse(state.pathParameters['id']!);
-          return PackageDetailScreen(packageId: packageId);
-        },
-      ),
-      GoRoute(
-        path: '/booking/:id',
-        builder: (context, state) {
-          final packageId = int.parse(state.pathParameters['id']!);
-          return BookingScreen(packageId: packageId);
-        },
-      ),
-      GoRoute(
-        path: '/bookings',
-        builder: (context, state) => const MyBookingsScreen(),
-      ),
-      GoRoute(
-        path: '/calendar',
-        builder: (context, state) => const CalendarScreen(),
-      ),
-      GoRoute(
-        path: '/wishlist',
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
+      ShellRoute(
+        builder: (context, state, child) => ResponsiveAppShell(child: child),
+        routes: [
+          GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+          GoRoute(
+            path: '/packages',
+            builder: (context, state) => const PackagesScreen(),
+          ),
+          GoRoute(
+            path: '/package-details/:id',
+            builder: (context, state) {
+              final packageId = int.parse(state.pathParameters['id']!);
+              return PackageDetailScreen(packageId: packageId);
+            },
+          ),
+          GoRoute(
+            path: '/booking/:id',
+            builder: (context, state) {
+              final packageId = int.parse(state.pathParameters['id']!);
+              return BookingScreen(packageId: packageId);
+            },
+          ),
+          GoRoute(
+            path: '/bookings',
+            builder: (context, state) => const MyBookingsScreen(),
+          ),
+          GoRoute(
+            path: '/calendar',
+            builder: (context, state) => const CalendarScreen(),
+          ),
+          GoRoute(
+            path: '/wishlist',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
       ),
     ],
   );

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-
 import '../providers/index.dart';
 import '../widgets/index.dart';
-import '../widgets/app_logo.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -19,17 +16,18 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           children: [
             // ============================================================
-            // HEADER
+            // HEADER (Mobile only, Desktop uses TopNavBar in App Shell)
             // ============================================================
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Center(child: AppLogo()),
-                ],
+            if (MediaQuery.of(context).size.width < 768)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Center(child: AppLogo()),
+                  ],
+                ),
               ),
-            ),
 
             Expanded(
               child: SingleChildScrollView(
@@ -177,7 +175,7 @@ class HomeScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
-                          color: const Color(0xFF6A4053),
+                          color: Color(0xFF6A4053),
                         ),
                       ),
                     ),
@@ -224,7 +222,6 @@ class HomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(),
     );
   }
 }

@@ -24,11 +24,13 @@ class PackageDetailScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   child: Row(
                     children: [
-                      GestureDetector(
-                        onTap: () => context.pop(),
-                        child: const Icon(Icons.arrow_back, color: Color(0xFF6A4053)),
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Color(0xFF6A4053)),
+                        tooltip: 'Back',
+                        mouseCursor: SystemMouseCursors.click,
+                        onPressed: () => context.pop(),
                       ),
-                      const SizedBox(width: 15),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Container(
                           height: 40,
@@ -102,7 +104,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF6A4053),
+                                      color: Color(0xFF6A4053),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -112,21 +114,21 @@ class PackageDetailScreen extends ConsumerWidget {
                                       const SizedBox(width: 4),
                                       Text(
                                         '${package.rating ?? 4.5}',
-                                        style: const TextStyle(fontSize: 14, color: const Color(0xFF6A4053)),
+                                        style: const TextStyle(fontSize: 14, color: Color(0xFF6A4053)),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '(${package.reviewsCount ?? 232} reviews)',
-                                        style: TextStyle(fontSize: 14, color: const Color(0xFF99868C)),
+                                        style: const TextStyle(fontSize: 14, color: Color(0xFF99868C)),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
                                   Text(
                                     package.description ?? 'Perfect for intimate celebrations...',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 13,
-                                      color: const Color(0xFF99868C),
+                                      color: Color(0xFF99868C),
                                       height: 1.4,
                                     ),
                                   ),
@@ -136,7 +138,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: const Color(0xFF6A4053),
+                                      color: Color(0xFF6A4053),
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -149,9 +151,9 @@ class PackageDetailScreen extends ConsumerWidget {
                                         Expanded(
                                           child: Text(
                                             inclusion,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               fontSize: 13,
-                                              color: const Color(0xFF6A4053),
+                                              color: Color(0xFF6A4053),
                                               height: 1.3,
                                             ),
                                           ),
@@ -167,7 +169,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        color: const Color(0xFF6A4053),
+                                        color: Color(0xFF6A4053),
                                       ),
                                     ),
                                     const SizedBox(height: 8),
