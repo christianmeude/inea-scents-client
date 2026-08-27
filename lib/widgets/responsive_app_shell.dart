@@ -70,14 +70,14 @@ class ResponsiveAppShell extends StatelessWidget {
         return Scaffold(
           backgroundColor: backgroundColor,
           appBar: isDesktopView ? const TopNavBar() : null,
-          body: isDesktopView
-              ? Center(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: maxWidth),
-                    child: child,
-                  ),
-                )
-              : child,
+          body: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isDesktopView ? maxWidth : double.infinity,
+              ),
+              child: child,
+            ),
+          ),
           bottomNavigationBar: isDesktopView ? null : _buildMobileBottomNav(context),
         );
       },

@@ -22,3 +22,34 @@ Acceptance Criteria:
 - Verification: Widget tests successfully verify the breakpoint navigation toggle behavior.
 
 Execute your SWE Light loop (Implementer r0 -> Reviewers r1..rN -> Verification) and report results back.
+
+## Follow-up — 2026-08-27T11:59:01Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Implement Issue #44
+> Requested team: small focused team
+
+Implement Issue #44: 3-Column Reservation Flow Layout. This is a single self-contained feature; keep it small and focused.
+
+Working directory: c:\Users\Christian\Projects\inea_scents_client
+Integrity mode: development
+
+## Requirements
+
+### R1. Desktop Split View
+Implement the 3-column split view for the desktop reservation flow (>1024px). Left column: Calendar. Middle column: Packages/Times. Right column: Sticky floating Order Summary side-panel.
+
+### R2. Responsive Integration
+Integrate this split view seamlessly into the existing ResponsiveAppShell. Ensure the layout remains vertical (1-column or 2-column) on smaller breakpoints as specified in the app's responsiveness guidelines.
+
+## Acceptance Criteria
+
+### Layout Validation
+- [ ] Reservation flow renders a 3-column layout on screens > 1024px.
+- [ ] Order Summary side-panel is implemented as a sticky widget that remains visible during scrolling.
+
+### Verification
+- [ ] Golden tests or widget tests successfully verify the visual regression of the 3-column layout on a 1200x800 viewport.
+

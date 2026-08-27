@@ -1,6 +1,7 @@
-# DISPATCH
+# Original User Request
 
-## 2026-08-27T11:59:52Z
+## Initial Request — 2026-08-27T11:59:52Z
+
 <USER_REQUEST>
 You are the SWE Light Orchestrator for Issue #44: 3-Column Reservation Flow Layout.
 
