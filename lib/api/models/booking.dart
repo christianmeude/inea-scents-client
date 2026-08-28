@@ -34,6 +34,8 @@ abstract class Booking with _$Booking {
     @JsonKey(name: 'payment_method')
     String? paymentMethod,
     String? status,
+    @JsonKey(name: 'checkout_url')
+    String? checkoutUrl,
     Package? package,
     List<Scent>? scents,
   }) = _Booking;

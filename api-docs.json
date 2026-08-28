@@ -589,6 +589,10 @@
                     "status": {
                         "type": "string"
                     },
+                    "checkout_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
                     "package": {
                         "$ref": "#/components/schemas/Package"
                     },
