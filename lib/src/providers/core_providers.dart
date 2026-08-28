@@ -27,7 +27,8 @@ final dioClientProvider = Provider<DioClient>((ref) {
   
   if (!kDebugMode) {
     // Release builds on all platforms use the live backend
-    baseUrl = const String.fromEnvironment('API_URL', defaultValue: 'https://inea-scents.onrender.com');
+    const envUrl = String.fromEnvironment('API_URL');
+    baseUrl = envUrl.isEmpty ? 'https://inea-scents.onrender.com' : envUrl;
   } else {
     // Debug builds check the manual toggle
     baseUrl = currentEnvironment == Environment.local 
