@@ -95,18 +95,22 @@ class OrderSummaryPanel extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF22C55E).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(9999),
-                ),
-                child: const Text(
-                  'Live Preview',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF16A34A),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22C55E).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                  child: const Text(
+                    'Live Preview',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF16A34A),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ),
@@ -268,23 +272,31 @@ class OrderSummaryPanel extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Payment:',
-                  style: TextStyle(fontSize: 12, color: mutedPlum),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: cream,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0x3399868C)),
-                  ),
+                const Flexible(
                   child: Text(
-                    paymentMethod!.toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: plum,
+                    'Payment:',
+                    style: TextStyle(fontSize: 12, color: mutedPlum),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: cream,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: const Color(0x3399868C)),
+                    ),
+                    child: Text(
+                      paymentMethod!.toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: plum,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),

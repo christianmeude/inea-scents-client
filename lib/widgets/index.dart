@@ -10,3 +10,4 @@ export 'custom_text_field.dart';
 export 'order_summary_panel.dart';
 export 'reservation_calendar_panel.dart';
 export 'reservation_details_panel.dart';
+export 'desktop_payment_panel.dart';

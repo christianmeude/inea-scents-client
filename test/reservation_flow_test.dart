@@ -98,7 +98,7 @@ void main() {
       expect(find.text('Order Summary'), findsOneWidget);
       expect(find.text('Live Preview'), findsOneWidget);
       expect(find.text('Price Breakdown'), findsOneWidget);
-      expect(find.text('Confirm & Pay'), findsOneWidget);
+      expect(find.text('Proceed to Payment'), findsOneWidget);
       expect(find.text('Php. 4500.00'), findsOneWidget);
     });
 
@@ -116,7 +116,7 @@ void main() {
 
       // Check initial position of Order Summary panel
       final initialSummaryPos = tester.getTopLeft(find.byKey(const Key('order_summary_side_panel')));
-      final initialButtonPos = tester.getTopLeft(find.text('Confirm & Pay'));
+      final initialButtonPos = tester.getTopLeft(find.text('Proceed to Payment'));
 
       // Find middle scroll view and scroll down by 400 pixels
       final middleScrollFinder = find.byKey(const Key('desktop_middle_scroll_view'));
@@ -127,7 +127,7 @@ void main() {
 
       // Check position of Order Summary panel after middle column scroll
       final scrolledSummaryPos = tester.getTopLeft(find.byKey(const Key('order_summary_side_panel')));
-      final scrolledButtonPos = tester.getTopLeft(find.text('Confirm & Pay'));
+      final scrolledButtonPos = tester.getTopLeft(find.text('Proceed to Payment'));
 
       // The Order Summary panel position must remain unchanged (sticky/fixed in viewport)
       expect(scrolledSummaryPos.dy, equals(initialSummaryPos.dy));
@@ -136,7 +136,7 @@ void main() {
 
       // Verify Order Summary and CTA button are still 100% visible and interactive
       expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
-      expect(find.text('Confirm & Pay'), findsOneWidget);
+      expect(find.text('Proceed to Payment'), findsOneWidget);
     });
 
     testWidgets('R2: Tablet View renders 2-column layout on 800x800 viewport (768px - 1024px)',
@@ -270,7 +270,7 @@ void main() {
       expect(find.text('MAYA'), findsOneWidget);
     });
 
-    testWidgets('Confirm & Pay button completes flow and renders Payment Successful view',
+    testWidgets('Proceed to Payment and Confirm & Pay completes desktop flow and renders Payment Successful view',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1200, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -282,7 +282,16 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap 'Confirm & Pay' in sticky Order Summary panel
+      // Tap 'Proceed to Payment' in sticky Order Summary panel
+      final proceedButtonFinder = find.text('Proceed to Payment');
+      expect(proceedButtonFinder, findsOneWidget);
+      await tester.tap(proceedButtonFinder);
+      await tester.pumpAndSettle();
+
+      // Verify Desktop Payment panel appears
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+
+      // Tap 'Confirm & Pay' on payment step
       final confirmButtonFinder = find.text('Confirm & Pay');
       expect(confirmButtonFinder, findsOneWidget);
       await tester.tap(confirmButtonFinder);
@@ -888,7 +897,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Confirm & Pay to trigger success view - scroll within tablet_right_scroll_view
+      // Proceed to Payment then Confirm & Pay to trigger success view - scroll within tablet_right_scroll_view
+      final proceedBtn = find.text('Proceed to Payment');
+      await tester.scrollUntilVisible(
+        proceedBtn,
+        100,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('tablet_right_scroll_view')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      expect(proceedBtn, findsOneWidget);
+      await tester.tap(proceedBtn);
+      await tester.pumpAndSettle();
+
       final confirmBtn = find.text('Confirm & Pay');
       await tester.scrollUntilVisible(
         confirmBtn,
@@ -943,6 +965,687 @@ void main() {
 
       expect(find.text('March 10, 2018'), findsOneWidget);
       expect(find.text('Mar 10, 2018'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('Issue #45: In-place Payment Step Transition Tests', () {
+    testWidgets('R1: Desktop payment transition replaces Calendar and Details with DesktopPaymentPanel via in-place cross-fade on 1200x800 (>1024px)',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Initially on Step 2 (Reservation layout)
+      expect(find.byKey(const Key('reservation_calendar_panel')), findsOneWidget);
+      expect(find.byKey(const Key('reservation_details_panel')), findsOneWidget);
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsNothing);
+      expect(find.text('Proceed to Payment'), findsOneWidget);
+
+      // Tap Proceed to Payment
+      await tester.tap(find.text('Proceed to Payment'));
+
+      // Advance halfway through the 300ms cross-fade transition
+      await tester.pump(const Duration(milliseconds: 150));
+
+      // FadeTransition should be animating
+      expect(find.byType(FadeTransition), findsWidgets);
+
+      // Complete transition
+      await tester.pumpAndSettle();
+
+      // Columns 1 & 2 (Calendar & Details) are replaced by DesktopPaymentPanel
+      expect(find.byKey(const Key('reservation_calendar_panel')), findsNothing);
+      expect(find.byKey(const Key('reservation_details_panel')), findsNothing);
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+      expect(find.text('Payment & Checkout Details'), findsOneWidget);
+      expect(find.text('1. Select Payment Method'), findsOneWidget);
+    });
+
+    testWidgets('R2: Persistent Order Summary remains mounted at exact coordinates with identical live values during and after payment transition',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Record Order Summary position and values before transition
+      final summaryBeforePos = tester.getTopLeft(find.byKey(const Key('order_summary_side_panel')));
+      expect(find.text('Live Preview'), findsOneWidget);
+      expect(find.text('Price Breakdown'), findsOneWidget);
+      expect(find.text('Php. 4500.00'), findsOneWidget);
+
+      // Trigger payment transition
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pump(const Duration(milliseconds: 150));
+
+      // Mid-transition: Order Summary is STILL mounted and at exact same position
+      final summaryMidPos = tester.getTopLeft(find.byKey(const Key('order_summary_side_panel')));
+      expect(summaryMidPos.dx, equals(summaryBeforePos.dx));
+      expect(summaryMidPos.dy, equals(summaryBeforePos.dy));
+
+      await tester.pumpAndSettle();
+
+      // Post-transition: Order Summary remains persistently visible at exact coordinates
+      final summaryAfterPos = tester.getTopLeft(find.byKey(const Key('order_summary_side_panel')));
+      expect(summaryAfterPos.dx, equals(summaryBeforePos.dx));
+      expect(summaryAfterPos.dy, equals(summaryBeforePos.dy));
+      expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
+
+      // Summary button has updated to 'Confirm & Pay'
+      expect(find.text('Confirm & Pay'), findsOneWidget);
+      expect(find.text('Php. 4500.00'), findsOneWidget);
+    });
+
+    testWidgets('Desktop payment header updates title to Payment & Checkout and badge to Secure In-Place Checkout',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Initial reservation header
+      expect(find.textContaining('Reservation —'), findsOneWidget);
+      expect(find.text('3-Column Reservation Flow'), findsOneWidget);
+
+      // Proceed to payment
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // Payment header updates
+      expect(find.textContaining('Payment & Checkout —'), findsOneWidget);
+      expect(find.text('Secure In-Place Checkout'), findsOneWidget);
+      expect(find.byIcon(Icons.lock_outline_rounded), findsWidgets);
+    });
+
+    testWidgets('Header Back button cross-fades back from DesktopPaymentPanel to 3-column reservation layout',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Go to payment step
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+
+      // Tap Header Back button
+      await tester.tap(find.text('Back'));
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(find.byType(FadeTransition), findsWidgets);
+
+      await tester.pumpAndSettle();
+
+      // Returned to 3-column reservation layout
+      expect(find.byKey(const Key('reservation_calendar_panel')), findsOneWidget);
+      expect(find.byKey(const Key('reservation_details_panel')), findsOneWidget);
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsNothing);
+      expect(find.text('Proceed to Payment'), findsOneWidget);
+    });
+
+    testWidgets('Edit Selection button in DesktopPaymentPanel cross-fades back to 3-column reservation layout',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Go to payment step
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // Find and tap 'Edit Selection' button inside payment panel
+      final editSelectionFinder = find.text('Edit Selection');
+      expect(editSelectionFinder, findsOneWidget);
+      await tester.tap(editSelectionFinder);
+      await tester.pumpAndSettle();
+
+      // Returned to Calendar and Details panels
+      expect(find.byKey(const Key('reservation_calendar_panel')), findsOneWidget);
+      expect(find.byKey(const Key('reservation_details_panel')), findsOneWidget);
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsNothing);
+    });
+
+    testWidgets('Interactive payment method switching in DesktopPaymentPanel (GCash, Card, Maya) updates Order Summary live preview',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Proceed to Payment
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // 1. Initial method is GCash
+      expect(find.text('2. GCash Account Details'), findsOneWidget);
+      expect(find.text('GCASH'), findsOneWidget);
+
+      // 2. Select Credit / Debit Card
+      final cardMethodFinder = find.text('Credit / Debit Card');
+      expect(cardMethodFinder, findsOneWidget);
+      await tester.tap(cardMethodFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('2. Card Details'), findsOneWidget);
+      expect(find.text('CARD'), findsOneWidget);
+      expect(find.text('Cardholder Full Name'), findsOneWidget);
+      expect(find.text('Card Number'), findsOneWidget);
+
+      // 3. Select Maya
+      final mayaMethodFinder = find.text('Maya');
+      expect(mayaMethodFinder, findsOneWidget);
+      await tester.tap(mayaMethodFinder);
+      await tester.pumpAndSettle();
+
+      expect(find.text('2. Maya Account Details'), findsOneWidget);
+      expect(find.text('MAYA'), findsOneWidget);
+    });
+
+    testWidgets('DesktopPaymentPanel card and contact text input fields accept keyboard entries cleanly',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Proceed to Payment
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // Switch to Card
+      await tester.tap(find.text('Credit / Debit Card'));
+      await tester.pumpAndSettle();
+
+      // Enter card details
+      await tester.enterText(find.byKey(const Key('payment_cardholder_name')), 'Maria Clara');
+      await tester.enterText(find.byKey(const Key('payment_card_number')), '4123 9999 8888 7777');
+      await tester.enterText(find.byKey(const Key('payment_card_expiry')), '12/28');
+      await tester.enterText(find.byKey(const Key('payment_card_cvv')), '888');
+
+      // Enter customer & venue details
+      await tester.enterText(find.byKey(const Key('payment_customer_name')), 'Maria Clara');
+      await tester.enterText(find.byKey(const Key('payment_customer_email')), 'maria@example.com');
+      await tester.enterText(find.byKey(const Key('payment_customer_phone')), '+63 917 123 4567');
+      await tester.enterText(find.byKey(const Key('payment_venue_address')), 'The Peninsula Manila');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Maria Clara'), findsWidgets);
+      expect(find.text('4123 9999 8888 7777'), findsOneWidget);
+      expect(find.text('The Peninsula Manila'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Confirm & Pay on Desktop completes payment flow and renders Payment Successful view',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Step 1: Proceed to Payment
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+
+      // Step 2: Confirm & Pay in persistent Order Summary
+      final confirmBtn = find.text('Confirm & Pay');
+      expect(confirmBtn, findsOneWidget);
+      await tester.tap(confirmBtn);
+      await tester.pumpAndSettle();
+
+      // Step 3: Payment Successful screen
+      expect(find.text('Payment Successful'), findsOneWidget);
+      expect(find.text('Thank you for your booking.'), findsOneWidget);
+      expect(find.text('Done'), findsOneWidget);
+    });
+
+    testWidgets('R3: Mobile payment flow behavior is 100% preserved (Schedule -> Details -> Payment -> Success)',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(375, 667);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(375, 667)));
+      await tester.pumpAndSettle();
+
+      // Step 2: Schedule & Pax
+      expect(find.text('Please Choose Available Schedule'), findsOneWidget);
+      expect(find.text('Next'), findsOneWidget);
+
+      // Advance to Step 3: Details
+      await tester.tap(find.text('Next'));
+      await tester.pumpAndSettle();
+      expect(find.text('Order Details'), findsOneWidget);
+      expect(find.text('Proceed to Payment'), findsOneWidget);
+
+      // Advance to Step 4: Mobile Payment
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      expect(find.text('Price Details'), findsOneWidget);
+      expect(find.text('Choose Payment Method'), findsOneWidget);
+      expect(find.text('Confirm & Pay'), findsOneWidget);
+
+      // Test mobile back navigation
+      await tester.tap(find.text('Back'));
+      await tester.pumpAndSettle();
+      expect(find.text('Order Details'), findsOneWidget);
+
+      // Advance back to mobile payment and complete
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm & Pay'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Payment Successful'), findsOneWidget);
+      expect(find.text('Done'), findsOneWidget);
+    });
+
+    testWidgets('Tablet 2-column view triggers in-place cross-fade on left column to DesktopPaymentPanel while keeping Order Summary persistent',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(900, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(900, 800)));
+      await tester.pumpAndSettle();
+
+      // Initial tablet 2-column layout
+      expect(find.byKey(const Key('tablet_calendar_panel')), findsOneWidget);
+      expect(find.byKey(const Key('tablet_details_panel')), findsOneWidget);
+      expect(find.byKey(const Key('tablet_order_summary_panel')), findsOneWidget);
+      expect(find.text('Proceed to Payment'), findsOneWidget);
+
+      // Tap Proceed to Payment in tablet Order Summary
+      final proceedBtn = find.text('Proceed to Payment');
+      await tester.scrollUntilVisible(
+        proceedBtn,
+        100,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('tablet_right_scroll_view')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.tap(proceedBtn);
+      await tester.pump(const Duration(milliseconds: 150));
+
+      expect(find.byType(FadeTransition), findsWidgets);
+      await tester.pumpAndSettle();
+
+      // Left column is now DesktopPaymentPanel on tablet
+      expect(find.byKey(const Key('tablet_payment_panel_view')), findsOneWidget);
+      expect(find.byKey(const Key('tablet_order_summary_panel')), findsOneWidget);
+      expect(find.text('Confirm & Pay'), findsOneWidget);
+
+      // Confirm & Pay completes tablet flow
+      await tester.tap(find.text('Confirm & Pay'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Payment Successful'), findsOneWidget);
+    });
+
+    testWidgets('DesktopPaymentPanel renders cleanly in Dark Theme',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            packageDetailsProvider(42).overrideWith((ref) => testPackage),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: const ResponsiveAppShell(
+              child: BookingScreen(packageId: 42),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+      expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
+      expect(find.text('Payment & Checkout Details'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Desktop payment transition renders cleanly under 2.0x text scaling without flex overflow',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            packageDetailsProvider(42).overrideWith((ref) => testPackage),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            builder: (context, child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: const TextScaler.linear(2.0),
+                ),
+                child: child!,
+              );
+            },
+            home: const ResponsiveAppShell(
+              child: BookingScreen(packageId: 42),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final proceedBtn = find.text('Proceed to Payment');
+      await tester.scrollUntilVisible(
+        proceedBtn,
+        100,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('desktop_summary_scroll_view')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      expect(proceedBtn, findsOneWidget);
+      await tester.tap(proceedBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+      expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Dynamic resize between Desktop (1200px) and Tablet (900px) preserves active payment step state',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Proceed to payment on Desktop
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+
+      // Resize to Tablet (900px) -> Still in Payment step
+      tester.view.physicalSize = const Size(900, 800);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('tablet_payment_panel_view')), findsOneWidget);
+      expect(find.byKey(const Key('tablet_order_summary_panel')), findsOneWidget);
+      expect(find.text('Confirm & Pay'), findsOneWidget);
+
+      // Resize back to Desktop (1400px) -> Still in Payment step
+      tester.view.physicalSize = const Size(1400, 800);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+      expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
+      expect(find.text('Confirm & Pay'), findsOneWidget);
+    });
+
+    testWidgets('DesktopPaymentPanel inputFormatters enforce numeric constraints and length limits on card and CVV fields',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // Switch to Card
+      await tester.tap(find.text('Credit / Debit Card'));
+      await tester.pumpAndSettle();
+
+      // Attempt to enter alpha characters and excess digits into card number
+      final cardField = find.byKey(const Key('payment_card_number'));
+      await tester.enterText(cardField, '4123ABCD4567890123456789999');
+      await tester.pumpAndSettle();
+
+      final TextField cardWidget = tester.widget(cardField);
+      // Digits only & max 19 chars
+      expect(cardWidget.controller?.text, equals('4123456789012345678'));
+
+      // Attempt to enter alpha characters and excess digits into CVV
+      final cvvField = find.byKey(const Key('payment_card_cvv'));
+      await tester.enterText(cvvField, '99XYZ88');
+      await tester.pumpAndSettle();
+
+      final TextField cvvWidget = tester.widget(cvvField);
+      // Digits only & max 4 chars
+      expect(cvvWidget.controller?.text, equals('9988'));
+
+      // Expiry max 5 chars
+      final expiryField = find.byKey(const Key('payment_card_expiry'));
+      await tester.enterText(expiryField, '12/2030');
+      await tester.pumpAndSettle();
+
+      final TextField expiryWidget = tester.widget(expiryField);
+      expect(expiryWidget.controller?.text, equals('12/20'));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('DesktopPaymentPanel fields expose proper TextInputAction for keyboard navigation',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+
+      // Switch to Card
+      await tester.tap(find.text('Credit / Debit Card'));
+      await tester.pumpAndSettle();
+
+      final cardHolderField = find.byKey(const Key('payment_cardholder_name'));
+      final TextField cardHolderWidget = tester.widget(cardHolderField);
+      expect(cardHolderWidget.textInputAction, equals(TextInputAction.next));
+
+      final cardField = find.byKey(const Key('payment_card_number'));
+      final TextField cardWidget = tester.widget(cardField);
+      expect(cardWidget.textInputAction, equals(TextInputAction.next));
+
+      final nameField = find.byKey(const Key('payment_customer_name'));
+      final TextField nameWidget = tester.widget(nameField);
+      expect(nameWidget.textInputAction, equals(TextInputAction.next));
+
+      final emailField = find.byKey(const Key('payment_customer_email'));
+      final TextField emailWidget = tester.widget(emailField);
+      expect(emailWidget.textInputAction, equals(TextInputAction.next));
+
+      final addressField = find.byKey(const Key('payment_venue_address'));
+      final TextField addressWidget = tester.widget(addressField);
+      expect(addressWidget.textInputAction, equals(TextInputAction.done));
+    });
+
+    testWidgets('DesktopPaymentPanel renders robustly on narrow tablet column under 3.0x extreme text scale without overflow',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(768, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            packageDetailsProvider(42).overrideWith((ref) => testPackage),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            builder: (context, child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: const TextScaler.linear(3.0),
+                ),
+                child: child!,
+              );
+            },
+            home: const ResponsiveAppShell(
+              child: BookingScreen(packageId: 42),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final proceedBtn = find.text('Proceed to Payment');
+      await tester.scrollUntilVisible(
+        proceedBtn,
+        100,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('tablet_right_scroll_view')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.tap(proceedBtn);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('tablet_payment_panel_view')), findsOneWidget);
+      expect(find.byKey(const Key('tablet_order_summary_panel')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Rapid step oscillation between reservation and payment views preserves selection state and transition animations cleanly',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(createBookingScreenWidget(screenSize: const Size(1200, 800)));
+      await tester.pumpAndSettle();
+
+      // Select 100 Pax and Maya on reservation step
+      await tester.tap(find.text('100 Pax'));
+      await tester.pumpAndSettle();
+
+      final mayaOption = find.text('Maya');
+      await tester.scrollUntilVisible(
+        mayaOption,
+        100,
+        scrollable: find.descendant(
+          of: find.byKey(const Key('desktop_middle_scroll_view')),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.tap(mayaOption);
+      await tester.pumpAndSettle();
+
+      expect(find.text('MAYA'), findsOneWidget);
+      expect(find.text('100 Pax'), findsWidgets);
+
+      // Rapidly toggle forward and backward 3 times
+      for (int i = 0; i < 3; i++) {
+        // Proceed to Payment
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.byType(FadeTransition), findsWidgets);
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('desktop_payment_panel_view')), findsOneWidget);
+
+        // Edit Selection (Back to Reservation)
+        await tester.tap(find.text('Edit Selection'));
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(find.byType(FadeTransition), findsWidgets);
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('reservation_calendar_panel')), findsOneWidget);
+      }
+
+      // State is preserved
+      expect(find.text('MAYA'), findsOneWidget);
+      expect(find.text('100 Pax'), findsWidgets);
+
+      // Final proceed to payment and confirm
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Confirm & Pay'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Payment Successful'), findsOneWidget);
+    });
+
+    testWidgets('DesktopPaymentPanel handles bare/null package data gracefully with default fallbacks',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      const minimalPackage = Package(
+        id: 99,
+        name: null,
+        description: null,
+        price: null,
+        images: null,
+        inclusions: null,
+        freebies: null,
+        paxOptions: null,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: Scaffold(
+            body: DesktopPaymentPanel(
+              package: minimalPackage,
+              paymentMethod: 'gcash',
+              onPaymentMethodSelected: (_) {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Payment & Checkout Details'), findsOneWidget);
+      expect(find.textContaining('₱4500.00'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

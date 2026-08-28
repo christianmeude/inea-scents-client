@@ -161,6 +161,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   // ==========================================================================
 
   Widget _buildDesktopThreeColumnLayout(Package package) {
+    final isPayment = currentStep == 4;
+
     return Column(
       children: [
         _buildDesktopHeader(package),
@@ -169,61 +171,109 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ------------------------------------------------------
-              // COLUMN 1 (LEFT): CALENDAR
+              // COLUMNS 1 & 2 (LEFT & MIDDLE): IN-PLACE CROSS-FADE
               // ------------------------------------------------------
               Expanded(
-                flex: 1,
-                child: SingleChildScrollView(
-                  key: const Key('desktop_calendar_scroll_view'),
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
-                  child: ReservationCalendarPanel(
-                    key: const Key('reservation_calendar_panel'),
-                    selectedDate: _selectedDate,
-                    onDateSelected: (date) {
-                      setState(() {
-                        _selectedDate = date;
-                      });
-                      ref.read(bookingFlowProvider.notifier).setSelectedDate(date);
-                    },
-                  ),
-                ),
-              ),
+                flex: 2,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  switchInCurve: Curves.easeInOut,
+                  switchOutCurve: Curves.easeInOut,
+                  layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                    return Stack(
+                      alignment: Alignment.topLeft,
+                      children: <Widget>[
+                        ...previousChildren,
+                        ?currentChild,
+                      ],
+                    );
+                  },
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: isPayment
+                      ? DesktopPaymentPanel(
+                          key: const ValueKey('desktop_payment_panel_view'),
+                          package: package,
+                          selectedDate: _selectedDate,
+                          selectedTime: _selectedTime,
+                          selectedPax: _selectedPax,
+                          paymentMethod: _paymentMethod,
+                          onPaymentMethodSelected: (method) {
+                            setState(() {
+                              _paymentMethod = method;
+                            });
+                            ref.read(bookingFlowProvider.notifier).setPaymentMethod(method);
+                          },
+                          onBackToReservation: () {
+                            setState(() {
+                              currentStep = 2;
+                            });
+                          },
+                        )
+                      : Row(
+                          key: const ValueKey('desktop_reservation_columns_view'),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // COLUMN 1 (LEFT): CALENDAR
+                            Expanded(
+                              flex: 1,
+                              child: SingleChildScrollView(
+                                key: const Key('desktop_calendar_scroll_view'),
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
+                                child: ReservationCalendarPanel(
+                                  key: const Key('reservation_calendar_panel'),
+                                  selectedDate: _selectedDate,
+                                  onDateSelected: (date) {
+                                    setState(() {
+                                      _selectedDate = date;
+                                    });
+                                    ref.read(bookingFlowProvider.notifier).setSelectedDate(date);
+                                  },
+                                ),
+                              ),
+                            ),
 
-              // ------------------------------------------------------
-              // COLUMN 2 (MIDDLE): PACKAGES / TIMES / CUSTOMIZATION
-              // ------------------------------------------------------
-              Expanded(
-                flex: 1,
-                child: SingleChildScrollView(
-                  key: const Key('desktop_middle_scroll_view'),
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-                  child: ReservationDetailsPanel(
-                    key: const Key('reservation_details_panel'),
-                    package: package,
-                    selectedPax: _selectedPax,
-                    onPaxSelected: (pax) {
-                      setState(() {
-                        _selectedPax = pax;
-                      });
-                      ref.read(bookingFlowProvider.notifier).setSelectedPax(pax);
-                    },
-                    selectedTime: _selectedTime,
-                    onTimeSelected: (time) {
-                      setState(() {
-                        _selectedTime = time;
-                      });
-                      ref.read(bookingFlowProvider.notifier).setSelectedTime(time);
-                    },
-                    paymentMethod: _paymentMethod,
-                    onPaymentMethodSelected: (method) {
-                      setState(() {
-                        _paymentMethod = method;
-                      });
-                      ref.read(bookingFlowProvider.notifier).setPaymentMethod(method);
-                    },
-                  ),
+                            // COLUMN 2 (MIDDLE): PACKAGES / TIMES / CUSTOMIZATION
+                            Expanded(
+                              flex: 1,
+                              child: SingleChildScrollView(
+                                key: const Key('desktop_middle_scroll_view'),
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+                                child: ReservationDetailsPanel(
+                                  key: const Key('reservation_details_panel'),
+                                  package: package,
+                                  selectedPax: _selectedPax,
+                                  onPaxSelected: (pax) {
+                                    setState(() {
+                                      _selectedPax = pax;
+                                    });
+                                    ref.read(bookingFlowProvider.notifier).setSelectedPax(pax);
+                                  },
+                                  selectedTime: _selectedTime,
+                                  onTimeSelected: (time) {
+                                    setState(() {
+                                      _selectedTime = time;
+                                    });
+                                    ref.read(bookingFlowProvider.notifier).setSelectedTime(time);
+                                  },
+                                  paymentMethod: _paymentMethod,
+                                  onPaymentMethodSelected: (method) {
+                                    setState(() {
+                                      _paymentMethod = method;
+                                    });
+                                    ref.read(bookingFlowProvider.notifier).setPaymentMethod(method);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
 
@@ -243,11 +293,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     selectedTime: _selectedTime,
                     selectedPax: _selectedPax,
                     paymentMethod: _paymentMethod,
-                    actionButtonText: 'Confirm & Pay',
+                    actionButtonText: isPayment ? 'Confirm & Pay' : 'Proceed to Payment',
                     isSticky: true,
                     onProceed: () {
                       setState(() {
-                        currentStep = 5;
+                        if (currentStep == 4) {
+                          currentStep = 5;
+                        } else {
+                          currentStep = 4;
+                        }
                       });
                     },
                   ),
@@ -265,6 +319,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   // ==========================================================================
 
   Widget _buildTabletTwoColumnLayout(Package package) {
+    final isPayment = currentStep == 4;
+
     return Column(
       children: [
         _buildDesktopHeader(package),
@@ -272,53 +328,93 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left Column: Calendar & Customization (Scrollable)
+              // Left Column: Calendar & Customization / Payment (Scrollable & Cross-Faded)
               Expanded(
                 flex: 1,
-                child: SingleChildScrollView(
-                  key: const Key('tablet_left_scroll_view'),
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
-                  child: Column(
-                    children: [
-                      ReservationCalendarPanel(
-                        key: const Key('tablet_calendar_panel'),
-                        selectedDate: _selectedDate,
-                        onDateSelected: (date) {
-                          setState(() {
-                            _selectedDate = date;
-                          });
-                          ref.read(bookingFlowProvider.notifier).setSelectedDate(date);
-                        },
-                      ),
-                      const SizedBox(height: 14),
-                      ReservationDetailsPanel(
-                        key: const Key('tablet_details_panel'),
-                        package: package,
-                        selectedPax: _selectedPax,
-                        onPaxSelected: (pax) {
-                          setState(() {
-                            _selectedPax = pax;
-                          });
-                          ref.read(bookingFlowProvider.notifier).setSelectedPax(pax);
-                        },
-                        selectedTime: _selectedTime,
-                        onTimeSelected: (time) {
-                          setState(() {
-                            _selectedTime = time;
-                          });
-                          ref.read(bookingFlowProvider.notifier).setSelectedTime(time);
-                        },
-                        paymentMethod: _paymentMethod,
-                        onPaymentMethodSelected: (method) {
-                          setState(() {
-                            _paymentMethod = method;
-                          });
-                          ref.read(bookingFlowProvider.notifier).setPaymentMethod(method);
-                        },
-                      ),
-                    ],
-                  ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  switchInCurve: Curves.easeInOut,
+                  switchOutCurve: Curves.easeInOut,
+                  layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                    return Stack(
+                      alignment: Alignment.topLeft,
+                      children: <Widget>[
+                        ...previousChildren,
+                        ?currentChild,
+                      ],
+                    );
+                  },
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: isPayment
+                      ? DesktopPaymentPanel(
+                          key: const ValueKey('tablet_payment_panel_view'),
+                          package: package,
+                          selectedDate: _selectedDate,
+                          selectedTime: _selectedTime,
+                          selectedPax: _selectedPax,
+                          paymentMethod: _paymentMethod,
+                          onPaymentMethodSelected: (method) {
+                            setState(() {
+                              _paymentMethod = method;
+                            });
+                            ref.read(bookingFlowProvider.notifier).setPaymentMethod(method);
+                          },
+                          onBackToReservation: () {
+                            setState(() {
+                              currentStep = 2;
+                            });
+                          },
+                        )
+                      : SingleChildScrollView(
+                          key: const Key('tablet_left_scroll_view'),
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
+                          child: Column(
+                            children: [
+                              ReservationCalendarPanel(
+                                key: const Key('tablet_calendar_panel'),
+                                selectedDate: _selectedDate,
+                                onDateSelected: (date) {
+                                  setState(() {
+                                    _selectedDate = date;
+                                  });
+                                  ref.read(bookingFlowProvider.notifier).setSelectedDate(date);
+                                },
+                              ),
+                              const SizedBox(height: 14),
+                              ReservationDetailsPanel(
+                                key: const Key('tablet_details_panel'),
+                                package: package,
+                                selectedPax: _selectedPax,
+                                onPaxSelected: (pax) {
+                                  setState(() {
+                                    _selectedPax = pax;
+                                  });
+                                  ref.read(bookingFlowProvider.notifier).setSelectedPax(pax);
+                                },
+                                selectedTime: _selectedTime,
+                                onTimeSelected: (time) {
+                                  setState(() {
+                                    _selectedTime = time;
+                                  });
+                                  ref.read(bookingFlowProvider.notifier).setSelectedTime(time);
+                                },
+                                paymentMethod: _paymentMethod,
+                                onPaymentMethodSelected: (method) {
+                                  setState(() {
+                                    _paymentMethod = method;
+                                  });
+                                  ref.read(bookingFlowProvider.notifier).setPaymentMethod(method);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                 ),
               ),
 
@@ -336,11 +432,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     selectedTime: _selectedTime,
                     selectedPax: _selectedPax,
                     paymentMethod: _paymentMethod,
-                    actionButtonText: 'Confirm & Pay',
+                    actionButtonText: isPayment ? 'Confirm & Pay' : 'Proceed to Payment',
                     isSticky: true,
                     onProceed: () {
                       setState(() {
-                        currentStep = 5;
+                        if (currentStep == 4) {
+                          currentStep = 5;
+                        } else {
+                          currentStep = 4;
+                        }
                       });
                     },
                   ),
@@ -404,13 +504,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   // ==========================================================================
 
   Widget _buildDesktopHeader(Package package) {
+    final isPayment = currentStep == 4;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
       child: Row(
         children: [
           TextButton.icon(
             onPressed: () {
-              if (context.canPop()) {
+              if (currentStep > 2) {
+                setState(() => currentStep = 2);
+              } else if (context.canPop()) {
                 context.pop();
               } else {
                 try {
@@ -440,7 +544,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'Reservation — ${package.name ?? "Custom Experience"}',
+              isPayment
+                  ? 'Payment & Checkout — ${package.name ?? "Custom Experience"}'
+                  : 'Reservation — ${package.name ?? "Custom Experience"}',
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -451,29 +557,41 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ),
           ),
           const SizedBox(width: 10),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(9999),
-              border: Border.all(color: const Color(0x3399868C)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_circle_rounded, size: 13, color: Color(0xFF16A34A)),
-                const SizedBox(width: 5),
-                Text(
-                  MediaQuery.of(context).size.width > ResponsiveAppShell.tabletBreakpoint
-                      ? '3-Column Reservation Flow'
-                      : '2-Column Reservation Flow',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: plum,
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(9999),
+                border: Border.all(color: const Color(0x3399868C)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isPayment ? Icons.lock_outline_rounded : Icons.check_circle_rounded,
+                    size: 13,
+                    color: isPayment ? plum : const Color(0xFF16A34A),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 5),
+                  Flexible(
+                    child: Text(
+                      isPayment
+                          ? 'Secure In-Place Checkout'
+                          : (MediaQuery.of(context).size.width > ResponsiveAppShell.tabletBreakpoint
+                              ? '3-Column Reservation Flow'
+                              : '2-Column Reservation Flow'),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: plum,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

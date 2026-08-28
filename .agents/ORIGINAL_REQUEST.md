@@ -53,3 +53,36 @@ Integrate this split view seamlessly into the existing ResponsiveAppShell. Ensur
 ### Verification
 - [ ] Golden tests or widget tests successfully verify the visual regression of the 3-column layout on a 1200x800 viewport.
 
+## Follow-up — 2026-08-27T12:43:04Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Implement Issue #45
+> Requested team: small focused team
+
+Implement Issue #45: In-place Payment Step Transition. This is a single self-contained feature; keep it small and focused.
+
+Working directory: c:\Users\Christian\Projects\inea_scents_client
+Integrity mode: development
+
+## Requirements
+
+### R1. Desktop Payment Transition
+Implement the desktop payment step transition in the reservation flow. During payment on desktop (>=1024px), the left (Calendar) and middle (Packages/Details) columns should fade out and be replaced by the payment form.
+
+### R2. Persistent Order Summary
+Ensure the right-hand sticky Order Summary remains persistently visible during and after the payment transition.
+
+### R3. Mobile Preservation
+Ensure the mobile payment flow behavior (bottom sheets, slide transitions, etc.) remains entirely unchanged.
+
+## Acceptance Criteria
+
+### Interaction and Layout
+- [ ] Payment step triggers an in-place cross-fade transition replacing the left/middle columns on desktop.
+- [ ] Sticky Order Summary remains persistently visible during the transition.
+- [ ] Mobile payment flow behavior remains unchanged.
+
+### Verification
+- [ ] Widget tests successfully verify the in-place cross-fade transition on desktop viewports and ensure the summary remains visible.
