@@ -56,18 +56,8 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final RestClient _apiClient;
   final TokenStorage _tokenStorage;
-  final Dio _dio;
 
-  AuthNotifier(this._apiClient, this._tokenStorage, this._dio) : super(AuthState());
-
-  Future<String?> getMagicUrl() async {
-    try {
-      final response = await _dio.post('/api/admin/magic-url');
-      return response.data['url'];
-    } catch (e) {
-      return null;
-    }
-  }
+  AuthNotifier(this._apiClient, this._tokenStorage) : super(AuthState());
 
   Future<void> register({
     required String name,
@@ -133,8 +123,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   final tokenStorage = ref.watch(tokenStorageProvider);
-  final dio = ref.watch(dioClientProvider).dio;
-  return AuthNotifier(apiClient, tokenStorage, dio);
+  return AuthNotifier(apiClient, tokenStorage);
 });
 
 // Packages providers

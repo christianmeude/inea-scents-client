@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
 import '../widgets/index.dart';
@@ -33,19 +32,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    ref.listen(authProvider, (previous, next) async {
+    ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
-        if (next.user?.isAdmin == true) {
-          final url = await ref.read(authProvider.notifier).getMagicUrl();
-          if (!context.mounted) return;
-          if (url != null) {
-            await launchUrl(Uri.parse(url), webOnlyWindowName: '_self');
-          } else {
-            context.go('/home'); // Fallback if magic URL fails
-          }
-        } else {
-          context.go('/home');
-        }
+        context.go('/home');
       } else if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

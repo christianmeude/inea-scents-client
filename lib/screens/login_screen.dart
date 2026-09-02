@@ -1,9 +1,7 @@
 import 'dart:ui';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
 import '../widgets/index.dart';
@@ -29,135 +27,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _showAdminRestrictedBottomSheet(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Drag indicator
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              // Warning Icon
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6A4053).withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.desktop_mac_outlined,
-                  color: Color(0xFF6A4053),
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Title
-              Text(
-                'Admin Access Restricted',
-                style: GoogleFonts.figtree(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF151012),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              
-              // Subtitle
-              Text(
-                'The admin dashboard is heavily optimized for desktop displays. Please log in via the web portal to manage bookings, packages, and clients.',
-                style: GoogleFonts.figtree(
-                  fontSize: 15,
-                  height: 1.5,
-                  color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.7) : const Color(0xFF151012).withValues(alpha: 0.7),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              
-              // Primary Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6A4053),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  child: Text(
-                    'UNDERSTOOD',
-                    style: GoogleFonts.figtree(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    ref.listen(authProvider, (previous, next) async {
+    ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
-        if (next.user?.isAdmin == true) {
-          if (kIsWeb) {
-            final url = await ref.read(authProvider.notifier).getMagicUrl();
-            if (!context.mounted) return;
-            if (url != null) {
-              await launchUrl(Uri.parse(url), webOnlyWindowName: '_self');
-            } else {
-              context.go('/home'); // Fallback if magic URL fails
-            }
-          } else {
-            // Block mobile app admin logins and force logout
-            ref.read(authProvider.notifier).logout();
-            if (!context.mounted) return;
-            _showAdminRestrictedBottomSheet(context);
-          }
-        } else {
-          context.go('/home');
-        }
+        context.go('/home');
       } else if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
