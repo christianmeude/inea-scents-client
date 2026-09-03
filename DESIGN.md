@@ -8,6 +8,9 @@ colors:
   neutral-bg: "#fdf4f5"
   neutral-surface: "#ffffff"
   neutral-text: "#6a4053"
+  scrim:
+    light: "rgba(43, 15, 31, 0.5)"
+    dark: "rgba(43, 15, 31, 0.62)"
   semantic:
     success: "#22c55e"
     pending: "#eab308"
@@ -15,9 +18,13 @@ colors:
     link: "#06b6d4"
 typography:
   display:
-    fontFamily: "Figtree, sans-serif"
+    fontFamily: "Josefin Sans, sans-serif"
     fontSize: "2rem"
     fontWeight: 700
+  script:
+    fontFamily: "Great Vibes, cursive"
+    fontSize: "2rem"
+    fontWeight: 400
   title:
     fontFamily: "Figtree, sans-serif"
     fontSize: "1.25rem"
@@ -78,6 +85,10 @@ The palette is derived directly from the brand's floral and cosmetic inspiration
 ### Backgrounds
 - **Light Cream** (#fdf4f5): The primary background color for the application shell, providing a warm alternative to stark white.
 - **Surface White** (#ffffff): Used for content cards (like the calendar component or product cards) to contrast against the cream background.
+
+### Scrim
+- **Light Scrim** (rgba(43, 15, 31, 0.5)): Overlay for modal backgrounds and image dimming (light contexts).
+- **Dark Scrim** (rgba(43, 15, 31, 0.62)): Overlay for hero sections and full-bleed image overlays.
 
 ### Semantic
 - **Success (Green):** Used for "Confirmed" or "Payment Successful".
