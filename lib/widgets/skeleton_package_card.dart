@@ -31,10 +31,7 @@ class SkeletonPackageCard extends StatelessWidget {
               child: Shimmer.fromColors(
                 baseColor: const Color(0xFF99868C),
                 highlightColor: const Color(0xFFE8DEE2),
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                ),
+                child: Container(width: double.infinity, color: Colors.white),
               ),
             ),
           ),
@@ -59,22 +56,14 @@ class SkeletonPackageCard extends StatelessWidget {
                 Shimmer.fromColors(
                   baseColor: const Color(0xFF99868C),
                   highlightColor: const Color(0xFFE8DEE2),
-                  child: Container(
-                    height: 14,
-                    width: 100,
-                    color: Colors.white,
-                  ),
+                  child: Container(height: 14, width: 100, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 // Price
                 Shimmer.fromColors(
                   baseColor: const Color(0xFF99868C),
                   highlightColor: const Color(0xFFE8DEE2),
-                  child: Container(
-                    height: 16,
-                    width: 80,
-                    color: Colors.white,
-                  ),
+                  child: Container(height: 16, width: 80, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 // Button

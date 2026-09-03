@@ -20,12 +20,13 @@ class HomeScreen extends ConsumerWidget {
             // ============================================================
             if (MediaQuery.of(context).size.width < 768)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
                 child: Stack(
                   alignment: Alignment.center,
-                  children: [
-                    Center(child: AppLogo()),
-                  ],
+                  children: [Center(child: AppLogo())],
                 ),
               ),
 
@@ -48,12 +49,18 @@ class HomeScreen extends ConsumerWidget {
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0x4D99868C)),
+                                border: Border.all(
+                                  color: const Color(0x4D99868C),
+                                ),
                               ),
                               child: Row(
                                 children: [
                                   const SizedBox(width: 12),
-                                  Icon(Icons.search, color: const Color(0xFF99868C), size: 20),
+                                  Icon(
+                                    Icons.search,
+                                    color: const Color(0xFF99868C),
+                                    size: 20,
+                                  ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
@@ -71,9 +78,15 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 15),
-                          const Icon(Icons.chat_bubble_rounded, color: Color(0xFF6A4053)),
+                          const Icon(
+                            Icons.chat_bubble_rounded,
+                            color: Color(0xFF6A4053),
+                          ),
                           const SizedBox(width: 15),
-                          const Icon(Icons.calendar_today_rounded, color: Color(0xFF6A4053)),
+                          const Icon(
+                            Icons.calendar_today_rounded,
+                            color: Color(0xFF6A4053),
+                          ),
                         ],
                       ),
                     ),
@@ -93,7 +106,9 @@ class HomeScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF6A4053).withValues(alpha: 0.05),
+                              color: const Color(
+                                0xFF6A4053,
+                              ).withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -112,7 +127,11 @@ class HomeScreen extends ConsumerWidget {
                                 children: [
                                   Row(
                                     children: [
-                                      Icon(Icons.local_florist, size: 24, color: Color(0xFFC0A062)),
+                                      Icon(
+                                        Icons.local_florist,
+                                        size: 24,
+                                        color: Color(0xFFC0A062),
+                                      ),
                                       const SizedBox(width: 8),
                                       const Expanded(
                                         child: Text(
@@ -190,18 +209,22 @@ class HomeScreen extends ConsumerWidget {
                       child: packagesAsync.when(
                         data: (packages) {
                           if (packages.isEmpty) {
-                            return const Center(child: Text("No packages available"));
+                            return const Center(
+                              child: Text("No packages available"),
+                            );
                           }
 
                           return GridView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.52, // Adjusted for card height to prevent overflow
-                              crossAxisSpacing: 15,
-                              mainAxisSpacing: 15,
-                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio:
+                                      0.52, // Adjusted for card height to prevent overflow
+                                  crossAxisSpacing: 15,
+                                  mainAxisSpacing: 15,
+                                ),
                             itemCount: packages.length,
                             itemBuilder: (context, index) {
                               return PackageCard(package: packages[index]);
@@ -209,9 +232,12 @@ class HomeScreen extends ConsumerWidget {
                           );
                         },
                         loading: () => const Center(
-                          child: CircularProgressIndicator(color: Color(0xFF6A4053)),
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF6A4053),
+                          ),
                         ),
-                        error: (err, stack) => Center(child: Text(err.toString())),
+                        error: (err, stack) =>
+                            Center(child: Text(err.toString())),
                       ),
                     ),
                     const SizedBox(height: 40),

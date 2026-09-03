@@ -14,6 +14,7 @@ abstract class RegisterRequestBody with _$RegisterRequestBody {
     required String email,
     required String password,
   }) = _RegisterRequestBody;
-  
-  factory RegisterRequestBody.fromJson(Map<String, Object?> json) => _$RegisterRequestBodyFromJson(json);
+
+  factory RegisterRequestBody.fromJson(Map<String, Object?> json) =>
+      _$RegisterRequestBodyFromJson(json);
 }

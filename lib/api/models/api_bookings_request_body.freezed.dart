@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'api_bookings_request_body.dart';
@@ -9,7 +9,6 @@ part of 'api_bookings_request_body.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -67,7 +66,7 @@ class _$ApiBookingsRequestBodyCopyWithImpl<$Res>
 /// Create a copy of ApiBookingsRequestBody
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? packageId = null,Object? customerName = null,Object? customerEmail = null,Object? pax = null,Object? eventDate = null,Object? venueAddress = null,Object? paymentMethod = null,Object? customerPhone = freezed,Object? eventTime = freezed,Object? scentIds = freezed,}) {
-  return _then(ApiBookingsRequestBody(
+  return _then(_self.copyWith(
 packageId: null == packageId ? _self.packageId : packageId // ignore: cast_nullable_to_non_nullable
 as int,customerName: null == customerName ? _self.customerName : customerName // ignore: cast_nullable_to_non_nullable
 as String,customerEmail: null == customerEmail ? _self.customerEmail : customerEmail // ignore: cast_nullable_to_non_nullable
@@ -219,7 +218,7 @@ return $default(_that.packageId,_that.customerName,_that.customerEmail,_that.pax
 @JsonSerializable()
 
 class _ApiBookingsRequestBody implements ApiBookingsRequestBody {
-  const _ApiBookingsRequestBody({@JsonKey(name: 'package_id') required this.packageId, @JsonKey(name: 'customer_name') required this.customerName, @JsonKey(name: 'customer_email') required this.customerEmail, required this.pax, @JsonKey(name: 'event_date') required this.eventDate, @JsonKey(name: 'venue_address') required this.venueAddress, @JsonKey(name: 'payment_method') required this.paymentMethod, @JsonKey(name: 'customer_phone') this.customerPhone, @JsonKey(name: 'event_time') this.eventTime, @JsonKey(name: 'scent_ids')  List<int>? scentIds}): _scentIds = scentIds;
+  const _ApiBookingsRequestBody({@JsonKey(name: 'package_id') required this.packageId, @JsonKey(name: 'customer_name') required this.customerName, @JsonKey(name: 'customer_email') required this.customerEmail, required this.pax, @JsonKey(name: 'event_date') required this.eventDate, @JsonKey(name: 'venue_address') required this.venueAddress, @JsonKey(name: 'payment_method') required this.paymentMethod, @JsonKey(name: 'customer_phone') this.customerPhone, @JsonKey(name: 'event_time') this.eventTime, @JsonKey(name: 'scent_ids') final  List<int>? scentIds}): _scentIds = scentIds;
   factory _ApiBookingsRequestBody.fromJson(Map<String, dynamic> json) => _$ApiBookingsRequestBodyFromJson(json);
 
 @override@JsonKey(name: 'package_id') final  int packageId;

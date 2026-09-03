@@ -56,7 +56,9 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
                           // ========================================================
                           // 1. BRAND LOGO
                           // ========================================================
-                          _BrandLogo(onTap: () => _navigateTo(context, '/home')),
+                          _BrandLogo(
+                            onTap: () => _navigateTo(context, '/home'),
+                          ),
 
                           const SizedBox(width: 16),
 
@@ -74,40 +76,50 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
                                       label: 'HOME',
                                       icon: Icons.home_outlined,
                                       activeIcon: Icons.home,
-                                      isSelected: _getCurrentIndex(context) == 0,
-                                      onTap: () => _navigateTo(context, '/home'),
+                                      isSelected:
+                                          _getCurrentIndex(context) == 0,
+                                      onTap: () =>
+                                          _navigateTo(context, '/home'),
                                     ),
                                     const SizedBox(width: 6),
                                     _TopNavItem(
                                       label: 'PACKAGES',
                                       icon: Icons.card_giftcard_outlined,
                                       activeIcon: Icons.card_giftcard,
-                                      isSelected: _getCurrentIndex(context) == 1,
-                                      onTap: () => _navigateTo(context, '/packages'),
+                                      isSelected:
+                                          _getCurrentIndex(context) == 1,
+                                      onTap: () =>
+                                          _navigateTo(context, '/packages'),
                                     ),
                                     const SizedBox(width: 6),
                                     _TopNavItem(
                                       label: 'BOOKINGS',
                                       icon: Icons.calendar_today_outlined,
                                       activeIcon: Icons.calendar_today,
-                                      isSelected: _getCurrentIndex(context) == 2,
-                                      onTap: () => _navigateTo(context, '/bookings'),
+                                      isSelected:
+                                          _getCurrentIndex(context) == 2,
+                                      onTap: () =>
+                                          _navigateTo(context, '/bookings'),
                                     ),
                                     const SizedBox(width: 6),
                                     _TopNavItem(
                                       label: 'CALENDAR',
                                       icon: Icons.event_available_outlined,
                                       activeIcon: Icons.event_available,
-                                      isSelected: _getCurrentIndex(context) == 3,
-                                      onTap: () => _navigateTo(context, '/calendar'),
+                                      isSelected:
+                                          _getCurrentIndex(context) == 3,
+                                      onTap: () =>
+                                          _navigateTo(context, '/calendar'),
                                     ),
                                     const SizedBox(width: 6),
                                     _TopNavItem(
                                       label: 'PROFILE',
                                       icon: Icons.person_outline,
                                       activeIcon: Icons.person,
-                                      isSelected: _getCurrentIndex(context) == 4,
-                                      onTap: () => _navigateTo(context, '/profile'),
+                                      isSelected:
+                                          _getCurrentIndex(context) == 4,
+                                      onTap: () =>
+                                          _navigateTo(context, '/profile'),
                                     ),
                                   ],
                                 ),
@@ -125,8 +137,13 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: ElevatedButton.icon(
-                                onPressed: () => _navigateTo(context, '/packages'),
-                                icon: const Icon(Icons.auto_awesome, size: 13, color: AppTheme.primary),
+                                onPressed: () =>
+                                    _navigateTo(context, '/packages'),
+                                icon: const Icon(
+                                  Icons.auto_awesome,
+                                  size: 13,
+                                  color: AppTheme.primary,
+                                ),
                                 label: const Text(
                                   'Explore Packages',
                                   style: TextStyle(
@@ -139,7 +156,10 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFFDF4F5),
                                   foregroundColor: AppTheme.primary,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 8,
+                                  ),
                                   visualDensity: VisualDensity.compact,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
@@ -180,7 +200,8 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
         return 2;
       } else if (location.contains('calendar')) {
         return 3;
-      } else if (location.contains('profile') || location.contains('wishlist')) {
+      } else if (location.contains('profile') ||
+          location.contains('wishlist')) {
         return 4;
       } else if (location == '/' || location.contains('home')) {
         return 0;
@@ -230,8 +251,8 @@ class _TopNavItemState extends State<_TopNavItem> {
     final bg = isSelected
         ? Colors.white.withValues(alpha: 0.25)
         : (_isHovered || _isFocused)
-            ? Colors.white.withValues(alpha: 0.15)
-            : Colors.transparent;
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.transparent;
 
     return FocusableActionDetector(
       mouseCursor: SystemMouseCursors.click,
@@ -261,8 +282,11 @@ class _TopNavItemState extends State<_TopNavItem> {
               border: _isFocused
                   ? Border.all(color: Colors.white, width: 2)
                   : isSelected
-                      ? Border.all(color: Colors.white.withValues(alpha: 0.45), width: 1)
-                      : Border.all(color: Colors.transparent, width: 1),
+                  ? Border.all(
+                      color: Colors.white.withValues(alpha: 0.45),
+                      width: 1,
+                    )
+                  : Border.all(color: Colors.transparent, width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -328,7 +352,9 @@ class _BrandLogoState extends State<_BrandLogo> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
             decoration: BoxDecoration(
-              color: _isHovered ? Colors.white.withValues(alpha: 0.1) : Colors.transparent,
+              color: _isHovered
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: _isFocused
                   ? Border.all(color: Colors.white, width: 2.0)

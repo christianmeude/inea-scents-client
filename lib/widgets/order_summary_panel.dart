@@ -34,10 +34,29 @@ class OrderSummaryPanel extends StatelessWidget {
   String _formatDate(DateTime? date) {
     if (date == null) return 'Not selected';
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
+  static String _paymentMethodLabel(String id) {
+    return     switch (id) {
+      'credit_card' => 'CARD',
+      'cash' => 'CASH',
+      'bank_transfer' => 'BANK TRANSFER',
+      _ => id.toUpperCase(),
+    };
   }
 
   @override
@@ -97,7 +116,10 @@ class OrderSummaryPanel extends StatelessWidget {
               const SizedBox(width: 6),
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF22C55E).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(9999),
@@ -137,17 +159,23 @@ class OrderSummaryPanel extends StatelessWidget {
                     width: 48,
                     height: 48,
                     color: const Color(0xFFF3EBE1),
-                    child: (package.images != null && package.images!.isNotEmpty)
+                    child:
+                        (package.images != null && package.images!.isNotEmpty)
                         ? Image.network(
                             package.images!.first,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => const Icon(
-                              Icons.local_florist,
-                              color: plum,
-                              size: 24,
-                            ),
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(
+                                  Icons.local_florist,
+                                  color: plum,
+                                  size: 24,
+                                ),
                           )
-                        : const Icon(Icons.local_florist, color: plum, size: 24),
+                        : const Icon(
+                            Icons.local_florist,
+                            color: plum,
+                            size: 24,
+                          ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -168,12 +196,19 @@ class OrderSummaryPanel extends StatelessWidget {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          const Icon(Icons.star_rounded, size: 13, color: Colors.amber),
+                          const Icon(
+                            Icons.star_rounded,
+                            size: 13,
+                            color: Colors.amber,
+                          ),
                           const SizedBox(width: 3),
                           Expanded(
                             child: Text(
                               '${package.rating ?? 4.8} (${package.reviewsCount ?? 140})',
-                              style: const TextStyle(fontSize: 11, color: mutedPlum),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: mutedPlum,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -247,9 +282,14 @@ class OrderSummaryPanel extends StatelessWidget {
               color: plum,
             ),
           ),
-          _buildDottedLineItem('Base Package', '₱${effectivePrice.toStringAsFixed(2)}'),
+          _buildDottedLineItem(
+            'Base Package',
+            '₱${effectivePrice.toStringAsFixed(2)}',
+          ),
           if (package.inclusions != null && package.inclusions!.isNotEmpty)
-            ...package.inclusions!.map((inc) => _buildDottedLineItem(inc, 'Included'))
+            ...package.inclusions!.map(
+              (inc) => _buildDottedLineItem(inc, 'Included'),
+            )
           else ...[
             _buildDottedLineItem('Customized Logo', 'Included'),
             _buildDottedLineItem('4 Signature Scents', 'Included'),
@@ -282,14 +322,17 @@ class OrderSummaryPanel extends StatelessWidget {
                 const SizedBox(width: 8),
                 Flexible(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: cream,
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: const Color(0x3399868C)),
                     ),
                     child: Text(
-                      paymentMethod!.toUpperCase(),
+                      _paymentMethodLabel(paymentMethod!),
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
@@ -389,10 +432,7 @@ class OrderSummaryPanel extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: isEmphasized ? plum : mutedPlum),
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 11, color: mutedPlum),
-        ),
+        Text(label, style: const TextStyle(fontSize: 11, color: mutedPlum)),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -434,7 +474,10 @@ class OrderSummaryPanel extends StatelessWidget {
                     '. ' * count,
                     maxLines: 1,
                     overflow: TextOverflow.clip,
-                    style: const TextStyle(color: Color(0x5999868C), fontSize: 9),
+                    style: const TextStyle(
+                      color: Color(0x5999868C),
+                      fontSize: 9,
+                    ),
                   ),
                 );
               },

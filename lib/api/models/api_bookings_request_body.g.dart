@@ -40,6 +40,8 @@ Map<String, dynamic> _$ApiBookingsRequestBodyToJson(
 
 const _$PaymentMethodEnumMap = {
   PaymentMethod.creditCard: 'credit_card',
+  PaymentMethod.gcash: 'gcash',
+  PaymentMethod.maya: 'maya',
   PaymentMethod.cash: 'cash',
   PaymentMethod.bankTransfer: 'bank_transfer',
   PaymentMethod.$unknown: r'$unknown',

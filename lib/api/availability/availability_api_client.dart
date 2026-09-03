@@ -11,7 +11,8 @@ part 'availability_api_client.g.dart';
 
 @RestApi()
 abstract class AvailabilityApiClient {
-  factory AvailabilityApiClient(Dio dio, {String? baseUrl}) = _AvailabilityApiClient;
+  factory AvailabilityApiClient(Dio dio, {String? baseUrl}) =
+      _AvailabilityApiClient;
 
   /// Get availability calendar for a given month and year.
   ///

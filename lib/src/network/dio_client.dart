@@ -6,16 +6,22 @@ class DioClient {
 
   DioClient._(this.dio);
 
-  factory DioClient({required String baseUrl, required TokenStorage tokenStorage}) {
-    final dio = Dio(BaseOptions(
-      baseUrl: baseUrl,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    ))
-      ..interceptors.add(_AuthInterceptor(tokenStorage))
-      ..interceptors.add(_JsonBodyInterceptor());
+  factory DioClient({
+    required String baseUrl,
+    required TokenStorage tokenStorage,
+  }) {
+    final dio =
+        Dio(
+            BaseOptions(
+              baseUrl: baseUrl,
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+              },
+            ),
+          )
+          ..interceptors.add(_AuthInterceptor(tokenStorage))
+          ..interceptors.add(_JsonBodyInterceptor());
     return DioClient._(dio);
   }
 }
@@ -42,7 +48,10 @@ class _AuthInterceptor extends Interceptor {
   _AuthInterceptor(this._tokenStorage);
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     try {
       final token = await _tokenStorage.readToken();
       if (token != null && token.isNotEmpty) {

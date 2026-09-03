@@ -66,16 +66,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
         : Colors.white.withValues(alpha: 0.40);
     final focusBorder = isDark ? const Color(0xFFFDF4F5) : Colors.white;
 
-    final currentBg = _isFocused
-        ? focusBg
-        : (_isHovered ? hoverBg : baseBg);
+    final currentBg = _isFocused ? focusBg : (_isHovered ? hoverBg : baseBg);
     final currentBorder = _isFocused
         ? focusBorder
         : (_isHovered ? hoverBorder : baseBorder);
     final borderWidth = _isFocused ? 2.0 : 1.0;
 
     return FocusableActionDetector(
-      mouseCursor: widget.enabled ? SystemMouseCursors.text : SystemMouseCursors.basic,
+      mouseCursor: widget.enabled
+          ? SystemMouseCursors.text
+          : SystemMouseCursors.basic,
       onShowHoverHighlight: (hovered) {
         if (_isHovered != hovered) {
           setState(() => _isHovered = hovered);
@@ -121,10 +121,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               decoration: BoxDecoration(
                 color: currentBg,
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: currentBorder,
-                  width: borderWidth,
-                ),
+                border: Border.all(color: currentBorder, width: borderWidth),
               ),
               child: Focus(
                 onFocusChange: (hasFocus) {

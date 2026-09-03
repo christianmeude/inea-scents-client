@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
-
 
 import '../providers/index.dart';
 
@@ -58,7 +58,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.42),
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.65),
+                      ),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
@@ -165,7 +167,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   Widget _buildCalendar(AvailabilityState availabilityState) {
     final availability = availabilityState.data;
     final now = DateTime.now();
-    DateTime focusedDay = DateTime(availabilityState.year, availabilityState.month, 1);
+    DateTime focusedDay = DateTime(
+      availabilityState.year,
+      availabilityState.month,
+      1,
+    );
     if (focusedDay.year == now.year && focusedDay.month == now.month) {
       focusedDay = now;
     }
@@ -279,14 +285,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   setState(() {
                     _selectedDay = selectedDay;
                   });
-                  ref.read(availabilityProvider.notifier).setMonth(focusedDay.month, focusedDay.year);
+                  ref
+                      .read(availabilityProvider.notifier)
+                      .setMonth(focusedDay.month, focusedDay.year);
                 },
 
                 onPageChanged: (newFocusedDay) {
                   setState(() {
                     _selectedDay = null;
                   });
-                  ref.read(availabilityProvider.notifier).setMonth(newFocusedDay.month, newFocusedDay.year);
+                  ref
+                      .read(availabilityProvider.notifier)
+                      .setMonth(newFocusedDay.month, newFocusedDay.year);
                 },
 
                 // ==================================================
@@ -551,6 +561,36 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  final d = _selectedDay!;
+                  final dateStr =
+                      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+                  ref.read(bookingFlowProvider.notifier).setSelectedDate(d);
+                  context.push('/packages');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Selected $dateStr — choose a package to book',
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: Text('Continue with ${_formatDate(_selectedDay!)}'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                ),
+              ),
+            ),
           ],
 
           const SizedBox(height: 10),
@@ -736,7 +776,9 @@ class _CalendarDay extends StatelessWidget {
                 height: 5,
 
                 decoration: BoxDecoration(
-                  color: selected ? Colors.white.withValues(alpha: 0.9) : statusColor,
+                  color: selected
+                      ? Colors.white.withValues(alpha: 0.9)
+                      : statusColor,
                   shape: BoxShape.circle,
                 ),
               ),

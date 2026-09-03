@@ -21,9 +21,11 @@ final filteredPackagesProvider = Provider<AsyncValue<List<Package>>>((ref) {
   return asyncPackages.whenData((packages) {
     var filtered = packages.where((p) {
       final nameMatches = p.name?.toLowerCase().contains(query) ?? false;
-      final categoryMatches = category == 'All' || 
-          (p.name?.toLowerCase().contains(category.toLowerCase()) ?? false) || 
-          (p.description?.toLowerCase().contains(category.toLowerCase()) ?? false);
+      final categoryMatches =
+          category == 'All' ||
+          (p.name?.toLowerCase().contains(category.toLowerCase()) ?? false) ||
+          (p.description?.toLowerCase().contains(category.toLowerCase()) ??
+              false);
       return nameMatches && categoryMatches;
     }).toList();
 
@@ -254,7 +256,9 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                   // SEARCH BAR
                   // ==================================================
                   _SearchBar(
-                    onChanged: (val) => ref.read(packagesSearchQueryProvider.notifier).state = val,
+                    onChanged: (val) =>
+                        ref.read(packagesSearchQueryProvider.notifier).state =
+                            val,
                   ),
 
                   const SizedBox(height: 26),
@@ -266,29 +270,41 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     height: 40,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: ['All', 'Wedding', 'Birthday', 'Corporate'].map((cat) {
-                        final isSelected = ref.watch(packagesCategoryProvider) == cat;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12),
-                          child: FilterChip(
-                            mouseCursor: SystemMouseCursors.click,
-                            label: Text(cat),
-                            selected: isSelected,
-                            onSelected: (val) {
-                              ref.read(packagesCategoryProvider.notifier).state = cat;
-                            },
-                            backgroundColor: Colors.white.withValues(alpha: 0.3),
-                            selectedColor: primaryColor,
-                            labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : textColor,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      children: ['All', 'Wedding', 'Birthday', 'Corporate'].map(
+                        (cat) {
+                          final isSelected =
+                              ref.watch(packagesCategoryProvider) == cat;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 12),
+                            child: FilterChip(
+                              mouseCursor: SystemMouseCursors.click,
+                              label: Text(cat),
+                              selected: isSelected,
+                              onSelected: (val) {
+                                ref
+                                        .read(packagesCategoryProvider.notifier)
+                                        .state =
+                                    cat;
+                              },
+                              backgroundColor: Colors.white.withValues(
+                                alpha: 0.3,
+                              ),
+                              selectedColor: primaryColor,
+                              labelStyle: TextStyle(
+                                color: isSelected ? Colors.white : textColor,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                              side: BorderSide(
+                                color: isSelected
+                                    ? primaryColor
+                                    : Colors.white.withValues(alpha: 0.5),
+                              ),
                             ),
-                            side: BorderSide(
-                              color: isSelected ? primaryColor : Colors.white.withValues(alpha: 0.5),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        },
+                      ).toList(),
                     ),
                   ),
 
@@ -302,8 +318,14 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: const [
-                        _SortChip(label: 'Price: Low to High', value: 'price_asc'),
-                        _SortChip(label: 'Price: High to Low', value: 'price_desc'),
+                        _SortChip(
+                          label: 'Price: Low to High',
+                          value: 'price_asc',
+                        ),
+                        _SortChip(
+                          label: 'Price: High to Low',
+                          value: 'price_desc',
+                        ),
                         _SortChip(label: 'Top Rated', value: 'rating_desc'),
                       ],
                     ),
@@ -386,11 +408,11 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.52,
-                          crossAxisSpacing: 14,
-                          mainAxisSpacing: 16,
-                        ),
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.52,
+                              crossAxisSpacing: 14,
+                              mainAxisSpacing: 16,
+                            ),
                         itemCount: 4,
                         itemBuilder: (context, index) {
                           return const SkeletonPackageCard();
@@ -709,10 +731,7 @@ class _SearchBarState extends State<_SearchBar> {
             onChanged: widget.onChanged,
             decoration: const InputDecoration(
               hintText: 'Search "Perfume" here',
-              hintStyle: TextStyle(
-                color: Color(0xBFFFFFFF),
-                fontSize: 14,
-              ),
+              hintStyle: TextStyle(color: Color(0xBFFFFFFF), fontSize: 14),
               prefixIcon: Icon(
                 Icons.search_rounded,
                 color: Colors.white,
@@ -755,7 +774,9 @@ class _SortChip extends ConsumerWidget {
         label: Text(label),
         selected: isSelected,
         onSelected: (_) {
-          ref.read(packagesSortProvider.notifier).state = isSelected ? 'none' : value;
+          ref.read(packagesSortProvider.notifier).state = isSelected
+              ? 'none'
+              : value;
         },
         backgroundColor: Colors.white.withValues(alpha: 0.3),
         selectedColor: const Color(0xFF95647E),
@@ -764,7 +785,9 @@ class _SortChip extends ConsumerWidget {
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
         side: BorderSide(
-          color: isSelected ? const Color(0xFF95647E) : Colors.white.withValues(alpha: 0.5),
+          color: isSelected
+              ? const Color(0xFF95647E)
+              : Colors.white.withValues(alpha: 0.5),
         ),
       ),
     );

@@ -17,22 +17,18 @@ abstract class Package with _$Package {
     String? name,
     String? description,
     List<String>? inclusions,
-    @JsonKey(name: 'pax_options')
-    List<int>? paxOptions,
+    @JsonKey(name: 'pax_options') List<int>? paxOptions,
     List<String>? freebies,
     double? price,
     double? rating,
-    @JsonKey(name: 'reviews_count')
-    int? reviewsCount,
+    @JsonKey(name: 'reviews_count') int? reviewsCount,
     List<String>? images,
-    @JsonKey(name: 'gallery_images')
-    List<String>? galleryImages,
+    @JsonKey(name: 'gallery_images') List<String>? galleryImages,
     List<Scent>? scents,
-    @JsonKey(name: 'created_at')
-    DateTime? createdAt,
-    @JsonKey(name: 'updated_at')
-    DateTime? updatedAt,
+    @JsonKey(name: 'created_at') DateTime? createdAt,
+    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _Package;
-  
-  factory Package.fromJson(Map<String, Object?> json) => _$PackageFromJson(json);
+
+  factory Package.fromJson(Map<String, Object?> json) =>
+      _$PackageFromJson(json);
 }

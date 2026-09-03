@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'package.dart';
@@ -9,7 +9,6 @@ part of 'package.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -67,7 +66,7 @@ class _$PackageCopyWithImpl<$Res>
 /// Create a copy of Package
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? inclusions = freezed,Object? paxOptions = freezed,Object? freebies = freezed,Object? price = freezed,Object? rating = freezed,Object? reviewsCount = freezed,Object? images = freezed,Object? galleryImages = freezed,Object? scents = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
-  return _then(Package(
+  return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
@@ -223,7 +222,7 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 @JsonSerializable()
 
 class _Package implements Package {
-  const _Package({this.id, this.name, this.description,  List<String>? inclusions, @JsonKey(name: 'pax_options')  List<int>? paxOptions,  List<String>? freebies, this.price, this.rating, @JsonKey(name: 'reviews_count') this.reviewsCount,  List<String>? images, @JsonKey(name: 'gallery_images')  List<String>? galleryImages,  List<Scent>? scents, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _inclusions = inclusions,_paxOptions = paxOptions,_freebies = freebies,_images = images,_galleryImages = galleryImages,_scents = scents;
+  const _Package({this.id, this.name, this.description, final  List<String>? inclusions, @JsonKey(name: 'pax_options') final  List<int>? paxOptions, final  List<String>? freebies, this.price, this.rating, @JsonKey(name: 'reviews_count') this.reviewsCount, final  List<String>? images, @JsonKey(name: 'gallery_images') final  List<String>? galleryImages, final  List<Scent>? scents, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _inclusions = inclusions,_paxOptions = paxOptions,_freebies = freebies,_images = images,_galleryImages = galleryImages,_scents = scents;
   factory _Package.fromJson(Map<String, dynamic> json) => _$PackageFromJson(json);
 
 @override final  int? id;

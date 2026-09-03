@@ -13,9 +13,9 @@ abstract class GetApiUserResponse with _$GetApiUserResponse {
     int? id,
     String? name,
     String? email,
-    @JsonKey(name: 'is_admin')
-    bool? isAdmin,
+    @JsonKey(name: 'is_admin') bool? isAdmin,
   }) = _GetApiUserResponse;
-  
-  factory GetApiUserResponse.fromJson(Map<String, Object?> json) => _$GetApiUserResponseFromJson(json);
+
+  factory GetApiUserResponse.fromJson(Map<String, Object?> json) =>
+      _$GetApiUserResponseFromJson(json);
 }

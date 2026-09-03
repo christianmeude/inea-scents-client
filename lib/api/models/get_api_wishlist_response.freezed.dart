@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'get_api_wishlist_response.dart';
@@ -9,7 +9,6 @@ part of 'get_api_wishlist_response.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 
@@ -67,7 +66,7 @@ class _$GetApiWishlistResponseCopyWithImpl<$Res>
 /// Create a copy of GetApiWishlistResponse
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? data = freezed,}) {
-  return _then(GetApiWishlistResponse(
+  return _then(_self.copyWith(
 data: freezed == data ? _self.data : data // ignore: cast_nullable_to_non_nullable
 as List<Package>?,
   ));
@@ -210,7 +209,7 @@ return $default(_that.data);case _:
 @JsonSerializable()
 
 class _GetApiWishlistResponse implements GetApiWishlistResponse {
-  const _GetApiWishlistResponse({ List<Package>? data}): _data = data;
+  const _GetApiWishlistResponse({final  List<Package>? data}): _data = data;
   factory _GetApiWishlistResponse.fromJson(Map<String, dynamic> json) => _$GetApiWishlistResponseFromJson(json);
 
  final  List<Package>? _data;

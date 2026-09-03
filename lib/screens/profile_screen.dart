@@ -27,7 +27,6 @@ class ProfileScreen extends ConsumerWidget {
     const textColor = Color(0xFF633E50);
     const secondaryTextColor = Color(0xFF765867);
 
-
     final userName = authState.user?.name ?? 'User';
     final userEmail = authState.user?.email ?? '';
 
@@ -435,7 +434,9 @@ class ProfileScreen extends ConsumerWidget {
                       color: Colors.white.withValues(alpha: 0.34),
                       borderRadius: BorderRadius.circular(24),
 
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.60)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.60),
+                      ),
 
                       boxShadow: [
                         BoxShadow(
@@ -897,10 +898,7 @@ class _EmptyWishlist extends StatelessWidget {
             ),
             child: const Text(
               'Explore Packages',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
             ),
           ),
         ],

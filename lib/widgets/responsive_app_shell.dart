@@ -4,7 +4,7 @@ import 'bottom_nav_bar.dart';
 import 'top_nav_bar.dart';
 
 /// Foundational responsive layout scaffolding for the application.
-/// 
+///
 /// Breakpoints:
 /// - Mobile (`< 768px`, 1-col): Hides [TopNavBar], renders unconstrained content, and renders [BottomNavBar].
 /// - Tablet (`768px - 1024px`, 2-col): Displays [TopNavBar], centers content in [maxContentWidth] container.
@@ -78,7 +78,9 @@ class ResponsiveAppShell extends StatelessWidget {
               child: child,
             ),
           ),
-          bottomNavigationBar: isDesktopView ? null : _buildMobileBottomNav(context),
+          bottomNavigationBar: isDesktopView
+              ? null
+              : _buildMobileBottomNav(context),
         );
       },
     );
@@ -96,7 +98,8 @@ class ResponsiveAppShell extends StatelessWidget {
             location = router.location;
           } catch (_) {}
         }
-        final hideBottomNav = location.contains('package-details') ||
+        final hideBottomNav =
+            location.contains('package-details') ||
             location.contains('booking/') ||
             location.contains('login') ||
             location.contains('register') ||
@@ -110,4 +113,3 @@ class ResponsiveAppShell extends StatelessWidget {
     return const BottomNavBar();
   }
 }
-

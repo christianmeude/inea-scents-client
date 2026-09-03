@@ -33,9 +33,15 @@ class _PackageCardState extends State<PackageCard> {
     final cardBg = isDark
         ? (_isHovered ? const Color(0xFF4A2D3C) : const Color(0xFF3B232F))
         : (_isHovered ? const Color(0xFFFAF2F4) : Colors.white);
-    final focusBorderColor = isDark ? const Color(0xFFFDF4F5) : AppTheme.primary;
-    final primaryTextColor = isDark ? const Color(0xFFFDF4F5) : AppTheme.primary;
-    final secondaryTextColor = isDark ? const Color(0xFFC4ACAC) : AppTheme.secondary;
+    final focusBorderColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : AppTheme.primary;
+    final primaryTextColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : AppTheme.primary;
+    final secondaryTextColor = isDark
+        ? const Color(0xFFC4ACAC)
+        : AppTheme.secondary;
     final badgeBg = isDark
         ? (_isHovered ? const Color(0xFF5A3646) : const Color(0xFF4A2D3C))
         : (_isHovered ? const Color(0xFFFAF2F4) : Colors.white);
@@ -106,8 +112,12 @@ class _PackageCardState extends State<PackageCard> {
                       aspectRatio: 1.15,
                       child: Container(
                         width: double.infinity,
-                        color: isDark ? const Color(0xFF2C1923) : AppTheme.neutralBg,
-                        child: (package.images != null && package.images!.isNotEmpty)
+                        color: isDark
+                            ? const Color(0xFF2C1923)
+                            : AppTheme.neutralBg,
+                        child:
+                            (package.images != null &&
+                                package.images!.isNotEmpty)
                             ? Image.network(
                                 package.images![0],
                                 fit: BoxFit.cover,
@@ -116,7 +126,10 @@ class _PackageCardState extends State<PackageCard> {
                                     child: Text(
                                       package.name ?? '',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 12, color: primaryTextColor),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: primaryTextColor,
+                                      ),
                                     ),
                                   );
                                 },
@@ -125,7 +138,10 @@ class _PackageCardState extends State<PackageCard> {
                                 child: Text(
                                   package.name ?? '',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 12, color: primaryTextColor),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: primaryTextColor,
+                                  ),
                                 ),
                               ),
                       ),
@@ -136,7 +152,10 @@ class _PackageCardState extends State<PackageCard> {
                     right: 0,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: badgeBg,
                         borderRadius: const BorderRadius.only(
@@ -179,13 +198,19 @@ class _PackageCardState extends State<PackageCard> {
                         const SizedBox(width: 4),
                         Text(
                           '${package.rating ?? 4.5}',
-                          style: TextStyle(fontSize: 13, color: primaryTextColor),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: primaryTextColor,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             '(${package.reviewsCount ?? 232} reviews)',
-                            style: TextStyle(fontSize: 13, color: secondaryTextColor),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: secondaryTextColor,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -194,7 +219,8 @@ class _PackageCardState extends State<PackageCard> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      package.description ?? 'Perfect for intimate celebrations and small gatherings.',
+                      package.description ??
+                          'Perfect for intimate celebrations and small gatherings.',
                       style: TextStyle(
                         fontSize: 12,
                         color: secondaryTextColor,

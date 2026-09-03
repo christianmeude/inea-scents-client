@@ -11,87 +11,92 @@ void main() {
   });
 
   group('ResponsiveAppShell & Navigation Breakpoint Tests', () {
-    testWidgets('Renders TopNavBar and hides BottomNavBar on desktop screens (width >= 768px)',
-        (WidgetTester tester) async {
-      // Configure large desktop screen (1280x800)
-      tester.view.physicalSize = const Size(1280, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'Renders TopNavBar and hides BottomNavBar on desktop screens (width >= 768px)',
+      (WidgetTester tester) async {
+        // Configure large desktop screen (1280x800)
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Desktop Content'),
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(child: Text('Desktop Content')),
           ),
-        ),
-      );
+        );
 
-      // Verify TopNavBar is present
-      expect(find.byType(TopNavBar), findsOneWidget);
-      // Verify BottomNavBar is NOT rendered / hidden
-      expect(find.byType(BottomNavBar), findsNothing);
-      expect(find.text('Desktop Content'), findsOneWidget);
+        // Verify TopNavBar is present
+        expect(find.byType(TopNavBar), findsOneWidget);
+        // Verify BottomNavBar is NOT rendered / hidden
+        expect(find.byType(BottomNavBar), findsNothing);
+        expect(find.text('Desktop Content'), findsOneWidget);
 
-      // Verify TopNavBar has glassmorphism (BackdropFilter)
-      final backdropFilters = find.descendant(
-        of: find.byType(TopNavBar),
-        matching: find.byType(BackdropFilter),
-      );
-      expect(backdropFilters, findsOneWidget);
+        // Verify TopNavBar has glassmorphism (BackdropFilter)
+        final backdropFilters = find.descendant(
+          of: find.byType(TopNavBar),
+          matching: find.byType(BackdropFilter),
+        );
+        expect(backdropFilters, findsOneWidget);
 
-      final backdropFilterWidget = tester.widget<BackdropFilter>(backdropFilters);
-      expect(backdropFilterWidget.filter, isNotNull);
+        final backdropFilterWidget = tester.widget<BackdropFilter>(
+          backdropFilters,
+        );
+        expect(backdropFilterWidget.filter, isNotNull);
 
-      // Verify TopNavBar branding
-      expect(find.text('INEA'), findsOneWidget);
-      expect(find.text('Scents'), findsOneWidget);
+        // Verify TopNavBar branding
+        expect(find.text('INEA'), findsOneWidget);
+        expect(find.text('Scents'), findsOneWidget);
 
-      // Verify TopNavBar navigation items
-      expect(find.text('HOME'), findsOneWidget);
-      expect(find.text('PACKAGES'), findsOneWidget);
-      expect(find.text('BOOKINGS'), findsOneWidget);
-      expect(find.text('CALENDAR'), findsOneWidget);
-      expect(find.text('PROFILE'), findsOneWidget);
+        // Verify TopNavBar navigation items
+        expect(find.text('HOME'), findsOneWidget);
+        expect(find.text('PACKAGES'), findsOneWidget);
+        expect(find.text('BOOKINGS'), findsOneWidget);
+        expect(find.text('CALENDAR'), findsOneWidget);
+        expect(find.text('PROFILE'), findsOneWidget);
 
-      // Verify max-width container (1200px)
-      final constrainedBoxFinder = find.ancestor(
-        of: find.text('Desktop Content'),
-        matching: find.byType(ConstrainedBox),
-      );
-      expect(constrainedBoxFinder, findsWidgets);
+        // Verify max-width container (1200px)
+        final constrainedBoxFinder = find.ancestor(
+          of: find.text('Desktop Content'),
+          matching: find.byType(ConstrainedBox),
+        );
+        expect(constrainedBoxFinder, findsWidgets);
 
-      final constrainedBox = tester.widget<ConstrainedBox>(constrainedBoxFinder.first);
-      expect(constrainedBox.constraints.maxWidth, equals(1200.0));
-    });
+        final constrainedBox = tester.widget<ConstrainedBox>(
+          constrainedBoxFinder.first,
+        );
+        expect(constrainedBox.constraints.maxWidth, equals(1200.0));
+      },
+    );
 
-    testWidgets('Renders BottomNavBar and hides TopNavBar on mobile screens (width < 768px)',
-        (WidgetTester tester) async {
-      // Configure mobile screen (375x667)
-      tester.view.physicalSize = const Size(375, 667);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'Renders BottomNavBar and hides TopNavBar on mobile screens (width < 768px)',
+      (WidgetTester tester) async {
+        // Configure mobile screen (375x667)
+        tester.view.physicalSize = const Size(375, 667);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Mobile Content'),
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(child: Text('Mobile Content')),
           ),
-        ),
-      );
+        );
 
-      // Verify TopNavBar is NOT present
-      expect(find.byType(TopNavBar), findsNothing);
-      // Verify BottomNavBar IS present
-      expect(find.byType(BottomNavBar), findsOneWidget);
-      expect(find.text('Mobile Content'), findsOneWidget);
-    });
+        // Verify TopNavBar is NOT present
+        expect(find.byType(TopNavBar), findsNothing);
+        // Verify BottomNavBar IS present
+        expect(find.byType(BottomNavBar), findsOneWidget);
+        expect(find.text('Mobile Content'), findsOneWidget);
+      },
+    );
 
-    testWidgets('Boundary precision test at exactly 768.0px and 767.9px',
-        (WidgetTester tester) async {
+    testWidgets('Boundary precision test at exactly 768.0px and 767.9px', (
+      WidgetTester tester,
+    ) async {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
@@ -101,9 +106,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Boundary Content'),
-          ),
+          home: const ResponsiveAppShell(child: Text('Boundary Content')),
         ),
       );
       expect(find.byType(TopNavBar), findsNothing);
@@ -116,75 +119,76 @@ void main() {
       expect(find.byType(BottomNavBar), findsNothing);
     });
 
-    testWidgets('Toggles between TopNavBar and BottomNavBar dynamically across multi-breakpoint resize sequence',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(320, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'Toggles between TopNavBar and BottomNavBar dynamically across multi-breakpoint resize sequence',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(320, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Responsive Body'),
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(child: Text('Responsive Body')),
           ),
-        ),
-      );
+        );
 
-      // Step 1: Small mobile (320px)
-      expect(find.byType(TopNavBar), findsNothing);
-      expect(find.byType(BottomNavBar), findsOneWidget);
+        // Step 1: Small mobile (320px)
+        expect(find.byType(TopNavBar), findsNothing);
+        expect(find.byType(BottomNavBar), findsOneWidget);
 
-      // Step 2: Resize to 768px (Desktop boundary)
-      tester.view.physicalSize = const Size(768, 900);
-      await tester.pumpAndSettle();
-      expect(find.byType(TopNavBar), findsOneWidget);
-      expect(find.byType(BottomNavBar), findsNothing);
+        // Step 2: Resize to 768px (Desktop boundary)
+        tester.view.physicalSize = const Size(768, 900);
+        await tester.pumpAndSettle();
+        expect(find.byType(TopNavBar), findsOneWidget);
+        expect(find.byType(BottomNavBar), findsNothing);
 
-      // Step 3: Resize to 2560px (4K Ultra-wide)
-      tester.view.physicalSize = const Size(2560, 1440);
-      await tester.pumpAndSettle();
-      expect(find.byType(TopNavBar), findsOneWidget);
-      expect(find.byType(BottomNavBar), findsNothing);
+        // Step 3: Resize to 2560px (4K Ultra-wide)
+        tester.view.physicalSize = const Size(2560, 1440);
+        await tester.pumpAndSettle();
+        expect(find.byType(TopNavBar), findsOneWidget);
+        expect(find.byType(BottomNavBar), findsNothing);
 
-      // Step 4: Resize back to 600px (Mobile)
-      tester.view.physicalSize = const Size(600, 900);
-      await tester.pumpAndSettle();
-      expect(find.byType(TopNavBar), findsNothing);
-      expect(find.byType(BottomNavBar), findsOneWidget);
-    });
+        // Step 4: Resize back to 600px (Mobile)
+        tester.view.physicalSize = const Size(600, 900);
+        await tester.pumpAndSettle();
+        expect(find.byType(TopNavBar), findsNothing);
+        expect(find.byType(BottomNavBar), findsOneWidget);
+      },
+    );
 
-    testWidgets('TopNavBar items use SystemMouseCursors.click for web interaction',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'TopNavBar items use SystemMouseCursors.click for web interaction',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Content'),
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(child: Text('Content')),
           ),
-        ),
-      );
+        );
 
-      final mouseRegions = find.descendant(
-        of: find.byType(TopNavBar),
-        matching: find.byType(MouseRegion),
-      );
-      expect(mouseRegions, findsWidgets);
+        final mouseRegions = find.descendant(
+          of: find.byType(TopNavBar),
+          matching: find.byType(MouseRegion),
+        );
+        expect(mouseRegions, findsWidgets);
 
-      for (final element in mouseRegions.evaluate()) {
-        final widget = element.widget as MouseRegion;
-        expect(widget.cursor, equals(SystemMouseCursors.click));
-      }
-    });
+        for (final element in mouseRegions.evaluate()) {
+          final widget = element.widget as MouseRegion;
+          expect(widget.cursor, equals(SystemMouseCursors.click));
+        }
+      },
+    );
 
-    testWidgets('TopNavBar renders dark theme background when Theme is dark',
-        (WidgetTester tester) async {
+    testWidgets('TopNavBar renders dark theme background when Theme is dark', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(1024, 768);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -193,9 +197,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Dark Desktop Content'),
-          ),
+          home: const ResponsiveAppShell(child: Text('Dark Desktop Content')),
         ),
       );
 
@@ -207,216 +209,245 @@ void main() {
       expect(backdrop, findsOneWidget);
     });
 
-    testWidgets('ResponsiveAppShell Scaffold inherits scaffoldBackgroundColor from active Theme (Light and Dark)',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'ResponsiveAppShell Scaffold inherits scaffoldBackgroundColor from active Theme (Light and Dark)',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      // 1. Light theme scaffold background check
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Light Content'),
+        // 1. Light theme scaffold background check
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(child: Text('Light Content')),
           ),
-        ),
-      );
+        );
 
-      final lightScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(lightScaffold.backgroundColor, isNull); // Let's Scaffold inherit from lightTheme (AppTheme.neutralBg)
+        final lightScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+        expect(
+          lightScaffold.backgroundColor,
+          isNull,
+        ); // Let's Scaffold inherit from lightTheme (AppTheme.neutralBg)
 
-      // 2. Dark theme scaffold background check
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.darkTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Dark Content'),
+        // 2. Dark theme scaffold background check
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: const ResponsiveAppShell(child: Text('Dark Content')),
           ),
-        ),
-      );
+        );
 
-      final darkScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(darkScaffold.backgroundColor, isNull); // Let's Scaffold inherit from darkTheme (Color(0xFF2C1923))
-    });
+        final darkScaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+        expect(
+          darkScaffold.backgroundColor,
+          isNull,
+        ); // Let's Scaffold inherit from darkTheme (Color(0xFF2C1923))
+      },
+    );
 
-    testWidgets('BottomNavBar widget self-hides when rendered directly on wide screens (>= 768px)',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1024, 768);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'BottomNavBar widget self-hides when rendered directly on wide screens (>= 768px)',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Text('Standalone'),
-            bottomNavigationBar: BottomNavBar(),
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(
+              body: Text('Standalone'),
+              bottomNavigationBar: BottomNavBar(),
+            ),
           ),
-        ),
-      );
+        );
 
-      // The BottomNavBar should render SizedBox.shrink on >= 768px
-      final bottomNavBarFinder = find.byType(BottomNavBar);
-      expect(bottomNavBarFinder, findsOneWidget);
+        // The BottomNavBar should render SizedBox.shrink on >= 768px
+        final bottomNavBarFinder = find.byType(BottomNavBar);
+        expect(bottomNavBarFinder, findsOneWidget);
 
-      final sizedBoxDescendant = find.descendant(
-        of: bottomNavBarFinder,
-        matching: find.byType(SizedBox),
-      );
-      expect(sizedBoxDescendant, findsOneWidget);
-    });
+        final sizedBoxDescendant = find.descendant(
+          of: bottomNavBarFinder,
+          matching: find.byType(SizedBox),
+        );
+        expect(sizedBoxDescendant, findsOneWidget);
+      },
+    );
 
-    testWidgets('BottomNavBar renders dark theme background in Dark Mode on mobile screens',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(375, 667);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'BottomNavBar renders dark theme background in Dark Mode on mobile screens',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(375, 667);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.darkTheme,
-          home: const ResponsiveAppShell(
-            child: Text('Dark Mobile Content'),
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: const ResponsiveAppShell(child: Text('Dark Mobile Content')),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(BottomNavBar), findsOneWidget);
-      final containerFinder = find.descendant(
-        of: find.byType(BottomNavBar),
-        matching: find.byType(Container),
-      );
-      expect(containerFinder, findsWidgets);
+        expect(find.byType(BottomNavBar), findsOneWidget);
+        final containerFinder = find.descendant(
+          of: find.byType(BottomNavBar),
+          matching: find.byType(Container),
+        );
+        expect(containerFinder, findsWidgets);
 
-      final containerWidget = tester.widget<Container>(containerFinder.first);
-      final decoration = containerWidget.decoration as BoxDecoration;
-      expect(decoration.color, equals(const Color(0xFF2C1923).withValues(alpha: 0.88)));
-    });
+        final containerWidget = tester.widget<Container>(containerFinder.first);
+        final decoration = containerWidget.decoration as BoxDecoration;
+        expect(
+          decoration.color,
+          equals(const Color(0xFF2C1923).withValues(alpha: 0.88)),
+        );
+      },
+    );
   });
 
   group('GoRouter ShellRoute Deep Navigation & Selection Tests', () {
-    testWidgets('Navigates through all primary routes and updates active highlight in TopNavBar',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1280, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'Navigates through all primary routes and updates active highlight in TopNavBar',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      final router = GoRouter(
-        initialLocation: '/home',
-        routes: [
-          ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
-            routes: [
-              GoRoute(
-                path: '/home',
-                builder: (context, state) => const Text('Home Screen Page'),
-              ),
-              GoRoute(
-                path: '/packages',
-                builder: (context, state) => const Text('Packages Screen Page'),
-              ),
-              GoRoute(
-                path: '/package-details/:id',
-                builder: (context, state) => Text('Package Detail ${state.pathParameters['id']}'),
-              ),
-              GoRoute(
-                path: '/booking/:id',
-                builder: (context, state) => Text('Booking Flow ${state.pathParameters['id']}'),
-              ),
-              GoRoute(
-                path: '/bookings',
-                builder: (context, state) => const Text('My Bookings Screen Page'),
-              ),
-              GoRoute(
-                path: '/calendar',
-                builder: (context, state) => const Text('Calendar Screen Page'),
-              ),
-              GoRoute(
-                path: '/profile',
-                builder: (context, state) => const Text('Profile Screen Page'),
-              ),
-              GoRoute(
-                path: '/wishlist',
-                builder: (context, state) => const Text('Wishlist Screen Page'),
-              ),
-            ],
-          ),
-        ],
-      );
+        final router = GoRouter(
+          initialLocation: '/home',
+          routes: [
+            ShellRoute(
+              builder: (context, state, child) =>
+                  ResponsiveAppShell(child: child),
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  builder: (context, state) => const Text('Home Screen Page'),
+                ),
+                GoRoute(
+                  path: '/packages',
+                  builder: (context, state) =>
+                      const Text('Packages Screen Page'),
+                ),
+                GoRoute(
+                  path: '/package-details/:id',
+                  builder: (context, state) =>
+                      Text('Package Detail ${state.pathParameters['id']}'),
+                ),
+                GoRoute(
+                  path: '/booking/:id',
+                  builder: (context, state) =>
+                      Text('Booking Flow ${state.pathParameters['id']}'),
+                ),
+                GoRoute(
+                  path: '/bookings',
+                  builder: (context, state) =>
+                      const Text('My Bookings Screen Page'),
+                ),
+                GoRoute(
+                  path: '/calendar',
+                  builder: (context, state) =>
+                      const Text('Calendar Screen Page'),
+                ),
+                GoRoute(
+                  path: '/profile',
+                  builder: (context, state) =>
+                      const Text('Profile Screen Page'),
+                ),
+                GoRoute(
+                  path: '/wishlist',
+                  builder: (context, state) =>
+                      const Text('Wishlist Screen Page'),
+                ),
+              ],
+            ),
+          ],
+        );
 
-      await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
-      );
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(
+          MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
+        );
+        await tester.pumpAndSettle();
 
-      // 1. Initial route: /home
-      expect(find.text('Home Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.home), findsOneWidget); // Active icon for HOME
+        // 1. Initial route: /home
+        expect(find.text('Home Screen Page'), findsOneWidget);
+        expect(find.byIcon(Icons.home), findsOneWidget); // Active icon for HOME
 
-      // 2. Navigate to PACKAGES via tab click
-      await tester.tap(find.text('PACKAGES'));
-      await tester.pumpAndSettle();
-      expect(find.text('Packages Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.card_giftcard), findsOneWidget); // Active icon for PACKAGES
+        // 2. Navigate to PACKAGES via tab click
+        await tester.tap(find.text('PACKAGES'));
+        await tester.pumpAndSettle();
+        expect(find.text('Packages Screen Page'), findsOneWidget);
+        expect(
+          find.byIcon(Icons.card_giftcard),
+          findsOneWidget,
+        ); // Active icon for PACKAGES
 
-      // 3. Navigate to BOOKINGS via tab click
-      await tester.tap(find.text('BOOKINGS'));
-      await tester.pumpAndSettle();
-      expect(find.text('My Bookings Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.calendar_today), findsOneWidget); // Active icon for BOOKINGS
+        // 3. Navigate to BOOKINGS via tab click
+        await tester.tap(find.text('BOOKINGS'));
+        await tester.pumpAndSettle();
+        expect(find.text('My Bookings Screen Page'), findsOneWidget);
+        expect(
+          find.byIcon(Icons.calendar_today),
+          findsOneWidget,
+        ); // Active icon for BOOKINGS
 
-      // 4. Navigate to CALENDAR via tab click
-      await tester.tap(find.text('CALENDAR'));
-      await tester.pumpAndSettle();
-      expect(find.text('Calendar Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.event_available), findsOneWidget); // Active icon for CALENDAR
+        // 4. Navigate to CALENDAR via tab click
+        await tester.tap(find.text('CALENDAR'));
+        await tester.pumpAndSettle();
+        expect(find.text('Calendar Screen Page'), findsOneWidget);
+        expect(
+          find.byIcon(Icons.event_available),
+          findsOneWidget,
+        ); // Active icon for CALENDAR
 
-      // 5. Navigate to PROFILE via tab click
-      await tester.tap(find.text('PROFILE'));
-      await tester.pumpAndSettle();
-      expect(find.text('Profile Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.person), findsOneWidget); // Active icon for PROFILE
+        // 5. Navigate to PROFILE via tab click
+        await tester.tap(find.text('PROFILE'));
+        await tester.pumpAndSettle();
+        expect(find.text('Profile Screen Page'), findsOneWidget);
+        expect(
+          find.byIcon(Icons.person),
+          findsOneWidget,
+        ); // Active icon for PROFILE
 
-      // 6. Navigate back to HOME via logo click
-      await tester.tap(find.text('INEA'));
-      await tester.pumpAndSettle();
-      expect(find.text('Home Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.home), findsOneWidget);
+        // 6. Navigate back to HOME via logo click
+        await tester.tap(find.text('INEA'));
+        await tester.pumpAndSettle();
+        expect(find.text('Home Screen Page'), findsOneWidget);
+        expect(find.byIcon(Icons.home), findsOneWidget);
 
-      // 7. Navigate to PACKAGES via 'Explore Packages' action button
-      await tester.tap(find.text('Explore Packages'));
-      await tester.pumpAndSettle();
-      expect(find.text('Packages Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
+        // 7. Navigate to PACKAGES via 'Explore Packages' action button
+        await tester.tap(find.text('Explore Packages'));
+        await tester.pumpAndSettle();
+        expect(find.text('Packages Screen Page'), findsOneWidget);
+        expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
 
-      // 8. Test subroute /package-details/42 retains PACKAGES section highlight
-      router.go('/package-details/42');
-      await tester.pumpAndSettle();
-      expect(find.text('Package Detail 42'), findsOneWidget);
-      expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
+        // 8. Test subroute /package-details/42 retains PACKAGES section highlight
+        router.go('/package-details/42');
+        await tester.pumpAndSettle();
+        expect(find.text('Package Detail 42'), findsOneWidget);
+        expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
 
-      // 9. Test subroute /booking/99 retains BOOKINGS section highlight
-      router.go('/booking/99');
-      await tester.pumpAndSettle();
-      expect(find.text('Booking Flow 99'), findsOneWidget);
-      expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+        // 9. Test subroute /booking/99 retains BOOKINGS section highlight
+        router.go('/booking/99');
+        await tester.pumpAndSettle();
+        expect(find.text('Booking Flow 99'), findsOneWidget);
+        expect(find.byIcon(Icons.calendar_today), findsOneWidget);
 
-      // 10. Test /wishlist route highlights PROFILE
-      router.go('/wishlist');
-      await tester.pumpAndSettle();
-      expect(find.text('Wishlist Screen Page'), findsOneWidget);
-      expect(find.byIcon(Icons.person), findsOneWidget);
-    });
+        // 10. Test /wishlist route highlights PROFILE
+        router.go('/wishlist');
+        await tester.pumpAndSettle();
+        expect(find.text('Wishlist Screen Page'), findsOneWidget);
+        expect(find.byIcon(Icons.person), findsOneWidget);
+      },
+    );
 
-    testWidgets('Mobile shell hides BottomNavBar on detail routes',
-        (WidgetTester tester) async {
+    testWidgets('Mobile shell hides BottomNavBar on detail routes', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(375, 667);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -426,7 +457,8 @@ void main() {
         initialLocation: '/packages',
         routes: [
           ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
+            builder: (context, state, child) =>
+                ResponsiveAppShell(child: child),
             routes: [
               GoRoute(
                 path: '/packages',
@@ -446,10 +478,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
+        MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
       );
       await tester.pumpAndSettle();
 
@@ -467,65 +496,249 @@ void main() {
       expect(find.byType(BottomNavBar), findsNothing);
     });
 
-    testWidgets('Desktop navigation works smoothly at exact 768.0px minimum desktop width without overflow',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(768.0, 900.0);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'Desktop navigation works smoothly at exact 768.0px minimum desktop width without overflow',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(768.0, 900.0);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      final router = GoRouter(
-        initialLocation: '/home',
-        routes: [
-          ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
-            routes: [
-              GoRoute(path: '/home', builder: (context, state) => const Text('Home Screen')),
-              GoRoute(path: '/packages', builder: (context, state) => const Text('Packages Screen')),
-              GoRoute(path: '/bookings', builder: (context, state) => const Text('Bookings Screen')),
-              GoRoute(path: '/calendar', builder: (context, state) => const Text('Calendar Screen')),
-              GoRoute(path: '/profile', builder: (context, state) => const Text('Profile Screen')),
-            ],
+        final router = GoRouter(
+          initialLocation: '/home',
+          routes: [
+            ShellRoute(
+              builder: (context, state, child) =>
+                  ResponsiveAppShell(child: child),
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  builder: (context, state) => const Text('Home Screen'),
+                ),
+                GoRoute(
+                  path: '/packages',
+                  builder: (context, state) => const Text('Packages Screen'),
+                ),
+                GoRoute(
+                  path: '/bookings',
+                  builder: (context, state) => const Text('Bookings Screen'),
+                ),
+                GoRoute(
+                  path: '/calendar',
+                  builder: (context, state) => const Text('Calendar Screen'),
+                ),
+                GoRoute(
+                  path: '/profile',
+                  builder: (context, state) => const Text('Profile Screen'),
+                ),
+              ],
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
+        );
+        await tester.pumpAndSettle();
+
+        // TopNavBar is rendered at 768.0px
+        expect(find.byType(TopNavBar), findsOneWidget);
+        expect(find.byType(BottomNavBar), findsNothing);
+
+        // Verify tapping each tab at 768px width
+        await tester.tap(find.text('PACKAGES'));
+        await tester.pumpAndSettle();
+        expect(find.text('Packages Screen'), findsOneWidget);
+
+        await tester.tap(find.text('BOOKINGS'));
+        await tester.pumpAndSettle();
+        expect(find.text('Bookings Screen'), findsOneWidget);
+
+        await tester.tap(find.text('CALENDAR'));
+        await tester.pumpAndSettle();
+        expect(find.text('Calendar Screen'), findsOneWidget);
+
+        await tester.tap(find.text('PROFILE'));
+        await tester.pumpAndSettle();
+        expect(find.text('Profile Screen'), findsOneWidget);
+
+        await tester.tap(find.text('Explore Packages'));
+        await tester.pumpAndSettle();
+        expect(find.text('Packages Screen'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'TopNavBar items support keyboard activation via ActivateIntent and ButtonActivateIntent',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final router = GoRouter(
+          initialLocation: '/home',
+          routes: [
+            ShellRoute(
+              builder: (context, state, child) =>
+                  ResponsiveAppShell(child: child),
+              routes: [
+                GoRoute(
+                  path: '/home',
+                  builder: (context, state) => const Text('Home Page'),
+                ),
+                GoRoute(
+                  path: '/packages',
+                  builder: (context, state) => const Text('Packages Page'),
+                ),
+              ],
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Home Page'), findsOneWidget);
+
+        // Find FocusableActionDetector for PACKAGES nav item
+        final packagesDetectorFinder = find.ancestor(
+          of: find.text('PACKAGES'),
+          matching: find.byType(FocusableActionDetector),
+        );
+        expect(packagesDetectorFinder, findsOneWidget);
+
+        final detector = tester.widget<FocusableActionDetector>(
+          packagesDetectorFinder,
+        );
+
+        // Test ActivateIntent (Enter key)
+        final activateAction =
+            detector.actions?[ActivateIntent]
+                as CallbackAction<ActivateIntent>?;
+        expect(activateAction, isNotNull);
+        activateAction?.invoke(const ActivateIntent());
+        await tester.pumpAndSettle();
+        expect(find.text('Packages Page'), findsOneWidget);
+
+        // Find Brand Logo FocusableActionDetector
+        final brandDetectorFinder = find.ancestor(
+          of: find.text('INEA'),
+          matching: find.byType(FocusableActionDetector),
+        );
+        expect(brandDetectorFinder, findsOneWidget);
+        final brandDetector = tester.widget<FocusableActionDetector>(
+          brandDetectorFinder,
+        );
+
+        // Test Focus highlight on Brand Logo
+        brandDetector.onShowFocusHighlight!(true);
+        await tester.pumpAndSettle();
+
+        final brandContainerFinder = find.descendant(
+          of: brandDetectorFinder,
+          matching: find.byType(AnimatedContainer),
+        );
+        final brandContainer = tester.widget<AnimatedContainer>(
+          brandContainerFinder,
+        );
+        final brandDec = brandContainer.decoration as BoxDecoration;
+        final brandBorder = brandDec.border as Border;
+        expect(brandBorder.top.color, equals(Colors.white));
+        expect(brandBorder.top.width, equals(2.0));
+
+        // Test ButtonActivateIntent (Space key) on Brand Logo to navigate back to Home
+        final brandButtonAction =
+            brandDetector.actions?[ButtonActivateIntent]
+                as CallbackAction<ButtonActivateIntent>?;
+        expect(brandButtonAction, isNotNull);
+        brandButtonAction?.invoke(const ButtonActivateIntent());
+        await tester.pumpAndSettle();
+        expect(find.text('Home Page'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'TopNavBar handles unmatched routes gracefully with no active pill',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final router = GoRouter(
+          initialLocation: '/unmatched-custom-route',
+          routes: [
+            ShellRoute(
+              builder: (context, state, child) =>
+                  ResponsiveAppShell(child: child),
+              routes: [
+                GoRoute(
+                  path: '/unmatched-custom-route',
+                  builder: (context, state) =>
+                      const Text('Custom Unmatched Screen'),
+                ),
+              ],
+            ),
+          ],
+        );
+
+        await tester.pumpWidget(
+          MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Custom Unmatched Screen'), findsOneWidget);
+        // No active filled icon should be present (HOME active icon is Icons.home, inactive is Icons.home_outlined)
+        expect(find.byIcon(Icons.home), findsNothing);
+        expect(find.byIcon(Icons.home_outlined), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'ResponsiveAppShell respects custom breakpoint and maxWidth overrides',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(900, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        // Custom breakpoint at 1000px -> at 900px, it should be in mobile mode
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(
+              breakpoint: 1000.0,
+              maxWidth: 800.0,
+              child: Text('Custom Breakpoint Content'),
+            ),
           ),
-        ],
-      );
+        );
 
-      await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
-      );
-      await tester.pumpAndSettle();
+        expect(find.byType(TopNavBar), findsNothing);
+        expect(find.byType(BottomNavBar), findsOneWidget);
 
-      // TopNavBar is rendered at 768.0px
-      expect(find.byType(TopNavBar), findsOneWidget);
-      expect(find.byType(BottomNavBar), findsNothing);
+        // Now resize to 1100px -> desktop mode with custom maxWidth 800px
+        tester.view.physicalSize = const Size(1100, 800);
+        await tester.pumpAndSettle();
 
-      // Verify tapping each tab at 768px width
-      await tester.tap(find.text('PACKAGES'));
-      await tester.pumpAndSettle();
-      expect(find.text('Packages Screen'), findsOneWidget);
+        expect(find.byType(TopNavBar), findsOneWidget);
+        expect(find.byType(BottomNavBar), findsNothing);
 
-      await tester.tap(find.text('BOOKINGS'));
-      await tester.pumpAndSettle();
-      expect(find.text('Bookings Screen'), findsOneWidget);
+        final constrainedBoxFinder = find.ancestor(
+          of: find.text('Custom Breakpoint Content'),
+          matching: find.byType(ConstrainedBox),
+        );
+        final box = tester.widget<ConstrainedBox>(constrainedBoxFinder.first);
+        expect(box.constraints.maxWidth, equals(800.0));
+      },
+    );
 
-      await tester.tap(find.text('CALENDAR'));
-      await tester.pumpAndSettle();
-      expect(find.text('Calendar Screen'), findsOneWidget);
-
-      await tester.tap(find.text('PROFILE'));
-      await tester.pumpAndSettle();
-      expect(find.text('Profile Screen'), findsOneWidget);
-
-      await tester.tap(find.text('Explore Packages'));
-      await tester.pumpAndSettle();
-      expect(find.text('Packages Screen'), findsOneWidget);
-    });
-
-    testWidgets('TopNavBar items support keyboard activation via ActivateIntent and ButtonActivateIntent',
-        (WidgetTester tester) async {
+    testWidgets('TopNavBar nav item changes background on hover', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -535,166 +748,24 @@ void main() {
         initialLocation: '/home',
         routes: [
           ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
+            builder: (context, state, child) =>
+                ResponsiveAppShell(child: child),
             routes: [
-              GoRoute(path: '/home', builder: (context, state) => const Text('Home Page')),
-              GoRoute(path: '/packages', builder: (context, state) => const Text('Packages Page')),
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const Text('Home'),
+              ),
+              GoRoute(
+                path: '/packages',
+                builder: (context, state) => const Text('Packages'),
+              ),
             ],
           ),
         ],
       );
 
       await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Home Page'), findsOneWidget);
-
-      // Find FocusableActionDetector for PACKAGES nav item
-      final packagesDetectorFinder = find.ancestor(
-        of: find.text('PACKAGES'),
-        matching: find.byType(FocusableActionDetector),
-      );
-      expect(packagesDetectorFinder, findsOneWidget);
-
-      final detector = tester.widget<FocusableActionDetector>(packagesDetectorFinder);
-      
-      // Test ActivateIntent (Enter key)
-      final activateAction = detector.actions?[ActivateIntent] as CallbackAction<ActivateIntent>?;
-      expect(activateAction, isNotNull);
-      activateAction?.invoke(const ActivateIntent());
-      await tester.pumpAndSettle();
-      expect(find.text('Packages Page'), findsOneWidget);
-
-      // Find Brand Logo FocusableActionDetector
-      final brandDetectorFinder = find.ancestor(
-        of: find.text('INEA'),
-        matching: find.byType(FocusableActionDetector),
-      );
-      expect(brandDetectorFinder, findsOneWidget);
-      final brandDetector = tester.widget<FocusableActionDetector>(brandDetectorFinder);
-
-      // Test Focus highlight on Brand Logo
-      brandDetector.onShowFocusHighlight!(true);
-      await tester.pumpAndSettle();
-
-      final brandContainerFinder = find.descendant(
-        of: brandDetectorFinder,
-        matching: find.byType(AnimatedContainer),
-      );
-      final brandContainer = tester.widget<AnimatedContainer>(brandContainerFinder);
-      final brandDec = brandContainer.decoration as BoxDecoration;
-      final brandBorder = brandDec.border as Border;
-      expect(brandBorder.top.color, equals(Colors.white));
-      expect(brandBorder.top.width, equals(2.0));
-
-      // Test ButtonActivateIntent (Space key) on Brand Logo to navigate back to Home
-      final brandButtonAction = brandDetector.actions?[ButtonActivateIntent] as CallbackAction<ButtonActivateIntent>?;
-      expect(brandButtonAction, isNotNull);
-      brandButtonAction?.invoke(const ButtonActivateIntent());
-      await tester.pumpAndSettle();
-      expect(find.text('Home Page'), findsOneWidget);
-    });
-
-    testWidgets('TopNavBar handles unmatched routes gracefully with no active pill',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1280, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      final router = GoRouter(
-        initialLocation: '/unmatched-custom-route',
-        routes: [
-          ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
-            routes: [
-              GoRoute(path: '/unmatched-custom-route', builder: (context, state) => const Text('Custom Unmatched Screen')),
-            ],
-          ),
-        ],
-      );
-
-      await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Custom Unmatched Screen'), findsOneWidget);
-      // No active filled icon should be present (HOME active icon is Icons.home, inactive is Icons.home_outlined)
-      expect(find.byIcon(Icons.home), findsNothing);
-      expect(find.byIcon(Icons.home_outlined), findsOneWidget);
-    });
-
-    testWidgets('ResponsiveAppShell respects custom breakpoint and maxWidth overrides',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(900, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      // Custom breakpoint at 1000px -> at 900px, it should be in mobile mode
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            breakpoint: 1000.0,
-            maxWidth: 800.0,
-            child: Text('Custom Breakpoint Content'),
-          ),
-        ),
-      );
-
-      expect(find.byType(TopNavBar), findsNothing);
-      expect(find.byType(BottomNavBar), findsOneWidget);
-
-      // Now resize to 1100px -> desktop mode with custom maxWidth 800px
-      tester.view.physicalSize = const Size(1100, 800);
-      await tester.pumpAndSettle();
-
-      expect(find.byType(TopNavBar), findsOneWidget);
-      expect(find.byType(BottomNavBar), findsNothing);
-
-      final constrainedBoxFinder = find.ancestor(
-        of: find.text('Custom Breakpoint Content'),
-        matching: find.byType(ConstrainedBox),
-      );
-      final box = tester.widget<ConstrainedBox>(constrainedBoxFinder.first);
-      expect(box.constraints.maxWidth, equals(800.0));
-    });
-
-    testWidgets('TopNavBar nav item changes background on hover',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1280, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      final router = GoRouter(
-        initialLocation: '/home',
-        routes: [
-          ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
-            routes: [
-              GoRoute(path: '/home', builder: (context, state) => const Text('Home')),
-              GoRoute(path: '/packages', builder: (context, state) => const Text('Packages')),
-            ],
-          ),
-        ],
-      );
-
-      await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
+        MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
       );
       await tester.pumpAndSettle();
 
@@ -705,14 +776,18 @@ void main() {
       );
       expect(packagesDetectorFinder, findsOneWidget);
 
-      final detector = tester.widget<FocusableActionDetector>(packagesDetectorFinder);
+      final detector = tester.widget<FocusableActionDetector>(
+        packagesDetectorFinder,
+      );
 
       // Verify unhovered background
       final unhoveredContainerFinder = find.descendant(
         of: packagesDetectorFinder,
         matching: find.byType(AnimatedContainer),
       );
-      final unhoveredContainer = tester.widget<AnimatedContainer>(unhoveredContainerFinder);
+      final unhoveredContainer = tester.widget<AnimatedContainer>(
+        unhoveredContainerFinder,
+      );
       final unhoveredDec = unhoveredContainer.decoration as BoxDecoration;
       expect(unhoveredDec.color, equals(Colors.transparent));
 
@@ -720,13 +795,16 @@ void main() {
       detector.onShowHoverHighlight!(true);
       await tester.pumpAndSettle();
 
-      final hoveredContainer = tester.widget<AnimatedContainer>(unhoveredContainerFinder);
+      final hoveredContainer = tester.widget<AnimatedContainer>(
+        unhoveredContainerFinder,
+      );
       final hoveredDec = hoveredContainer.decoration as BoxDecoration;
       expect(hoveredDec.color, equals(Colors.white.withValues(alpha: 0.15)));
     });
 
-    testWidgets('Mobile BottomNavBar full tap navigation cycle',
-        (WidgetTester tester) async {
+    testWidgets('Mobile BottomNavBar full tap navigation cycle', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(375, 667);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -736,22 +814,32 @@ void main() {
         initialLocation: '/home',
         routes: [
           ShellRoute(
-            builder: (context, state, child) => ResponsiveAppShell(child: child),
+            builder: (context, state, child) =>
+                ResponsiveAppShell(child: child),
             routes: [
-              GoRoute(path: '/home', builder: (context, state) => const Text('Mobile Home')),
-              GoRoute(path: '/packages', builder: (context, state) => const Text('Mobile Packages')),
-              GoRoute(path: '/bookings', builder: (context, state) => const Text('Mobile Bookings')),
-              GoRoute(path: '/profile', builder: (context, state) => const Text('Mobile Profile')),
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const Text('Mobile Home'),
+              ),
+              GoRoute(
+                path: '/packages',
+                builder: (context, state) => const Text('Mobile Packages'),
+              ),
+              GoRoute(
+                path: '/bookings',
+                builder: (context, state) => const Text('Mobile Bookings'),
+              ),
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const Text('Mobile Profile'),
+              ),
             ],
           ),
         ],
       );
 
       await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.lightTheme,
-          routerConfig: router,
-        ),
+        MaterialApp.router(theme: AppTheme.lightTheme, routerConfig: router),
       );
       await tester.pumpAndSettle();
 
@@ -780,107 +868,113 @@ void main() {
   });
 
   group('R1 Foundational Breakpoints & LayoutBuilder Tests', () {
-    test('Breakpoint column count calculations (Mobile: 1-col, Tablet: 2-col, Desktop: 3-col)', () {
-      // Mobile (< 768px -> 1 column)
-      expect(ResponsiveAppShell.getGridColumnCount(-10), equals(1));
-      expect(ResponsiveAppShell.getGridColumnCount(0), equals(1));
-      expect(ResponsiveAppShell.getGridColumnCount(320), equals(1));
-      expect(ResponsiveAppShell.getGridColumnCount(600), equals(1));
-      expect(ResponsiveAppShell.getGridColumnCount(767.9), equals(1));
+    test(
+      'Breakpoint column count calculations (Mobile: 1-col, Tablet: 2-col, Desktop: 3-col)',
+      () {
+        // Mobile (< 768px -> 1 column)
+        expect(ResponsiveAppShell.getGridColumnCount(-10), equals(1));
+        expect(ResponsiveAppShell.getGridColumnCount(0), equals(1));
+        expect(ResponsiveAppShell.getGridColumnCount(320), equals(1));
+        expect(ResponsiveAppShell.getGridColumnCount(600), equals(1));
+        expect(ResponsiveAppShell.getGridColumnCount(767.9), equals(1));
 
-      // Tablet (768px - 1024px -> 2 columns)
-      expect(ResponsiveAppShell.getGridColumnCount(768.0), equals(2));
-      expect(ResponsiveAppShell.getGridColumnCount(900.0), equals(2));
-      expect(ResponsiveAppShell.getGridColumnCount(1024.0), equals(2));
+        // Tablet (768px - 1024px -> 2 columns)
+        expect(ResponsiveAppShell.getGridColumnCount(768.0), equals(2));
+        expect(ResponsiveAppShell.getGridColumnCount(900.0), equals(2));
+        expect(ResponsiveAppShell.getGridColumnCount(1024.0), equals(2));
 
-      // Desktop (> 1024px -> 3 columns)
-      expect(ResponsiveAppShell.getGridColumnCount(1024.01), equals(3));
-      expect(ResponsiveAppShell.getGridColumnCount(1200.0), equals(3));
-      expect(ResponsiveAppShell.getGridColumnCount(1920.0), equals(3));
-      expect(ResponsiveAppShell.getGridColumnCount(5120.0), equals(3));
-    });
+        // Desktop (> 1024px -> 3 columns)
+        expect(ResponsiveAppShell.getGridColumnCount(1024.01), equals(3));
+        expect(ResponsiveAppShell.getGridColumnCount(1200.0), equals(3));
+        expect(ResponsiveAppShell.getGridColumnCount(1920.0), equals(3));
+        expect(ResponsiveAppShell.getGridColumnCount(5120.0), equals(3));
+      },
+    );
 
-    testWidgets('ResponsiveAppShell contains root LayoutBuilder and evaluates constraints correctly',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1280, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets(
+      'ResponsiveAppShell contains root LayoutBuilder and evaluates constraints correctly',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1280, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: const ResponsiveAppShell(
-            child: Text('LayoutBuilder Content'),
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(
+              child: Text('LayoutBuilder Content'),
+            ),
           ),
-        ),
-      );
-
-      final layoutBuilderFinder = find.descendant(
-        of: find.byType(ResponsiveAppShell),
-        matching: find.byType(LayoutBuilder),
-      );
-      expect(layoutBuilderFinder, findsOneWidget);
-
-      expect(find.byType(TopNavBar), findsOneWidget);
-      expect(find.byType(BottomNavBar), findsNothing);
-    });
-
-    testWidgets('ResponsiveAppShell static helpers (isMobile, isTablet, isDesktop, isWideScreen)',
-        (WidgetTester tester) async {
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      late bool isMobileVal;
-      late bool isTabletVal;
-      late bool isDesktopVal;
-      late bool isWideVal;
-
-      Widget buildProbe() {
-        return Builder(
-          builder: (context) {
-            isMobileVal = ResponsiveAppShell.isMobile(context);
-            isTabletVal = ResponsiveAppShell.isTablet(context);
-            isDesktopVal = ResponsiveAppShell.isDesktop(context);
-            isWideVal = ResponsiveAppShell.isWideScreen(context);
-            return const SizedBox.shrink();
-          },
         );
-      }
 
-      // 1. Mobile (400px)
-      tester.view.physicalSize = const Size(400, 800);
-      await tester.pumpWidget(MaterialApp(home: buildProbe()));
-      expect(isMobileVal, isTrue);
-      expect(isTabletVal, isFalse);
-      expect(isDesktopVal, isFalse);
-      expect(isWideVal, isFalse);
+        final layoutBuilderFinder = find.descendant(
+          of: find.byType(ResponsiveAppShell),
+          matching: find.byType(LayoutBuilder),
+        );
+        expect(layoutBuilderFinder, findsOneWidget);
 
-      // 2. Tablet (800px)
-      tester.view.physicalSize = const Size(800, 800);
-      await tester.pumpWidget(MaterialApp(home: buildProbe()));
-      expect(isMobileVal, isFalse);
-      expect(isTabletVal, isTrue);
-      expect(isDesktopVal, isFalse);
-      expect(isWideVal, isTrue);
+        expect(find.byType(TopNavBar), findsOneWidget);
+        expect(find.byType(BottomNavBar), findsNothing);
+      },
+    );
 
-      // 3. Exact Tablet upper boundary (1024.0px)
-      tester.view.physicalSize = const Size(1024.0, 800);
-      await tester.pumpWidget(MaterialApp(home: buildProbe()));
-      expect(isMobileVal, isFalse);
-      expect(isTabletVal, isTrue);
-      expect(isDesktopVal, isFalse);
-      expect(isWideVal, isTrue);
+    testWidgets(
+      'ResponsiveAppShell static helpers (isMobile, isTablet, isDesktop, isWideScreen)',
+      (WidgetTester tester) async {
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      // 4. Desktop (1400px)
-      tester.view.physicalSize = const Size(1400, 800);
-      await tester.pumpWidget(MaterialApp(home: buildProbe()));
-      expect(isMobileVal, isFalse);
-      expect(isTabletVal, isFalse);
-      expect(isDesktopVal, isTrue);
-      expect(isWideVal, isTrue);
-    });
+        late bool isMobileVal;
+        late bool isTabletVal;
+        late bool isDesktopVal;
+        late bool isWideVal;
+
+        Widget buildProbe() {
+          return Builder(
+            builder: (context) {
+              isMobileVal = ResponsiveAppShell.isMobile(context);
+              isTabletVal = ResponsiveAppShell.isTablet(context);
+              isDesktopVal = ResponsiveAppShell.isDesktop(context);
+              isWideVal = ResponsiveAppShell.isWideScreen(context);
+              return const SizedBox.shrink();
+            },
+          );
+        }
+
+        // 1. Mobile (400px)
+        tester.view.physicalSize = const Size(400, 800);
+        await tester.pumpWidget(MaterialApp(home: buildProbe()));
+        expect(isMobileVal, isTrue);
+        expect(isTabletVal, isFalse);
+        expect(isDesktopVal, isFalse);
+        expect(isWideVal, isFalse);
+
+        // 2. Tablet (800px)
+        tester.view.physicalSize = const Size(800, 800);
+        await tester.pumpWidget(MaterialApp(home: buildProbe()));
+        expect(isMobileVal, isFalse);
+        expect(isTabletVal, isTrue);
+        expect(isDesktopVal, isFalse);
+        expect(isWideVal, isTrue);
+
+        // 3. Exact Tablet upper boundary (1024.0px)
+        tester.view.physicalSize = const Size(1024.0, 800);
+        await tester.pumpWidget(MaterialApp(home: buildProbe()));
+        expect(isMobileVal, isFalse);
+        expect(isTabletVal, isTrue);
+        expect(isDesktopVal, isFalse);
+        expect(isWideVal, isTrue);
+
+        // 4. Desktop (1400px)
+        tester.view.physicalSize = const Size(1400, 800);
+        await tester.pumpWidget(MaterialApp(home: buildProbe()));
+        expect(isMobileVal, isFalse);
+        expect(isTabletVal, isFalse);
+        expect(isDesktopVal, isTrue);
+        expect(isWideVal, isTrue);
+      },
+    );
   });
 }
-

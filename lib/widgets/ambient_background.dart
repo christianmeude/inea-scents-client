@@ -31,13 +31,13 @@ class AmbientBackground extends StatelessWidget {
                 colors: [
                   AppTheme.backgroundTop,
                   AppTheme.backgroundMiddle,
-                  AppTheme.backgroundBottom
+                  AppTheme.backgroundBottom,
                 ],
                 stops: [0.0, 0.52, 1.0],
               ),
             ),
           ),
-          
+
           // TOP LEFT GLOW
           Positioned(
             top: -130,
@@ -87,7 +87,7 @@ class AmbientBackground extends StatelessWidget {
               color: const Color(0xFF69384F).withValues(alpha: 0.28),
             ),
           ),
-          
+
           // MAIN CONTENT
           child,
         ],

@@ -21,11 +21,17 @@ class PackageDetailScreen extends ConsumerWidget {
               children: [
                 // Top App Bar Area
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 15,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Color(0xFF6A4053)),
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Color(0xFF6A4053),
+                        ),
                         tooltip: 'Back',
                         mouseCursor: SystemMouseCursors.click,
                         onPressed: () => context.pop(),
@@ -42,7 +48,11 @@ class PackageDetailScreen extends ConsumerWidget {
                           child: Row(
                             children: [
                               const SizedBox(width: 12),
-                              Icon(Icons.search, color: const Color(0xFF99868C), size: 20),
+                              Icon(
+                                Icons.search,
+                                color: const Color(0xFF99868C),
+                                size: 20,
+                              ),
                               const SizedBox(width: 12),
                               Text(
                                 'Search "Perfume" here',
@@ -56,13 +66,19 @@ class PackageDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      const Icon(Icons.chat_bubble_rounded, color: Color(0xFF6A4053)),
+                      const Icon(
+                        Icons.chat_bubble_rounded,
+                        color: Color(0xFF6A4053),
+                      ),
                       const SizedBox(width: 15),
-                      const Icon(Icons.calendar_today_rounded, color: Color(0xFF6A4053)),
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        color: Color(0xFF6A4053),
+                      ),
                     ],
                   ),
                 ),
-                
+
                 // Content
                 Expanded(
                   child: SingleChildScrollView(
@@ -87,13 +103,22 @@ class PackageDetailScreen extends ConsumerWidget {
                                 aspectRatio: 1.4,
                                 child: Container(
                                   color: const Color(0xFFF3EBE1),
-                                  child: (package.images != null && package.images!.isNotEmpty)
-                                      ? Image.network(package.images![0], fit: BoxFit.cover)
-                                      : const Center(child: Text("Package Image Placeholder")),
+                                  child:
+                                      (package.images != null &&
+                                          package.images!.isNotEmpty)
+                                      ? Image.network(
+                                          package.images![0],
+                                          fit: BoxFit.cover,
+                                        )
+                                      : const Center(
+                                          child: Text(
+                                            "Package Image Placeholder",
+                                          ),
+                                        ),
                                 ),
                               ),
                             ),
-                            
+
                             Padding(
                               padding: const EdgeInsets.all(20),
                               child: Column(
@@ -110,22 +135,33 @@ class PackageDetailScreen extends ConsumerWidget {
                                   const SizedBox(height: 8),
                                   Row(
                                     children: [
-                                      const Icon(Icons.star, size: 16, color: Colors.amber),
+                                      const Icon(
+                                        Icons.star,
+                                        size: 16,
+                                        color: Colors.amber,
+                                      ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '${package.rating ?? 4.5}',
-                                        style: const TextStyle(fontSize: 14, color: Color(0xFF6A4053)),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF6A4053),
+                                        ),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '(${package.reviewsCount ?? 232} reviews)',
-                                        style: const TextStyle(fontSize: 14, color: Color(0xFF99868C)),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF99868C),
+                                        ),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
                                   Text(
-                                    package.description ?? 'Perfect for intimate celebrations...',
+                                    package.description ??
+                                        'Perfect for intimate celebrations...',
                                     style: const TextStyle(
                                       fontSize: 13,
                                       color: Color(0xFF99868C),
@@ -142,28 +178,38 @@ class PackageDetailScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  ...(package.inclusions ?? []).map((inclusion) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 4),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        const Text('•  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                        Expanded(
-                                          child: Text(
-                                            inclusion,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Color(0xFF6A4053),
-                                              height: 1.3,
+                                  ...(package.inclusions ?? []).map(
+                                    (inclusion) => Padding(
+                                      padding: const EdgeInsets.only(bottom: 4),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            '•  ',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                          Expanded(
+                                            child: Text(
+                                              inclusion,
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFF6A4053),
+                                                height: 1.3,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  )),
+                                  ),
                                   const SizedBox(height: 15),
                                   // Free items if any
-                                  if (package.freebies != null && package.freebies!.isNotEmpty) ...[
+                                  if (package.freebies != null &&
+                                      package.freebies!.isNotEmpty) ...[
                                     const Text(
                                       'Free:',
                                       style: TextStyle(
@@ -173,26 +219,39 @@ class PackageDetailScreen extends ConsumerWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 8),
-                                    ...package.freebies!.map((freebie) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 4),
-                                      child: Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text('•  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                          Expanded(
-                                            child: Text(
-                                              freebie,
+                                    ...package.freebies!.map(
+                                      (freebie) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 4,
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              '•  ',
                                               style: TextStyle(
-                                                fontSize: 13,
-                                                color: const Color(0xFF6A4053),
-                                                height: 1.3,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            Expanded(
+                                              child: Text(
+                                                freebie,
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: const Color(
+                                                    0xFF6A4053,
+                                                  ),
+                                                  height: 1.3,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    )),
-                                  ]
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -202,13 +261,18 @@ class PackageDetailScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
-                
+
                 // Sticky Bottom Bar
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border(top: BorderSide(color: const Color(0x4D99868C))),
+                    border: Border(
+                      top: BorderSide(color: const Color(0x4D99868C)),
+                    ),
                   ),
                   child: SafeArea(
                     top: false,
@@ -224,18 +288,35 @@ class PackageDetailScreen extends ConsumerWidget {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: () => context.push('/calendar', extra: package.id),
+                          onPressed: () {
+                            final id = package.id;
+                            if (id == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Invalid package'),
+                                ),
+                              );
+                              return;
+                            }
+                            context.push('/booking/$id');
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6A4053), // Plum
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(9999),
                             ),
                           ),
                           child: const Text(
                             'Book Now',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
@@ -245,7 +326,9 @@ class PackageDetailScreen extends ConsumerWidget {
               ],
             );
           },
-          loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF6A4053))),
+          loading: () => const Center(
+            child: CircularProgressIndicator(color: Color(0xFF6A4053)),
+          ),
           error: (error, stack) => Center(child: Text('Error: $error')),
         ),
       ),

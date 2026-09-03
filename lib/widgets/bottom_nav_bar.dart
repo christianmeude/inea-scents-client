@@ -24,9 +24,7 @@ class BottomNavBar extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
-          decoration: BoxDecoration(
-            color: navBg,
-          ),
+          decoration: BoxDecoration(color: navBg),
           child: BottomNavigationBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -51,6 +49,9 @@ class BottomNavBar extends StatelessWidget {
                     context.go('/bookings');
                     break;
                   case 3:
+                    context.go('/calendar');
+                    break;
+                  case 4:
                     context.go('/profile');
                     break;
                 }
@@ -93,6 +94,17 @@ class BottomNavBar extends StatelessWidget {
               BottomNavigationBarItem(
                 icon: Padding(
                   padding: EdgeInsets.only(bottom: 4),
+                  child: Icon(Icons.event_available_outlined),
+                ),
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 4),
+                  child: Icon(Icons.event_available),
+                ),
+                label: 'CALENDAR',
+              ),
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 4),
                   child: Icon(Icons.person_outline),
                 ),
                 activeIcon: Padding(
@@ -122,10 +134,13 @@ class BottomNavBar extends StatelessWidget {
       }
       if (location.contains('package')) {
         return 1;
-      } else if (location.contains('booking') || location.contains('calendar')) {
+      } else if (location.contains('booking')) {
         return 2;
-      } else if (location.contains('profile') || location.contains('wishlist')) {
+      } else if (location.contains('calendar')) {
         return 3;
+      } else if (location.contains('profile') ||
+          location.contains('wishlist')) {
+        return 4;
       } else if (location == '/' || location.contains('home')) {
         return 0;
       }

@@ -13,6 +13,7 @@ abstract class ApiLoginRequestBody with _$ApiLoginRequestBody {
     required String email,
     required String password,
   }) = _ApiLoginRequestBody;
-  
-  factory ApiLoginRequestBody.fromJson(Map<String, Object?> json) => _$ApiLoginRequestBodyFromJson(json);
+
+  factory ApiLoginRequestBody.fromJson(Map<String, Object?> json) =>
+      _$ApiLoginRequestBodyFromJson(json);
 }

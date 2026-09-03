@@ -30,20 +30,25 @@ class ReservationDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final paxList = (package.paxOptions != null && package.paxOptions!.isNotEmpty)
+    final paxList =
+        (package.paxOptions != null && package.paxOptions!.isNotEmpty)
         ? package.paxOptions!
         : [20, 30, 50, 75, 100];
 
-    final timeSlots = [
-      '10:00 AM - 1:00 PM',
-      '2:00 PM - 5:00 PM',
-      '6:00 PM - 9:00 PM',
-    ];
+    final timeSlots = TimeSlot.available.map((s) => s.label).toList();
 
     final paymentMethods = [
-      {'id': 'gcash', 'label': 'GCash', 'color': const Color(0xFF007DFE)},
-      {'id': 'card', 'label': 'VISA / MC', 'color': const Color(0xFFEB001B)},
-      {'id': 'maya', 'label': 'Maya', 'color': const Color(0xFF00B14F)},
+      {
+        'id': 'credit_card',
+        'label': 'VISA / MC',
+        'color': const Color(0xFFEB001B),
+      },
+      {'id': 'cash', 'label': 'Cash', 'color': const Color(0xFF16A34A)},
+      {
+        'id': 'bank_transfer',
+        'label': 'Bank Transfer',
+        'color': const Color(0xFF475569),
+      },
     ];
 
     return Column(
@@ -113,7 +118,8 @@ class ReservationDetailsPanel extends StatelessWidget {
                   ),
                 ],
               ),
-              if (package.description != null && package.description!.isNotEmpty) ...[
+              if (package.description != null &&
+                  package.description!.isNotEmpty) ...[
                 const SizedBox(height: 10),
                 Text(
                   package.description!,
@@ -191,7 +197,10 @@ class ReservationDetailsPanel extends StatelessWidget {
                     mouseCursor: SystemMouseCursors.click,
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected ? plum : cream,
                         borderRadius: BorderRadius.circular(9999),
@@ -213,7 +222,9 @@ class ReservationDetailsPanel extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isSelected ? Icons.check_circle_rounded : Icons.person_rounded,
+                            isSelected
+                                ? Icons.check_circle_rounded
+                                : Icons.person_rounded,
                             size: 13,
                             color: isSelected ? Colors.white : plum,
                           ),
@@ -222,7 +233,9 @@ class ReservationDetailsPanel extends StatelessWidget {
                             '$pax Pax',
                             style: TextStyle(
                               fontSize: 11,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
                               color: isSelected ? Colors.white : plum,
                             ),
                           ),
@@ -299,7 +312,10 @@ class ReservationDetailsPanel extends StatelessWidget {
                       mouseCursor: SystemMouseCursors.click,
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 10,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? plum.withValues(alpha: 0.08)
@@ -325,7 +341,9 @@ class ReservationDetailsPanel extends StatelessWidget {
                                 time,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   color: plum,
                                 ),
                                 maxLines: 1,
@@ -334,7 +352,10 @@ class ReservationDetailsPanel extends StatelessWidget {
                             ),
                             if (isSelected)
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: plum,
                                   borderRadius: BorderRadius.circular(9999),
@@ -411,55 +432,64 @@ class ReservationDetailsPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 12),
-              Row(
-                children: paymentMethods.map((method) {
-                  final isSelected = (paymentMethod ?? 'gcash') == method['id'];
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 3),
-                      child: InkWell(
-                        onTap: () => onPaymentMethodSelected(method['id'] as String),
-                        borderRadius: BorderRadius.circular(12),
-                        mouseCursor: SystemMouseCursors.click,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: isSelected ? cream : Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected ? plum : const Color(0x3399868C),
-                              width: isSelected ? 1.5 : 1.0,
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardW = (constraints.maxWidth - 6) / 2;
+                  return Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: paymentMethods.map((method) {
+                      final isSelected =
+                          (paymentMethod ?? 'credit_card') == method['id'];
+                      return SizedBox(
+                        width: cardW,
+                        child: InkWell(
+                          onTap: () =>
+                              onPaymentMethodSelected(method['id'] as String),
+                          borderRadius: BorderRadius.circular(12),
+                          mouseCursor: SystemMouseCursors.click,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isSelected ? cream : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? plum
+                                    : const Color(0x3399868C),
+                                width: isSelected ? 1.5 : 1.0,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  method['label'] as String,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: method['color'] as Color,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Icon(
+                                  isSelected
+                                      ? Icons.check_circle_rounded
+                                      : Icons.circle_outlined,
+                                  size: 14,
+                                  color: isSelected ? plum : mutedPlum,
+                                ),
+                              ],
                             ),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                method['label'] as String,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: method['color'] as Color,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Icon(
-                                isSelected
-                                    ? Icons.check_circle_rounded
-                                    : Icons.circle_outlined,
-                                size: 14,
-                                color: isSelected ? plum : mutedPlum,
-                              ),
-                            ],
-                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    }).toList(),
                   );
-                }).toList(),
+                },
               ),
             ],
           ),

@@ -7,8 +7,12 @@ class AppLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final brandPrimary = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
-    final strokeColor = isDark ? const Color(0xFF6A4053) : const Color(0xFFFDF4F5);
+    final brandPrimary = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF6A4053);
+    final strokeColor = isDark
+        ? const Color(0xFF6A4053)
+        : const Color(0xFFFDF4F5);
 
     final sw = MediaQuery.of(context).size.width;
     final isDesktop = sw >= 640;
@@ -16,10 +20,10 @@ class AppLogo extends StatelessWidget {
     final ineaSize = isDesktop ? 72.0 : 60.0;
     final ineaSpacing = ineaSize * 0.15;
     final scentsSize = isDesktop ? 96.0 : 72.0;
-    
+
     // Adjusted offset for perfect visual 1:1 match with Inertia Web Rendering
-    final scentsOffsetX = isDesktop ? -76.0 : -63.0; 
-    final scentsOffsetY = isDesktop ? 34.0 : 25.0; 
+    final scentsOffsetX = isDesktop ? -76.0 : -63.0;
+    final scentsOffsetY = isDesktop ? 34.0 : 25.0;
 
     // Since Transform.translate only moves the visual layer, the layout bounding box
     // still reserves the original width on the right. We shift the whole block right
@@ -73,17 +77,17 @@ class AppLogo extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('INEA', style: ineaStroke),
-                // Invisible untranslated Scents guarantees the Stack layout width 
+                // Invisible untranslated Scents guarantees the Stack layout width
                 // matches the natural flow of the two words.
                 Opacity(opacity: 0, child: Text('Scents', style: scentsStroke)),
               ],
             ),
-            
+
             // ==============================================================
             // 2. INEA FILL
             // ==============================================================
             Text('INEA', style: ineaFill),
-            
+
             // ==============================================================
             // 3. SCENTS STROKE (Knocks out the INEA Fill beneath it!)
             // ==============================================================
@@ -98,7 +102,7 @@ class AppLogo extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // ==============================================================
             // 4. SCENTS FILL
             // ==============================================================
@@ -123,4 +127,3 @@ class AppLogo extends StatelessWidget {
 // ============================================================================
 // INPUT LABEL
 // ============================================================================
-

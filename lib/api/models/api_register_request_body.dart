@@ -14,6 +14,7 @@ abstract class ApiRegisterRequestBody with _$ApiRegisterRequestBody {
     required String email,
     required String password,
   }) = _ApiRegisterRequestBody;
-  
-  factory ApiRegisterRequestBody.fromJson(Map<String, Object?> json) => _$ApiRegisterRequestBodyFromJson(json);
+
+  factory ApiRegisterRequestBody.fromJson(Map<String, Object?> json) =>
+      _$ApiRegisterRequestBodyFromJson(json);
 }

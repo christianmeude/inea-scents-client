@@ -28,4 +28,3 @@ export 'models/api_wishlist_toggle_request_body.dart';
 export 'models/payment_method.dart';
 // Root client
 export 'rest_client.dart';
-

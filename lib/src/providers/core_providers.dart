@@ -1,41 +1,50 @@
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb, kDebugMode;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/token_storage.dart';
 import '../network/dio_client.dart';
 import '../../api/rest_client.dart';
 
-import '../../config/environment.dart';
+/// 12-Factor: API_URL is required at build time via --dart-define.
+/// No hardcoded fallbacks. Each Vercel env (Preview/Production) and each
+/// `flutter run` must pass its backend explicitly.
+///
+/// Examples:
+///  - local web:   flutter run -d chrome --dart-define=API_URL=http://127.0.0.1:8000
+///  - local android emulator: --dart-define=API_URL=http://10.0.2.2:8000
+///  - staging web: --dart-define=API_URL=https://inea-scents-staging.onrender.com
+///  - prod web:    --dart-define=API_URL=https://inea-scents.onrender.com
 
-String _getLocalBackendUrl() {
-  if (kIsWeb) {
-    return 'http://127.0.0.1:8000';
-  }
-  // Android Emulator uses 10.0.2.2 to access the host machine's localhost
-  if (Platform.isAndroid) {
-    return 'http://10.0.2.2:8000';
-  }
+String _getLocalFallbackForPlatform() {
+  if (kIsWeb) return 'http://127.0.0.1:8000';
+  if (Platform.isAndroid) return 'http://10.0.2.2:8000';
   return 'http://127.0.0.1:8000';
+}
+
+String _resolveBaseUrl() {
+  const apiUrl = String.fromEnvironment('API_URL');
+
+  // In DEBUG without a dart-define, fall back to platform-local backend
+  // for convenience. In RELEASE, API_URL is required — misconfig fails fast.
+  if (apiUrl.isEmpty) {
+    const isRelease = bool.fromEnvironment('dart.vm.product');
+    if (isRelease) {
+      throw StateError(
+        'API_URL dart-define is required for release builds. '
+        'Build with --dart-define=API_URL=https://inea-scents-staging.onrender.com (staging) '
+        'or --dart-define=API_URL=https://inea-scents.onrender.com (prod).',
+      );
+    }
+    return _getLocalFallbackForPlatform();
+  }
+  return apiUrl;
 }
 
 final tokenStorageProvider = Provider<TokenStorage>((ref) => TokenStorage());
 
 final dioClientProvider = Provider<DioClient>((ref) {
   final storage = ref.watch(tokenStorageProvider);
-  
-  String baseUrl;
-  
-  if (!kDebugMode) {
-    // Release builds on all platforms use the live backend
-    const envUrl = String.fromEnvironment('API_URL');
-    baseUrl = envUrl.isEmpty ? 'https://inea-scents.onrender.com' : envUrl;
-  } else {
-    // Debug builds check the manual toggle
-    baseUrl = currentEnvironment == Environment.local 
-        ? _getLocalBackendUrl() 
-        : 'https://inea-scents.onrender.com';
-  }
-      
+  final baseUrl = _resolveBaseUrl();
   return DioClient(baseUrl: baseUrl, tokenStorage: storage);
 });
 

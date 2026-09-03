@@ -13,6 +13,7 @@ abstract class LoginRequestBody with _$LoginRequestBody {
     required String email,
     required String password,
   }) = _LoginRequestBody;
-  
-  factory LoginRequestBody.fromJson(Map<String, Object?> json) => _$LoginRequestBodyFromJson(json);
+
+  factory LoginRequestBody.fromJson(Map<String, Object?> json) =>
+      _$LoginRequestBodyFromJson(json);
 }

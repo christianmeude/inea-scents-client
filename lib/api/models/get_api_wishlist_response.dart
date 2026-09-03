@@ -11,9 +11,9 @@ part 'get_api_wishlist_response.g.dart';
 
 @Freezed()
 abstract class GetApiWishlistResponse with _$GetApiWishlistResponse {
-  const factory GetApiWishlistResponse({
-    List<Package>? data,
-  }) = _GetApiWishlistResponse;
-  
-  factory GetApiWishlistResponse.fromJson(Map<String, Object?> json) => _$GetApiWishlistResponseFromJson(json);
+  const factory GetApiWishlistResponse({List<Package>? data}) =
+      _GetApiWishlistResponse;
+
+  factory GetApiWishlistResponse.fromJson(Map<String, Object?> json) =>
+      _$GetApiWishlistResponseFromJson(json);
 }

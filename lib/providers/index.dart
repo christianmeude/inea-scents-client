@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/index.dart';
@@ -7,7 +9,8 @@ import '../src/services/token_storage.dart';
 
 String _getErrorMessage(dynamic e) {
   if (e is DioException) {
-    if (e.type == DioExceptionType.connectionError || e.type == DioExceptionType.connectionTimeout) {
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.connectionTimeout) {
       return 'Could not connect to the server. Please check your internet connection.';
     }
     if (e.response != null) {
@@ -67,7 +70,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final response = await _apiClient.auth.postApiRegister(
-        body: ApiRegisterRequestBody(name: name, email: email, password: password)
+        body: ApiRegisterRequestBody(
+          name: name,
+          email: email,
+          password: password,
+        ),
       );
       if (response.accessToken != null) {
         await _tokenStorage.saveToken(response.accessToken!);
@@ -78,7 +85,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _getErrorMessage(e),
+      );
     }
   }
 
@@ -86,7 +96,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final response = await _apiClient.auth.postApiLogin(
-        body: ApiLoginRequestBody(email: email, password: password)
+        body: ApiLoginRequestBody(email: email, password: password),
       );
       if (response.accessToken != null) {
         await _tokenStorage.saveToken(response.accessToken!);
@@ -97,7 +107,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isLoading: false,
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _getErrorMessage(e),
+      );
     }
   }
 
@@ -110,12 +123,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
       final user = await _apiClient.auth.getApiUser();
-      state = state.copyWith(
-        user: user,
-        isLoading: false,
-      );
+      state = state.copyWith(user: user, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _getErrorMessage(e),
+      );
     }
   }
 }
@@ -138,8 +151,14 @@ final packageDetailsProvider = FutureProvider.family<Package, int>((
   packageId,
 ) async {
   final apiClient = ref.watch(apiClientProvider);
-  final response = await apiClient.packages.getApiPackagesPackage(package: packageId);
-  return response.data!;
+  final response = await apiClient.packages.getApiPackagesPackage(
+    package: packageId,
+  );
+  final data = response.data;
+  if (data == null) {
+    throw Exception('Package $packageId not found');
+  }
+  return data;
 });
 
 // Wishlist providers
@@ -169,7 +188,7 @@ class AvailabilityState {
   final int month;
   final int year;
   final List<Availability> data;
-  
+
   AvailabilityState({
     required this.month,
     required this.year,
@@ -221,7 +240,9 @@ class AvailabilityNotifier extends AsyncNotifier<AvailabilityState> {
 
   void setMonth(int month, int year) async {
     final current = state.value;
-    if (current != null && current.month == month && current.year == year) return;
+    if (current != null && current.month == month && current.year == year) {
+      return;
+    }
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => _fetch(month, year));
   }
@@ -234,9 +255,10 @@ class AvailabilityNotifier extends AsyncNotifier<AvailabilityState> {
   }
 }
 
-final availabilityProvider = AsyncNotifierProvider<AvailabilityNotifier, AvailabilityState>(
-  AvailabilityNotifier.new,
-);
+final availabilityProvider =
+    AsyncNotifierProvider<AvailabilityNotifier, AvailabilityState>(
+      AvailabilityNotifier.new,
+    );
 
 // Bookings provider
 final bookingsProvider = FutureProvider<List<Booking>>((ref) async {
@@ -246,6 +268,14 @@ final bookingsProvider = FutureProvider<List<Booking>>((ref) async {
 });
 
 // Booking flow state
+enum BookingCheckoutStatus {
+  idle,
+  awaitingPayment,
+  awaitingAdmin,
+  confirmed,
+  cancelled,
+}
+
 class BookingFlowState {
   final Package? selectedPackage;
   final DateTime? selectedDate;
@@ -260,6 +290,8 @@ class BookingFlowState {
   final bool isLoading;
   final String? errorMessage;
   final int currentStep;
+  final Booking? booking;
+  final BookingCheckoutStatus checkoutStatus;
 
   BookingFlowState({
     this.selectedPackage,
@@ -274,12 +306,10 @@ class BookingFlowState {
     this.paymentMethod,
     this.isLoading = false,
     this.errorMessage,
-    this.currentStep = 0,
+    this.currentStep = 2,
+    this.booking,
+    this.checkoutStatus = BookingCheckoutStatus.idle,
   });
-
-  double get totalPrice {
-    return (selectedPackage?.price ?? 0) + 800 + 1500;
-  }
 
   BookingFlowState copyWith({
     Package? selectedPackage,
@@ -295,6 +325,8 @@ class BookingFlowState {
     bool? isLoading,
     String? errorMessage,
     int? currentStep,
+    Booking? booking,
+    BookingCheckoutStatus? checkoutStatus,
   }) {
     return BookingFlowState(
       selectedPackage: selectedPackage ?? this.selectedPackage,
@@ -310,23 +342,53 @@ class BookingFlowState {
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage,
       currentStep: currentStep ?? this.currentStep,
+      booking: booking ?? this.booking,
+      checkoutStatus: checkoutStatus ?? this.checkoutStatus,
     );
   }
 }
 
 class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
   final RestClient _apiClient;
+  Timer? _pollTimer;
 
-  BookingFlowNotifier(this._apiClient) : super(BookingFlowState());
+  BookingFlowNotifier(this._apiClient)
+    : super(BookingFlowState(currentStep: 2));
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
+  }
 
   void nextStep() {
     state = state.copyWith(currentStep: state.currentStep + 1);
   }
 
   void previousStep() {
-    if (state.currentStep > 0) {
+    if (state.currentStep > 2) {
       state = state.copyWith(currentStep: state.currentStep - 1);
     }
+  }
+
+  void goToStep(int step) {
+    state = state.copyWith(currentStep: step);
+  }
+
+  bool canProceedFromSchedule() {
+    return state.selectedDate != null &&
+        state.selectedPax != null &&
+        state.selectedTime != null;
+  }
+
+  bool canProceedFromDetails() {
+    final nameOk = (state.customerName ?? '').trim().isNotEmpty;
+    final email = (state.customerEmail ?? '').trim();
+    final venueOk = (state.venueAddress ?? '').trim().isNotEmpty;
+    return nameOk &&
+        venueOk &&
+        email.isNotEmpty &&
+        isValidEmail(email);
   }
 
   void setSelectedPackage(Package package) {
@@ -381,48 +443,203 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
     state = state.copyWith(paymentMethod: method);
   }
 
-  Future<dynamic> submitBooking() async {
+  void prefillFromUser(User? user) {
+    if (user == null) return;
+    state = state.copyWith(
+      customerName: state.customerName ?? user.name,
+      customerEmail: state.customerEmail ?? user.email,
+    );
+  }
+
+  Future<Booking?> submitBooking() async {
+    final email = state.customerEmail?.trim() ?? '';
     if (state.selectedPackage == null ||
         state.selectedDate == null ||
         state.selectedTime == null ||
         state.selectedPax == null ||
-        state.customerName == null ||
-        state.venueAddress == null ||
-        state.paymentMethod == null) {
+        (state.paymentMethod ?? '').isEmpty) {
       state = state.copyWith(
         errorMessage: 'Please fill in all required fields',
       );
       return null;
     }
+    if ((state.customerName ?? '').trim().isEmpty) {
+      state = state.copyWith(errorMessage: 'Customer name is required');
+      return null;
+    }
+    if ((state.venueAddress ?? '').trim().isEmpty) {
+      state = state.copyWith(errorMessage: 'Event venue is required');
+      return null;
+    }
+    if (email.isEmpty) {
+      state = state.copyWith(errorMessage: 'Email address is required');
+      return null;
+    }
+    if (!isValidEmail(email)) {
+      state = state.copyWith(
+        errorMessage: 'Please enter a valid email address',
+      );
+      return null;
+    }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    final pkgId = state.selectedPackage?.id;
+    if (pkgId == null) {
+      state = state.copyWith(errorMessage: 'Selected package is invalid');
+      return null;
+    }
+    _pollTimer?.cancel();
+    state = state.copyWith(isLoading: true, errorMessage: null, booking: null);
     try {
-      final booking = await _apiClient.bookings.postApiBookings(
+      final response = await _apiClient.bookings.postApiBookings(
         body: ApiBookingsRequestBody(
-          packageId: state.selectedPackage!.id!,
-          customerName: state.customerName!,
-          customerEmail: state.customerEmail ?? '',
-          customerPhone: state.customerPhone,
-          pax: state.selectedPax ?? 0,
+          packageId: pkgId,
+          customerName: state.customerName!.trim(),
+          customerEmail: email,
+          customerPhone: (state.customerPhone?.trim().isNotEmpty ?? false)
+              ? state.customerPhone!.trim()
+              : null,
+          pax: state.selectedPax!,
           eventDate: state.selectedDate!,
-          eventTime: state.selectedTime,
-          venueAddress: state.venueAddress!,
+          eventTime: TimeSlot.startTimeForLabel(state.selectedTime),
+          venueAddress: state.venueAddress!.trim(),
           paymentMethod: PaymentMethod.fromJson(state.paymentMethod!),
           scentIds: state.selectedScentIds.isNotEmpty
               ? state.selectedScentIds
               : null,
-        )
+        ),
       );
-      state = state.copyWith(isLoading: false);
+
+      final booking = response.data;
+      if (booking == null) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage:
+              'The server returned an empty response. Please try again.',
+        );
+        return null;
+      }
+
+      final method = state.paymentMethod!;
+      final status = isOnlinePaymentString(method)
+          ? BookingCheckoutStatus.awaitingPayment
+          : BookingCheckoutStatus.awaitingAdmin;
+      state = state.copyWith(
+        isLoading: false,
+        booking: booking,
+        checkoutStatus: status,
+      );
       return booking;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: _getErrorMessage(e));
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _getErrorMessage(e),
+        checkoutStatus: BookingCheckoutStatus.idle,
+      );
       return null;
     }
   }
 
+  /// Polls `GET /api/bookings` until the created booking is confirmed or
+  /// cancelled/expired. Re-arms every [interval] and gives up after [maxDuration].
+  Future<void> startPolling({
+    Duration interval = const Duration(seconds: 3),
+    Duration maxDuration = const Duration(minutes: 15),
+  }) async {
+    final bookingId = state.booking?.id;
+    if (bookingId == null) return;
+
+    _pollTimer?.cancel();
+    final stopwatch = Stopwatch()..start();
+
+    Future<void> poll() async {
+      var resolved = false;
+      try {
+        final response = await _apiClient.bookings.getApiBookings();
+        final matches = response.data?.where((b) => b.id == bookingId).toList();
+        if (matches != null && matches.isNotEmpty) {
+          final updated = matches.first;
+          final status = (updated.status ?? '').toLowerCase();
+          if (status == 'confirmed' || status == 'paid') {
+            state = state.copyWith(
+              booking: updated,
+              checkoutStatus: BookingCheckoutStatus.confirmed,
+            );
+            resolved = true;
+          } else if (status == 'cancelled' ||
+              status == 'expired' ||
+              status == 'canceled') {
+            state = state.copyWith(
+              booking: updated,
+              checkoutStatus: BookingCheckoutStatus.cancelled,
+            );
+            resolved = true;
+          }
+        }
+      } catch (_) {
+        // Transient network/server error while polling — keep trying.
+      }
+
+      if (resolved) {
+        _pollTimer?.cancel();
+        return;
+      }
+      if (stopwatch.elapsed >= maxDuration) {
+        _pollTimer?.cancel();
+        state = state.copyWith(checkoutStatus: BookingCheckoutStatus.cancelled);
+        return;
+      }
+      _pollTimer = Timer(interval, poll);
+    }
+
+    await poll();
+  }
+
+  /// Fetches the current booking status exactly once and updates the checkout
+  /// status only if it has resolved (confirmed/cancelled). If the booking is
+  /// still pending it leaves the current status untouched, so the caller can
+  /// keep waiting without ever forcing a false cancellation.
+  Future<void> checkStatusImmediate() async {
+    final bookingId = state.booking?.id;
+    if (bookingId == null) return;
+
+    try {
+      final response = await _apiClient.bookings.getApiBookings();
+      final matches = response.data?.where((b) => b.id == bookingId).toList();
+      if (matches == null || matches.isEmpty) return;
+      final updated = matches.first;
+      final status = (updated.status ?? '').toLowerCase();
+      if (status == 'confirmed' || status == 'paid') {
+        state = state.copyWith(
+          booking: updated,
+          checkoutStatus: BookingCheckoutStatus.confirmed,
+        );
+      } else if (status == 'cancelled' ||
+          status == 'expired' ||
+          status == 'canceled') {
+        state = state.copyWith(
+          booking: updated,
+          checkoutStatus: BookingCheckoutStatus.cancelled,
+        );
+      }
+    } catch (_) {
+      // Transient network/server error — the caller can retry.
+    }
+  }
+
+  void rebook() {
+    _pollTimer?.cancel();
+    state = state.copyWith(
+      booking: null,
+      checkoutStatus: BookingCheckoutStatus.idle,
+      errorMessage: null,
+      isLoading: false,
+      currentStep: 2,
+    );
+  }
+
   void reset() {
-    state = BookingFlowState();
+    _pollTimer?.cancel();
+    state = BookingFlowState(currentStep: 2);
   }
 }
 

@@ -15,16 +15,10 @@ class CrossFadePageTransitionsBuilder extends PageTransitionsBuilder {
     Widget child,
   ) {
     return FadeTransition(
-      opacity: CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeInOut,
-      ),
+      opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOut),
       child: FadeTransition(
         opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
-          CurvedAnimation(
-            parent: secondaryAnimation,
-            curve: Curves.easeInOut,
-          ),
+          CurvedAnimation(parent: secondaryAnimation, curve: Curves.easeInOut),
         ),
         child: child,
       ),
@@ -40,7 +34,7 @@ class AppTheme {
   static const Color neutralBg = Color(0xFFFDF4F5); // Light Cream
   static const Color neutralSurface = Color(0xFFFFFFFF); // Surface White
   static const Color neutralText = Color(0xFF6A4053); // Same as primary
-  
+
   // Background Gradients (for ambient backgrounds)
   static const Color backgroundTop = Color(0xFFF8E9DF);
   static const Color backgroundMiddle = Color(0xFFD8B0BA);
@@ -172,7 +166,10 @@ class AppTheme {
             if (states.contains(WidgetState.hovered)) {
               return const BorderSide(color: primary, width: 1.5);
             }
-            return BorderSide(color: primary.withValues(alpha: 0.6), width: 1.5);
+            return BorderSide(
+              color: primary.withValues(alpha: 0.6),
+              width: 1.5,
+            );
           }),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(9999)),
@@ -252,7 +249,10 @@ class AppTheme {
         filled: true,
         fillColor: Colors.transparent,
         hoverColor: primary.withValues(alpha: 0.04),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         labelStyle: const TextStyle(color: primary),
         hintStyle: TextStyle(color: secondary.withValues(alpha: 0.7)),
         border: OutlineInputBorder(
@@ -290,10 +290,9 @@ class AppTheme {
         onSurface: darkPrimary,
         error: unavailable,
       ),
-      textTheme: GoogleFonts.figtreeTextTheme(ThemeData.dark().textTheme).apply(
-        bodyColor: darkPrimary,
-        displayColor: darkPrimary,
-      ),
+      textTheme: GoogleFonts.figtreeTextTheme(
+        ThemeData.dark().textTheme,
+      ).apply(bodyColor: darkPrimary, displayColor: darkPrimary),
       appBarTheme: const AppBarTheme(
         backgroundColor: darkBg,
         foregroundColor: darkPrimary,
@@ -384,7 +383,10 @@ class AppTheme {
             if (states.contains(WidgetState.hovered)) {
               return const BorderSide(color: darkPrimary, width: 1.5);
             }
-            return BorderSide(color: darkPrimary.withValues(alpha: 0.6), width: 1.5);
+            return BorderSide(
+              color: darkPrimary.withValues(alpha: 0.6),
+              width: 1.5,
+            );
           }),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(9999)),
@@ -464,7 +466,10 @@ class AppTheme {
         filled: true,
         fillColor: Colors.transparent,
         hoverColor: darkPrimary.withValues(alpha: 0.05),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         labelStyle: const TextStyle(color: darkPrimary),
         hintStyle: TextStyle(color: secondary.withValues(alpha: 0.7)),
         border: OutlineInputBorder(

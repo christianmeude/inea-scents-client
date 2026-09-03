@@ -20,7 +20,8 @@ class MyApp extends ConsumerWidget {
       title: 'INEA Scents',
       themeMode: themeMode,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme, // Support dark theme properly as there's no dark theme specified in DESIGN.md, or we can use the default with tweaked colors if we wanted. But DESIGN.md says 'The no-black rule', so forcing light theme or letting it be is fine.
+      darkTheme: AppTheme
+          .darkTheme, // Support dark theme properly as there's no dark theme specified in DESIGN.md, or we can use the default with tweaked colors if we wanted. But DESIGN.md says 'The no-black rule', so forcing light theme or letting it be is fine.
       routerConfig: router,
     );
   }

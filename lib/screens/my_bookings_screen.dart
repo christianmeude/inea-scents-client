@@ -265,7 +265,10 @@ class _BookingCard extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.94),
         borderRadius: BorderRadius.circular(22),
 
-        border: Border.all(color: Colors.white.withValues(alpha: 0.85), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.85),
+          width: 1,
+        ),
 
         boxShadow: [
           BoxShadow(
@@ -441,7 +444,7 @@ class _BookingCard extends StatelessWidget {
                   ),
 
                   Text(
-                    booking.package != null 
+                    booking.package != null
                         ? 'Php. ${booking.package!.price?.toStringAsFixed(2) ?? '0.00'}'
                         : 'N/A',
                     style: const TextStyle(
@@ -602,7 +605,9 @@ class _EmptyBookings extends StatelessWidget {
 
                 boxShadow: [
                   BoxShadow(
-                    color: MyBookingsScreen.primaryColor.withValues(alpha: 0.08),
+                    color: MyBookingsScreen.primaryColor.withValues(
+                      alpha: 0.08,
+                    ),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
                   ),
@@ -649,7 +654,10 @@ class _EmptyBookings extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: MyBookingsScreen.primaryColor,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(9999),
                 ),
@@ -657,10 +665,7 @@ class _EmptyBookings extends StatelessWidget {
               ),
               child: const Text(
                 'Explore Packages',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
           ],

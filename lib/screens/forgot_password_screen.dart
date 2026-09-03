@@ -11,7 +11,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -51,13 +52,16 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
-    final inputLabelColor = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
+    final inputLabelColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF6A4053);
 
     final sw = MediaQuery.of(context).size.width;
     final sh = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Let AnimatedContainer handle background
+      backgroundColor:
+          Colors.transparent, // Let AnimatedContainer handle background
       body: AnimatedContainer(
         duration: const Duration(milliseconds: 500),
         color: bgColor,
@@ -72,7 +76,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 600,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
+                color: isDark
+                    ? const Color(0x664A1C28)
+                    : const Color(0xFFDABDAC),
                 angle: 30 * (3.14159 / 180),
               ),
             ),
@@ -82,7 +88,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 300,
-                color: isDark ? const Color(0x664A1C28) : const Color(0xFFDABDAC),
+                color: isDark
+                    ? const Color(0x664A1C28)
+                    : const Color(0xFFDABDAC),
                 angle: 15 * (3.14159 / 180),
               ),
             ),
@@ -92,7 +100,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 250,
-                color: isDark ? const Color(0x806A4053) : const Color(0xFFC08D9E),
+                color: isDark
+                    ? const Color(0x806A4053)
+                    : const Color(0xFFC08D9E),
                 angle: 10 * (3.14159 / 180),
               ),
             ),
@@ -102,7 +112,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0x994A2D3C) : const Color(0xFF988088),
+                color: isDark
+                    ? const Color(0x994A2D3C)
+                    : const Color(0xFF988088),
               ),
             ),
             Positioned(
@@ -111,7 +123,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 800,
                 height: 600,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
+                color: isDark
+                    ? const Color(0xB33B1019)
+                    : const Color(0xFFC4A5A8),
               ),
             ),
             Positioned(
@@ -120,7 +134,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 500,
                 height: 400,
-                color: isDark ? const Color(0xB33B1019) : const Color(0xFFC4A5A8),
+                color: isDark
+                    ? const Color(0xB33B1019)
+                    : const Color(0xFFC4A5A8),
               ),
             ),
             Positioned(
@@ -129,7 +145,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 300,
                 height: 500,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
+                color: isDark
+                    ? const Color(0x996A4053)
+                    : const Color(0xFF6E3C53),
               ),
             ),
             Positioned(
@@ -138,7 +156,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: _BlurBlob(
                 width: 600,
                 height: 250,
-                color: isDark ? const Color(0x996A4053) : const Color(0xFF6E3C53),
+                color: isDark
+                    ? const Color(0x996A4053)
+                    : const Color(0xFF6E3C53),
               ),
             ),
 
@@ -163,7 +183,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           child: Text(
                             'Enter your email address to receive a secure password reset link.',
                             style: GoogleFonts.figtree(
-                              color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.8) : const Color(0xFF6A4053).withValues(alpha: 0.8),
+                              color: isDark
+                                  ? const Color(
+                                      0xFFFDF4F5,
+                                    ).withValues(alpha: 0.8)
+                                  : const Color(
+                                      0xFF6A4053,
+                                    ).withValues(alpha: 0.8),
                               fontSize: 14,
                             ),
                           ),
@@ -185,17 +211,36 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             onPressed: authState.isLoading
                                 ? null
                                 : () async {
-                                    final dioClient = ref.read(dioClientProvider);
+                                    final dioClient = ref.read(
+                                      dioClientProvider,
+                                    );
                                     try {
-                                      await dioClient.dio.post('/forgot-password', data: {'email': emailController.text.trim()});
+                                      await dioClient.dio.post(
+                                        '/forgot-password',
+                                        data: {
+                                          'email': emailController.text.trim(),
+                                        },
+                                      );
                                       if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Password reset link sent!')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Password reset link sent!',
+                                          ),
+                                        ),
                                       );
                                     } catch (e) {
                                       if (!context.mounted) return;
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Failed to send reset link')),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Failed to send reset link',
+                                          ),
+                                        ),
                                       );
                                     }
                                   },
@@ -227,7 +272,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        
+
                         SizedBox(
                           width: double.infinity,
                           height: 44,
@@ -236,7 +281,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                             style: OutlinedButton.styleFrom(
                               foregroundColor: const Color(0xFF6A4053),
                               side: BorderSide(
-                                color: isDark ? const Color(0xFFFDF4F5).withValues(alpha: 0.5) : const Color(0xFF6A4053), 
+                                color: isDark
+                                    ? const Color(
+                                        0xFFFDF4F5,
+                                      ).withValues(alpha: 0.5)
+                                    : const Color(0xFF6A4053),
                                 width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
@@ -249,7 +298,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.2,
-                                color: isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053),
+                                color: isDark
+                                    ? const Color(0xFFFDF4F5)
+                                    : const Color(0xFF6A4053),
                               ),
                             ),
                           ),
@@ -260,16 +311,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 ),
               ),
             ),
-            
+
             // ======================================================
             // THEME TOGGLE
             // ======================================================
             const Positioned(
               top: 24,
               right: 24,
-              child: SafeArea(
-                child: _ThemeToggle(),
-              ),
+              child: SafeArea(child: _ThemeToggle()),
             ),
           ],
         ),
@@ -288,8 +337,12 @@ class _ApplicationLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final brandPrimary = isDark ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
-    final strokeColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
+    final brandPrimary = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF6A4053);
+    final strokeColor = isDark
+        ? const Color(0xFF151012)
+        : const Color(0xFFFDF4F5);
 
     final sw = MediaQuery.of(context).size.width;
     final isDesktop = sw >= 640;
@@ -297,10 +350,10 @@ class _ApplicationLogo extends StatelessWidget {
     final ineaSize = isDesktop ? 72.0 : 60.0;
     final ineaSpacing = ineaSize * 0.15;
     final scentsSize = isDesktop ? 96.0 : 72.0;
-    
+
     // Adjusted offset for perfect visual 1:1 match with Inertia Web Rendering
-    final scentsOffsetX = isDesktop ? -76.0 : -63.0; 
-    final scentsOffsetY = isDesktop ? 34.0 : 25.0; 
+    final scentsOffsetX = isDesktop ? -76.0 : -63.0;
+    final scentsOffsetY = isDesktop ? 34.0 : 25.0;
 
     // Since Transform.translate only moves the visual layer, the layout bounding box
     // still reserves the original width on the right. We shift the whole block right
@@ -354,17 +407,17 @@ class _ApplicationLogo extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('INEA', style: ineaStroke),
-                // Invisible untranslated Scents guarantees the Stack layout width 
+                // Invisible untranslated Scents guarantees the Stack layout width
                 // matches the natural flow of the two words.
                 Opacity(opacity: 0, child: Text('Scents', style: scentsStroke)),
               ],
             ),
-            
+
             // ==============================================================
             // 2. INEA FILL
             // ==============================================================
             Text('INEA', style: ineaFill),
-            
+
             // ==============================================================
             // 3. SCENTS STROKE (Knocks out the INEA Fill beneath it!)
             // ==============================================================
@@ -379,7 +432,7 @@ class _ApplicationLogo extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // ==============================================================
             // 4. SCENTS FILL
             // ==============================================================
@@ -479,14 +532,11 @@ class _ThemeToggle extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF261D21).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.5),
+        color: isDark
+            ? const Color(0xFF261D21).withValues(alpha: 0.5)
+            : Colors.white.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(30),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0C000000),
-            blurRadius: 10,
-          )
-        ],
+        boxShadow: const [BoxShadow(color: Color(0x0C000000), blurRadius: 10)],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(30),
@@ -499,21 +549,24 @@ class _ThemeToggle extends ConsumerWidget {
                 icon: Icons.light_mode_outlined,
                 isSelected: theme == ThemeMode.light,
                 isDarkEnv: isDark,
-                onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.light,
+                onTap: () => ref.read(themeModeProvider.notifier).state =
+                    ThemeMode.light,
               ),
               const SizedBox(width: 4),
               _ThemeToggleButton(
                 icon: Icons.dark_mode_outlined,
                 isSelected: theme == ThemeMode.dark,
                 isDarkEnv: isDark,
-                onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.dark,
+                onTap: () =>
+                    ref.read(themeModeProvider.notifier).state = ThemeMode.dark,
               ),
               const SizedBox(width: 4),
               _ThemeToggleButton(
                 icon: Icons.monitor_outlined,
                 isSelected: theme == ThemeMode.system,
                 isDarkEnv: isDark,
-                onTap: () => ref.read(themeModeProvider.notifier).state = ThemeMode.system,
+                onTap: () => ref.read(themeModeProvider.notifier).state =
+                    ThemeMode.system,
               ),
             ],
           ),
@@ -546,11 +599,15 @@ class _ThemeToggleButtonState extends State<_ThemeToggleButton> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedBg = widget.isDarkEnv ? const Color(0xFF6A4053) : Colors.white;
+    final selectedBg = widget.isDarkEnv
+        ? const Color(0xFF6A4053)
+        : Colors.white;
     final hoverBg = widget.isDarkEnv
         ? const Color(0xFF6A4053).withValues(alpha: 0.3)
         : Colors.white.withValues(alpha: 0.3);
-    final selectedIconColor = widget.isDarkEnv ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053);
+    final selectedIconColor = widget.isDarkEnv
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF6A4053);
     final unselectedIconColor = widget.isDarkEnv
         ? const Color(0xFFFDF4F5).withValues(alpha: 0.6)
         : const Color(0xFF6A4053).withValues(alpha: 0.6);
@@ -586,17 +643,14 @@ class _ThemeToggleButtonState extends State<_ThemeToggleButton> {
             shape: BoxShape.circle,
             border: _isFocused
                 ? Border.all(
-                    color: widget.isDarkEnv ? const Color(0xFFFDF4F5) : const Color(0xFF6A4053),
+                    color: widget.isDarkEnv
+                        ? const Color(0xFFFDF4F5)
+                        : const Color(0xFF6A4053),
                     width: 2.0,
                   )
                 : null,
             boxShadow: widget.isSelected
-                ? const [
-                    BoxShadow(
-                      color: Color(0x0C000000),
-                      blurRadius: 4,
-                    )
-                  ]
+                ? const [BoxShadow(color: Color(0x0C000000), blurRadius: 4)]
                 : null,
           ),
           child: Icon(
@@ -609,4 +663,3 @@ class _ThemeToggleButtonState extends State<_ThemeToggleButton> {
     );
   }
 }
-

@@ -16,7 +16,10 @@ class WelcomeModal extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFF8E9DF),
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.8), width: 1.5),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.8),
+              width: 1.5,
+            ),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF74445C).withValues(alpha: 0.2),
@@ -77,10 +80,7 @@ class WelcomeModal extends StatelessWidget {
                   ),
                   child: const Text(
                     'Start Exploring',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
