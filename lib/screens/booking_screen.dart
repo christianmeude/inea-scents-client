@@ -48,7 +48,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     _selectedTime = '2:00 PM - 5:00 PM';
     _selectedPax = 50;
     _loadPackage();
-    _prefillFromUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _prefillFromUser();
+    });
   }
 
   @override
