@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Package {
 
- int? get id; String? get name; String? get description; List<String>? get inclusions;@JsonKey(name: 'pax_options') List<int>? get paxOptions; List<String>? get freebies; double? get price; double? get rating;@JsonKey(name: 'reviews_count') int? get reviewsCount; List<String>? get images;@JsonKey(name: 'gallery_images') List<String>? get galleryImages; List<Scent>? get scents;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+@JsonKey(fromJson: parseIntTolerant) int? get id; String? get name; String? get description;@JsonKey(fromJson: parseStringList) List<String>? get inclusions;@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? get paxOptions;@JsonKey(fromJson: parseStringList) List<String>? get freebies;@JsonKey(fromJson: parseDoubleTolerant) double? get price;@JsonKey(fromJson: parseDoubleTolerant) double? get rating;@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? get reviewsCount;@JsonKey(fromJson: parseStringList) List<String>? get images;@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? get galleryImages;@JsonKey(fromJson: parseScentList) List<Scent>? get scents;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
 /// Create a copy of Package
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $PackageCopyWith<$Res>  {
   factory $PackageCopyWith(Package value, $Res Function(Package) _then) = _$PackageCopyWithImpl;
 @useResult
 $Res call({
- int? id, String? name, String? description, List<String>? inclusions,@JsonKey(name: 'pax_options') List<int>? paxOptions, List<String>? freebies, double? price, double? rating,@JsonKey(name: 'reviews_count') int? reviewsCount, List<String>? images,@JsonKey(name: 'gallery_images') List<String>? galleryImages, List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+@JsonKey(fromJson: parseIntTolerant) int? id, String? name, String? description,@JsonKey(fromJson: parseStringList) List<String>? inclusions,@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? paxOptions,@JsonKey(fromJson: parseStringList) List<String>? freebies,@JsonKey(fromJson: parseDoubleTolerant) double? price,@JsonKey(fromJson: parseDoubleTolerant) double? rating,@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? reviewsCount,@JsonKey(fromJson: parseStringList) List<String>? images,@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? galleryImages,@JsonKey(fromJson: parseScentList) List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -166,7 +166,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int? id,  String? name,  String? description,  List<String>? inclusions, @JsonKey(name: 'pax_options')  List<int>? paxOptions,  List<String>? freebies,  double? price,  double? rating, @JsonKey(name: 'reviews_count')  int? reviewsCount,  List<String>? images, @JsonKey(name: 'gallery_images')  List<String>? galleryImages,  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Package() when $default != null:
 return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
@@ -187,7 +187,7 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int? id,  String? name,  String? description,  List<String>? inclusions, @JsonKey(name: 'pax_options')  List<int>? paxOptions,  List<String>? freebies,  double? price,  double? rating, @JsonKey(name: 'reviews_count')  int? reviewsCount,  List<String>? images, @JsonKey(name: 'gallery_images')  List<String>? galleryImages,  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Package():
 return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
@@ -207,7 +207,7 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int? id,  String? name,  String? description,  List<String>? inclusions, @JsonKey(name: 'pax_options')  List<int>? paxOptions,  List<String>? freebies,  double? price,  double? rating, @JsonKey(name: 'reviews_count')  int? reviewsCount,  List<String>? images, @JsonKey(name: 'gallery_images')  List<String>? galleryImages,  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Package() when $default != null:
 return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
@@ -222,14 +222,14 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 @JsonSerializable()
 
 class _Package implements Package {
-  const _Package({this.id, this.name, this.description, final  List<String>? inclusions, @JsonKey(name: 'pax_options') final  List<int>? paxOptions, final  List<String>? freebies, this.price, this.rating, @JsonKey(name: 'reviews_count') this.reviewsCount, final  List<String>? images, @JsonKey(name: 'gallery_images') final  List<String>? galleryImages, final  List<Scent>? scents, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _inclusions = inclusions,_paxOptions = paxOptions,_freebies = freebies,_images = images,_galleryImages = galleryImages,_scents = scents;
+  const _Package({@JsonKey(fromJson: parseIntTolerant) this.id, this.name, this.description, @JsonKey(fromJson: parseStringList) final  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList) final  List<int>? paxOptions, @JsonKey(fromJson: parseStringList) final  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant) this.price, @JsonKey(fromJson: parseDoubleTolerant) this.rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) this.reviewsCount, @JsonKey(fromJson: parseStringList) final  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList) final  List<String>? galleryImages, @JsonKey(fromJson: parseScentList) final  List<Scent>? scents, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _inclusions = inclusions,_paxOptions = paxOptions,_freebies = freebies,_images = images,_galleryImages = galleryImages,_scents = scents;
   factory _Package.fromJson(Map<String, dynamic> json) => _$PackageFromJson(json);
 
-@override final  int? id;
+@override@JsonKey(fromJson: parseIntTolerant) final  int? id;
 @override final  String? name;
 @override final  String? description;
  final  List<String>? _inclusions;
-@override List<String>? get inclusions {
+@override@JsonKey(fromJson: parseStringList) List<String>? get inclusions {
   final value = _inclusions;
   if (value == null) return null;
   if (_inclusions is EqualUnmodifiableListView) return _inclusions;
@@ -238,7 +238,7 @@ class _Package implements Package {
 }
 
  final  List<int>? _paxOptions;
-@override@JsonKey(name: 'pax_options') List<int>? get paxOptions {
+@override@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? get paxOptions {
   final value = _paxOptions;
   if (value == null) return null;
   if (_paxOptions is EqualUnmodifiableListView) return _paxOptions;
@@ -247,7 +247,7 @@ class _Package implements Package {
 }
 
  final  List<String>? _freebies;
-@override List<String>? get freebies {
+@override@JsonKey(fromJson: parseStringList) List<String>? get freebies {
   final value = _freebies;
   if (value == null) return null;
   if (_freebies is EqualUnmodifiableListView) return _freebies;
@@ -255,11 +255,11 @@ class _Package implements Package {
   return EqualUnmodifiableListView(value);
 }
 
-@override final  double? price;
-@override final  double? rating;
-@override@JsonKey(name: 'reviews_count') final  int? reviewsCount;
+@override@JsonKey(fromJson: parseDoubleTolerant) final  double? price;
+@override@JsonKey(fromJson: parseDoubleTolerant) final  double? rating;
+@override@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) final  int? reviewsCount;
  final  List<String>? _images;
-@override List<String>? get images {
+@override@JsonKey(fromJson: parseStringList) List<String>? get images {
   final value = _images;
   if (value == null) return null;
   if (_images is EqualUnmodifiableListView) return _images;
@@ -268,7 +268,7 @@ class _Package implements Package {
 }
 
  final  List<String>? _galleryImages;
-@override@JsonKey(name: 'gallery_images') List<String>? get galleryImages {
+@override@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? get galleryImages {
   final value = _galleryImages;
   if (value == null) return null;
   if (_galleryImages is EqualUnmodifiableListView) return _galleryImages;
@@ -277,7 +277,7 @@ class _Package implements Package {
 }
 
  final  List<Scent>? _scents;
-@override List<Scent>? get scents {
+@override@JsonKey(fromJson: parseScentList) List<Scent>? get scents {
   final value = _scents;
   if (value == null) return null;
   if (_scents is EqualUnmodifiableListView) return _scents;
@@ -321,7 +321,7 @@ abstract mixin class _$PackageCopyWith<$Res> implements $PackageCopyWith<$Res> {
   factory _$PackageCopyWith(_Package value, $Res Function(_Package) _then) = __$PackageCopyWithImpl;
 @override @useResult
 $Res call({
- int? id, String? name, String? description, List<String>? inclusions,@JsonKey(name: 'pax_options') List<int>? paxOptions, List<String>? freebies, double? price, double? rating,@JsonKey(name: 'reviews_count') int? reviewsCount, List<String>? images,@JsonKey(name: 'gallery_images') List<String>? galleryImages, List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+@JsonKey(fromJson: parseIntTolerant) int? id, String? name, String? description,@JsonKey(fromJson: parseStringList) List<String>? inclusions,@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? paxOptions,@JsonKey(fromJson: parseStringList) List<String>? freebies,@JsonKey(fromJson: parseDoubleTolerant) double? price,@JsonKey(fromJson: parseDoubleTolerant) double? rating,@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? reviewsCount,@JsonKey(fromJson: parseStringList) List<String>? images,@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? galleryImages,@JsonKey(fromJson: parseScentList) List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 

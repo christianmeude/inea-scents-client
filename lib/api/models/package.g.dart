@@ -7,28 +7,18 @@ part of 'package.dart';
 // **************************************************************************
 
 _Package _$PackageFromJson(Map<String, dynamic> json) => _Package(
-  id: (json['id'] as num?)?.toInt(),
+  id: parseIntTolerant(json['id']),
   name: json['name'] as String?,
   description: json['description'] as String?,
-  inclusions: (json['inclusions'] as List<dynamic>?)
-      ?.map((e) => e as String)
-      .toList(),
-  paxOptions: (json['pax_options'] as List<dynamic>?)
-      ?.map((e) => (e as num).toInt())
-      .toList(),
-  freebies: (json['freebies'] as List<dynamic>?)
-      ?.map((e) => e as String)
-      .toList(),
-  price: (json['price'] as num?)?.toDouble(),
-  rating: (json['rating'] as num?)?.toDouble(),
-  reviewsCount: (json['reviews_count'] as num?)?.toInt(),
-  images: (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
-  galleryImages: (json['gallery_images'] as List<dynamic>?)
-      ?.map((e) => e as String)
-      .toList(),
-  scents: (json['scents'] as List<dynamic>?)
-      ?.map((e) => Scent.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  inclusions: parseStringList(json['inclusions']),
+  paxOptions: parseIntList(json['pax_options']),
+  freebies: parseStringList(json['freebies']),
+  price: parseDoubleTolerant(json['price']),
+  rating: parseDoubleTolerant(json['rating']),
+  reviewsCount: parseIntTolerant(json['reviews_count']),
+  images: parseStringList(json['images']),
+  galleryImages: parseStringList(json['gallery_images']),
+  scents: parseScentList(json['scents']),
   createdAt: json['created_at'] == null
       ? null
       : DateTime.parse(json['created_at'] as String),

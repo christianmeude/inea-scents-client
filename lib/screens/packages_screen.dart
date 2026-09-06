@@ -574,13 +574,13 @@ class _EmptyPackages extends StatelessWidget {
 // ERROR STATE
 // ============================================================================
 
-class _ErrorState extends StatelessWidget {
+class _ErrorState extends ConsumerWidget {
   final Object error;
 
   const _ErrorState({required this.error});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     const textColor = Color(0xFF633E50);
     const secondaryTextColor = Color(0xFF765867);
     const primaryColor = Color(0xFF74445C);
@@ -625,7 +625,7 @@ class _ErrorState extends StatelessWidget {
 
           OutlinedButton(
             onPressed: () {
-              // Riverpod will refresh naturally when appropriate.
+              ref.invalidate(packagesProvider);
             },
 
             style: OutlinedButton.styleFrom(

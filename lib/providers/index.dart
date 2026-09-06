@@ -487,6 +487,21 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
       state = state.copyWith(errorMessage: 'Selected package is invalid');
       return null;
     }
+    // Pre-booking sanity gate: a corrupt package payload must never reach
+    // POST / confirmation. Tolerant parsing already cleans most shapes, but
+    // if pax options are missing/empty or the chosen pax isn't offered,
+    // block here with a recoverable message instead of confirming garbage.
+    final paxOptions = state.selectedPackage?.paxOptions;
+    if (paxOptions == null ||
+        paxOptions.isEmpty ||
+        paxOptions.any((p) => p < 1) ||
+        !paxOptions.contains(state.selectedPax)) {
+      state = state.copyWith(
+        errorMessage:
+            'Selected package is unavailable, please choose another package',
+      );
+      return null;
+    }
     _pollTimer?.cancel();
     state = state.copyWith(isLoading: true, errorMessage: null, booking: null);
     try {
