@@ -12,7 +12,6 @@ import '../../api/rest_client.dart';
 /// Examples:
 ///  - local web:   flutter run -d chrome --dart-define=API_URL=http://127.0.0.1:8000
 ///  - local android emulator: --dart-define=API_URL=http://10.0.2.2:8000
-///  - staging web: --dart-define=API_URL=https://inea-scents-staging.onrender.com
 ///  - prod web:    --dart-define=API_URL=https://inea-scents.onrender.com
 
 String _getLocalFallbackForPlatform() {
@@ -31,8 +30,7 @@ String _resolveBaseUrl() {
     if (isRelease) {
       throw StateError(
         'API_URL dart-define is required for release builds. '
-        'Build with --dart-define=API_URL=https://inea-scents-staging.onrender.com (staging) '
-        'or --dart-define=API_URL=https://inea-scents.onrender.com (prod).',
+        'Build with --dart-define=API_URL=https://inea-scents.onrender.com (prod).',
       );
     }
     return _getLocalFallbackForPlatform();
