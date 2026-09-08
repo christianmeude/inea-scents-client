@@ -349,11 +349,18 @@ class BookingFlowState {
 }
 
 class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
+  final Ref _ref;
   final RestClient _apiClient;
   Timer? _pollTimer;
 
-  BookingFlowNotifier(this._apiClient)
+  BookingFlowNotifier(this._ref, this._apiClient)
     : super(BookingFlowState(currentStep: 2));
+
+  /// Refreshes the cached bookings list after checkout resolves. The poll
+  /// loop reads `_apiClient` directly, so invalidating mid-poll is safe.
+  void _refreshBookingsList() {
+    _ref.invalidate(bookingsProvider);
+  }
 
   @override
   void dispose() {
@@ -596,6 +603,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
 
       if (resolved) {
         _pollTimer?.cancel();
+        _refreshBookingsList();
         return;
       }
       if (stopwatch.elapsed >= maxDuration) {
@@ -628,6 +636,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
           booking: updated,
           checkoutStatus: BookingCheckoutStatus.confirmed,
         );
+        _refreshBookingsList();
       } else if (status == 'cancelled' ||
           status == 'expired' ||
           status == 'canceled') {
@@ -635,6 +644,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
           booking: updated,
           checkoutStatus: BookingCheckoutStatus.cancelled,
         );
+        _refreshBookingsList();
       }
     } catch (_) {
       // Transient network/server error — the caller can retry.
@@ -661,5 +671,5 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
 final bookingFlowProvider =
     StateNotifierProvider<BookingFlowNotifier, BookingFlowState>((ref) {
       final apiClient = ref.watch(apiClientProvider);
-      return BookingFlowNotifier(apiClient);
+      return BookingFlowNotifier(ref, apiClient);
     });

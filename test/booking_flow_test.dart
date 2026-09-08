@@ -172,11 +172,54 @@ void main() {
       );
       await Future<void>.delayed(const Duration(milliseconds: 400));
       await polling;
-      expect(backend.bookingsEndpointCallCount, 2);
+      // 2 polls + 1 refetch from bookingsProvider invalidation on resolve.
+      expect(backend.bookingsEndpointCallCount, 3);
       expect(
         container.read(bookingFlowProvider).checkoutStatus,
         BookingCheckoutStatus.confirmed,
       );
+    },
+  );
+
+  test(
+    'resolving checkout invalidates bookingsProvider without manual refresh',
+    () async {
+      final backend = FakeApiBackend()..pollAttemptsToResolve = 1;
+      final container = ProviderContainer(
+        overrides: [
+          apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      // Prime the cached list while the booking is still pending.
+      final primed = await container.read(bookingsProvider.future);
+      expect(primed.first.status, 'pending');
+
+      final notifier = container.read(bookingFlowProvider.notifier);
+      container.read(bookingFlowProvider.notifier)
+        ..setSelectedPackage(
+          Package(id: 1, name: 'Test', price: 4500.0, paxOptions: [50]),
+        )
+        ..setSelectedDate(DateTime(2026, 9, 30))
+        ..setSelectedTime('2:00 PM - 5:00 PM')
+        ..setSelectedPax(50)
+        ..setCustomerName('Maria Clara')
+        ..setCustomerEmail('maria@example.com')
+        ..setCustomerPhone('+639171234567')
+        ..setVenueAddress('The Peninsula Manila')
+        ..setPaymentMethod('credit_card');
+
+      await notifier.submitBooking();
+      await notifier.startPolling(interval: const Duration(milliseconds: 50));
+      expect(
+        container.read(bookingFlowProvider).checkoutStatus,
+        BookingCheckoutStatus.confirmed,
+      );
+
+      // No manual refresh: the cached list must now serve the confirmed row.
+      final fresh = await container.read(bookingsProvider.future);
+      expect(fresh.first.status, 'confirmed');
     },
   );
 }

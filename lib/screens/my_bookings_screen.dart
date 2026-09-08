@@ -108,7 +108,10 @@ class MyBookingsScreen extends ConsumerWidget {
                     return const _EmptyBookings();
                   }
 
-                  return ListView(
+                  return RefreshIndicator(
+                    color: primaryColor,
+                    onRefresh: () => ref.refresh(bookingsProvider.future),
+                    child: ListView(
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
                     children: [
@@ -145,6 +148,7 @@ class MyBookingsScreen extends ConsumerWidget {
                         (booking) => _BookingCard(booking: booking),
                       ),
                     ],
+                    ),
                   );
                 },
 
@@ -162,7 +166,10 @@ class MyBookingsScreen extends ConsumerWidget {
                 // ERROR
                 // ======================================================
                 error: (error, stack) {
-                  return _ErrorBookings(error: error.toString());
+                  return _ErrorBookings(
+                    error: error.toString(),
+                    onRetry: () => ref.invalidate(bookingsProvider),
+                  );
                 },
               ),
             ],
@@ -401,7 +408,7 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.location_on_outlined,
               label: 'Venue',
-              value: 'N/A',
+              value: booking.venueAddress ?? 'N/A',
             ),
 
             const SizedBox(height: 11),
@@ -412,7 +419,11 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.people_outline,
               label: 'Guests',
-              value: 'N/A',
+              value: booking.pax == null
+                  ? 'N/A'
+                  : booking.pax == 1
+                      ? '1 guest'
+                      : '${booking.pax} guests',
             ),
 
             const SizedBox(height: 18),
@@ -681,8 +692,9 @@ class _EmptyBookings extends StatelessWidget {
 
 class _ErrorBookings extends StatelessWidget {
   final String error;
+  final VoidCallback onRetry;
 
-  const _ErrorBookings({required this.error});
+  const _ErrorBookings({required this.error, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -731,6 +743,28 @@ class _ErrorBookings extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 12,
                 color: MyBookingsScreen.secondaryTextColor,
+              ),
+            ),
+
+            const SizedBox(height: 22),
+
+            ElevatedButton(
+              onPressed: onRetry,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: MyBookingsScreen.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(9999),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Try Again',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
           ],
