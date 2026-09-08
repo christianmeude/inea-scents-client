@@ -666,6 +666,20 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
     _pollTimer?.cancel();
     state = BookingFlowState(currentStep: 2);
   }
+
+  /// Drops stale flow state when entering a package booking screen.
+  /// Resets on terminal checkout (confirmed/cancelled) or when the
+  /// in-memory package differs from [packageId]. In-flight same-package
+  /// flows are kept so calendar reads and checkout polling stay alive.
+  void ensureFreshForPackage(int packageId) {
+    final terminal =
+        state.checkoutStatus == BookingCheckoutStatus.confirmed ||
+        state.checkoutStatus == BookingCheckoutStatus.cancelled;
+    final mismatch =
+        state.selectedPackage != null &&
+        state.selectedPackage!.id != packageId;
+    if (terminal || mismatch) reset();
+  }
 }
 
 final bookingFlowProvider =

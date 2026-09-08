@@ -44,6 +44,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   @override
   void initState() {
     super.initState();
+    // Fresh flow per package entry: drops a previous success/cancelled
+    // screen or another package's state. In-flight same-package checkout
+    // polling is preserved. Deferred post-frame: Riverpod forbids provider
+    // writes inside initState; registered before _loadPackage's callback
+    // so the reset lands before the new package is set.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref
+          .read(bookingFlowProvider.notifier)
+          .ensureFreshForPackage(widget.packageId);
+    });
     _selectedDate = DateTime.now().add(const Duration(days: 3));
     _selectedTime = '2:00 PM - 5:00 PM';
     _selectedPax = 50;
@@ -892,13 +903,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         buttonLabel: 'Done',
         buttonIcon: Icons.arrow_forward_rounded,
         onPressed: () {
-          if (context.canPop()) {
-            context.pop();
-          } else {
-            try {
+          ref.read(bookingFlowProvider.notifier).reset();
+          try {
+            if (context.canPop()) {
+              context.pop();
+            } else {
               context.go('/home');
-            } catch (_) {}
-          }
+            }
+          } catch (_) {}
         },
       );
     } else if (status == BookingCheckoutStatus.awaitingAdmin) {
@@ -976,13 +988,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           buttonLabel: 'Done',
           buttonIcon: Icons.arrow_forward_rounded,
           onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              try {
+            ref.read(bookingFlowProvider.notifier).reset();
+            try {
+              if (context.canPop()) {
+                context.pop();
+              } else {
                 context.go('/home');
-              } catch (_) {}
-            }
+              }
+            } catch (_) {}
           },
         );
       }

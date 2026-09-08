@@ -2147,4 +2147,131 @@ void main() {
       },
     );
   });
+
+  group('Issue #47: booking-screen entry and success-leave reset', () {
+    Future<ProviderContainer> driveToConfirmed(
+      WidgetTester tester,
+      FakeApiBackend backend,
+    ) async {
+      final container = ProviderContainer(
+        overrides: [
+          packageDetailsProvider(42).overrideWith((ref) => testPackage),
+          apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+        ],
+      );
+      // Dio needs real async: the widget fake-async zone would freeze it.
+      await tester.runAsync(() async {
+        final notifier = container.read(bookingFlowProvider.notifier);
+        container.read(bookingFlowProvider.notifier)
+          ..setSelectedPackage(testPackage)
+          ..setSelectedDate(DateTime(2026, 9, 30))
+          ..setSelectedTime('2:00 PM - 5:00 PM')
+          ..setSelectedPax(50)
+          ..setCustomerName('Maria Clara')
+          ..setCustomerEmail('maria@example.com')
+          ..setCustomerPhone('+639171234567')
+          ..setVenueAddress('The Peninsula Manila')
+          ..setPaymentMethod('credit_card');
+        await notifier.submitBooking();
+        await notifier.startPolling();
+        notifier.goToStep(5);
+      });
+      return container;
+    }
+
+    testWidgets(
+      're-entering after a completed booking shows schedule, never old success',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1200, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final container = await driveToConfirmed(tester, FakeApiBackend());
+        addTearDown(container.dispose);
+        expect(
+          container.read(bookingFlowProvider).checkoutStatus,
+          BookingCheckoutStatus.confirmed,
+        );
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const ResponsiveAppShell(
+                child: BookingScreen(packageId: 42),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Payment Successful'), findsNothing);
+        expect(find.text('1. Select Date'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+
+    testWidgets(
+      'Done on the success screen resets the flow',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1200, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final backend = FakeApiBackend();
+        final container = ProviderContainer(
+          overrides: [
+            packageDetailsProvider(42).overrideWith((ref) => testPackage),
+            apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: MaterialApp(
+              theme: AppTheme.lightTheme,
+              home: const ResponsiveAppShell(
+                child: BookingScreen(packageId: 42),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        await tester.runAsync(() async {
+          final notifier = container.read(bookingFlowProvider.notifier);
+          notifier
+            ..setSelectedPackage(testPackage)
+            ..setSelectedDate(DateTime(2026, 9, 30))
+            ..setSelectedTime('2:00 PM - 5:00 PM')
+            ..setSelectedPax(50)
+            ..setCustomerName('Maria Clara')
+            ..setCustomerEmail('maria@example.com')
+            ..setCustomerPhone('+639171234567')
+            ..setVenueAddress('The Peninsula Manila')
+            ..setPaymentMethod('credit_card');
+          await notifier.submitBooking();
+          await notifier.startPolling();
+          notifier.goToStep(5);
+        });
+        await tester.pumpAndSettle();
+
+        expect(find.text('Payment Successful'), findsOneWidget);
+        await tester.tap(find.text('Done'));
+        await tester.pumpAndSettle();
+
+        final state = container.read(bookingFlowProvider);
+        expect(state.booking, isNull);
+        expect(state.checkoutStatus, BookingCheckoutStatus.idle);
+        expect(state.currentStep, 2);
+        // No takeException: Done falls back to context.go('/home'), which
+        // asserts without a GoRouter in this harness (caught in product).
+      },
+    );
+  });
 }

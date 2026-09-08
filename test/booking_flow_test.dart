@@ -222,4 +222,129 @@ void main() {
       expect(fresh.first.status, 'confirmed');
     },
   );
+
+  test(
+    'ensureFreshForPackage resets a terminal flow for a new package',
+    () async {
+      final backend = FakeApiBackend();
+      final container = ProviderContainer(
+        overrides: [
+          apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(bookingFlowProvider.notifier);
+      container.read(bookingFlowProvider.notifier)
+        ..setSelectedPackage(
+          Package(id: 1, name: 'Test', price: 4500.0, paxOptions: [50]),
+        )
+        ..setSelectedDate(DateTime(2026, 9, 30))
+        ..setSelectedTime('2:00 PM - 5:00 PM')
+        ..setSelectedPax(50)
+        ..setCustomerName('Maria Clara')
+        ..setCustomerEmail('maria@example.com')
+        ..setCustomerPhone('+639171234567')
+        ..setVenueAddress('The Peninsula Manila')
+        ..setPaymentMethod('credit_card');
+
+      await notifier.submitBooking();
+      await notifier.startPolling();
+      expect(
+        container.read(bookingFlowProvider).checkoutStatus,
+        BookingCheckoutStatus.confirmed,
+      );
+
+      // Entering another package booking form starts fresh at schedule step.
+      notifier
+        ..ensureFreshForPackage(2)
+        ..goToStep(2);
+      final state = container.read(bookingFlowProvider);
+      expect(state.booking, isNull);
+      expect(state.checkoutStatus, BookingCheckoutStatus.idle);
+      expect(state.currentStep, 2);
+    },
+  );
+
+  test(
+    'ensureFreshForPackage resets a stale package when switching packages',
+    () async {
+      final backend = FakeApiBackend();
+      final container = ProviderContainer(
+        overrides: [
+          apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(bookingFlowProvider.notifier);
+      container.read(bookingFlowProvider.notifier)
+        ..setSelectedPackage(
+          Package(id: 1, name: 'Test', price: 4500.0, paxOptions: [50]),
+        )
+        ..setSelectedDate(DateTime(2026, 9, 30))
+        ..setSelectedTime('2:00 PM - 5:00 PM')
+        ..setSelectedPax(50)
+        ..setCustomerName('Maria Clara')
+        ..setCustomerEmail('maria@example.com')
+        ..setCustomerPhone('+639171234567')
+        ..setVenueAddress('The Peninsula Manila')
+        ..setPaymentMethod('cash');
+
+      await notifier.submitBooking();
+      expect(
+        container.read(bookingFlowProvider).checkoutStatus,
+        BookingCheckoutStatus.awaitingAdmin,
+      );
+
+      // A different package form never inherits the old in-memory booking.
+      notifier.ensureFreshForPackage(2);
+      expect(container.read(bookingFlowProvider).booking, isNull);
+      expect(
+        container.read(bookingFlowProvider).checkoutStatus,
+        BookingCheckoutStatus.idle,
+      );
+    },
+  );
+
+  test(
+    'ensureFreshForPackage keeps an in-flight same-package flow alive',
+    () async {
+      final backend = FakeApiBackend()..pollAttemptsToResolve = 99;
+      final container = ProviderContainer(
+        overrides: [
+          apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(bookingFlowProvider.notifier);
+      container.read(bookingFlowProvider.notifier)
+        ..setSelectedPackage(
+          Package(id: 1, name: 'Test', price: 4500.0, paxOptions: [50]),
+        )
+        ..setSelectedDate(DateTime(2026, 9, 30))
+        ..setSelectedTime('2:00 PM - 5:00 PM')
+        ..setSelectedPax(50)
+        ..setCustomerName('Maria Clara')
+        ..setCustomerEmail('maria@example.com')
+        ..setCustomerPhone('+639171234567')
+        ..setVenueAddress('The Peninsula Manila')
+        ..setPaymentMethod('credit_card');
+
+      await notifier.submitBooking();
+      expect(
+        container.read(bookingFlowProvider).checkoutStatus,
+        BookingCheckoutStatus.awaitingPayment,
+      );
+
+      // Same-package re-entry mid-poll must not disturb polling liveness.
+      notifier.ensureFreshForPackage(1);
+      expect(
+        container.read(bookingFlowProvider).checkoutStatus,
+        BookingCheckoutStatus.awaitingPayment,
+      );
+      expect(container.read(bookingFlowProvider).booking, isNotNull);
+    },
+  );
 }
