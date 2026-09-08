@@ -17,7 +17,7 @@ class BottomNavBar extends StatelessWidget {
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final navBg = isDark
-        ? const Color(0xFF2C1923).withValues(alpha: 0.88)
+        ? AppTheme.night.withValues(alpha: 0.88)
         : AppTheme.secondary.withValues(alpha: 0.85);
 
     return ClipRRect(

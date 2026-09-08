@@ -31,7 +31,7 @@ class _PackageCardState extends State<PackageCard> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final cardBg = isDark
-        ? (_isHovered ? const Color(0xFF4A2D3C) : const Color(0xFF3B232F))
+        ? (_isHovered ? AppTheme.nightBorder : AppTheme.nightSurface)
         : (_isHovered ? const Color(0xFFFAF2F4) : Colors.white);
     final focusBorderColor = isDark
         ? const Color(0xFFFDF4F5)
@@ -43,7 +43,7 @@ class _PackageCardState extends State<PackageCard> {
         ? const Color(0xFFC4ACAC)
         : AppTheme.secondary;
     final badgeBg = isDark
-        ? (_isHovered ? const Color(0xFF5A3646) : const Color(0xFF4A2D3C))
+        ? (_isHovered ? AppTheme.nightBorder : AppTheme.nightSurface)
         : (_isHovered ? const Color(0xFFFAF2F4) : Colors.white);
 
     return FocusableActionDetector(
@@ -113,7 +113,7 @@ class _PackageCardState extends State<PackageCard> {
                       child: Container(
                         width: double.infinity,
                         color: isDark
-                            ? const Color(0xFF2C1923)
+                            ? AppTheme.night
                             : AppTheme.neutralBg,
                         child:
                             (package.images != null &&

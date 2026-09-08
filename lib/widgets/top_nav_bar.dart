@@ -3,9 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import 'theme_toggle_button.dart';
 
 class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
-  const TopNavBar({super.key});
+  /// Injectable so provider-less tests can render the bar; production
+  /// passes the connected toggle via [ResponsiveAppShell].
+  final Widget themeToggle;
+
+  const TopNavBar({
+    super.key,
+    this.themeToggle = const ThemeToggleButton(isDark: false),
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(68.0);
@@ -14,7 +22,7 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final navBg = isDark
-        ? const Color(0xFF2C1923).withValues(alpha: 0.88)
+        ? AppTheme.night.withValues(alpha: 0.88)
         : AppTheme.primary.withValues(alpha: 0.88);
 
     return ClipRRect(
@@ -130,45 +138,10 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
                           const SizedBox(width: 16),
 
                           // ========================================================
-                          // 3. RIGHT ACTIONS
+                          // 3. RIGHT ACTIONS (theme toggle; PACKAGES nav
+                          // item covers the route, no CTA here)
                           // ========================================================
-                          MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: ElevatedButton.icon(
-                                onPressed: () =>
-                                    _navigateTo(context, '/packages'),
-                                icon: const Icon(
-                                  Icons.auto_awesome,
-                                  size: 13,
-                                  color: AppTheme.primary,
-                                ),
-                                label: const Text(
-                                  'Explore Packages',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.2,
-                                    color: AppTheme.primary,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFFDF4F5),
-                                  foregroundColor: AppTheme.primary,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 8,
-                                  ),
-                                  visualDensity: VisualDensity.compact,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(9999),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                          themeToggle,
                         ],
                       ),
                     ),

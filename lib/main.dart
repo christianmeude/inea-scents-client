@@ -4,8 +4,23 @@ import 'config/router.dart';
 import 'config/theme.dart';
 import 'providers/index.dart';
 
-void main() {
-  runApp(const ProviderScope(child: MyApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Landing parity: stored choice wins; otherwise resolve the OS brightness
+  // once (no live System follow).
+  final persisted = await loadPersistedThemeMode();
+  final initial =
+      persisted ??
+      (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark
+          ? ThemeMode.dark
+          : ThemeMode.light);
+  runApp(
+    ProviderScope(
+      overrides: [themeModeProvider.overrideWith((ref) => initial)],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {

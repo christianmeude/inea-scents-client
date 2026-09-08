@@ -26,7 +26,10 @@ class AppRouter {
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
       ShellRoute(
-        builder: (context, state, child) => ResponsiveAppShell(child: child),
+        builder: (context, state, child) => ResponsiveAppShell(
+          themeToggle: const ConnectedThemeToggleButton(inverted: true),
+          child: child,
+        ),
         routes: [
           GoRoute(
             path: '/home',

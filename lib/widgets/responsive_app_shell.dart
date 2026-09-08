@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'bottom_nav_bar.dart';
+import 'theme_toggle_button.dart';
 import 'top_nav_bar.dart';
 
 /// Foundational responsive layout scaffolding for the application.
@@ -20,12 +21,17 @@ class ResponsiveAppShell extends StatelessWidget {
   final double breakpoint;
   final Color? backgroundColor;
 
+  /// Injectable so provider-less tests can render the shell; production
+  /// passes the connected toggle.
+  final Widget themeToggle;
+
   const ResponsiveAppShell({
     super.key,
     required this.child,
     this.maxWidth = maxContentWidth,
     this.breakpoint = mobileBreakpoint,
     this.backgroundColor,
+    this.themeToggle = const ThemeToggleButton(isDark: false),
   });
 
   /// Helper to get responsive column counts based on R1 breakpoints.
@@ -69,7 +75,9 @@ class ResponsiveAppShell extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: backgroundColor,
-          appBar: isDesktopView ? const TopNavBar() : null,
+          appBar: isDesktopView
+              ? TopNavBar(themeToggle: themeToggle)
+              : null,
           body: Center(
             child: ConstrainedBox(
               constraints: BoxConstraints(

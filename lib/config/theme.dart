@@ -272,9 +272,14 @@ class AppTheme {
     );
   }
 
+  // Canonical landing nights: base #151012, surface #1c1618, border #36222c.
+  static const Color night = Color(0xFF151012);
+  static const Color nightSurface = Color(0xFF1C1618);
+  static const Color nightBorder = Color(0xFF36222C);
+
   static ThemeData get darkTheme {
-    const darkBg = Color(0xFF2C1923);
-    const darkSurface = Color(0xFF3B232F);
+    const darkBg = night;
+    const darkSurface = nightSurface;
     const darkPrimary = Color(0xFFFDF4F5);
 
     return ThemeData(

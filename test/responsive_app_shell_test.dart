@@ -243,7 +243,7 @@ void main() {
         expect(
           darkScaffold.backgroundColor,
           isNull,
-        ); // Let's Scaffold inherit from darkTheme (Color(0xFF2C1923))
+        ); // Let's Scaffold inherit from darkTheme (Color(0xFF151012))
       },
     );
 
@@ -302,7 +302,7 @@ void main() {
         final decoration = containerWidget.decoration as BoxDecoration;
         expect(
           decoration.color,
-          equals(const Color(0xFF2C1923).withValues(alpha: 0.88)),
+          equals(AppTheme.night.withValues(alpha: 0.88)),
         );
       },
     );
@@ -419,8 +419,10 @@ void main() {
         expect(find.text('Home Screen Page'), findsOneWidget);
         expect(find.byIcon(Icons.home), findsOneWidget);
 
-        // 7. Navigate to PACKAGES via 'Explore Packages' action button
-        await tester.tap(find.text('Explore Packages'));
+        // 7. Navigate to PACKAGES via the PACKAGES nav item
+        // (the old 'Explore Packages' CTA was removed; the toggle
+        // occupies the right cluster per the landing standard).
+        await tester.tap(find.text('PACKAGES'));
         await tester.pumpAndSettle();
         expect(find.text('Packages Screen Page'), findsOneWidget);
         expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
@@ -562,7 +564,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Profile Screen'), findsOneWidget);
 
-        await tester.tap(find.text('Explore Packages'));
+        await tester.tap(find.text('PACKAGES'));
         await tester.pumpAndSettle();
         expect(find.text('Packages Screen'), findsOneWidget);
       },

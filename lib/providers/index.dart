@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/index.dart';
 import 'package:dio/dio.dart';
 import '../src/providers/core_providers.dart';
@@ -24,8 +25,26 @@ String _getErrorMessage(dynamic e) {
   return e.toString();
 }
 
-// Theme state
+// Theme state. Storage key shared with the web surfaces (`inea-theme`).
+// No System option: a stored light/dark choice wins, otherwise the OS
+// brightness resolves once at startup (see main), like the landing toggle.
+const ineaThemeKey = 'inea-theme';
+
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
+
+/// Reads the persisted theme, if any. Returns null on first launch.
+Future<ThemeMode?> loadPersistedThemeMode() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    return switch (prefs.getString(ineaThemeKey)) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => null,
+    };
+  } catch (_) {
+    return null;
+  }
+}
 
 // Auth state
 class AuthState {

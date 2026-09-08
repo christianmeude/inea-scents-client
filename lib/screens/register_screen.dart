@@ -112,7 +112,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 width: 500,
                 height: 400,
                 color: isDark
-                    ? const Color(0x994A2D3C)
+                    ? const Color(0x9936222C)
                     : const Color(0xFF988088),
               ),
             ),
@@ -316,7 +316,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const Positioned(
               top: 24,
               right: 24,
-              child: SafeArea(child: _ThemeToggle()),
+              child: SafeArea(child: ConnectedThemeToggleButton()),
             ),
           ],
         ),
@@ -508,153 +508,6 @@ class _BlurBlob extends StatelessWidget {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// THEME TOGGLE
-// ============================================================================
-
-class _ThemeToggle extends ConsumerWidget {
-  const _ThemeToggle();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = ref.watch(themeModeProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: isDark
-            ? const Color(0xFF261D21).withValues(alpha: 0.5)
-            : Colors.white.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: const [BoxShadow(color: Color(0x0C000000), blurRadius: 10)],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _ThemeToggleButton(
-                icon: Icons.light_mode_outlined,
-                isSelected: theme == ThemeMode.light,
-                isDarkEnv: isDark,
-                onTap: () => ref.read(themeModeProvider.notifier).state =
-                    ThemeMode.light,
-              ),
-              const SizedBox(width: 4),
-              _ThemeToggleButton(
-                icon: Icons.dark_mode_outlined,
-                isSelected: theme == ThemeMode.dark,
-                isDarkEnv: isDark,
-                onTap: () =>
-                    ref.read(themeModeProvider.notifier).state = ThemeMode.dark,
-              ),
-              const SizedBox(width: 4),
-              _ThemeToggleButton(
-                icon: Icons.monitor_outlined,
-                isSelected: theme == ThemeMode.system,
-                isDarkEnv: isDark,
-                onTap: () => ref.read(themeModeProvider.notifier).state =
-                    ThemeMode.system,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemeToggleButton extends StatefulWidget {
-  final IconData icon;
-  final bool isSelected;
-  final bool isDarkEnv;
-  final VoidCallback onTap;
-
-  const _ThemeToggleButton({
-    required this.icon,
-    required this.isSelected,
-    required this.isDarkEnv,
-    required this.onTap,
-  });
-
-  @override
-  State<_ThemeToggleButton> createState() => _ThemeToggleButtonState();
-}
-
-class _ThemeToggleButtonState extends State<_ThemeToggleButton> {
-  bool _isHovered = false;
-  bool _isFocused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedBg = widget.isDarkEnv
-        ? const Color(0xFF6A4053)
-        : Colors.white;
-    final hoverBg = widget.isDarkEnv
-        ? const Color(0xFF6A4053).withValues(alpha: 0.3)
-        : Colors.white.withValues(alpha: 0.3);
-    final selectedIconColor = widget.isDarkEnv
-        ? const Color(0xFFFDF4F5)
-        : const Color(0xFF6A4053);
-    final unselectedIconColor = widget.isDarkEnv
-        ? const Color(0xFFFDF4F5).withValues(alpha: 0.6)
-        : const Color(0xFF6A4053).withValues(alpha: 0.6);
-
-    final bg = widget.isSelected
-        ? selectedBg
-        : (_isHovered ? hoverBg : Colors.transparent);
-
-    return FocusableActionDetector(
-      mouseCursor: SystemMouseCursors.click,
-      onShowHoverHighlight: (hovered) {
-        if (_isHovered != hovered) {
-          setState(() => _isHovered = hovered);
-        }
-      },
-      onShowFocusHighlight: (focused) {
-        if (_isFocused != focused) {
-          setState(() => _isFocused = focused);
-        }
-      },
-      actions: <Type, Action<Intent>>{
-        ActivateIntent: CallbackAction<ActivateIntent>(
-          onInvoke: (_) => widget.onTap(),
-        ),
-      },
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: bg,
-            shape: BoxShape.circle,
-            border: _isFocused
-                ? Border.all(
-                    color: widget.isDarkEnv
-                        ? const Color(0xFFFDF4F5)
-                        : const Color(0xFF6A4053),
-                    width: 2.0,
-                  )
-                : null,
-            boxShadow: widget.isSelected
-                ? const [BoxShadow(color: Color(0x0C000000), blurRadius: 4)]
-                : null,
-          ),
-          child: Icon(
-            widget.icon,
-            size: 14,
-            color: widget.isSelected ? selectedIconColor : unselectedIconColor,
           ),
         ),
       ),

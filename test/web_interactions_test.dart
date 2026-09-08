@@ -483,7 +483,7 @@ void main() {
             ),
           );
           final initialDec = initialContainer.decoration as BoxDecoration;
-          expect(initialDec.color, equals(const Color(0xFF3B232F)));
+          expect(initialDec.color, equals(AppTheme.nightSurface));
 
           // Trigger focus highlight
           final detector = tester.widget<FocusableActionDetector>(
