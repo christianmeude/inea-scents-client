@@ -1,11 +1,10 @@
 name: Sync API Client
 
+# Suspended: backend + client live side-by-side locally, sync manually
+# (dart run swagger_parser && dart run build_runner build -d).
+# Manual trigger only.
 on:
-  push:
-    branches:
-      - 'api-sync-*'
-    paths:
-      - 'api-docs.json'
+  workflow_dispatch:
 
 jobs:
   generate:
