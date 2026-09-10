@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/index.dart';
 import '../providers/index.dart';
+import '../src/utils/checkout_window.dart';
 import '../widgets/index.dart';
 
 /// Reservation and Booking Screen for INEA Scents.
@@ -40,6 +42,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       TextEditingController();
   final TextEditingController _venueAddressController = TextEditingController();
 
+  /// Gesture-held checkout tab (web only). Opened synchronously in the
+  /// Confirm tap so the browser grants the popup; navigated once the
+  /// booking POST returns a checkout URL. Nulled after navigate/close —
+  /// dispose only closes a tab we still own (never the PayMongo page).
+  CheckoutWindow? _heldCheckoutTab;
+
   int get _currentStep => ref.read(bookingFlowProvider).currentStep;
 
   @override
@@ -68,6 +76,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   @override
   void dispose() {
+    _heldCheckoutTab?.close();
+    _heldCheckoutTab = null;
     _customerNameController.dispose();
     _customerEmailController.dispose();
     _customerPhoneController.dispose();
@@ -85,8 +95,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   Future<void> _handleConfirmAndPay() async {
     final notifier = ref.read(bookingFlowProvider.notifier);
+    // Web popup rule: window.open only survives inside the tap gesture.
+    // The booking POST resolves seconds later, so hold a branded
+    // placeholder tab now (online methods only) and navigate it below.
+    // Null on mobile (url_launcher path) or when the open was blocked —
+    // both fall back to _launchCheckoutUrl plus the recovery button.
+    final online =
+        isOnlinePaymentString(ref.read(bookingFlowProvider).paymentMethod);
+    _heldCheckoutTab?.close();
+    _heldCheckoutTab = (kIsWeb && online) ? openCheckoutWindow() : null;
     final booking = await notifier.submitBooking();
     if (booking == null) {
+      _heldCheckoutTab?.close();
+      _heldCheckoutTab = null;
       final state = ref.read(bookingFlowProvider);
       if (state.errorMessage != null && mounted) {
         ScaffoldMessenger.of(context)
@@ -100,9 +121,22 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     if (status == BookingCheckoutStatus.awaitingPayment) {
       final checkoutUrl = booking.checkoutUrl;
       if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
-        unawaited(_launchCheckoutUrl(checkoutUrl));
+        final held = _heldCheckoutTab;
+        _heldCheckoutTab = null;
+        if (held != null) {
+          held.navigateTo(checkoutUrl);
+        } else {
+          unawaited(_launchCheckoutUrl(checkoutUrl));
+        }
+      } else {
+        _heldCheckoutTab?.close();
+        _heldCheckoutTab = null;
       }
       unawaited(notifier.startPolling());
+    } else {
+      // Offline methods never need the held tab.
+      _heldCheckoutTab?.close();
+      _heldCheckoutTab = null;
     }
   }
 
