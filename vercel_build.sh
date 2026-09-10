@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # Install Flutter SDK if not present
 if [ ! -d "flutter" ]; then
   git clone https://github.com/flutter/flutter.git -b stable
@@ -16,9 +17,10 @@ export PATH="$PATH:`pwd`/flutter/bin"
 # Local `flutter run` passes --dart-define=API_URL=http://127.0.0.1:8000 manually.
 : "${API_URL:?API_URL dart-define is required. Set Vercel env API_URL=https://inea-scents.onrender.com for Production and Preview.}"
 
-# Enable web and build
+# Enable web, install deps, and build with committed outputs.
+# Codegen (swagger_parser, build_runner) runs locally before pushing —
+# never on Vercel: fresh SDK resolves drift codegen deps and emit broken
+# outputs (seen: Dart 3.13 vs analyzer 3.12). Fail fast, no "|| true".
 flutter config --enable-web
 flutter pub get
-dart run swagger_parser || true
-dart run build_runner build -d || true
 flutter build web --release --dart-define=API_URL="$API_URL"
