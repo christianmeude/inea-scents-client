@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -105,13 +106,63 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     }
   }
 
-  Future<void> _launchCheckoutUrl(String checkoutUrl) async {
-    try {
-      await launchUrl(Uri.parse(checkoutUrl));
-    } catch (_) {
-      // Polling continues regardless; the user can also retry from the
-      // "processing" screen.
+  /// Opens [checkoutUrl] in a new browser tab (external application), so
+  /// the app — and its payment polling — stays alive underneath.
+  /// Returns true when the platform accepted the launch. Never throws:
+  /// a failure surfaces as a SnackBar with a copy-link action instead of
+  /// stranding the user on the processing screen.
+  Future<bool> _launchCheckoutUrl(String checkoutUrl) async {
+    final uri = Uri.tryParse(checkoutUrl);
+    if (uri == null || (!uri.isScheme('http') && !uri.isScheme('https'))) {
+      _showCheckoutLaunchFailure(checkoutUrl);
+      return false;
     }
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) _showCheckoutLaunchFailure(checkoutUrl);
+      return launched;
+    } catch (_) {
+      _showCheckoutLaunchFailure(checkoutUrl);
+      return false;
+    }
+  }
+
+  void _showCheckoutLaunchFailure(String checkoutUrl) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Checkout did not open automatically. Use the button below.',
+          ),
+          action: SnackBarAction(
+            label: 'Copy link',
+            onPressed: () =>
+                Clipboard.setData(ClipboardData(text: checkoutUrl)),
+          ),
+        ),
+      );
+  }
+
+  /// Re-opens the stored checkout link for the in-flight booking, if any.
+  Future<void> _openCheckoutFromState() async {
+    final checkoutUrl = ref.read(bookingFlowProvider).booking?.checkoutUrl;
+    if (checkoutUrl == null || checkoutUrl.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('Checkout link is unavailable. Please rebook.'),
+          ),
+        );
+      return;
+    }
+    await _launchCheckoutUrl(checkoutUrl);
   }
 
   void _loadPackage() async {
@@ -953,14 +1004,20 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         iconColor: plum,
         title: 'Processing Your Payment',
         messageLines: [
-          'Complete your payment in the opened checkout window.',
+          'A secure checkout page should have opened in a new tab.',
+          'If it did not, tap below to open it.',
           '',
           'Booking reference: $reference',
           'We are waiting for payment confirmation.',
         ],
-        buttonLabel: 'Recheck',
-        buttonIcon: Icons.refresh_rounded,
+        buttonLabel: 'Open Checkout Page',
+        buttonIcon: Icons.open_in_new_rounded,
         onPressed: () {
+          unawaited(_openCheckoutFromState());
+        },
+        secondaryLabel: 'Recheck status',
+        secondaryIcon: Icons.refresh_rounded,
+        secondaryOnPressed: () {
           ref.read(bookingFlowProvider.notifier).checkStatusImmediate();
         },
         showSpinner: true,
@@ -1025,6 +1082,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     required String buttonLabel,
     required IconData buttonIcon,
     required VoidCallback? onPressed,
+    String? secondaryLabel,
+    IconData? secondaryIcon,
+    VoidCallback? secondaryOnPressed,
     bool showSpinner = false,
   }) {
     return Container(
@@ -1101,6 +1161,24 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
             ),
           ),
+          if (secondaryLabel != null) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: TextButton.icon(
+                onPressed: secondaryOnPressed,
+                icon: Icon(secondaryIcon ?? Icons.refresh_rounded, size: 18),
+                label: Text(secondaryLabel),
+                style: TextButton.styleFrom(
+                  foregroundColor: plum,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
