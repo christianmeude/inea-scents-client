@@ -8,7 +8,8 @@ const _plum = '#6A4053';
 const _ivory = '#FAF7F2';
 const _muted = '#8A6A53';
 
-const _pageCss = '''
+const _pageCss =
+    '''
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:$_ivory;color:$_plum;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
 .card{text-align:center;padding:48px 32px;max-width:420px}

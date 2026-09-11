@@ -12,7 +12,8 @@
 library;
 
 import 'checkout_window_stub.dart'
-    if (dart.library.js_interop) 'checkout_window_web.dart' as impl;
+    if (dart.library.js_interop) 'checkout_window_web.dart'
+    as impl;
 
 /// Opaque handle to a held checkout tab. The tab is owned until it is
 /// navigated to the payment URL or closed — never both.

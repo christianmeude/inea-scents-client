@@ -14,6 +14,10 @@ class DioClient {
         Dio(
             BaseOptions(
               baseUrl: baseUrl,
+              // Hung requests must surface, never hang the UI: the booking
+              // flow maps these to a retryable message (see _getErrorMessage).
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(seconds: 30),
               headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',

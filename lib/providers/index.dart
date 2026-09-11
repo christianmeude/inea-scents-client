@@ -14,6 +14,10 @@ String _getErrorMessage(dynamic e) {
         e.type == DioExceptionType.connectionTimeout) {
       return 'Could not connect to the server. Please check your internet connection.';
     }
+    if (e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return 'The request is taking too long. Please try again.';
+    }
     if (e.response != null) {
       if (e.response?.data is Map && e.response!.data['message'] != null) {
         return e.response!.data['message'].toString();
@@ -411,10 +415,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
     final nameOk = (state.customerName ?? '').trim().isNotEmpty;
     final email = (state.customerEmail ?? '').trim();
     final venueOk = (state.venueAddress ?? '').trim().isNotEmpty;
-    return nameOk &&
-        venueOk &&
-        email.isNotEmpty &&
-        isValidEmail(email);
+    return nameOk && venueOk && email.isNotEmpty && isValidEmail(email);
   }
 
   void setSelectedPackage(Package package) {
@@ -695,8 +696,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
         state.checkoutStatus == BookingCheckoutStatus.confirmed ||
         state.checkoutStatus == BookingCheckoutStatus.cancelled;
     final mismatch =
-        state.selectedPackage != null &&
-        state.selectedPackage!.id != packageId;
+        state.selectedPackage != null && state.selectedPackage!.id != packageId;
     if (terminal || mismatch) reset();
   }
 }

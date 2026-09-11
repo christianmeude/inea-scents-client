@@ -48,6 +48,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// dispose only closes a tab we still own (never the PayMongo page).
   CheckoutWindow? _heldCheckoutTab;
 
+  /// Re-entrancy guard: the provider's `isLoading` flips a frame after the
+  /// tap, so a fast double-tap could otherwise POST two bookings.
+  bool _submitting = false;
+
   int get _currentStep => ref.read(bookingFlowProvider).currentStep;
 
   @override
@@ -94,49 +98,56 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   Future<void> _handleConfirmAndPay() async {
-    final notifier = ref.read(bookingFlowProvider.notifier);
-    // Web popup rule: window.open only survives inside the tap gesture.
-    // The booking POST resolves seconds later, so hold a branded
-    // placeholder tab now (online methods only) and navigate it below.
-    // Null on mobile (url_launcher path) or when the open was blocked —
-    // both fall back to _launchCheckoutUrl plus the recovery button.
-    final online =
-        isOnlinePaymentString(ref.read(bookingFlowProvider).paymentMethod);
-    _heldCheckoutTab?.close();
-    _heldCheckoutTab = (kIsWeb && online) ? openCheckoutWindow() : null;
-    final booking = await notifier.submitBooking();
-    if (booking == null) {
+    if (_submitting) return;
+    _submitting = true;
+    try {
+      final notifier = ref.read(bookingFlowProvider.notifier);
+      // Web popup rule: window.open only survives inside the tap gesture.
+      // The booking POST resolves seconds later, so hold a branded
+      // placeholder tab now (online methods only) and navigate it below.
+      // Null on mobile (url_launcher path) or when the open was blocked —
+      // both fall back to _launchCheckoutUrl plus the recovery button.
+      final online = isOnlinePaymentString(
+        ref.read(bookingFlowProvider).paymentMethod,
+      );
       _heldCheckoutTab?.close();
-      _heldCheckoutTab = null;
-      final state = ref.read(bookingFlowProvider);
-      if (state.errorMessage != null && mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text(state.errorMessage!)));
-      }
-      return;
-    }
-    final status = ref.read(bookingFlowProvider).checkoutStatus;
-    notifier.goToStep(5);
-    if (status == BookingCheckoutStatus.awaitingPayment) {
-      final checkoutUrl = booking.checkoutUrl;
-      if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
-        final held = _heldCheckoutTab;
+      _heldCheckoutTab = (kIsWeb && online) ? openCheckoutWindow() : null;
+      final booking = await notifier.submitBooking();
+      if (booking == null) {
+        _heldCheckoutTab?.close();
         _heldCheckoutTab = null;
-        if (held != null) {
-          held.navigateTo(checkoutUrl);
-        } else {
-          unawaited(_launchCheckoutUrl(checkoutUrl));
+        final state = ref.read(bookingFlowProvider);
+        if (state.errorMessage != null && mounted) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(SnackBar(content: Text(state.errorMessage!)));
         }
+        return;
+      }
+      final status = ref.read(bookingFlowProvider).checkoutStatus;
+      notifier.goToStep(5);
+      if (status == BookingCheckoutStatus.awaitingPayment) {
+        final checkoutUrl = booking.checkoutUrl;
+        if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
+          final held = _heldCheckoutTab;
+          _heldCheckoutTab = null;
+          if (held != null) {
+            held.navigateTo(checkoutUrl);
+          } else {
+            unawaited(_launchCheckoutUrl(checkoutUrl));
+          }
+        } else {
+          _heldCheckoutTab?.close();
+          _heldCheckoutTab = null;
+        }
+        unawaited(notifier.startPolling());
       } else {
+        // Offline methods never need the held tab.
         _heldCheckoutTab?.close();
         _heldCheckoutTab = null;
       }
-      unawaited(notifier.startPolling());
-    } else {
-      // Offline methods never need the held tab.
-      _heldCheckoutTab?.close();
-      _heldCheckoutTab = null;
+    } finally {
+      _submitting = false;
     }
   }
 
@@ -537,6 +548,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     actionButtonText: isPayment
                         ? 'Confirm & Pay'
                         : 'Proceed to Payment',
+                    isLoading: ref.watch(bookingFlowProvider).isLoading,
                     isSticky: true,
                     onProceed: () {
                       final notifier = ref.read(bookingFlowProvider.notifier);
@@ -734,6 +746,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     actionButtonText: isPayment
                         ? 'Confirm & Pay'
                         : 'Proceed to Payment',
+                    isLoading: ref.watch(bookingFlowProvider).isLoading,
                     isSticky: true,
                     onProceed: () {
                       final notifier = ref.read(bookingFlowProvider.notifier);
@@ -781,6 +794,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   // ==========================================================================
 
   Widget _buildMobileLayout(Package package) {
+    final submitting = ref.watch(bookingFlowProvider).isLoading;
     return Column(
       children: [
         _buildHeader(showBack: true),
@@ -798,62 +812,77 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {
-                final notifier = ref.read(bookingFlowProvider.notifier);
-                if (_currentStep == 4) {
-                  _handleConfirmAndPay();
-                } else if (_currentStep == 2) {
-                  final localOk =
-                      _selectedDate != null &&
-                      _selectedPax != null &&
-                      _selectedTime != null;
-                  if (!notifier.canProceedFromSchedule() && !localOk) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please select date, pax and time slot'),
-                      ),
-                    );
-                    return;
-                  }
-                  // Ensure provider has local values before advancing
-                  if (_selectedDate != null) {
-                    notifier.setSelectedDate(_selectedDate!);
-                  }
-                  if (_selectedPax != null) {
-                    notifier.setSelectedPax(_selectedPax!);
-                  }
-                  if (_selectedTime != null) {
-                    notifier.setSelectedTime(_selectedTime!);
-                  }
-                  notifier.nextStep();
-                } else if (_currentStep == 3) {
-                  if (!notifier.canProceedFromDetails()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please fill name, email and venue'),
-                      ),
-                    );
-                    return;
-                  }
-                  notifier.nextStep();
-                } else {
-                  notifier.nextStep();
-                }
-              },
+              onPressed: submitting
+                  ? null
+                  : () {
+                      final notifier = ref.read(bookingFlowProvider.notifier);
+                      if (_currentStep == 4) {
+                        _handleConfirmAndPay();
+                      } else if (_currentStep == 2) {
+                        final localOk =
+                            _selectedDate != null &&
+                            _selectedPax != null &&
+                            _selectedTime != null;
+                        if (!notifier.canProceedFromSchedule() && !localOk) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Please select date, pax and time slot',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        // Ensure provider has local values before advancing
+                        if (_selectedDate != null) {
+                          notifier.setSelectedDate(_selectedDate!);
+                        }
+                        if (_selectedPax != null) {
+                          notifier.setSelectedPax(_selectedPax!);
+                        }
+                        if (_selectedTime != null) {
+                          notifier.setSelectedTime(_selectedTime!);
+                        }
+                        notifier.nextStep();
+                      } else if (_currentStep == 3) {
+                        if (!notifier.canProceedFromDetails()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Please fill name, email and venue',
+                              ),
+                            ),
+                          );
+                          return;
+                        }
+                        notifier.nextStep();
+                      } else {
+                        notifier.nextStep();
+                      }
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: plum,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(9999),
                 ),
               ),
-              child: Text(
-                _currentStep == 4
-                    ? 'Confirm & Pay'
-                    : _currentStep == 3
-                    ? 'Proceed to Payment'
-                    : 'Next',
-                style: const TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              child: submitting
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      _currentStep == 4
+                          ? 'Confirm & Pay'
+                          : _currentStep == 3
+                          ? 'Proceed to Payment'
+                          : 'Next',
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
             ),
           ),
         ),
@@ -1909,7 +1938,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
-                      children:
+                  children:
                       [
                         {
                           'id': 'credit_card',
