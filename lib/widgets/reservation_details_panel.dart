@@ -30,12 +30,17 @@ class ReservationDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final paxList =
-        (package.paxOptions != null && package.paxOptions!.isNotEmpty)
-        ? package.paxOptions!
-        : [20, 30, 50, 75, 100];
+    final tiers = package.tiers;
+    final paxList = tiers.isNotEmpty
+        ? tiers.map((t) => t.pax).toList()
+        : ((package.paxOptions != null && package.paxOptions!.isNotEmpty)
+              ? package.paxOptions!
+              : [20, 30, 50, 75, 100]);
 
-    final timeSlots = TimeSlot.available.map((s) => s.label).toList();
+    String? tierPriceLabel(int pax) {
+      if (tiers.isEmpty) return null;
+      return '₱${package.priceForPax(pax).toStringAsFixed(0)}';
+    }
 
     final paymentMethods = [
       {
@@ -191,6 +196,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                 runSpacing: 8,
                 children: paxList.map((pax) {
                   final isSelected = selectedPax == pax;
+                  final price = tierPriceLabel(pax);
                   return InkWell(
                     onTap: () => onPaxSelected(pax),
                     borderRadius: BorderRadius.circular(9999),
@@ -230,7 +236,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            '$pax Pax',
+                            price == null ? '$pax Pax' : '$pax Pax · $price',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: isSelected
@@ -289,7 +295,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                   const SizedBox(width: 10),
                   const Flexible(
                     child: Text(
-                      '3. Select Time Slot',
+                      '3. Choose Event Time',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -300,81 +306,69 @@ class ReservationDetailsPanel extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 4),
+              const Text(
+                'One booking lasts 3–4 hrs.',
+                style: TextStyle(fontSize: 12, color: mutedPlum),
+              ),
               const SizedBox(height: 12),
-              Column(
-                children: timeSlots.map((time) {
-                  final isSelected = selectedTime == time;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: InkWell(
-                      onTap: () => onTimeSelected(time),
-                      borderRadius: BorderRadius.circular(12),
-                      mouseCursor: SystemMouseCursors.click,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 10,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? plum.withValues(alpha: 0.08)
-                              : cream.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected ? plum : const Color(0x3399868C),
-                            width: isSelected ? 1.5 : 1.0,
+              InkWell(
+                key: const Key('event_time_picker_button'),
+                onTap: () async {
+                  TimeOfDay initial = const TimeOfDay(hour: 14, minute: 0);
+                  final current = TimeSlot.toEventTime(selectedTime);
+                  if (current != null) {
+                    final parts = current.split(':');
+                    initial = TimeOfDay(
+                      hour: int.parse(parts[0]),
+                      minute: int.parse(parts[1]),
+                    );
+                  }
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: initial,
+                  );
+                  if (picked == null) return;
+                  onTimeSelected(
+                    '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}:00',
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
+                mouseCursor: SystemMouseCursors.click,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cream.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0x3399868C)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.schedule_rounded, size: 16, color: plum),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          selectedTime == null
+                              ? 'Select time'
+                              : TimeSlot.display(selectedTime),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: plum,
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              isSelected
-                                  ? Icons.radio_button_checked_rounded
-                                  : Icons.radio_button_unchecked_rounded,
-                              size: 16,
-                              color: isSelected ? plum : mutedPlum,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                time,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  color: plum,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            if (isSelected)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: plum,
-                                  borderRadius: BorderRadius.circular(9999),
-                                ),
-                                child: const Text(
-                                  'Selected',
-                                  style: TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
+                      const Icon(
+                        Icons.access_time_rounded,
+                        size: 16,
+                        color: mutedPlum,
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),

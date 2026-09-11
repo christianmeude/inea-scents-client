@@ -48,6 +48,31 @@ class PackagesScreen extends ConsumerStatefulWidget {
   ConsumerState<PackagesScreen> createState() => _PackagesScreenState();
 }
 
+/// One selectable card on the packages grid. Tiered packages expand to
+/// one entry per headcount step ("50 Guests — ₱4,499"); untiered packages
+/// render as a single entry.
+class _TierEntry {
+  final Package package;
+  final PackageTier? tier;
+
+  const _TierEntry(this.package, [this.tier]);
+}
+
+List<_TierEntry> _tierEntries(List<Package> packages) {
+  final entries = <_TierEntry>[];
+  for (final package in packages) {
+    final tiers = package.tiers;
+    if (tiers.isEmpty) {
+      entries.add(_TierEntry(package));
+    } else {
+      for (final tier in tiers) {
+        entries.add(_TierEntry(package, tier));
+      }
+    }
+  }
+  return entries;
+}
+
 class _PackagesScreenState extends ConsumerState<PackagesScreen> {
   @override
   void initState() {
@@ -389,12 +414,16 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                               mainAxisSpacing: 16,
                             ),
 
-                        itemCount: packages.length,
+                        itemCount: _tierEntries(packages).length,
 
                         itemBuilder: (context, index) {
-                          final package = packages[index];
+                          final entry = _tierEntries(packages)[index];
 
-                          return PackageCard(package: package);
+                          return PackageCard(
+                            package: entry.package,
+                            tierPax: entry.tier?.pax,
+                            tierPrice: entry.tier?.price,
+                          );
                         },
                       );
                     },

@@ -43,14 +43,26 @@ class AppRouter {
             path: '/package-details/:id',
             builder: (context, state) {
               final packageId = int.parse(state.pathParameters['id']!);
-              return PackageDetailScreen(packageId: packageId);
+              final initialPax = int.tryParse(
+                state.queryParameters['pax'] ?? '',
+              );
+              return PackageDetailScreen(
+                packageId: packageId,
+                initialPax: initialPax,
+              );
             },
           ),
           GoRoute(
             path: '/booking/:id',
             builder: (context, state) {
               final packageId = int.parse(state.pathParameters['id']!);
-              return BookingScreen(packageId: packageId);
+              final initialPax = int.tryParse(
+                state.queryParameters['pax'] ?? '',
+              );
+              return BookingScreen(
+                packageId: packageId,
+                initialPax: initialPax,
+              );
             },
           ),
           GoRoute(

@@ -144,7 +144,7 @@ void main() {
 
         // Verify contents inside Middle column (Packages/Times)
         expect(find.text('2. Choose Available Pax'), findsOneWidget);
-        expect(find.text('3. Select Time Slot'), findsOneWidget);
+        expect(find.text('3. Choose Event Time'), findsOneWidget);
         expect(find.text('4. Payment Method'), findsOneWidget);
 
         // Verify contents inside Right column (Sticky Order Summary)
@@ -306,7 +306,7 @@ void main() {
     );
 
     testWidgets(
-      'Interactive Time slot selection updates Order Summary in real-time on desktop',
+      'Freeform time picker updates Order Summary in real-time on desktop',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -318,18 +318,22 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Select '6:00 PM - 9:00 PM' time slot
-        final eveningSlotFinder = find.text('6:00 PM - 9:00 PM');
-        expect(eveningSlotFinder, findsOneWidget);
-        await tester.tap(eveningSlotFinder);
-        await tester.pumpAndSettle();
-
-        // Verify Order Summary displays '6:00 PM - 9:00 PM'
-        final timeFinder = find.descendant(
-          of: find.byKey(const Key('order_summary_side_panel')),
-          matching: find.text('6:00 PM - 9:00 PM'),
+        // Picker shows the current time with the duration hint
+        expect(find.text('3. Choose Event Time'), findsOneWidget);
+        expect(
+          find.text('One booking lasts 3–4 hrs.'),
+          findsOneWidget,
         );
-        expect(timeFinder, findsOneWidget);
+        expect(find.text('2:00 PM'), findsWidgets);
+
+        // Opening the picker surfaces the clock dialog; cancelling keeps time
+        await tester.tap(find.byKey(const Key('event_time_picker_button')));
+        await tester.pumpAndSettle();
+        expect(find.byType(TimePickerDialog), findsOneWidget);
+        await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+        expect(find.byType(TimePickerDialog), findsNothing);
+        expect(find.text('2:00 PM'), findsWidgets);
       },
     );
 
@@ -661,15 +665,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Change selections on desktop: 100 Pax, 6:00 PM - 9:00 PM, Cash
+        // Change selections on desktop: 100 Pax, Cash (time stays default)
         final hundredPaxFinder = find.text('100 Pax');
         expect(hundredPaxFinder, findsOneWidget);
         await tester.tap(hundredPaxFinder);
         await tester.pumpAndSettle();
 
-        final eveningSlotFinder = find.text('6:00 PM - 9:00 PM');
-        await tester.tap(eveningSlotFinder);
-        await tester.pumpAndSettle();
+        // Freeform time keeps its default through selection changes
+        expect(find.text('2:00 PM'), findsWidgets);
 
         final cashFinder = find.text('Cash');
         await tester.scrollUntilVisible(
@@ -932,10 +935,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Step 2: Select 6:00 PM - 9:00 PM time slot
-        final timeSlotFinder = find.text('6:00 PM - 9:00 PM');
+        // Step 2: freeform time picker shows the default with duration hint
+        expect(find.text('Choose Event Time'), findsOneWidget);
+        expect(find.text('One booking lasts 3–4 hrs.'), findsOneWidget);
+        final pickerFinder = find.byKey(
+          const Key('event_time_picker_button'),
+        );
         await tester.scrollUntilVisible(
-          timeSlotFinder,
+          pickerFinder,
           100,
           scrollable: find
               .descendant(
@@ -944,9 +951,8 @@ void main() {
               )
               .first,
         );
-        expect(timeSlotFinder, findsOneWidget);
-        await tester.tap(timeSlotFinder);
-        await tester.pumpAndSettle();
+        expect(pickerFinder, findsOneWidget);
+        expect(find.text('2:00 PM'), findsWidgets);
 
         // Advance to Step 3 (Details)
         await tester.tap(find.text('Next'));
@@ -954,7 +960,7 @@ void main() {
 
         // Verify selected time and pax are displayed in Details
         expect(find.text('Selected Time:'), findsOneWidget);
-        expect(find.text('6:00 PM - 9:00 PM'), findsOneWidget);
+        expect(find.text('2:00 PM'), findsWidgets);
         expect(find.text('Selected Pax:'), findsOneWidget);
 
         await fillMobileContacts(tester);

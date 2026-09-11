@@ -73,3 +73,26 @@ List<Scent>? parseScentList(Object? json) {
   }
   return parsed;
 }
+
+/// Tier map `{pax: price}`. JSON keys arrive as strings; coerce to int
+/// pax with numeric prices, drop anything else. Never throws.
+Map<int, double>? parsePaxPrices(Object? json) {
+  if (json == null) return null;
+  if (json is! Map) return <int, double>{};
+  final cleaned = <int, double>{};
+  for (final entry in json.entries) {
+    final pax = entry.key is int
+        ? entry.key as int
+        : int.tryParse(entry.key.toString().trim());
+    final raw = entry.value;
+    final price = raw is num
+        ? raw.toDouble()
+        : raw is String
+        ? double.tryParse(raw.trim())
+        : null;
+    if (pax != null && pax >= 1 && price != null && price >= 0) {
+      cleaned[pax] = price;
+    }
+  }
+  return cleaned;
+}

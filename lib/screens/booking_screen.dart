@@ -22,7 +22,12 @@ import '../widgets/index.dart';
 class BookingScreen extends ConsumerStatefulWidget {
   final int packageId;
 
-  const BookingScreen({super.key, required this.packageId});
+  /// Preselected headcount tier carried from a tier card (`?pax=`).
+  /// Honored when it matches the package's tiers; otherwise the first
+  /// available option wins as before.
+  final int? initialPax;
+
+  const BookingScreen({super.key, required this.packageId, this.initialPax});
 
   @override
   ConsumerState<BookingScreen> createState() => _BookingScreenState();
@@ -69,7 +74,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           .ensureFreshForPackage(widget.packageId);
     });
     _selectedDate = DateTime.now().add(const Duration(days: 3));
-    _selectedTime = '2:00 PM - 5:00 PM';
+    // Freeform clock time, prefilled like the old default slot so the
+    // schedule step is submittable before the user opens the picker.
+    _selectedTime = '14:00:00';
     _selectedPax = 50;
     _loadPackage();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -228,12 +235,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               .setSelectedTime(_selectedTime!);
         }
         if (package.paxOptions != null && package.paxOptions!.isNotEmpty) {
+          // Honor a tier preselected from a tier card; otherwise the first
+          // available option wins as before.
+          final tiers = package.tiers.map((t) => t.pax).toList();
+          final preselected = widget.initialPax;
+          final candidates = tiers.isNotEmpty ? tiers : package.paxOptions!;
+          final chosen =
+              (preselected != null && candidates.contains(preselected))
+              ? preselected
+              : candidates.first;
           setState(() {
-            _selectedPax = package.paxOptions!.first;
+            _selectedPax = chosen;
           });
-          ref
-              .read(bookingFlowProvider.notifier)
-              .setSelectedPax(package.paxOptions!.first);
+          ref.read(bookingFlowProvider.notifier).setSelectedPax(chosen);
         }
       });
     });
@@ -251,6 +265,26 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   void _goToStep(int step) {
     ref.read(bookingFlowProvider.notifier).goToStep(step);
+  }
+
+  /// Freeform clock-time picker. Stores `H:i:s` directly (no slot labels);
+  /// the provider passes it to the API, which accepts any valid time.
+  Future<void> _pickEventTime() async {
+    TimeOfDay initial = const TimeOfDay(hour: 14, minute: 0);
+    final current = TimeSlot.toEventTime(_selectedTime);
+    if (current != null) {
+      final parts = current.split(':');
+      initial = TimeOfDay(
+        hour: int.parse(parts[0]),
+        minute: int.parse(parts[1]),
+      );
+    }
+    final picked = await showTimePicker(context: context, initialTime: initial);
+    if (picked == null || !mounted) return;
+    final value =
+        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}:00';
+    setState(() => _selectedTime = value);
+    ref.read(bookingFlowProvider.notifier).setSelectedTime(value);
   }
 
   @override
@@ -1415,7 +1449,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Widget _buildCurrentStep(Package package) {
     if (_currentStep == 2) {
       // Schedule Step
-      final timeSlots = TimeSlot.available.map((s) => s.label).toList();
+      final tiers = package.tiers;
+      final paxEntries = tiers.isNotEmpty
+          ? tiers.map((t) => t.pax).toList()
+          : (package.paxOptions ?? [20, 30, 50, 75, 100]);
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1452,12 +1489,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             child: Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: (package.paxOptions ?? [20, 30, 50, 75, 100]).map((
-                pax,
-              ) {
+              children: paxEntries.map((pax) {
                 final isSelected = _selectedPax == pax;
+                final priceLabel = tiers.isNotEmpty
+                    ? ' · ₱${package.priceForPax(pax).toStringAsFixed(0)}'
+                    : '';
                 return ChoiceChip(
-                  label: Text('$pax Pax'),
+                  label: Text('$pax Pax$priceLabel'),
                   selected: isSelected,
                   selectedColor: plum,
                   labelStyle: TextStyle(
@@ -1480,8 +1518,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           ),
           const SizedBox(height: 25),
           const Text(
-            'Please Choose Available Time Slot',
+            'Choose Event Time',
             style: TextStyle(fontSize: 13, color: plum),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'One booking lasts 3–4 hrs.',
+            style: TextStyle(fontSize: 12, color: Color(0x8A6A4053)),
           ),
           const SizedBox(height: 10),
           Container(
@@ -1492,31 +1535,42 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               borderRadius: BorderRadius.circular(15),
               border: Border.all(color: const Color(0x4D99868C)),
             ),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: timeSlots.map((time) {
-                final isSelected = _selectedTime == time;
-                return ChoiceChip(
-                  label: Text(time),
-                  selected: isSelected,
-                  selectedColor: plum,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : plum,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                  onSelected: (selected) {
-                    if (selected) {
-                      setState(() => _selectedTime = time);
-                      ref
-                          .read(bookingFlowProvider.notifier)
-                          .setSelectedTime(time);
-                    }
-                  },
-                );
-              }).toList(),
+            child: InkWell(
+              key: const Key('event_time_picker_button'),
+              onTap: () => _pickEventTime(),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF4F5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0x3399868C)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.schedule_rounded, size: 18, color: plum),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _selectedTime == null
+                            ? 'Select time'
+                            : TimeSlot.display(_selectedTime),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: _selectedTime == null
+                              ? FontWeight.normal
+                              : FontWeight.w700,
+                          color: plum,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.access_time_rounded, size: 18, color: plum),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -1626,7 +1680,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        _selectedTime ?? '2:00 PM - 5:00 PM',
+                        TimeSlot.display(_selectedTime),
                         style: const TextStyle(fontSize: 13, color: plum),
                       ),
                       const SizedBox(height: 15),
@@ -1652,7 +1706,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        'Php. ${(package.price ?? 4500).toStringAsFixed(2)}',
+                        'Php. ${package.priceForPax(_selectedPax).toStringAsFixed(2)}',
                         style: const TextStyle(fontSize: 13, color: plum),
                       ),
                     ],

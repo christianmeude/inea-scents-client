@@ -51,7 +51,7 @@ class OrderSummaryPanel extends StatelessWidget {
   }
 
   static String _paymentMethodLabel(String id) {
-    return     switch (id) {
+    return switch (id) {
       'credit_card' => 'CARD',
       'cash' => 'CASH',
       'bank_transfer' => 'BANK TRANSFER',
@@ -61,7 +61,7 @@ class OrderSummaryPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectivePrice = package.price ?? 4500.0;
+    final effectivePrice = package.priceForPax(selectedPax);
 
     return Container(
       width: double.infinity,
@@ -255,7 +255,7 @@ class OrderSummaryPanel extends StatelessWidget {
                 _buildDetailRow(
                   icon: Icons.access_time_rounded,
                   label: 'Time',
-                  value: selectedTime ?? '2:00 PM - 5:00 PM',
+                  value: TimeSlot.display(selectedTime),
                   isEmphasized: selectedTime != null,
                 ),
                 const Divider(color: Color(0x1F99868C), height: 8),

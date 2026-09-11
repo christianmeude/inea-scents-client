@@ -7,7 +7,18 @@ class PackageCard extends StatefulWidget {
   final Package package;
   final VoidCallback? onTap;
 
-  const PackageCard({super.key, required this.package, this.onTap});
+  /// Tier override: renders this card as one selectable headcount step
+  /// ("50 Guests — ₱4,499") instead of the whole package.
+  final int? tierPax;
+  final double? tierPrice;
+
+  const PackageCard({
+    super.key,
+    required this.package,
+    this.onTap,
+    this.tierPax,
+    this.tierPrice,
+  });
 
   @override
   State<PackageCard> createState() => _PackageCardState();
@@ -21,7 +32,13 @@ class _PackageCardState extends State<PackageCard> {
     if (widget.onTap != null) {
       widget.onTap!();
     } else {
-      context.push('/package-details/${widget.package.id}');
+      final tier = widget.tierPax;
+      final id = widget.package.id;
+      context.push(
+        tier == null
+            ? '/package-details/$id'
+            : '/package-details/$id?pax=$tier',
+      );
     }
   }
 
@@ -112,9 +129,7 @@ class _PackageCardState extends State<PackageCard> {
                       aspectRatio: 1.15,
                       child: Container(
                         width: double.infinity,
-                        color: isDark
-                            ? AppTheme.night
-                            : AppTheme.neutralBg,
+                        color: isDark ? AppTheme.night : AppTheme.neutralBg,
                         child:
                             (package.images != null &&
                                 package.images!.isNotEmpty)
@@ -182,7 +197,9 @@ class _PackageCardState extends State<PackageCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      package.name ?? '',
+                      widget.tierPax != null
+                          ? '${widget.tierPax} Guests'
+                          : package.name ?? '',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -231,7 +248,7 @@ class _PackageCardState extends State<PackageCard> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Php. ${(package.price ?? 4499.0).toStringAsFixed(2)}',
+                      'Php. ${(widget.tierPrice ?? package.price ?? 4499.0).toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 15,
                         color: primaryTextColor,

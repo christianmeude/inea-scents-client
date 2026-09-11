@@ -2,6 +2,7 @@
 export '../api/export.dart';
 export 'payment.dart';
 export 'time_slot.dart';
+export 'package_tiers.dart';
 
 import '../api/export.dart';
 

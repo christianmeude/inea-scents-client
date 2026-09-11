@@ -2,11 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
+import '../models/index.dart';
 
 class PackageDetailScreen extends ConsumerWidget {
   final int packageId;
 
-  const PackageDetailScreen({super.key, required this.packageId});
+  /// Preselected headcount tier carried from a tier card (`?pax=`).
+  /// Forwarded to the booking flow; ignored when not a valid tier.
+  final int? initialPax;
+
+  const PackageDetailScreen({
+    super.key,
+    required this.packageId,
+    this.initialPax,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -279,14 +288,32 @@ class PackageDetailScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Starting at ₱${(package.price ?? 4499.0).toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF6A4053),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                initialPax == null
+                                    ? 'Starting at ₱${(package.price ?? 4499.0).toStringAsFixed(0)}'
+                                    : '₱${package.priceForPax(initialPax).toStringAsFixed(0)} · $initialPax Guests',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF6A4053),
+                                ),
+                              ),
+                              const Text(
+                                'One booking lasts 3–4 hrs.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF99868C),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                        const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: () {
                             final id = package.id;
@@ -298,7 +325,11 @@ class PackageDetailScreen extends ConsumerWidget {
                               );
                               return;
                             }
-                            context.push('/booking/$id');
+                            context.push(
+                              initialPax == null
+                                  ? '/booking/$id'
+                                  : '/booking/$id?pax=$initialPax',
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6A4053), // Plum

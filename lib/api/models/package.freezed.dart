@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Package {
 
-@JsonKey(fromJson: parseIntTolerant) int? get id; String? get name; String? get description;@JsonKey(fromJson: parseStringList) List<String>? get inclusions;@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? get paxOptions;@JsonKey(fromJson: parseStringList) List<String>? get freebies;@JsonKey(fromJson: parseDoubleTolerant) double? get price;@JsonKey(fromJson: parseDoubleTolerant) double? get rating;@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? get reviewsCount;@JsonKey(fromJson: parseStringList) List<String>? get images;@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? get galleryImages;@JsonKey(fromJson: parseScentList) List<Scent>? get scents;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+@JsonKey(fromJson: parseIntTolerant) int? get id; String? get name; String? get description;@JsonKey(fromJson: parseStringList) List<String>? get inclusions;@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? get paxOptions;@JsonKey(name: 'pax_prices', fromJson: parsePaxPrices) Map<int, double>? get paxPrices;@JsonKey(fromJson: parseStringList) List<String>? get freebies;@JsonKey(fromJson: parseDoubleTolerant) double? get price;@JsonKey(fromJson: parseDoubleTolerant) double? get rating;@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? get reviewsCount;@JsonKey(fromJson: parseStringList) List<String>? get images;@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? get galleryImages;@JsonKey(fromJson: parseScentList) List<Scent>? get scents;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
 /// Create a copy of Package
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $PackageCopyWith<Package> get copyWith => _$PackageCopyWithImpl<Package>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Package&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.inclusions, inclusions)&&const DeepCollectionEquality().equals(other.paxOptions, paxOptions)&&const DeepCollectionEquality().equals(other.freebies, freebies)&&(identical(other.price, price) || other.price == price)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other.images, images)&&const DeepCollectionEquality().equals(other.galleryImages, galleryImages)&&const DeepCollectionEquality().equals(other.scents, scents)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Package&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other.inclusions, inclusions)&&const DeepCollectionEquality().equals(other.paxOptions, paxOptions)&&const DeepCollectionEquality().equals(other.paxPrices, paxPrices)&&const DeepCollectionEquality().equals(other.freebies, freebies)&&(identical(other.price, price) || other.price == price)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other.images, images)&&const DeepCollectionEquality().equals(other.galleryImages, galleryImages)&&const DeepCollectionEquality().equals(other.scents, scents)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(inclusions),const DeepCollectionEquality().hash(paxOptions),const DeepCollectionEquality().hash(freebies),price,rating,reviewsCount,const DeepCollectionEquality().hash(images),const DeepCollectionEquality().hash(galleryImages),const DeepCollectionEquality().hash(scents),createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(inclusions),const DeepCollectionEquality().hash(paxOptions),const DeepCollectionEquality().hash(paxPrices),const DeepCollectionEquality().hash(freebies),price,rating,reviewsCount,const DeepCollectionEquality().hash(images),const DeepCollectionEquality().hash(galleryImages),const DeepCollectionEquality().hash(scents),createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'Package(id: $id, name: $name, description: $description, inclusions: $inclusions, paxOptions: $paxOptions, freebies: $freebies, price: $price, rating: $rating, reviewsCount: $reviewsCount, images: $images, galleryImages: $galleryImages, scents: $scents, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'Package(id: $id, name: $name, description: $description, inclusions: $inclusions, paxOptions: $paxOptions, paxPrices: $paxPrices, freebies: $freebies, price: $price, rating: $rating, reviewsCount: $reviewsCount, images: $images, galleryImages: $galleryImages, scents: $scents, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $PackageCopyWith<$Res>  {
   factory $PackageCopyWith(Package value, $Res Function(Package) _then) = _$PackageCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(fromJson: parseIntTolerant) int? id, String? name, String? description,@JsonKey(fromJson: parseStringList) List<String>? inclusions,@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? paxOptions,@JsonKey(fromJson: parseStringList) List<String>? freebies,@JsonKey(fromJson: parseDoubleTolerant) double? price,@JsonKey(fromJson: parseDoubleTolerant) double? rating,@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? reviewsCount,@JsonKey(fromJson: parseStringList) List<String>? images,@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? galleryImages,@JsonKey(fromJson: parseScentList) List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+@JsonKey(fromJson: parseIntTolerant) int? id, String? name, String? description,@JsonKey(fromJson: parseStringList) List<String>? inclusions,@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? paxOptions,@JsonKey(name: 'pax_prices', fromJson: parsePaxPrices) Map<int, double>? paxPrices,@JsonKey(fromJson: parseStringList) List<String>? freebies,@JsonKey(fromJson: parseDoubleTolerant) double? price,@JsonKey(fromJson: parseDoubleTolerant) double? rating,@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? reviewsCount,@JsonKey(fromJson: parseStringList) List<String>? images,@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? galleryImages,@JsonKey(fromJson: parseScentList) List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -65,14 +65,15 @@ class _$PackageCopyWithImpl<$Res>
 
 /// Create a copy of Package
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? inclusions = freezed,Object? paxOptions = freezed,Object? freebies = freezed,Object? price = freezed,Object? rating = freezed,Object? reviewsCount = freezed,Object? images = freezed,Object? galleryImages = freezed,Object? scents = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? inclusions = freezed,Object? paxOptions = freezed,Object? paxPrices = freezed,Object? freebies = freezed,Object? price = freezed,Object? rating = freezed,Object? reviewsCount = freezed,Object? images = freezed,Object? galleryImages = freezed,Object? scents = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_self.copyWith(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,inclusions: freezed == inclusions ? _self.inclusions : inclusions // ignore: cast_nullable_to_non_nullable
 as List<String>?,paxOptions: freezed == paxOptions ? _self.paxOptions : paxOptions // ignore: cast_nullable_to_non_nullable
-as List<int>?,freebies: freezed == freebies ? _self.freebies : freebies // ignore: cast_nullable_to_non_nullable
+as List<int>?,paxPrices: freezed == paxPrices ? _self.paxPrices : paxPrices // ignore: cast_nullable_to_non_nullable
+as Map<int, double>?,freebies: freezed == freebies ? _self.freebies : freebies // ignore: cast_nullable_to_non_nullable
 as List<String>?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double?,rating: freezed == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
 as double?,reviewsCount: freezed == reviewsCount ? _self.reviewsCount : reviewsCount // ignore: cast_nullable_to_non_nullable
@@ -166,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(name: 'pax_prices', fromJson: parsePaxPrices)  Map<int, double>? paxPrices, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Package() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.paxPrices,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
   return orElse();
 
 }
@@ -187,10 +188,10 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(name: 'pax_prices', fromJson: parsePaxPrices)  Map<int, double>? paxPrices, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
 switch (_that) {
 case _Package():
-return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.paxPrices,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -207,10 +208,10 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(fromJson: parseIntTolerant)  int? id,  String? name,  String? description, @JsonKey(fromJson: parseStringList)  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList)  List<int>? paxOptions, @JsonKey(name: 'pax_prices', fromJson: parsePaxPrices)  Map<int, double>? paxPrices, @JsonKey(fromJson: parseStringList)  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant)  double? price, @JsonKey(fromJson: parseDoubleTolerant)  double? rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant)  int? reviewsCount, @JsonKey(fromJson: parseStringList)  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList)  List<String>? galleryImages, @JsonKey(fromJson: parseScentList)  List<Scent>? scents, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _Package() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.paxOptions,_that.paxPrices,_that.freebies,_that.price,_that.rating,_that.reviewsCount,_that.images,_that.galleryImages,_that.scents,_that.createdAt,_that.updatedAt);case _:
   return null;
 
 }
@@ -222,7 +223,7 @@ return $default(_that.id,_that.name,_that.description,_that.inclusions,_that.pax
 @JsonSerializable()
 
 class _Package implements Package {
-  const _Package({@JsonKey(fromJson: parseIntTolerant) this.id, this.name, this.description, @JsonKey(fromJson: parseStringList) final  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList) final  List<int>? paxOptions, @JsonKey(fromJson: parseStringList) final  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant) this.price, @JsonKey(fromJson: parseDoubleTolerant) this.rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) this.reviewsCount, @JsonKey(fromJson: parseStringList) final  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList) final  List<String>? galleryImages, @JsonKey(fromJson: parseScentList) final  List<Scent>? scents, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _inclusions = inclusions,_paxOptions = paxOptions,_freebies = freebies,_images = images,_galleryImages = galleryImages,_scents = scents;
+  const _Package({@JsonKey(fromJson: parseIntTolerant) this.id, this.name, this.description, @JsonKey(fromJson: parseStringList) final  List<String>? inclusions, @JsonKey(name: 'pax_options', fromJson: parseIntList) final  List<int>? paxOptions, @JsonKey(name: 'pax_prices', fromJson: parsePaxPrices) final  Map<int, double>? paxPrices, @JsonKey(fromJson: parseStringList) final  List<String>? freebies, @JsonKey(fromJson: parseDoubleTolerant) this.price, @JsonKey(fromJson: parseDoubleTolerant) this.rating, @JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) this.reviewsCount, @JsonKey(fromJson: parseStringList) final  List<String>? images, @JsonKey(name: 'gallery_images', fromJson: parseStringList) final  List<String>? galleryImages, @JsonKey(fromJson: parseScentList) final  List<Scent>? scents, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _inclusions = inclusions,_paxOptions = paxOptions,_paxPrices = paxPrices,_freebies = freebies,_images = images,_galleryImages = galleryImages,_scents = scents;
   factory _Package.fromJson(Map<String, dynamic> json) => _$PackageFromJson(json);
 
 @override@JsonKey(fromJson: parseIntTolerant) final  int? id;
@@ -244,6 +245,15 @@ class _Package implements Package {
   if (_paxOptions is EqualUnmodifiableListView) return _paxOptions;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(value);
+}
+
+ final  Map<int, double>? _paxPrices;
+@override@JsonKey(name: 'pax_prices', fromJson: parsePaxPrices) Map<int, double>? get paxPrices {
+  final value = _paxPrices;
+  if (value == null) return null;
+  if (_paxPrices is EqualUnmodifiableMapView) return _paxPrices;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
 }
 
  final  List<String>? _freebies;
@@ -301,16 +311,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Package&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._inclusions, _inclusions)&&const DeepCollectionEquality().equals(other._paxOptions, _paxOptions)&&const DeepCollectionEquality().equals(other._freebies, _freebies)&&(identical(other.price, price) || other.price == price)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other._images, _images)&&const DeepCollectionEquality().equals(other._galleryImages, _galleryImages)&&const DeepCollectionEquality().equals(other._scents, _scents)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Package&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&const DeepCollectionEquality().equals(other._inclusions, _inclusions)&&const DeepCollectionEquality().equals(other._paxOptions, _paxOptions)&&const DeepCollectionEquality().equals(other._paxPrices, _paxPrices)&&const DeepCollectionEquality().equals(other._freebies, _freebies)&&(identical(other.price, price) || other.price == price)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other._images, _images)&&const DeepCollectionEquality().equals(other._galleryImages, _galleryImages)&&const DeepCollectionEquality().equals(other._scents, _scents)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(_inclusions),const DeepCollectionEquality().hash(_paxOptions),const DeepCollectionEquality().hash(_freebies),price,rating,reviewsCount,const DeepCollectionEquality().hash(_images),const DeepCollectionEquality().hash(_galleryImages),const DeepCollectionEquality().hash(_scents),createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,name,description,const DeepCollectionEquality().hash(_inclusions),const DeepCollectionEquality().hash(_paxOptions),const DeepCollectionEquality().hash(_paxPrices),const DeepCollectionEquality().hash(_freebies),price,rating,reviewsCount,const DeepCollectionEquality().hash(_images),const DeepCollectionEquality().hash(_galleryImages),const DeepCollectionEquality().hash(_scents),createdAt,updatedAt);
 
 @override
 String toString() {
-  return 'Package(id: $id, name: $name, description: $description, inclusions: $inclusions, paxOptions: $paxOptions, freebies: $freebies, price: $price, rating: $rating, reviewsCount: $reviewsCount, images: $images, galleryImages: $galleryImages, scents: $scents, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'Package(id: $id, name: $name, description: $description, inclusions: $inclusions, paxOptions: $paxOptions, paxPrices: $paxPrices, freebies: $freebies, price: $price, rating: $rating, reviewsCount: $reviewsCount, images: $images, galleryImages: $galleryImages, scents: $scents, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 
@@ -321,7 +331,7 @@ abstract mixin class _$PackageCopyWith<$Res> implements $PackageCopyWith<$Res> {
   factory _$PackageCopyWith(_Package value, $Res Function(_Package) _then) = __$PackageCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(fromJson: parseIntTolerant) int? id, String? name, String? description,@JsonKey(fromJson: parseStringList) List<String>? inclusions,@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? paxOptions,@JsonKey(fromJson: parseStringList) List<String>? freebies,@JsonKey(fromJson: parseDoubleTolerant) double? price,@JsonKey(fromJson: parseDoubleTolerant) double? rating,@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? reviewsCount,@JsonKey(fromJson: parseStringList) List<String>? images,@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? galleryImages,@JsonKey(fromJson: parseScentList) List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+@JsonKey(fromJson: parseIntTolerant) int? id, String? name, String? description,@JsonKey(fromJson: parseStringList) List<String>? inclusions,@JsonKey(name: 'pax_options', fromJson: parseIntList) List<int>? paxOptions,@JsonKey(name: 'pax_prices', fromJson: parsePaxPrices) Map<int, double>? paxPrices,@JsonKey(fromJson: parseStringList) List<String>? freebies,@JsonKey(fromJson: parseDoubleTolerant) double? price,@JsonKey(fromJson: parseDoubleTolerant) double? rating,@JsonKey(name: 'reviews_count', fromJson: parseIntTolerant) int? reviewsCount,@JsonKey(fromJson: parseStringList) List<String>? images,@JsonKey(name: 'gallery_images', fromJson: parseStringList) List<String>? galleryImages,@JsonKey(fromJson: parseScentList) List<Scent>? scents,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
 });
 
 
@@ -338,14 +348,15 @@ class __$PackageCopyWithImpl<$Res>
 
 /// Create a copy of Package
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? inclusions = freezed,Object? paxOptions = freezed,Object? freebies = freezed,Object? price = freezed,Object? rating = freezed,Object? reviewsCount = freezed,Object? images = freezed,Object? galleryImages = freezed,Object? scents = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? name = freezed,Object? description = freezed,Object? inclusions = freezed,Object? paxOptions = freezed,Object? paxPrices = freezed,Object? freebies = freezed,Object? price = freezed,Object? rating = freezed,Object? reviewsCount = freezed,Object? images = freezed,Object? galleryImages = freezed,Object? scents = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
   return _then(_Package(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int?,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String?,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,inclusions: freezed == inclusions ? _self._inclusions : inclusions // ignore: cast_nullable_to_non_nullable
 as List<String>?,paxOptions: freezed == paxOptions ? _self._paxOptions : paxOptions // ignore: cast_nullable_to_non_nullable
-as List<int>?,freebies: freezed == freebies ? _self._freebies : freebies // ignore: cast_nullable_to_non_nullable
+as List<int>?,paxPrices: freezed == paxPrices ? _self._paxPrices : paxPrices // ignore: cast_nullable_to_non_nullable
+as Map<int, double>?,freebies: freezed == freebies ? _self._freebies : freebies // ignore: cast_nullable_to_non_nullable
 as List<String>?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double?,rating: freezed == rating ? _self.rating : rating // ignore: cast_nullable_to_non_nullable
 as double?,reviewsCount: freezed == reviewsCount ? _self.reviewsCount : reviewsCount // ignore: cast_nullable_to_non_nullable

@@ -22,6 +22,8 @@ abstract class Package with _$Package {
     @JsonKey(fromJson: parseStringList) List<String>? inclusions,
     @JsonKey(name: 'pax_options', fromJson: parseIntList)
     List<int>? paxOptions,
+    @JsonKey(name: 'pax_prices', fromJson: parsePaxPrices)
+    Map<int, double>? paxPrices,
     @JsonKey(fromJson: parseStringList) List<String>? freebies,
     @JsonKey(fromJson: parseDoubleTolerant) double? price,
     @JsonKey(fromJson: parseDoubleTolerant) double? rating,

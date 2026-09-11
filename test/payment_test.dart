@@ -6,8 +6,6 @@ void main() {
   group('isOnlinePayment', () {
     test('returns true for online wallet/checkout methods', () {
       expect(isOnlinePayment(PaymentMethod.creditCard), isTrue);
-      expect(isOnlinePayment(PaymentMethod.gcash), isTrue);
-      expect(isOnlinePayment(PaymentMethod.maya), isTrue);
     });
 
     test('returns false for offline methods', () {

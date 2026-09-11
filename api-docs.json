@@ -330,6 +330,68 @@
                 ]
             }
         },
+        "/api/inquiries": {
+            "post": {
+                "tags": [
+                    "Inquiries"
+                ],
+                "summary": "Submit a new inquiry",
+                "description": "Public lead capture for the landing page. One row per submission; email is not unique.",
+                "operationId": "faf42b4e51cdef6f5020b15879f9d196",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "phone"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "event_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Inquiry created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Inquiry"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/packages": {
             "get": {
                 "tags": [
@@ -593,6 +655,10 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "inquiry_id": {
+                        "type": "integer",
+                        "nullable": true
+                    },
                     "package": {
                         "$ref": "#/components/schemas/Package"
                     },
@@ -601,6 +667,39 @@
                         "items": {
                             "$ref": "#/components/schemas/Scent"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "Inquiry": {
+                "title": "Inquiry",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "phone": {
+                        "type": "string"
+                    },
+                    "event_date": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "archived": {
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -632,6 +731,12 @@
                         "type": "array",
                         "items": {
                             "type": "integer"
+                        }
+                    },
+                    "pax_prices": {
+                        "type": "object",
+                        "example": {
+                            "50": 4499
                         }
                     },
                     "freebies": {
@@ -742,6 +847,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Inquiries",
+            "description": "Inquiries"
         },
         {
             "name": "Wishlist",
