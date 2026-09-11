@@ -1,10 +1,14 @@
 #!/bin/bash
 set -e
+# Pinned Flutter SDK: floating on `stable` once broke Vercel codegen
+# (Dart 3.13 vs analyzer 3.12 emitted bad outputs). This tag built green.
+# Bump deliberately: verify `flutter analyze` + a Vercel deploy, then update.
+FLUTTER_VERSION="3.47.3"
 # Install Flutter SDK if not present
 if [ ! -d "flutter" ]; then
-  git clone https://github.com/flutter/flutter.git -b stable
+  git clone --depth 1 --branch "$FLUTTER_VERSION" https://github.com/flutter/flutter.git
 else
-  cd flutter && git pull && cd ..
+  cd flutter && git fetch --depth 1 origin tag "$FLUTTER_VERSION" && git checkout -q "$FLUTTER_VERSION" && cd ..
 fi
 
 # Add Flutter to PATH
