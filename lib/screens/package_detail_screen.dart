@@ -296,7 +296,7 @@ class PackageDetailScreen extends ConsumerWidget {
                               Text(
                                 initialPax == null
                                     ? 'Starting at ₱${(package.price ?? 4499.0).toStringAsFixed(0)}'
-                                    : '₱${package.priceForPax(initialPax).toStringAsFixed(0)} · $initialPax Guests',
+                                    : '₱${package.priceForPax(initialPax).toStringAsFixed(0)} · $initialPax PAX',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,

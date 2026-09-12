@@ -52,9 +52,9 @@ class OrderSummaryPanel extends StatelessWidget {
 
   static String _paymentMethodLabel(String id) {
     return switch (id) {
-      'credit_card' => 'CARD',
+      'credit_card' => 'ONLINE',
       'cash' => 'CASH',
-      'bank_transfer' => 'BANK TRANSFER',
+      // Legacy payloads may still carry retired methods; display verbatim.
       _ => id.toUpperCase(),
     };
   }
@@ -262,7 +262,7 @@ class OrderSummaryPanel extends StatelessWidget {
                 _buildDetailRow(
                   icon: Icons.people_outline_rounded,
                   label: 'Capacity',
-                  value: '${selectedPax ?? 50} Pax',
+                  value: '${selectedPax ?? 50} PAX',
                   isEmphasized: selectedPax != null,
                 ),
               ],

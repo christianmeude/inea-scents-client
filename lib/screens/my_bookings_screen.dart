@@ -414,16 +414,16 @@ class _BookingCard extends StatelessWidget {
             const SizedBox(height: 11),
 
             // ==========================================================
-            // GUESTS
+            // PAX
             // ==========================================================
             _BookingDetailRow(
               icon: Icons.people_outline,
-              label: 'Guests',
+              label: 'PAX',
               value: booking.pax == null
                   ? 'N/A'
                   : booking.pax == 1
-                      ? '1 guest'
-                      : '${booking.pax} guests',
+                      ? '1 PAX'
+                      : '${booking.pax} PAX',
             ),
 
             const SizedBox(height: 18),

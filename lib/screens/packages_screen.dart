@@ -48,25 +48,25 @@ class PackagesScreen extends ConsumerStatefulWidget {
   ConsumerState<PackagesScreen> createState() => _PackagesScreenState();
 }
 
-/// One selectable card on the packages grid. Tiered packages expand to
-/// one entry per headcount step ("50 Guests — ₱4,499"); untiered packages
+/// One selectable card on the packages grid. Packages with options expand to
+/// one entry per headcount step ("50 PAX — ₱4,499"); packages without options
 /// render as a single entry.
-class _TierEntry {
+class _PackageEntry {
   final Package package;
-  final PackageTier? tier;
+  final PackageOption? option;
 
-  const _TierEntry(this.package, [this.tier]);
+  const _PackageEntry(this.package, [this.option]);
 }
 
-List<_TierEntry> _tierEntries(List<Package> packages) {
-  final entries = <_TierEntry>[];
+List<_PackageEntry> _packageEntries(List<Package> packages) {
+  final entries = <_PackageEntry>[];
   for (final package in packages) {
-    final tiers = package.tiers;
-    if (tiers.isEmpty) {
-      entries.add(_TierEntry(package));
+    final options = package.options;
+    if (options.isEmpty) {
+      entries.add(_PackageEntry(package));
     } else {
-      for (final tier in tiers) {
-        entries.add(_TierEntry(package, tier));
+      for (final option in options) {
+        entries.add(_PackageEntry(package, option));
       }
     }
   }
@@ -414,15 +414,14 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                               mainAxisSpacing: 16,
                             ),
 
-                        itemCount: _tierEntries(packages).length,
+                        itemCount: _packageEntries(packages).length,
 
                         itemBuilder: (context, index) {
-                          final entry = _tierEntries(packages)[index];
+                          final entry = _packageEntries(packages)[index];
 
                           return PackageCard(
                             package: entry.package,
-                            tierPax: entry.tier?.pax,
-                            tierPrice: entry.tier?.price,
+                            optionPax: entry.option?.pax,
                           );
                         },
                       );

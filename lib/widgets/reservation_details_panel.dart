@@ -30,30 +30,24 @@ class ReservationDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tiers = package.tiers;
-    final paxList = tiers.isNotEmpty
-        ? tiers.map((t) => t.pax).toList()
-        : ((package.paxOptions != null && package.paxOptions!.isNotEmpty)
-              ? package.paxOptions!
-              : [20, 30, 50, 75, 100]);
+    final options = package.options;
+    final paxList = options.isNotEmpty
+        ? options.map((t) => t.pax).toList()
+        : (package.paxOptions ?? const <int>[]);
 
-    String? tierPriceLabel(int pax) {
-      if (tiers.isEmpty) return null;
+    String? optionPriceLabel(int pax) {
+      if (options.isEmpty) return null;
       return '₱${package.priceForPax(pax).toStringAsFixed(0)}';
     }
 
+    // Customer-facing methods only: Online (PayMongo) or Cash.
     final paymentMethods = [
       {
         'id': 'credit_card',
-        'label': 'VISA / MC',
+        'label': 'Online',
         'color': const Color(0xFFEB001B),
       },
       {'id': 'cash', 'label': 'Cash', 'color': const Color(0xFF16A34A)},
-      {
-        'id': 'bank_transfer',
-        'label': 'Bank Transfer',
-        'color': const Color(0xFF475569),
-      },
     ];
 
     return Column(
@@ -196,7 +190,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                 runSpacing: 8,
                 children: paxList.map((pax) {
                   final isSelected = selectedPax == pax;
-                  final price = tierPriceLabel(pax);
+                  final price = optionPriceLabel(pax);
                   return InkWell(
                     onTap: () => onPaxSelected(pax),
                     borderRadius: BorderRadius.circular(9999),
@@ -236,7 +230,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            price == null ? '$pax Pax' : '$pax Pax · $price',
+                            price == null ? '$pax PAX' : '$pax PAX · $price',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: isSelected

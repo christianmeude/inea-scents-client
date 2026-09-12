@@ -51,10 +51,6 @@ class DesktopPaymentPanel extends StatefulWidget {
 }
 
 class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
-  late TextEditingController _cardNumberController;
-  late TextEditingController _cardHolderController;
-  late TextEditingController _expiryController;
-  late TextEditingController _cvvController;
   late TextEditingController _customerNameController;
   late TextEditingController _customerEmailController;
   late TextEditingController _customerPhoneController;
@@ -63,10 +59,6 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
   @override
   void initState() {
     super.initState();
-    _cardNumberController = TextEditingController();
-    _cardHolderController = TextEditingController();
-    _expiryController = TextEditingController();
-    _cvvController = TextEditingController();
     _customerNameController = TextEditingController(
       text: widget.customerName ?? '',
     );
@@ -104,10 +96,6 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
 
   @override
   void dispose() {
-    _cardNumberController.dispose();
-    _cardHolderController.dispose();
-    _expiryController.dispose();
-    _cvvController.dispose();
     _customerNameController.dispose();
     _customerEmailController.dispose();
     _customerPhoneController.dispose();
@@ -119,27 +107,23 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
   Widget build(BuildContext context) {
     final activeMethod = widget.paymentMethod ?? 'credit_card';
 
+    // Customer-facing methods: Online (PayMongo) or Cash (admin confirm).
+    // bank_transfer is retired (owner Q14-B); the enum keeps it for
+    // legacy payloads but no picker offers it.
     final paymentMethods = [
       {
         'id': 'credit_card',
-        'label': 'Credit / Debit Card',
-        'sublabel': 'VISA / Mastercard',
+        'label': 'Online',
+        'sublabel': 'PayMongo secure checkout',
         'color': const Color(0xFFEB001B),
         'icon': Icons.credit_card_rounded,
       },
       {
         'id': 'cash',
         'label': 'Cash',
-        'sublabel': 'Offline',
+        'sublabel': 'Pay on event day · admin confirms',
         'color': const Color(0xFF16A34A),
         'icon': Icons.payments_rounded,
-      },
-      {
-        'id': 'bank_transfer',
-        'label': 'Bank Transfer',
-        'sublabel': 'Offline',
-        'color': const Color(0xFF475569),
-        'icon': Icons.account_balance_rounded,
       },
     ];
 
@@ -537,7 +521,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Expanded(
                           child: Text(
                             activeMethod == 'credit_card'
-                                ? '2. Card Details'
+                                ? '2. Online Checkout'
                                 : '2. Offline Payment Instructions',
                             style: const TextStyle(
                               fontSize: 15,
@@ -552,94 +536,46 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                     ),
                     const SizedBox(height: 14),
 
+                    // Online = PayMongo link flow: no card is captured here.
+                    // Tapping Confirm & Pay opens the secure checkout page.
                     if (activeMethod == 'credit_card') ...[
-                      _buildInputField(
-                        label: 'Cardholder Full Name',
-                        hint: 'e.g. Maria Santos',
-                        controller: _cardHolderController,
-                        keyName: 'payment_cardholder_name',
-                        icon: Icons.person_outline_rounded,
-                        textInputAction: TextInputAction.next,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildInputField(
-                        label: 'Card Number',
-                        hint: '4123 4567 8901 2345',
-                        controller: _cardNumberController,
-                        keyName: 'payment_card_number',
-                        icon: Icons.credit_card_rounded,
-                        keyboardType: TextInputType.number,
-                        textInputAction: TextInputAction.next,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9 ]')),
-                          LengthLimitingTextInputFormatter(19),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (isNarrow) ...[
-                        _buildInputField(
-                          label: 'Expiration Date',
-                          hint: 'MM / YY',
-                          controller: _expiryController,
-                          keyName: 'payment_card_expiry',
-                          icon: Icons.calendar_today_outlined,
-                          keyboardType: TextInputType.datetime,
-                          textInputAction: TextInputAction.next,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(5),
-                          ],
+                      Container(
+                        key: const Key('online_checkout_explainer'),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(
+                            0xFFEB001B,
+                          ).withValues(alpha: 0.06),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(
+                              0xFFEB001B,
+                            ).withValues(alpha: 0.25),
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        _buildInputField(
-                          label: 'Security Code (CVV)',
-                          hint: '123',
-                          controller: _cvvController,
-                          keyName: 'payment_card_cvv',
-                          icon: Icons.lock_outline_rounded,
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
-                          obscureText: true,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(4),
-                          ],
-                        ),
-                      ] else
-                        Row(
+                        child: const Row(
                           children: [
-                            Expanded(
-                              child: _buildInputField(
-                                label: 'Expiration Date',
-                                hint: 'MM / YY',
-                                controller: _expiryController,
-                                keyName: 'payment_card_expiry',
-                                icon: Icons.calendar_today_outlined,
-                                keyboardType: TextInputType.datetime,
-                                textInputAction: TextInputAction.next,
-                                inputFormatters: [
-                                  LengthLimitingTextInputFormatter(5),
-                                ],
-                              ),
+                            Icon(
+                              Icons.lock_outline_rounded,
+                              size: 18,
+                              color: Color(0xFFEB001B),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 10),
                             Expanded(
-                              child: _buildInputField(
-                                label: 'Security Code (CVV)',
-                                hint: '123',
-                                controller: _cvvController,
-                                keyName: 'payment_card_cvv',
-                                icon: Icons.lock_outline_rounded,
-                                keyboardType: TextInputType.number,
-                                textInputAction: TextInputAction.next,
-                                obscureText: true,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(4),
-                                ],
+                              child: Text(
+                                'You will continue to PayMongo\u2019s secure checkout. '
+                                'Your booking confirms automatically once payment succeeds — '
+                                'no card details are entered here.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFFEB001B),
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ],
                         ),
+                      ),
                     ] else ...[
                       Container(
                         padding: const EdgeInsets.all(12),
@@ -664,9 +600,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                activeMethod == 'cash'
-                                    ? 'You will pay in cash on the event day. Our team will confirm your booking shortly.'
-                                    : 'Send payment via bank transfer. Our team will confirm your booking once the payment is received.',
+                                'You will pay in cash on the event day. Our team will confirm your booking shortly.',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF16A34A),

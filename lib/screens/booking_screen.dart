@@ -36,10 +36,15 @@ class BookingScreen extends ConsumerStatefulWidget {
 class _BookingScreenState extends ConsumerState<BookingScreen> {
   static const Color plum = Color(0xFF6A4053);
 
-  DateTime? _selectedDate;
-  int? _selectedPax;
-  String? _selectedTime;
-  String? _paymentMethod = 'credit_card';
+  /// P4 state shape: selections are owned by [bookingFlowProvider].
+  /// The screen watches (see build) and dispatches — no local mirror.
+  /// Text controllers stay local per Flutter requirements and commit
+  /// through to the notifier on change (see panel callbacks below).
+  DateTime? get _selectedDate => ref.read(bookingFlowProvider).selectedDate;
+  int? get _selectedPax => ref.read(bookingFlowProvider).selectedPax;
+  String? get _selectedTime => ref.read(bookingFlowProvider).selectedTime;
+  String get _paymentMethod =>
+      ref.read(bookingFlowProvider).paymentMethod ?? 'credit_card';
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _customerEmailController =
       TextEditingController();
@@ -69,15 +74,22 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     // so the reset lands before the new package is set.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      ref
-          .read(bookingFlowProvider.notifier)
-          .ensureFreshForPackage(widget.packageId);
+      final notifier = ref.read(bookingFlowProvider.notifier);
+      notifier.ensureFreshForPackage(widget.packageId);
+      // Notifier-owned defaults (provider writes are forbidden in initState).
+      final flow = ref.read(bookingFlowProvider);
+      if (flow.selectedDate == null) {
+        notifier.setSelectedDate(DateTime.now().add(const Duration(days: 3)));
+      }
+      // Freeform clock time, prefilled like the old default slot so the
+      // schedule step is submittable before the user opens the picker.
+      if (flow.selectedTime == null) {
+        notifier.setSelectedTime('14:00:00');
+      }
+      if (flow.paymentMethod == null) {
+        notifier.setPaymentMethod('credit_card');
+      }
     });
-    _selectedDate = DateTime.now().add(const Duration(days: 3));
-    // Freeform clock time, prefilled like the old default slot so the
-    // schedule step is submittable before the user opens the picker.
-    _selectedTime = '14:00:00';
-    _selectedPax = 50;
     _loadPackage();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -222,44 +234,33 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       packageAsync.whenData((package) {
-        ref.read(bookingFlowProvider.notifier).setSelectedPackage(package);
+        final notifier = ref.read(bookingFlowProvider.notifier);
+        notifier.setSelectedPackage(package);
         _syncNotifierDefaults();
-        if (_selectedDate != null) {
-          ref
-              .read(bookingFlowProvider.notifier)
-              .setSelectedDate(_selectedDate!);
-        }
-        if (_selectedTime != null) {
-          ref
-              .read(bookingFlowProvider.notifier)
-              .setSelectedTime(_selectedTime!);
-        }
         if (package.paxOptions != null && package.paxOptions!.isNotEmpty) {
-          // Honor a tier preselected from a tier card; otherwise the first
-          // available option wins as before.
-          final tiers = package.tiers.map((t) => t.pax).toList();
+          // Honor a package option preselected from a package card; otherwise
+          // the first available option wins as before.
+          final options = package.options.map((t) => t.pax).toList();
           final preselected = widget.initialPax;
-          final candidates = tiers.isNotEmpty ? tiers : package.paxOptions!;
+          final candidates = options.isNotEmpty ? options : package.paxOptions!;
           final chosen =
               (preselected != null && candidates.contains(preselected))
               ? preselected
               : candidates.first;
-          setState(() {
-            _selectedPax = chosen;
-          });
-          ref.read(bookingFlowProvider.notifier).setSelectedPax(chosen);
+          notifier.setSelectedPax(chosen);
         }
       });
     });
   }
 
-  /// Pushes UI defaults into the booking flow notifier so submission has a
+  /// Ensures the notifier carries a payment default so submission has a
   /// complete state even when the user never touched a control.
+  /// (Selections now live in the notifier; nothing to mirror back.)
   void _syncNotifierDefaults() {
     final state = ref.read(bookingFlowProvider);
     final notifier = ref.read(bookingFlowProvider.notifier);
-    if (state.paymentMethod == null && _paymentMethod != null) {
-      notifier.setPaymentMethod(_paymentMethod!);
+    if (state.paymentMethod == null) {
+      notifier.setPaymentMethod('credit_card');
     }
   }
 
@@ -283,7 +284,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     if (picked == null || !mounted) return;
     final value =
         '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}:00';
-    setState(() => _selectedTime = value);
     ref.read(bookingFlowProvider.notifier).setSelectedTime(value);
   }
 
@@ -297,27 +297,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       next.whenData((package) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          ref.read(bookingFlowProvider.notifier).setSelectedPackage(package);
+          final flowNotifier = ref.read(bookingFlowProvider.notifier);
+          flowNotifier.setSelectedPackage(package);
           _syncNotifierDefaults();
-          if (_selectedDate != null) {
-            ref
-                .read(bookingFlowProvider.notifier)
-                .setSelectedDate(_selectedDate!);
-          }
-          if (_selectedTime != null) {
-            ref
-                .read(bookingFlowProvider.notifier)
-                .setSelectedTime(_selectedTime!);
-          }
+          // Selections live in the notifier; only repair a pax value that
+          // the freshly loaded package no longer offers.
           if (package.paxOptions != null && package.paxOptions!.isNotEmpty) {
-            if (_selectedPax == null ||
-                !package.paxOptions!.contains(_selectedPax)) {
-              setState(() {
-                _selectedPax = package.paxOptions!.first;
-              });
-              ref
-                  .read(bookingFlowProvider.notifier)
-                  .setSelectedPax(package.paxOptions!.first);
+            final currentPax = ref.read(bookingFlowProvider).selectedPax;
+            if (currentPax == null ||
+                !package.paxOptions!.contains(currentPax)) {
+              flowNotifier.setSelectedPax(package.paxOptions!.first);
             }
           }
         });
@@ -474,9 +463,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 .setVenueAddress(v);
                           },
                           onPaymentMethodSelected: (method) {
-                            setState(() {
-                              _paymentMethod = method;
-                            });
                             ref
                                 .read(bookingFlowProvider.notifier)
                                 .setPaymentMethod(method);
@@ -507,9 +493,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   key: const Key('reservation_calendar_panel'),
                                   selectedDate: _selectedDate,
                                   onDateSelected: (date) {
-                                    setState(() {
-                                      _selectedDate = date;
-                                    });
                                     ref
                                         .read(bookingFlowProvider.notifier)
                                         .setSelectedDate(date);
@@ -530,27 +513,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   package: package,
                                   selectedPax: _selectedPax,
                                   onPaxSelected: (pax) {
-                                    setState(() {
-                                      _selectedPax = pax;
-                                    });
                                     ref
                                         .read(bookingFlowProvider.notifier)
                                         .setSelectedPax(pax);
                                   },
                                   selectedTime: _selectedTime,
                                   onTimeSelected: (time) {
-                                    setState(() {
-                                      _selectedTime = time;
-                                    });
                                     ref
                                         .read(bookingFlowProvider.notifier)
                                         .setSelectedTime(time);
                                   },
                                   paymentMethod: _paymentMethod,
                                   onPaymentMethodSelected: (method) {
-                                    setState(() {
-                                      _paymentMethod = method;
-                                    });
                                     ref
                                         .read(bookingFlowProvider.notifier)
                                         .setPaymentMethod(method);
@@ -589,11 +563,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       if (_currentStep == 4) {
                         _handleConfirmAndPay();
                       } else {
-                        final localOk =
-                            _selectedDate != null &&
-                            _selectedPax != null &&
-                            _selectedTime != null;
-                        if (!notifier.canProceedFromSchedule() && !localOk) {
+                        // Selections live in the notifier; the gate below is
+                        // the single authority — nothing to mirror back.
+                        if (!notifier.canProceedFromSchedule()) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
@@ -602,15 +574,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             ),
                           );
                           return;
-                        }
-                        if (_selectedDate != null) {
-                          notifier.setSelectedDate(_selectedDate!);
-                        }
-                        if (_selectedPax != null) {
-                          notifier.setSelectedPax(_selectedPax!);
-                        }
-                        if (_selectedTime != null) {
-                          notifier.setSelectedTime(_selectedTime!);
                         }
                         _goToStep(4);
                       }
@@ -696,9 +659,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 .setVenueAddress(v);
                           },
                           onPaymentMethodSelected: (method) {
-                            setState(() {
-                              _paymentMethod = method;
-                            });
                             ref
                                 .read(bookingFlowProvider.notifier)
                                 .setPaymentMethod(method);
@@ -717,9 +677,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 key: const Key('tablet_calendar_panel'),
                                 selectedDate: _selectedDate,
                                 onDateSelected: (date) {
-                                  setState(() {
-                                    _selectedDate = date;
-                                  });
                                   ref
                                       .read(bookingFlowProvider.notifier)
                                       .setSelectedDate(date);
@@ -731,27 +688,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 package: package,
                                 selectedPax: _selectedPax,
                                 onPaxSelected: (pax) {
-                                  setState(() {
-                                    _selectedPax = pax;
-                                  });
                                   ref
                                       .read(bookingFlowProvider.notifier)
                                       .setSelectedPax(pax);
                                 },
                                 selectedTime: _selectedTime,
                                 onTimeSelected: (time) {
-                                  setState(() {
-                                    _selectedTime = time;
-                                  });
                                   ref
                                       .read(bookingFlowProvider.notifier)
                                       .setSelectedTime(time);
                                 },
                                 paymentMethod: _paymentMethod,
                                 onPaymentMethodSelected: (method) {
-                                  setState(() {
-                                    _paymentMethod = method;
-                                  });
                                   ref
                                       .read(bookingFlowProvider.notifier)
                                       .setPaymentMethod(method);
@@ -787,11 +735,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       if (_currentStep == 4) {
                         _handleConfirmAndPay();
                       } else {
-                        final localOk =
-                            _selectedDate != null &&
-                            _selectedPax != null &&
-                            _selectedTime != null;
-                        if (!notifier.canProceedFromSchedule() && !localOk) {
+                        // Selections live in the notifier; the gate below is
+                        // the single authority — nothing to mirror back.
+                        if (!notifier.canProceedFromSchedule()) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
@@ -800,15 +746,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             ),
                           );
                           return;
-                        }
-                        if (_selectedDate != null) {
-                          notifier.setSelectedDate(_selectedDate!);
-                        }
-                        if (_selectedPax != null) {
-                          notifier.setSelectedPax(_selectedPax!);
-                        }
-                        if (_selectedTime != null) {
-                          notifier.setSelectedTime(_selectedTime!);
                         }
                         _goToStep(4);
                       }
@@ -1449,10 +1386,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Widget _buildCurrentStep(Package package) {
     if (_currentStep == 2) {
       // Schedule Step
-      final tiers = package.tiers;
-      final paxEntries = tiers.isNotEmpty
-          ? tiers.map((t) => t.pax).toList()
-          : (package.paxOptions ?? [20, 30, 50, 75, 100]);
+      final options = package.options;
+      // API options first, legacy paxOptions second, never a hardcoded list:
+      // an empty list renders a flagged notice instead of silent pricing.
+      final paxEntries = options.isNotEmpty
+          ? options.map((t) => t.pax).toList()
+          : (package.paxOptions ?? const <int>[]);
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1466,9 +1405,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             key: const Key('mobile_inea_calendar'),
             selectedDate: _selectedDate,
             onDateSelected: (date) {
-              setState(() {
-                _selectedDate = date;
-              });
               ref.read(bookingFlowProvider.notifier).setSelectedDate(date);
             },
           ),
@@ -1491,11 +1427,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               runSpacing: 8,
               children: paxEntries.map((pax) {
                 final isSelected = _selectedPax == pax;
-                final priceLabel = tiers.isNotEmpty
+                final priceLabel = options.isNotEmpty
                     ? ' · ₱${package.priceForPax(pax).toStringAsFixed(0)}'
                     : '';
                 return ChoiceChip(
-                  label: Text('$pax Pax$priceLabel'),
+                  label: Text('$pax PAX$priceLabel'),
                   selected: isSelected,
                   selectedColor: plum,
                   labelStyle: TextStyle(
@@ -1506,7 +1442,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   ),
                   onSelected: (selected) {
                     if (selected) {
-                      setState(() => _selectedPax = pax);
                       ref
                           .read(bookingFlowProvider.notifier)
                           .setSelectedPax(pax);
@@ -1693,7 +1628,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        '${_selectedPax ?? 50} Pax',
+                        '${_selectedPax ?? 50} PAX',
                         style: const TextStyle(fontSize: 13, color: plum),
                       ),
                       const SizedBox(height: 15),
@@ -1892,19 +1827,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 ),
                 const SizedBox(height: 15),
                 const Text(
-                  'Inclusion/s:',
+                  'Inclusions:',
                   style: TextStyle(fontSize: 12, color: Color(0xFF99868C)),
                 ),
                 const SizedBox(height: 10),
+                // Live package data — same source as the desktop summary.
+                // No per-item prices exist; rows show Included/Free.
                 ...[
-                  {'label': 'Featuring your logo', 'val': '300'},
-                  {'label': '4 Inspired scents', 'val': '800'},
-                  {'label': 'Perfume Bar Setup', 'val': '1500'},
-                  {'label': 'Claim Stub', 'val': '150'},
-                  {'label': 'Duration: 3-4 Hrs', 'val': '0.00'},
-                  {'label': '2 staff members', 'val': '1000'},
-                  {'label': 'Selfie Mirror', 'val': '0.00'},
-                  {'label': '1 Gift for Celebrant', 'val': '0.00'},
+                  ...?package.inclusions?.map(
+                    (label) => {'label': label, 'val': 'Included'},
+                  ),
+                  ...?package.freebies?.map(
+                    (label) => {'label': label, 'val': 'Free'},
+                  ),
                 ].map((item) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(vertical: 3),
@@ -1959,7 +1894,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: Text(
-                    'Total: Php. ${(package.price ?? 4500.0).toStringAsFixed(2)}',
+                    'Total: Php. ${package.priceForPax(_selectedPax).toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xFF99868C),
@@ -1996,7 +1931,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       [
                         {
                           'id': 'credit_card',
-                          'label': 'VISA / MC',
+                          'label': 'Online',
                           'color': const Color(0xFFEB001B),
                         },
                         {
@@ -2004,24 +1939,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           'label': 'Cash',
                           'color': const Color(0xFF16A34A),
                         },
-                        {
-                          'id': 'bank_transfer',
-                          'label': 'Bank Transfer',
-                          'color': const Color(0xFF475569),
-                        },
                       ].map((m) {
                         final isSel = _paymentMethod == m['id'];
                         return SizedBox(
                           width: (MediaQuery.of(context).size.width - 138) / 2,
                           child: InkWell(
-                            onTap: () {
-                              setState(
-                                () => _paymentMethod = m['id'] as String,
-                              );
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setPaymentMethod(m['id'] as String);
-                            },
+                              onTap: () {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setPaymentMethod(m['id'] as String);
+                              },
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 8),

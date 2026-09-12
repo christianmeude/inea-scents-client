@@ -290,18 +290,18 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Initially, default pax is 20 Pax (from testPackage.paxOptions.first)
+        // Initially, default pax is 20 PAX (from testPackage.paxOptions.first)
         expect(find.text('Capacity'), findsOneWidget);
-        expect(find.text('20 Pax'), findsWidgets);
+        expect(find.text('20 PAX'), findsWidgets);
 
-        // Tap on '75 Pax' choice in middle column
-        final seventyFivePaxFinder = find.text('75 Pax');
+        // Tap on '75 PAX' choice in middle column
+        final seventyFivePaxFinder = find.text('75 PAX');
         expect(seventyFivePaxFinder, findsOneWidget);
         await tester.tap(seventyFivePaxFinder);
         await tester.pumpAndSettle();
 
-        // Verify Order Summary now reflects 75 Pax
-        expect(find.text('75 Pax'), findsWidgets);
+        // Verify Order Summary now reflects 75 PAX
+        expect(find.text('75 PAX'), findsWidgets);
       },
     );
 
@@ -350,22 +350,25 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Select 'Bank Transfer' in middle column
-        final bankTransferFinder = find.text('Bank Transfer');
+        // Retired method is gone from every picker (owner Q14-B).
+        expect(find.text('Bank Transfer'), findsNothing);
+
+        // Select 'Cash' in middle column
+        final cashFinder = find.text('Cash');
         await tester.scrollUntilVisible(
-          bankTransferFinder,
+          cashFinder,
           100,
           scrollable: find.descendant(
             of: find.byKey(const Key('desktop_middle_scroll_view')),
             matching: find.byType(Scrollable),
           ),
         );
-        expect(bankTransferFinder, findsOneWidget);
-        await tester.tap(bankTransferFinder);
+        expect(cashFinder, findsWidgets);
+        await tester.tap(cashFinder.first);
         await tester.pumpAndSettle();
 
-        // Verify Order Summary displays 'BANK TRANSFER' badge
-        expect(find.text('BANK TRANSFER'), findsOneWidget);
+        // Verify Order Summary displays 'CASH' badge
+        expect(find.text('CASH'), findsWidgets);
       },
     );
 
@@ -665,8 +668,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Change selections on desktop: 100 Pax, Cash (time stays default)
-        final hundredPaxFinder = find.text('100 Pax');
+        // Change selections on desktop: 100 PAX, Cash (time stays default)
+        final hundredPaxFinder = find.text('100 PAX');
         expect(hundredPaxFinder, findsOneWidget);
         await tester.tap(hundredPaxFinder);
         await tester.pumpAndSettle();
@@ -687,7 +690,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('CASH'), findsOneWidget);
-        expect(find.text('100 Pax'), findsWidgets);
+        expect(find.text('100 PAX'), findsWidgets);
 
         // Oscillate across desktop/tablet boundary multiple times
         for (int i = 0; i < 3; i++) {
@@ -854,7 +857,7 @@ void main() {
 
         // Step 2: Schedule & Pax
         expect(find.text('Please Choose Available Schedule'), findsOneWidget);
-        final thirtyPaxFinder = find.text('30 Pax');
+        final thirtyPaxFinder = find.text('30 PAX');
         await tester.scrollUntilVisible(
           thirtyPaxFinder,
           100,
@@ -897,7 +900,7 @@ void main() {
         // Step 4: Payment
         expect(find.text('Price Details'), findsOneWidget);
         expect(find.text('Choose Payment Method'), findsOneWidget);
-        final cardFinder = find.text('VISA / MC');
+        final cardFinder = find.text('Online');
         await tester.scrollUntilVisible(
           cardFinder,
           100,
@@ -1473,7 +1476,7 @@ void main() {
     );
 
     testWidgets(
-      'Interactive payment method switching in DesktopPaymentPanel (Card, Cash, Bank Transfer) updates Order Summary live preview',
+      'Interactive payment method switching in DesktopPaymentPanel (Online, Cash) updates Order Summary live preview',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1489,34 +1492,30 @@ void main() {
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
-        // 1. Initial method is Card
-        expect(find.text('2. Card Details'), findsOneWidget);
-        expect(find.text('CARD'), findsOneWidget);
-        expect(find.text('Cardholder Full Name'), findsOneWidget);
-        expect(find.text('Card Number'), findsOneWidget);
+        // 1. Initial method is Online: explainer, no card capture, no retired methods
+        expect(find.text('2. Online Checkout'), findsOneWidget);
+        expect(find.text('ONLINE'), findsWidgets);
+        expect(
+          find.byKey(const Key('online_checkout_explainer')),
+          findsOneWidget,
+        );
+        expect(find.text('Cardholder Full Name'), findsNothing);
+        expect(find.text('Card Number'), findsNothing);
+        expect(find.text('Bank Transfer'), findsNothing);
 
         // 2. Select Cash
         final cashMethodFinder = find.text('Cash');
-        expect(cashMethodFinder, findsOneWidget);
-        await tester.tap(cashMethodFinder);
+        expect(cashMethodFinder, findsWidgets);
+        await tester.tap(cashMethodFinder.first);
         await tester.pumpAndSettle();
 
         expect(find.text('2. Offline Payment Instructions'), findsOneWidget);
-        expect(find.text('CASH'), findsOneWidget);
-
-        // 3. Select Bank Transfer
-        final bankMethodFinder = find.text('Bank Transfer');
-        expect(bankMethodFinder, findsOneWidget);
-        await tester.tap(bankMethodFinder);
-        await tester.pumpAndSettle();
-
-        expect(find.text('2. Offline Payment Instructions'), findsOneWidget);
-        expect(find.text('BANK TRANSFER'), findsOneWidget);
+        expect(find.text('CASH'), findsWidgets);
       },
     );
 
     testWidgets(
-      'DesktopPaymentPanel card and contact text input fields accept keyboard entries cleanly',
+      'DesktopPaymentPanel contact text input fields accept keyboard entries cleanly',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1532,27 +1531,14 @@ void main() {
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
-        // Switch to Card
-        await tester.tap(find.text('Credit / Debit Card'));
+        // Online is the default: explainer on, no card capture anywhere
+        await tester.tap(find.text('Online'));
         await tester.pumpAndSettle();
-
-        // Enter card details
-        await tester.enterText(
-          find.byKey(const Key('payment_cardholder_name')),
-          'Maria Clara',
+        expect(
+          find.byKey(const Key('online_checkout_explainer')),
+          findsOneWidget,
         );
-        await tester.enterText(
-          find.byKey(const Key('payment_card_number')),
-          '4123 9999 8888 7777',
-        );
-        await tester.enterText(
-          find.byKey(const Key('payment_card_expiry')),
-          '12/28',
-        );
-        await tester.enterText(
-          find.byKey(const Key('payment_card_cvv')),
-          '888',
-        );
+        expect(find.text('Card Number'), findsNothing);
 
         // Enter customer & venue details
         await tester.enterText(
@@ -1574,8 +1560,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Maria Clara'), findsWidgets);
-        expect(find.text('4123 9999 8888 7777'), findsOneWidget);
-        expect(find.text('The Peninsula Manila'), findsOneWidget);
+        expect(find.text('The Peninsula Manila'), findsWidgets);
         expect(tester.takeException(), isNull);
       },
     );
@@ -1894,7 +1879,7 @@ void main() {
     );
 
     testWidgets(
-      'DesktopPaymentPanel inputFormatters enforce numeric constraints and length limits on card and CVV fields',
+      'DesktopPaymentPanel captures no card details: Online shows explainer and contact fields accept input',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1909,41 +1894,33 @@ void main() {
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
-        // Switch to Card
-        await tester.tap(find.text('Credit / Debit Card'));
+        // Online method: explainer present, card capture absent
+        await tester.tap(find.text('Online'));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('online_checkout_explainer')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('payment_card_number')),
+          findsNothing,
+        );
+        expect(find.byKey(const Key('payment_card_cvv')), findsNothing);
+        expect(find.byKey(const Key('payment_card_expiry')), findsNothing);
+
+        // Contact email still accepts free text
+        final emailField = find.byKey(const Key('payment_customer_email'));
+        await tester.enterText(emailField, 'maria@example.com');
         await tester.pumpAndSettle();
 
-        // Attempt to enter alpha characters and excess digits into card number
-        final cardField = find.byKey(const Key('payment_card_number'));
-        await tester.enterText(cardField, '4123ABCD4567890123456789999');
-        await tester.pumpAndSettle();
-
-        final TextField cardWidget = tester.widget(cardField);
-        // Digits only & max 19 chars
-        expect(cardWidget.controller?.text, equals('4123456789012345678'));
-
-        // Attempt to enter alpha characters and excess digits into CVV
-        final cvvField = find.byKey(const Key('payment_card_cvv'));
-        await tester.enterText(cvvField, '99XYZ88');
-        await tester.pumpAndSettle();
-
-        final TextField cvvWidget = tester.widget(cvvField);
-        // Digits only & max 4 chars
-        expect(cvvWidget.controller?.text, equals('9988'));
-
-        // Expiry max 5 chars
-        final expiryField = find.byKey(const Key('payment_card_expiry'));
-        await tester.enterText(expiryField, '12/2030');
-        await tester.pumpAndSettle();
-
-        final TextField expiryWidget = tester.widget(expiryField);
-        expect(expiryWidget.controller?.text, equals('12/20'));
+        final TextField emailWidget = tester.widget(emailField);
+        expect(emailWidget.controller?.text, equals('maria@example.com'));
         expect(tester.takeException(), isNull);
       },
     );
 
     testWidgets(
-      'DesktopPaymentPanel fields expose proper TextInputAction for keyboard navigation',
+      'DesktopPaymentPanel contact fields expose proper TextInputAction for keyboard navigation',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1957,20 +1934,6 @@ void main() {
 
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
-
-        // Switch to Card
-        await tester.tap(find.text('Credit / Debit Card'));
-        await tester.pumpAndSettle();
-
-        final cardHolderField = find.byKey(
-          const Key('payment_cardholder_name'),
-        );
-        final TextField cardHolderWidget = tester.widget(cardHolderField);
-        expect(cardHolderWidget.textInputAction, equals(TextInputAction.next));
-
-        final cardField = find.byKey(const Key('payment_card_number'));
-        final TextField cardWidget = tester.widget(cardField);
-        expect(cardWidget.textInputAction, equals(TextInputAction.next));
 
         final nameField = find.byKey(const Key('payment_customer_name'));
         final TextField nameWidget = tester.widget(nameField);
@@ -2057,24 +2020,24 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Select 100 Pax and Card on reservation step
-        await tester.tap(find.text('100 Pax'));
+        // Select 100 PAX and Online on reservation step
+        await tester.tap(find.text('100 PAX'));
         await tester.pumpAndSettle();
 
-        final cardOption = find.text('VISA / MC');
+        final onlineOption = find.text('Online');
         await tester.scrollUntilVisible(
-          cardOption,
+          onlineOption,
           100,
           scrollable: find.descendant(
             of: find.byKey(const Key('desktop_middle_scroll_view')),
             matching: find.byType(Scrollable),
           ),
         );
-        await tester.tap(cardOption);
+        await tester.tap(onlineOption);
         await tester.pumpAndSettle();
 
-        expect(find.text('CARD'), findsOneWidget);
-        expect(find.text('100 Pax'), findsWidgets);
+        expect(find.text('ONLINE'), findsWidgets);
+        expect(find.text('100 PAX'), findsWidgets);
 
         // Rapidly toggle forward and backward 3 times
         for (int i = 0; i < 3; i++) {
@@ -2100,8 +2063,8 @@ void main() {
         }
 
         // State is preserved
-        expect(find.text('CARD'), findsOneWidget);
-        expect(find.text('100 Pax'), findsWidgets);
+        expect(find.text('ONLINE'), findsWidgets);
+        expect(find.text('100 PAX'), findsWidgets);
 
         // Final proceed to payment and confirm
         await tester.tap(find.text('Proceed to Payment'));
@@ -2148,7 +2111,11 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Payment & Checkout Details'), findsOneWidget);
-        expect(find.text('2. Card Details'), findsOneWidget);
+        expect(find.text('2. Online Checkout'), findsOneWidget);
+        expect(
+          find.byKey(const Key('online_checkout_explainer')),
+          findsOneWidget,
+        );
         expect(tester.takeException(), isNull);
       },
     );

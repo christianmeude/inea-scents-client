@@ -7,17 +7,15 @@ class PackageCard extends StatefulWidget {
   final Package package;
   final VoidCallback? onTap;
 
-  /// Tier override: renders this card as one selectable headcount step
-  /// ("50 Guests — ₱4,499") instead of the whole package.
-  final int? tierPax;
-  final double? tierPrice;
+  /// Package-option override: renders this card as one selectable headcount
+  /// step ("50 PAX — ₱4,499") instead of the whole package.
+  final int? optionPax;
 
   const PackageCard({
     super.key,
     required this.package,
     this.onTap,
-    this.tierPax,
-    this.tierPrice,
+    this.optionPax,
   });
 
   @override
@@ -32,12 +30,12 @@ class _PackageCardState extends State<PackageCard> {
     if (widget.onTap != null) {
       widget.onTap!();
     } else {
-      final tier = widget.tierPax;
+      final option = widget.optionPax;
       final id = widget.package.id;
       context.push(
-        tier == null
+        option == null
             ? '/package-details/$id'
-            : '/package-details/$id?pax=$tier',
+            : '/package-details/$id?pax=$option',
       );
     }
   }
@@ -197,8 +195,8 @@ class _PackageCardState extends State<PackageCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.tierPax != null
-                          ? '${widget.tierPax} Guests'
+                      widget.optionPax != null
+                          ? '${widget.optionPax} PAX'
                           : package.name ?? '',
                       style: TextStyle(
                         fontSize: 16,
@@ -248,7 +246,7 @@ class _PackageCardState extends State<PackageCard> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Php. ${(widget.tierPrice ?? package.price ?? 4499.0).toStringAsFixed(2)}',
+                      'Php. ${package.priceForPax(widget.optionPax).toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 15,
                         color: primaryTextColor,

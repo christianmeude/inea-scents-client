@@ -40,15 +40,15 @@ void main() {
     });
   });
 
-  group('PackageTiers', () {
-    test('tiers sorts by pax with titles and labels', () {
-      final tiers = _tieredPackage().tiers;
-      expect(tiers.map((t) => t.pax).toList(), [50, 70, 100, 150]);
-      expect(tiers.first.title, '50 Guests');
-      expect(tiers.first.priceLabel, '₱4499');
+  group('PackageOptions', () {
+    test('options sort by pax with titles and labels', () {
+      final options = _tieredPackage().options;
+      expect(options.map((t) => t.pax).toList(), [50, 70, 100, 150]);
+      expect(options.first.title, '50 PAX');
+      expect(options.first.priceLabel, '₱4499');
     });
 
-    test('priceForPax follows the tier map with scalar fallback', () {
+    test('priceForPax follows the option map with scalar fallback', () {
       final pkg = _tieredPackage();
       expect(pkg.priceForPax(70), 6399.0);
       expect(pkg.priceForPax(51), 4499.0);
@@ -59,7 +59,7 @@ void main() {
       expect(const Package(id: 3).priceForPax(null), 4500.0);
     });
 
-    test('startsAtLabel uses the cheapest tier', () {
+    test('startsAtLabel uses the cheapest option', () {
       expect(_tieredPackage().startsAtLabel, 'Starts at ₱4499');
     });
   });
