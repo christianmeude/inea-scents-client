@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../providers/index.dart';
+import '../widgets/index.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -141,12 +142,21 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 );
               },
 
+              // P6 (Q6/Q8): shared friendly card; raw errors stay
+              // in logs, never on screen.
               error: (error, _) {
-                return _CalendarError(
-                  error: error.toString(),
-                  onRetry: () {
-                    ref.read(availabilityProvider.notifier).refresh();
-                  },
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ErrorStateCard(
+                      title: 'Unable to load availability',
+                      message: "We couldn't load the calendar. "
+                          'Check your connection and try again.',
+                      onRetry: () {
+                        ref.read(availabilityProvider.notifier).refresh();
+                      },
+                    ),
+                  ),
                 );
               },
 
@@ -826,122 +836,9 @@ class _Legend extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// ERROR STATE
-// ============================================================================
-
-class _CalendarError extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
-
-  const _CalendarError({required this.error, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    const primary = Color(0xFF74445C);
-    const textColor = Color(0xFF633E50);
-    const secondary = Color(0xFF765867);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-
-        child: Container(
-          padding: const EdgeInsets.all(25),
-
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.90),
-            borderRadius: BorderRadius.circular(24),
-
-            border: Border.all(color: Colors.white.withValues(alpha: 0.85)),
-
-            boxShadow: [
-              BoxShadow(
-                color: primary.withValues(alpha: 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 70,
-                height: 70,
-
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF5E8EC),
-                  shape: BoxShape.circle,
-                ),
-
-                child: const Icon(
-                  Icons.calendar_month_outlined,
-                  size: 35,
-                  color: primary,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Text(
-                'Unable to load availability',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                error,
-                textAlign: TextAlign.center,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: secondary,
-                  fontSize: 12,
-                  height: 1.4,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: onRetry,
-
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
-                    foregroundColor: Colors.white,
-
-                    elevation: 0,
-
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9999),
-                    ),
-                  ),
-
-                  child: const Text(
-                    'Try Again',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+// NOTE (P6 Q6/Q8): the bespoke _CalendarError was retired; call sites use
+// the shared ErrorStateCard from widgets/index.dart (friendly copy, dark-
+// aware, raw errors never rendered).
 
 // ============================================================================
 // BLURRED BACKGROUND CIRCLE

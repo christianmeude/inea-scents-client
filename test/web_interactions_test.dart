@@ -363,8 +363,9 @@ void main() {
         final dec = animatedContainer.decoration as BoxDecoration;
         final border = dec.border as Border;
 
-        // Visible 2.0px focus border
-        expect(border.top.width, equals(2.0));
+        // P6 (Q4): constant 1.5px border — focus is the white border
+        // color plus the outer glow ring, never a width change.
+        expect(border.top.width, equals(1.5));
         expect(border.top.color, equals(Colors.white));
 
         final outerContainer = tester.widget<Container>(
@@ -548,7 +549,8 @@ void main() {
           final dec = animatedContainer.decoration as BoxDecoration;
           final border = dec.border as Border;
           expect(border.top.color, equals(const Color(0xFFFDF4F5)));
-          expect(border.top.width, equals(2.0));
+          // P6 (Q4): constant 1.5px border in dark too.
+          expect(border.top.width, equals(1.5));
         },
       );
     },

@@ -142,27 +142,17 @@ class _PackageCardState extends State<PackageCard> {
                                 package.images![0],
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
-                                  return Center(
-                                    child: Text(
-                                      package.name ?? '',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: primaryTextColor,
-                                      ),
-                                    ),
+                                  // P6 (G6-A): monogram fallback tile keeps
+                                  // imageless cards composed instead of void.
+                                  return _MonogramTile(
+                                    name: package.name,
+                                    isDark: isDark,
                                   );
                                 },
                               )
-                            : Center(
-                                child: Text(
-                                  package.name ?? '',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: primaryTextColor,
-                                  ),
-                                ),
+                            : _MonogramTile(
+                                name: package.name,
+                                isDark: isDark,
                               ),
                       ),
                     ),
@@ -264,6 +254,64 @@ class _PackageCardState extends State<PackageCard> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// P6 (G6-A): monogram fallback tile for packages without images.
+/// Plum-tinted tile with the package initial; never a blank void.
+class _MonogramTile extends StatelessWidget {
+  final String? name;
+  final bool isDark;
+
+  const _MonogramTile({required this.name, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final trimmed = (name ?? '').trim();
+    final initial = trimmed.isNotEmpty
+        ? trimmed.substring(0, 1).toUpperCase()
+        : 'I';
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? const [AppTheme.nightSurface, AppTheme.nightBorder]
+              : const [Color(0xFFF3E4E7), Color(0xFFE4CBD2)],
+        ),
+      ),
+      child: Center(
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: (isDark ? const Color(0xFFFDF4F5) : AppTheme.primary)
+                .withValues(alpha: 0.12),
+            border: Border.all(
+              color: (isDark
+                      ? const Color(0xFFFDF4F5)
+                      : AppTheme.primary)
+                  .withValues(alpha: 0.35),
+              width: 1.5,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            initial,
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              color: isDark
+                  ? const Color(0xFFFDF4F5)
+                  : AppTheme.primary,
+            ),
           ),
         ),
       ),

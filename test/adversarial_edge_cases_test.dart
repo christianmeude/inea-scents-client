@@ -386,10 +386,10 @@ void main() {
     testWidgets(
       '12. Tablet upper boundary precision at 1024.0px and 1024.01px',
       (WidgetTester tester) async {
-        // 1024.0px is Tablet (2-col)
-        expect(ResponsiveAppShell.getGridColumnCount(1024.0), equals(2));
-        // 1024.01px is Desktop (3-col)
-        expect(ResponsiveAppShell.getGridColumnCount(1024.01), equals(3));
+        // 1024.0px is Tablet (3-col, P6 G2)
+        expect(ResponsiveAppShell.getGridColumnCount(1024.0), equals(3));
+        // 1024.01px is Desktop (4-col, P6 G2)
+        expect(ResponsiveAppShell.getGridColumnCount(1024.01), equals(4));
       },
     );
 

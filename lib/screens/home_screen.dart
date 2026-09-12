@@ -214,20 +214,26 @@ class HomeScreen extends ConsumerWidget {
                             );
                           }
 
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio:
-                                      0.52, // Adjusted for card height to prevent overflow
+                          return LayoutBuilder(
+                            builder: (context, constraints) {
+                              return GridView.builder(
+                                shrinkWrap: true,
+                                physics:
+                                    const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    ResponsiveAppShell.gridDelegateForWidth(
+                                  constraints.maxWidth,
+                                  // Adjusted for card height to prevent overflow
+                                  childAspectRatio: 0.52,
                                   crossAxisSpacing: 15,
                                   mainAxisSpacing: 15,
                                 ),
-                            itemCount: packages.length,
-                            itemBuilder: (context, index) {
-                              return PackageCard(package: packages[index]);
+                                itemCount: packages.length,
+                                itemBuilder: (context, index) {
+                                  return PackageCard(
+                                      package: packages[index]);
+                                },
+                              );
                             },
                           );
                         },
@@ -236,8 +242,18 @@ class HomeScreen extends ConsumerWidget {
                             color: Color(0xFF6A4053),
                           ),
                         ),
-                        error: (err, stack) =>
-                            Center(child: Text(err.toString())),
+                        // P6 (Q6/Q8): shared friendly card; raw
+                        // errors stay in logs, never on screen.
+                        error: (err, stack) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: ErrorStateCard(
+                            title: 'Unable to load packages',
+                            message:
+                                "We couldn't load the packages. Check your connection and try again.",
+                            onRetry: () =>
+                                ref.invalidate(packagesProvider),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 40),

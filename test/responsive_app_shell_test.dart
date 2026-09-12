@@ -863,25 +863,27 @@ void main() {
 
   group('R1 Foundational Breakpoints & LayoutBuilder Tests', () {
     test(
-      'Breakpoint column count calculations (Mobile: 1-col, Tablet: 2-col, Desktop: 3-col)',
+      // P6 (G2): package grids render 2 → 3 → 4 columns across
+      // mobile / tablet / desktop.
+      'Breakpoint column count calculations (Mobile: 2-col, Tablet: 3-col, Desktop: 4-col)',
       () {
-        // Mobile (< 768px -> 1 column)
-        expect(ResponsiveAppShell.getGridColumnCount(-10), equals(1));
-        expect(ResponsiveAppShell.getGridColumnCount(0), equals(1));
-        expect(ResponsiveAppShell.getGridColumnCount(320), equals(1));
-        expect(ResponsiveAppShell.getGridColumnCount(600), equals(1));
-        expect(ResponsiveAppShell.getGridColumnCount(767.9), equals(1));
+        // Mobile (< 768px -> 2 columns)
+        expect(ResponsiveAppShell.getGridColumnCount(-10), equals(2));
+        expect(ResponsiveAppShell.getGridColumnCount(0), equals(2));
+        expect(ResponsiveAppShell.getGridColumnCount(320), equals(2));
+        expect(ResponsiveAppShell.getGridColumnCount(600), equals(2));
+        expect(ResponsiveAppShell.getGridColumnCount(767.9), equals(2));
 
-        // Tablet (768px - 1024px -> 2 columns)
-        expect(ResponsiveAppShell.getGridColumnCount(768.0), equals(2));
-        expect(ResponsiveAppShell.getGridColumnCount(900.0), equals(2));
-        expect(ResponsiveAppShell.getGridColumnCount(1024.0), equals(2));
+        // Tablet (768px - 1024px -> 3 columns)
+        expect(ResponsiveAppShell.getGridColumnCount(768.0), equals(3));
+        expect(ResponsiveAppShell.getGridColumnCount(900.0), equals(3));
+        expect(ResponsiveAppShell.getGridColumnCount(1024.0), equals(3));
 
-        // Desktop (> 1024px -> 3 columns)
-        expect(ResponsiveAppShell.getGridColumnCount(1024.01), equals(3));
-        expect(ResponsiveAppShell.getGridColumnCount(1200.0), equals(3));
-        expect(ResponsiveAppShell.getGridColumnCount(1920.0), equals(3));
-        expect(ResponsiveAppShell.getGridColumnCount(5120.0), equals(3));
+        // Desktop (> 1024px -> 4 columns)
+        expect(ResponsiveAppShell.getGridColumnCount(1024.01), equals(4));
+        expect(ResponsiveAppShell.getGridColumnCount(1200.0), equals(4));
+        expect(ResponsiveAppShell.getGridColumnCount(1920.0), equals(4));
+        expect(ResponsiveAppShell.getGridColumnCount(5120.0), equals(4));
       },
     );
 

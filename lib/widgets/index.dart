@@ -13,3 +13,4 @@ export 'reservation_calendar_panel.dart';
 export 'reservation_details_panel.dart';
 export 'desktop_payment_panel.dart';
 export 'theme_toggle_button.dart';
+export 'error_state_card.dart';

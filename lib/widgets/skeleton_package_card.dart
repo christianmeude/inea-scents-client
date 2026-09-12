@@ -6,9 +6,17 @@ class SkeletonPackageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // P6 (Q1): dark-aware shimmer so loading states never flash white.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final base = isDark
+        ? const Color(0xFF36222C)
+        : const Color(0xFF99868C);
+    final highlight = isDark
+        ? const Color(0xFF5A4450)
+        : const Color(0xFFE8DEE2);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1C1618) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -29,8 +37,8 @@ class SkeletonPackageCard extends StatelessWidget {
                 topRight: Radius.circular(12),
               ),
               child: Shimmer.fromColors(
-                baseColor: const Color(0xFF99868C),
-                highlightColor: const Color(0xFFE8DEE2),
+                baseColor: base,
+                highlightColor: highlight,
                 child: Container(width: double.infinity, color: Colors.white),
               ),
             ),
@@ -43,8 +51,8 @@ class SkeletonPackageCard extends StatelessWidget {
               children: [
                 // Title
                 Shimmer.fromColors(
-                  baseColor: const Color(0xFF99868C),
-                  highlightColor: const Color(0xFFE8DEE2),
+                  baseColor: base,
+                  highlightColor: highlight,
                   child: Container(
                     height: 16,
                     width: double.infinity,
@@ -54,22 +62,22 @@ class SkeletonPackageCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 // Rating
                 Shimmer.fromColors(
-                  baseColor: const Color(0xFF99868C),
-                  highlightColor: const Color(0xFFE8DEE2),
+                  baseColor: base,
+                  highlightColor: highlight,
                   child: Container(height: 14, width: 100, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 // Price
                 Shimmer.fromColors(
-                  baseColor: const Color(0xFF99868C),
-                  highlightColor: const Color(0xFFE8DEE2),
+                  baseColor: base,
+                  highlightColor: highlight,
                   child: Container(height: 16, width: 80, color: Colors.white),
                 ),
                 const SizedBox(height: 12),
                 // Button
                 Shimmer.fromColors(
-                  baseColor: const Color(0xFF99868C),
-                  highlightColor: const Color(0xFFE8DEE2),
+                  baseColor: base,
+                  highlightColor: highlight,
                   child: Container(
                     height: 30,
                     width: double.infinity,

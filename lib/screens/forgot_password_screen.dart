@@ -39,7 +39,11 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       } else if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage ?? 'Error'),
+            // P6 (Q8): friendly fallback; provider messages pass through.
+            content: Text(
+              next.errorMessage ??
+                  "That didn't work. Check your details and try again.",
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: const Color(0xFF6A4053),
             shape: RoundedRectangleBorder(
@@ -238,7 +242,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                       ).showSnackBar(
                                         const SnackBar(
                                           content: Text(
-                                            'Failed to send reset link',
+                                            "We couldn't send the reset link. "
+                                            'Check your connection and try again.',
                                           ),
                                         ),
                                       );

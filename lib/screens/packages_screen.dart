@@ -402,22 +402,20 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                         return _EmptyPackages();
                       }
 
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
 
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-
-                              // Slightly taller cards so they don't feel cramped.
-                              childAspectRatio: 0.52,
-
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 16,
+                            // P6 (G2): 2 → 3 → 4 columns across
+                            // mobile / tablet / desktop.
+                            gridDelegate:
+                                ResponsiveAppShell.gridDelegateForWidth(
+                              constraints.maxWidth,
                             ),
 
-                        itemCount: _packageEntries(packages).length,
+                            itemCount: _packageEntries(packages).length,
 
                         itemBuilder: (context, index) {
                           final entry = _packageEntries(packages)[index];
@@ -428,6 +426,8 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                             initialDate: widget.initialDate,
                           );
                         },
+                          );
+                        },
                       );
                     },
 
@@ -435,19 +435,20 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     // LOADING
                     // ==================================================
                     loading: () {
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.52,
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 16,
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          return GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                ResponsiveAppShell.gridDelegateForWidth(
+                              constraints.maxWidth,
                             ),
-                        itemCount: 4,
-                        itemBuilder: (context, index) {
-                          return const SkeletonPackageCard();
+                            itemCount: 4,
+                            itemBuilder: (context, index) {
+                              return const SkeletonPackageCard();
+                            },
+                          );
                         },
                       );
                     },
@@ -455,8 +456,16 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     // ==================================================
                     // ERROR
                     // ==================================================
+                    // P6 (Q6/Q8): shared friendly card; raw errors
+                    // stay in logs, never on screen.
                     error: (error, stack) {
-                      return _ErrorState(error: error);
+                      return ErrorStateCard(
+                        title: 'Unable to load packages',
+                        message: "We couldn't load the packages. "
+                            'Check your connection and try again.',
+                        onRetry: () =>
+                            ref.invalidate(packagesProvider),
+                      );
                     },
                   ),
 
@@ -560,81 +569,35 @@ class _EmptyPackages extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
+    // P6 (Q1): solid + dark-aware, like every other state card.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
+    final secondaryTextColor =
+        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 55, horizontal: 25),
 
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.28),
+        color: isDark ? const Color(0xFF1C1618) : Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.50)),
-      ),
-
-      child: const Column(
-        children: [
-          Icon(Icons.local_florist_outlined, size: 42, color: textColor),
-
-          SizedBox(height: 14),
-
-          Text(
-            'No packages available',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          SizedBox(height: 6),
-
-          Text(
-            'Please check back again later.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: secondaryTextColor, fontSize: 13),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// ERROR STATE
-// ============================================================================
-
-class _ErrorState extends ConsumerWidget {
-  final Object error;
-
-  const _ErrorState({required this.error});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
-    const primaryColor = Color(0xFF74445C);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.30),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.55)),
+        border: Border.all(
+          color: isDark
+              ? const Color(0xFF36222C)
+              : const Color(0x4D99868C),
+        ),
       ),
 
       child: Column(
         children: [
-          const Icon(Icons.cloud_off_rounded, size: 42, color: textColor),
+          Icon(Icons.local_florist_outlined, size: 42, color: textColor),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          const Text(
-            'Unable to load packages',
+          SelectableText(
+            'No packages available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: textColor,
@@ -645,30 +608,10 @@ class _ErrorState extends ConsumerWidget {
 
           const SizedBox(height: 6),
 
-          Text(
-            '$error',
+          SelectableText(
+            'Please check back again later.',
             textAlign: TextAlign.center,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: secondaryTextColor, fontSize: 12),
-          ),
-
-          const SizedBox(height: 16),
-
-          OutlinedButton(
-            onPressed: () {
-              ref.invalidate(packagesProvider);
-            },
-
-            style: OutlinedButton.styleFrom(
-              foregroundColor: primaryColor,
-              side: const BorderSide(color: primaryColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(9999),
-              ),
-            ),
-
-            child: const Text('Try Again'),
+            style: TextStyle(color: secondaryTextColor, fontSize: 13),
           ),
         ],
       ),
@@ -735,11 +678,13 @@ class _SearchBarState extends State<_SearchBar> {
               ? const Color(0xFFA5748E)
               : (_isHovered ? const Color(0xFF9E6D87) : inputColor),
           borderRadius: BorderRadius.circular(12),
+          // P6 (Q4): constant width — the glow ring below signals
+          // focus so neighbors never shift.
           border: Border.all(
             color: _isFocused
                 ? Colors.white
                 : Colors.white.withValues(alpha: _isHovered ? 0.95 : 0.80),
-            width: _isFocused ? 2.0 : 1.1,
+            width: 1.5,
           ),
           boxShadow: [
             BoxShadow(

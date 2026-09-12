@@ -15,7 +15,8 @@ import '../widgets/index.dart';
 /// Reservation and Booking Screen for INEA Scents.
 ///
 /// Features:
-/// - Desktop Split View (>1024px): 3-column layout (Left: Calendar, Middle: Packages/Times, Right: Sticky Order Summary).
+/// - Desktop Split View (>1024px): 2-column layout (Left: in-place flow
+///   Calendar → Details → Payment, Right: Sticky Order Summary).
 /// - Tablet View (768px - 1024px): 2-column layout (Left: Calendar & Customization, Right: Order Summary).
 /// - Mobile View (<768px): 1-column vertical step flow with timeline.
 /// - Integrated seamlessly with [ResponsiveAppShell].
@@ -288,6 +289,21 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     ref.read(bookingFlowProvider.notifier).goToStep(step);
   }
 
+  /// P6: headcount is chosen on the packages grid and travels via `?pax=`,
+  /// so booking shows a read-only row. "Change" returns to package details
+  /// carrying the current pax and date; nothing to repair when absent.
+  void _goChangePax(Package package) {
+    final id = package.id;
+    if (id == null) return;
+    final query = <String>[];
+    if (_selectedPax != null) query.add('pax=$_selectedPax');
+    if (_selectedDate != null) {
+      query.add('date=${formatDateParam(_selectedDate!)}');
+    }
+    final suffix = query.isEmpty ? '' : '?${query.join('&')}';
+    context.go('/package-details/$id$suffix');
+  }
+
   /// Freeform clock-time picker. Stores `H:i:s` directly (no slot labels);
   /// the provider passes it to the API, which accepts any valid time.
   Future<void> _pickEventTime() async {
@@ -352,7 +368,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     final width = constraints.maxWidth;
 
                     if (width > ResponsiveAppShell.tabletBreakpoint) {
-                      // Desktop 3-Column Split View (>1024px)
+                      // Desktop 2-Column Split View (>1024px, P6)
                       return _buildDesktopThreeColumnLayout(package);
                     } else if (width >= ResponsiveAppShell.mobileBreakpoint) {
                       // Tablet 2-Column Layout (768px - 1024px)
@@ -366,40 +382,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               },
               loading: () =>
                   const Center(child: CircularProgressIndicator(color: plum)),
+              // P6 (Q6/Q8): shared friendly card; raw errors stay
+              // in logs, never on screen.
               error: (e, s) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.error_outline_rounded,
-                        size: 48,
-                        color: plum,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Error loading package: $e',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: plum),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => ref.refresh(
-                          packageDetailsProvider(widget.packageId),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: plum,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(9999),
-                          ),
-                        ),
-                        child: const Text(
-                          'Retry',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ],
+                  child: ErrorStateCard(
+                    title: "We couldn't open this booking",
+                    message: 'Check your connection and try again. '
+                        'Nothing has been charged.',
+                    onRetry: () => ref.refresh(
+                      packageDetailsProvider(widget.packageId),
+                    ),
                   ),
                 ),
               ),
@@ -411,7 +405,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   // ==========================================================================
-  // DESKTOP 3-COLUMN SPLIT VIEW (>1024px)
+  // DESKTOP 2-COLUMN SPLIT VIEW (>1024px, P6: single flow + summary)
   // ==========================================================================
 
   Widget _buildDesktopThreeColumnLayout(Package package) {
@@ -497,11 +491,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           ),
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // COLUMN 1 (LEFT): CALENDAR
+                            // FLOW COLUMN (LEFT): CALENDAR → DETAILS, stacked
+                            // in one scroll view (P6: the 3-column split was
+                            // too noisy; summary keeps its own column).
                             Expanded(
-                              flex: 1,
+                              flex: 2,
                               child: SingleChildScrollView(
-                                key: const Key('desktop_calendar_scroll_view'),
+                                key: const Key('desktop_middle_scroll_view'),
                                 physics: const BouncingScrollPhysics(),
                                 padding: const EdgeInsets.fromLTRB(
                                   16,
@@ -509,46 +505,40 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   8,
                                   16,
                                 ),
-                                child: ReservationCalendarPanel(
-                                  key: const Key('reservation_calendar_panel'),
-                                  selectedDate: _selectedDate,
-                                  onDateSelected: (date) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setSelectedDate(date);
-                                  },
-                                ),
-                              ),
-                            ),
-
-                            // COLUMN 2 (MIDDLE): PACKAGES / TIMES / CUSTOMIZATION
-                            Expanded(
-                              flex: 1,
-                              child: SingleChildScrollView(
-                                key: const Key('desktop_middle_scroll_view'),
-                                physics: const BouncingScrollPhysics(),
-                                padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
-                                child: ReservationDetailsPanel(
-                                  key: const Key('reservation_details_panel'),
-                                  package: package,
-                                  selectedPax: _selectedPax,
-                                  onPaxSelected: (pax) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setSelectedPax(pax);
-                                  },
-                                  selectedTime: _selectedTime,
-                                  onTimeSelected: (time) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setSelectedTime(time);
-                                  },
-                                  paymentMethod: _paymentMethod,
-                                  onPaymentMethodSelected: (method) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setPaymentMethod(method);
-                                  },
+                                child: Column(
+                                  children: [
+                                    ReservationCalendarPanel(
+                                      key: const Key(
+                                          'reservation_calendar_panel'),
+                                      selectedDate: _selectedDate,
+                                      onDateSelected: (date) {
+                                        ref
+                                            .read(bookingFlowProvider.notifier)
+                                            .setSelectedDate(date);
+                                      },
+                                    ),
+                                    const SizedBox(height: 14),
+                                    ReservationDetailsPanel(
+                                      key: const Key(
+                                          'reservation_details_panel'),
+                                      package: package,
+                                      selectedPax: _selectedPax,
+                                      onChangePax: () =>
+                                          _goChangePax(package),
+                                      selectedTime: _selectedTime,
+                                      onTimeSelected: (time) {
+                                        ref
+                                            .read(bookingFlowProvider.notifier)
+                                            .setSelectedTime(time);
+                                      },
+                                      paymentMethod: _paymentMethod,
+                                      onPaymentMethodSelected: (method) {
+                                        ref
+                                            .read(bookingFlowProvider.notifier)
+                                            .setPaymentMethod(method);
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -589,7 +579,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                'Please select date, pax and time slot',
+                                'Please select date and time',
                               ),
                             ),
                           );
@@ -707,11 +697,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 key: const Key('tablet_details_panel'),
                                 package: package,
                                 selectedPax: _selectedPax,
-                                onPaxSelected: (pax) {
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setSelectedPax(pax);
-                                },
+                                onChangePax: () => _goChangePax(package),
                                 selectedTime: _selectedTime,
                                 onTimeSelected: (time) {
                                   ref
@@ -761,7 +747,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                'Please select date, pax and time slot',
+                                'Please select date and time',
                               ),
                             ),
                           );
@@ -818,7 +804,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                'Please select date, pax and time slot',
+                                'Please select date and time',
                               ),
                             ),
                           );
@@ -958,10 +944,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     child: Text(
                       isPayment
                           ? 'Secure In-Place Checkout'
-                          : (MediaQuery.of(context).size.width >
-                                    ResponsiveAppShell.tabletBreakpoint
-                                ? '3-Column Reservation Flow'
-                                : '2-Column Reservation Flow'),
+                          // P6: desktop is a 2-column flow + summary.
+                          : '2-Column Reservation Flow',
                       style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -1079,11 +1063,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     } else {
       final error = flowState.errorMessage;
       if (error != null && error.isNotEmpty) {
+        // P6 (Q8): friendly copy — the raw error stays in logs only.
         content = _buildCheckoutCard(
           iconData: Icons.error_outline_rounded,
           iconColor: const Color(0xFFC28A52),
           title: 'Unable to Submit Booking',
-          messageLines: [error],
+          messageLines: [
+            "We couldn't place your booking. Nothing was charged — "
+                'please try again.',
+          ],
           buttonLabel: 'Try Again',
           buttonIcon: Icons.refresh_rounded,
           onPressed: () {
@@ -1430,46 +1418,74 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           ),
           const SizedBox(height: 25),
           const Text(
-            'Please Choose Available Pax',
+            'Your Package',
             style: TextStyle(fontSize: 13, color: plum),
           ),
           const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: const Color(0x4D99868C)),
-            ),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: paxEntries.map((pax) {
-                final isSelected = _selectedPax == pax;
-                final priceLabel = options.isNotEmpty
-                    ? ' · ₱${package.priceForPax(pax).toStringAsFixed(0)}'
-                    : '';
-                return ChoiceChip(
-                  label: Text('$pax PAX$priceLabel'),
-                  selected: isSelected,
-                  selectedColor: plum,
-                  labelStyle: TextStyle(
-                    color: isSelected ? Colors.white : plum,
-                    fontWeight: isSelected
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                  onSelected: (selected) {
-                    if (selected) {
-                      ref
-                          .read(bookingFlowProvider.notifier)
-                          .setSelectedPax(pax);
-                    }
-                  },
-                );
-              }).toList(),
-            ),
+          // P6: read-only — the headcount step was chosen on the
+          // packages grid (`?pax=`); Change routes back to details.
+          Builder(
+            builder: (context) {
+              final effectivePax = _selectedPax ??
+                  (paxEntries.isNotEmpty ? paxEntries.first : null);
+              final priceLabel = (effectivePax != null &&
+                      options.isNotEmpty)
+                  ? ' · ₱${package.priceForPax(effectivePax).toStringAsFixed(0)}'
+                  : '';
+              return Container(
+                key: const Key('pax_readonly_row'),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: const Color(0x4D99868C)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle_rounded,
+                      size: 16,
+                      color: plum,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        effectivePax == null
+                            ? 'Headcount to be confirmed'
+                            : '$effectivePax Guests$priceLabel',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: plum,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    GestureDetector(
+                      key: const Key('pax_change_link'),
+                      onTap: () => _goChangePax(package),
+                      child: const MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: Text(
+                          'Change',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: plum,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 25),
           const Text(

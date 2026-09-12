@@ -70,7 +70,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
     final currentBorder = _isFocused
         ? focusBorder
         : (_isHovered ? hoverBorder : baseBorder);
-    final borderWidth = _isFocused ? 2.0 : 1.0;
+    // P6 (Q4): constant border width — focus is signaled by the glow ring
+    // and fill change, never by growing the border (which nudged siblings).
+    const borderWidth = 1.5;
 
     return FocusableActionDetector(
       mouseCursor: widget.enabled

@@ -14,16 +14,39 @@ class ProfileScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     // ============================================================
-    // COLORS
+    // COLORS (P6 Q1/Q3: dark-aware; cards are solid, never glass)
     // ============================================================
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     const backgroundTop = Color(0xFFF8E9DF);
     const backgroundMiddle = Color(0xFFD8B0BA);
     const backgroundBottom = Color(0xFFB78C9C);
 
     const primaryColor = Color(0xFF74445C);
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
+    final textColor =
+        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
+    final secondaryTextColor =
+        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
+
+    // Solid card surfaces matching the rest of the app (Q3).
+    final cardBg =
+        isDark ? const Color(0xFF1C1618) : Colors.white;
+    final cardBorder = isDark
+        ? const Color(0xFF36222C)
+        : const Color(0x4D99868C);
+    final circleBg = isDark
+        ? const Color(0xFF36222C)
+        : const Color(0xFFFDF4F5);
+    final circleBorder = isDark
+        ? const Color(0xFFFDF4F5).withValues(alpha: 0.25)
+        : const Color(0x4D99868C);
+    final gradientColors = isDark
+        ? const [
+            Color(0xFF151012),
+            Color(0xFF1C1618),
+            Color(0xFF2A1B23),
+          ]
+        : const [backgroundTop, backgroundMiddle, backgroundBottom];
 
     final userName = authState.user?.name ?? 'User';
     final userEmail = authState.user?.email ?? '';
@@ -55,16 +78,16 @@ class ProfileScreen extends ConsumerWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.35),
+                      color: circleBg,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.55),
+                        color: circleBorder,
                         width: 1,
                       ),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.more_horiz_rounded,
                         color: textColor,
                         size: 22,
@@ -86,11 +109,11 @@ class ProfileScreen extends ConsumerWidget {
           // GRADIENT BACKGROUND
           // ========================================================
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [backgroundTop, backgroundMiddle, backgroundBottom],
+                colors: gradientColors,
               ),
             ),
           ),
@@ -103,7 +126,9 @@ class ProfileScreen extends ConsumerWidget {
             left: -120,
             child: _BlurCircle(
               size: 390,
-              color: const Color(0xFFEBC9B8).withValues(alpha: 0.75),
+              // P6 (Q1): muted in dark so glows never wash out.
+              color: const Color(0xFFEBC9B8)
+                  .withValues(alpha: isDark ? 0.12 : 0.75),
             ),
           ),
 
@@ -115,7 +140,8 @@ class ProfileScreen extends ConsumerWidget {
             right: -150,
             child: _BlurCircle(
               size: 370,
-              color: const Color(0xFFD3A4AF).withValues(alpha: 0.72),
+              color: const Color(0xFFD3A4AF)
+                  .withValues(alpha: isDark ? 0.10 : 0.72),
             ),
           ),
 
@@ -127,7 +153,8 @@ class ProfileScreen extends ConsumerWidget {
             left: -130,
             child: _BlurCircle(
               size: 430,
-              color: const Color(0xFF9C8491).withValues(alpha: 0.65),
+              color: const Color(0xFF9C8491)
+                  .withValues(alpha: isDark ? 0.10 : 0.65),
             ),
           ),
 
@@ -139,7 +166,8 @@ class ProfileScreen extends ConsumerWidget {
             right: -120,
             child: _BlurCircle(
               size: 420,
-              color: const Color(0xFF69384F).withValues(alpha: 0.55),
+              color: const Color(0xFF69384F)
+                  .withValues(alpha: isDark ? 0.14 : 0.55),
             ),
           ),
 
@@ -151,7 +179,7 @@ class ProfileScreen extends ConsumerWidget {
             left: MediaQuery.of(context).size.width * 0.18,
             child: _BlurCircle(
               size: 420,
-              color: Colors.white.withValues(alpha: 0.25),
+              color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.25),
             ),
           ),
 
@@ -170,7 +198,7 @@ class ProfileScreen extends ConsumerWidget {
                   // ==================================================
                   // PAGE TITLE
                   // ==================================================
-                  const Text(
+                  Text(
                     'My Profile',
                     style: TextStyle(
                       color: textColor,
@@ -182,7 +210,7 @@ class ProfileScreen extends ConsumerWidget {
 
                   const SizedBox(height: 5),
 
-                  const Text(
+                  Text(
                     'Manage your account and preferences.',
                     style: TextStyle(color: secondaryTextColor, fontSize: 13),
                   ),
@@ -197,11 +225,12 @@ class ProfileScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(20),
 
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.34),
+                      // P6 (Q3): solid card, never glass.
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(24),
 
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.60),
+                        color: cardBorder,
                         width: 1,
                       ),
 
@@ -270,7 +299,7 @@ class ProfileScreen extends ConsumerWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
 
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: textColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
@@ -285,7 +314,7 @@ class ProfileScreen extends ConsumerWidget {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
 
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: secondaryTextColor,
                                   fontSize: 12.5,
                                 ),
@@ -327,10 +356,10 @@ class ProfileScreen extends ConsumerWidget {
                           height: 38,
 
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.40),
+                            color: circleBg,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.55),
+                              color: circleBorder,
                             ),
                           ),
 
@@ -370,11 +399,12 @@ class ProfileScreen extends ConsumerWidget {
                     width: double.infinity,
 
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.34),
+                      // P6 (Q3): solid card, never glass.
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(24),
 
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.60),
+                        color: cardBorder,
                       ),
 
                       boxShadow: [
@@ -562,9 +592,13 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
+    // P6 (Q1/Q3): dark-aware, solid icon chip.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     const primaryColor = Color(0xFF74445C);
+    final textColor =
+        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
+    final secondaryTextColor =
+        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
 
     return Row(
       children: [
@@ -573,13 +607,23 @@ class _SectionHeader extends StatelessWidget {
           height: 42,
 
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.38),
+            color: isDark
+                ? const Color(0xFF36222C)
+                : const Color(0xFFFDF4F5),
             shape: BoxShape.circle,
 
-            border: Border.all(color: Colors.white.withValues(alpha: 0.60)),
+            border: Border.all(
+              color: isDark
+                  ? const Color(0xFFFDF4F5).withValues(alpha: 0.25)
+                  : const Color(0x4D99868C),
+            ),
           ),
 
-          child: Icon(icon, color: primaryColor, size: 20),
+          child: Icon(
+            icon,
+            color: isDark ? const Color(0xFFFDF4F5) : primaryColor,
+            size: 20,
+          ),
         ),
 
         const SizedBox(width: 12),
@@ -591,7 +635,7 @@ class _SectionHeader extends StatelessWidget {
               Text(
                 title,
 
-                style: const TextStyle(
+                style: TextStyle(
                   color: textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -603,7 +647,7 @@ class _SectionHeader extends StatelessWidget {
               Text(
                 subtitle,
 
-                style: const TextStyle(
+                style: TextStyle(
                   color: secondaryTextColor,
                   fontSize: 11.5,
                 ),
@@ -639,11 +683,19 @@ class _ProfileSettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // P6 (Q1): dark-aware tile text.
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     const primaryColor = Color(0xFF74445C);
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
+    final textColor =
+        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
+    final secondaryTextColor =
+        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
 
-    final itemColor = isDestructive ? const Color(0xFF9A4F5D) : primaryColor;
+    final itemColor = isDestructive
+        ? isDark
+            ? const Color(0xFFF0A6B0)
+            : const Color(0xFF9A4F5D)
+        : (isDark ? const Color(0xFFFDF4F5) : primaryColor);
 
     return Material(
       color: Colors.transparent,
@@ -703,7 +755,7 @@ class _ProfileSettingTile extends StatelessWidget {
                     Text(
                       subtitle,
 
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: secondaryTextColor,
                         fontSize: 10.5,
                       ),
@@ -716,7 +768,7 @@ class _ProfileSettingTile extends StatelessWidget {
               // ARROW
               // ========================================================
               if (showArrow)
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,
                   color: secondaryTextColor,
@@ -744,7 +796,10 @@ class _SettingDivider extends StatelessWidget {
       child: Divider(
         height: 1,
         thickness: 0.7,
-        color: Colors.white.withValues(alpha: 0.55),
+        // P6 (Q1): visible on solid cards in both themes.
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF36222C)
+            : const Color(0x4D99868C),
       ),
     );
   }

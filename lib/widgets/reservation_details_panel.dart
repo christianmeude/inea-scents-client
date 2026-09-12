@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/index.dart';
 
 /// Middle Column / Panel for INEA Scents reservation flow on desktop.
-/// Handles Package variation overview, Pax selection, Time slot selection,
-/// Inclusions preview, and Payment Method selection.
+/// Handles Package variation overview, the locked Pax summary (P6: the
+/// headcount step is chosen on the packages grid, never re-picked here),
+/// Time slot selection, Inclusions preview, and Payment Method selection.
 class ReservationDetailsPanel extends StatelessWidget {
   static const Color plum = Color(0xFF6A4053);
   static const Color mutedPlum = Color(0xFF99868C);
@@ -11,7 +12,10 @@ class ReservationDetailsPanel extends StatelessWidget {
 
   final Package package;
   final int? selectedPax;
-  final ValueChanged<int> onPaxSelected;
+
+  /// Returns to package details so the customer can pick another
+  /// headcount step. Null hides the Change action.
+  final VoidCallback? onChangePax;
   final String? selectedTime;
   final ValueChanged<String> onTimeSelected;
   final String? paymentMethod;
@@ -21,7 +25,7 @@ class ReservationDetailsPanel extends StatelessWidget {
     super.key,
     required this.package,
     required this.selectedPax,
-    required this.onPaxSelected,
+    required this.onChangePax,
     required this.selectedTime,
     required this.onTimeSelected,
     required this.paymentMethod,
@@ -136,117 +140,126 @@ class ReservationDetailsPanel extends StatelessWidget {
         const SizedBox(height: 14),
 
         // ========================================================
-        // 2. CHOOSE AVAILABLE PAX
+        // 2. YOUR PACKAGE (P6: read-only — the headcount step was
+        // chosen on the packages grid and travels via `?pax=`).
         // ========================================================
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x4D99868C), width: 1.0),
-            boxShadow: [
-              BoxShadow(
-                color: plum.withValues(alpha: 0.06),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
+        Builder(
+          builder: (context) {
+            final effectivePax = selectedPax ??
+                (paxList.isNotEmpty ? paxList.first : null);
+            final price = effectivePax == null
+                ? null
+                : optionPriceLabel(effectivePax);
+            return Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                    color: const Color(0x4D99868C), width: 1.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: plum.withValues(alpha: 0.06),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-            ],
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: cream,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.people_outline_rounded,
+                          color: plum,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          '2. Your Package',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: plum,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    key: const Key('pax_readonly_row'),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: cream,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.people_outline_rounded,
-                      color: plum,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Flexible(
-                    child: Text(
-                      '2. Choose Available Pax',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: plum,
+                      borderRadius: BorderRadius.circular(9999),
+                      border: Border.all(
+                        color: const Color(0x4D99868C),
+                        width: 1.0,
                       ),
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle_rounded,
+                          size: 14,
+                          color: plum,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            effectivePax == null
+                                ? 'Headcount to be confirmed'
+                                : (price == null
+                                    ? '$effectivePax Guests'
+                                    : '$effectivePax Guests · $price'),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: plum,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (onChangePax != null)
+                          GestureDetector(
+                            key: const Key('pax_change_link'),
+                            onTap: onChangePax,
+                            child: const MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Text(
+                                'Change',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: plum,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: paxList.map((pax) {
-                  final isSelected = selectedPax == pax;
-                  final price = optionPriceLabel(pax);
-                  return InkWell(
-                    onTap: () => onPaxSelected(pax),
-                    borderRadius: BorderRadius.circular(9999),
-                    mouseCursor: SystemMouseCursors.click,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected ? plum : cream,
-                        borderRadius: BorderRadius.circular(9999),
-                        border: Border.all(
-                          color: isSelected ? plum : const Color(0x4D99868C),
-                          width: isSelected ? 1.5 : 1.0,
-                        ),
-                        boxShadow: isSelected
-                            ? [
-                                BoxShadow(
-                                  color: plum.withValues(alpha: 0.25),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isSelected
-                                ? Icons.check_circle_rounded
-                                : Icons.person_rounded,
-                            size: 13,
-                            color: isSelected ? Colors.white : plum,
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            price == null ? '$pax PAX' : '$pax PAX · $price',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w600,
-                              color: isSelected ? Colors.white : plum,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
+            );
+          },
         ),
 
         const SizedBox(height: 14),
@@ -442,11 +455,13 @@ class ReservationDetailsPanel extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isSelected ? cream : Colors.white,
                               borderRadius: BorderRadius.circular(12),
+                              // P6 (Q4): constant border width — focus/selection
+                              // never shifts layout; color alone signals state.
                               border: Border.all(
                                 color: isSelected
                                     ? plum
                                     : const Color(0x3399868C),
-                                width: isSelected ? 1.5 : 1.0,
+                                width: 1.0,
                               ),
                             ),
                             child: Column(

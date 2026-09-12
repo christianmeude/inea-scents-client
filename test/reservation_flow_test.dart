@@ -92,7 +92,9 @@ void main() {
 
   group('Issue #44: 3-Column Reservation Flow Layout Tests', () {
     testWidgets(
-      'R1: Desktop Split View renders 3-column layout on 1200x800 viewport (>1024px)',
+      // P6: desktop is a 2-column flow (calendar → details stacked) +
+      // sticky summary; the 3-column split was retired as too noisy.
+      'R1: Desktop Split View renders 2-column layout on 1200x800 viewport (>1024px)',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -104,7 +106,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Verify all 3 primary columns are rendered
+        // Verify flow column + summary column are rendered
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
@@ -119,11 +121,11 @@ void main() {
         );
 
         // Verify desktop header is present
-        expect(find.text('3-Column Reservation Flow'), findsOneWidget);
+        expect(find.text('2-Column Reservation Flow'), findsOneWidget);
         expect(find.textContaining('Reservation —'), findsOneWidget);
 
         // Layout coordinate verification:
-        // Left (Calendar) < Middle (Details) < Right (Order Summary)
+        // Calendar above Details in the flow column; summary to the right.
         final calendarPos = tester.getTopLeft(
           find.byKey(const Key('reservation_calendar_panel')),
         );
@@ -134,16 +136,17 @@ void main() {
           find.byKey(const Key('order_summary_side_panel')),
         );
 
-        expect(calendarPos.dx, lessThan(detailsPos.dx));
+        expect(calendarPos.dy, lessThan(detailsPos.dy));
         expect(detailsPos.dx, lessThan(summaryPos.dx));
 
-        // Verify contents inside Left column (Calendar)
+        // Verify contents inside the flow column (Calendar)
         expect(find.text('1. Select Date'), findsOneWidget);
         expect(find.text('Available'), findsWidgets);
         expect(find.text('Booked'), findsWidgets);
 
-        // Verify contents inside Middle column (Packages/Times)
-        expect(find.text('2. Choose Available Pax'), findsOneWidget);
+        // Verify contents inside the flow column (Details, PAX read-only)
+        expect(find.text('2. Your Package'), findsOneWidget);
+        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('3. Choose Event Time'), findsOneWidget);
         expect(find.text('4. Payment Method'), findsOneWidget);
 
@@ -278,7 +281,9 @@ void main() {
     );
 
     testWidgets(
-      'Interactive Pax selection updates Order Summary in real-time on desktop',
+      // P6: headcount is chosen on the packages grid and travels via
+      // `?pax=`; booking renders it read-only with a Change link.
+      'Pax preselection renders read-only with Change link on desktop',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -290,18 +295,23 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Initially, default pax is 20 PAX (from testPackage.paxOptions.first)
-        expect(find.text('Capacity'), findsOneWidget);
-        expect(find.text('20 PAX'), findsWidgets);
+        // Read-only row carries the locked headcount step (silent
+        // first-option fallback: no `?pax=` was passed, so 20 wins).
+        expect(find.text('2. Your Package'), findsOneWidget);
+        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
+        expect(find.text('20 Guests'), findsOneWidget);
+        expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
 
-        // Tap on '75 PAX' choice in middle column
-        final seventyFivePaxFinder = find.text('75 PAX');
-        expect(seventyFivePaxFinder, findsOneWidget);
-        await tester.tap(seventyFivePaxFinder);
-        await tester.pumpAndSettle();
-
-        // Verify Order Summary now reflects 75 PAX
-        expect(find.text('75 PAX'), findsWidgets);
+        // No in-flow pax selectors remain (the summary echo of the
+        // locked step is expected).
+        expect(find.text('2. Choose Available Pax'), findsNothing);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('reservation_details_panel')),
+            matching: find.textContaining('PAX'),
+          ),
+          findsNothing,
+        );
       },
     );
 
@@ -327,6 +337,13 @@ void main() {
         expect(find.text('2:00 PM'), findsWidgets);
 
         // Opening the picker surfaces the clock dialog; cancelling keeps time
+        // (P6: details sit lower in the merged flow column — reveal first).
+        await tester.ensureVisible(
+          find.byKey(const Key('event_time_picker_button')),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('event_time_picker_button')));
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('event_time_picker_button')));
         await tester.pumpAndSettle();
         expect(find.byType(TimePickerDialog), findsOneWidget);
@@ -353,18 +370,16 @@ void main() {
         // Retired method is gone from every picker (owner Q14-B).
         expect(find.text('Bank Transfer'), findsNothing);
 
-        // Select 'Cash' in middle column
-        final cashFinder = find.text('Cash');
-        await tester.scrollUntilVisible(
-          cashFinder,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('desktop_middle_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
+        // Select 'Cash' in the details panel (scoped: the summary
+        // column renders the method label too).
+        final cashFinder = find.descendant(
+          of: find.byKey(const Key('reservation_details_panel')),
+          matching: find.text('Cash'),
         );
-        expect(cashFinder, findsWidgets);
-        await tester.tap(cashFinder.first);
+        await tester.ensureVisible(cashFinder);
+        await tester.pumpAndSettle();
+        expect(cashFinder, findsOneWidget);
+        await tester.tap(cashFinder);
         await tester.pumpAndSettle();
 
         // Verify Order Summary displays 'CASH' badge
@@ -414,7 +429,7 @@ void main() {
     );
 
     testWidgets(
-      'Dynamic resize smoothly transitions 3-column -> 2-column -> 1-column without errors',
+      'Dynamic resize smoothly transitions 2-column -> 2-column -> 1-column without errors',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -530,13 +545,19 @@ void main() {
       );
       await tester.pump();
 
-      // Error UI is displayed with retry button
-      expect(find.textContaining('Error loading package:'), findsOneWidget);
-      expect(find.text('Retry'), findsOneWidget);
+      // P6 (Q6/Q8): shared friendly card — plain copy plus a
+      // single Try Again action, raw errors never rendered.
+      expect(
+        find.text("We couldn't open this booking"),
+        findsOneWidget,
+      );
+      expect(find.text('Try Again'), findsOneWidget);
+      expect(find.textContaining('Network timeout'), findsNothing);
     });
 
     testWidgets(
-      '3-Column Desktop view renders robustly under 2.0x accessibility text scale',
+      // P6: desktop is 2-column (flow + summary).
+      '2-Column Desktop view renders robustly under 2.0x accessibility text scale',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1400, 900);
         tester.view.devicePixelRatio = 1.0;
@@ -592,7 +613,7 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
 
-        // 1. 1025px (>1024px) -> Desktop 3-Column
+        // 1. 1025px (>1024px) -> Desktop 2-Column (P6)
         tester.view.physicalSize = const Size(1025, 800);
         await tester.pumpWidget(
           createBookingScreenWidget(screenSize: const Size(1025, 800)),
@@ -668,29 +689,25 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Change selections on desktop: 100 PAX, Cash (time stays default)
-        final hundredPaxFinder = find.text('100 PAX');
-        expect(hundredPaxFinder, findsOneWidget);
-        await tester.tap(hundredPaxFinder);
-        await tester.pumpAndSettle();
+        // P6: pax is read-only (locked step + Change link); payment
+        // toggles remain interactive. Time keeps its default.
+        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
+        expect(find.text('20 Guests'), findsOneWidget);
 
         // Freeform time keeps its default through selection changes
         expect(find.text('2:00 PM'), findsWidgets);
 
-        final cashFinder = find.text('Cash');
-        await tester.scrollUntilVisible(
-          cashFinder,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('desktop_middle_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
+        final cashFinder = find.descendant(
+          of: find.byKey(const Key('reservation_details_panel')),
+          matching: find.text('Cash'),
         );
+        await tester.ensureVisible(cashFinder);
+        await tester.pumpAndSettle();
         await tester.tap(cashFinder);
         await tester.pumpAndSettle();
 
         expect(find.text('CASH'), findsOneWidget);
-        expect(find.text('100 PAX'), findsWidgets);
+        expect(find.text('20 Guests'), findsWidgets);
 
         // Oscillate across desktop/tablet boundary multiple times
         for (int i = 0; i < 3; i++) {
@@ -810,7 +827,7 @@ void main() {
                     child: ReservationDetailsPanel(
                       package: minimalPackage,
                       selectedPax: null,
-                      onPaxSelected: (_) {},
+                      onChangePax: () {},
                       selectedTime: null,
                       onTimeSelected: (_) {},
                       paymentMethod: null,
@@ -843,7 +860,8 @@ void main() {
     );
 
     testWidgets(
-      'Mobile 1-column step flow allows date, pax, details, payment selection and completes to success screen',
+      // P6: mobile Step 2 keeps date + time pickers; pax is read-only.
+      'Mobile 1-column step flow allows date, details, payment selection and completes to success screen',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(375, 667);
         tester.view.devicePixelRatio = 1.0;
@@ -855,22 +873,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Step 2: Schedule & Pax
+        // Step 2: Schedule & locked Pax
         expect(find.text('Please Choose Available Schedule'), findsOneWidget);
-        final thirtyPaxFinder = find.text('30 PAX');
-        await tester.scrollUntilVisible(
-          thirtyPaxFinder,
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('mobile_step_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        expect(thirtyPaxFinder, findsOneWidget);
-        await tester.tap(thirtyPaxFinder);
-        await tester.pumpAndSettle();
+        expect(find.text('Your Package'), findsOneWidget);
+        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
+        expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
+        expect(find.text('30 PAX'), findsNothing);
 
         // Tap Next to go to Step 3 (Details)
         await tester.tap(find.text('Next'));
@@ -1376,9 +1384,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Initial reservation header
+        // Initial reservation header (P6: desktop is 2-column)
         expect(find.textContaining('Reservation —'), findsOneWidget);
-        expect(find.text('3-Column Reservation Flow'), findsOneWidget);
+        expect(find.text('2-Column Reservation Flow'), findsOneWidget);
 
         // Proceed to payment
         await tester.tap(find.text('Proceed to Payment'));
@@ -1392,7 +1400,7 @@ void main() {
     );
 
     testWidgets(
-      'Header Back button cross-fades back from DesktopPaymentPanel to 3-column reservation layout',
+      'Header Back button cross-fades back from DesktopPaymentPanel to 2-column reservation layout',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1419,7 +1427,7 @@ void main() {
 
         await tester.pumpAndSettle();
 
-        // Returned to 3-column reservation layout
+        // Returned to 2-column reservation layout (P6)
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
@@ -1437,7 +1445,7 @@ void main() {
     );
 
     testWidgets(
-      'Edit Selection button in DesktopPaymentPanel cross-fades back to 3-column reservation layout',
+      'Edit Selection button in DesktopPaymentPanel cross-fades back to 2-column reservation layout',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -2020,24 +2028,20 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Select 100 PAX and Online on reservation step
-        await tester.tap(find.text('100 PAX'));
-        await tester.pumpAndSettle();
+        // P6: pax is read-only; select Online on reservation step.
+        expect(find.text('20 Guests'), findsOneWidget);
 
-        final onlineOption = find.text('Online');
-        await tester.scrollUntilVisible(
-          onlineOption,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('desktop_middle_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
+        final onlineOption = find.descendant(
+          of: find.byKey(const Key('reservation_details_panel')),
+          matching: find.text('Online'),
         );
+        await tester.ensureVisible(onlineOption);
+        await tester.pumpAndSettle();
         await tester.tap(onlineOption);
         await tester.pumpAndSettle();
 
         expect(find.text('ONLINE'), findsWidgets);
-        expect(find.text('100 PAX'), findsWidgets);
+        expect(find.text('20 Guests'), findsWidgets);
 
         // Rapidly toggle forward and backward 3 times
         for (int i = 0; i < 3; i++) {
@@ -2064,7 +2068,7 @@ void main() {
 
         // State is preserved
         expect(find.text('ONLINE'), findsWidgets);
-        expect(find.text('100 PAX'), findsWidgets);
+        expect(find.text('20 Guests'), findsWidgets);
 
         // Final proceed to payment and confirm
         await tester.tap(find.text('Proceed to Payment'));

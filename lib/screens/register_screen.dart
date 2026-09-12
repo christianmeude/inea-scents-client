@@ -38,7 +38,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       } else if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage ?? 'Error'),
+            // P6 (Q8): friendly fallback; provider messages pass through.
+            content: Text(
+              next.errorMessage ??
+                  "That didn't work. Check your details and try again.",
+            ),
             behavior: SnackBarBehavior.floating,
             backgroundColor: const Color(0xFF6A4053),
             shape: RoundedRectangleBorder(

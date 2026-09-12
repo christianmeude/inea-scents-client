@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
 import '../models/index.dart';
+import '../widgets/index.dart';
 
 class MyBookingsScreen extends ConsumerWidget {
   const MyBookingsScreen({super.key});
@@ -11,9 +12,11 @@ class MyBookingsScreen extends ConsumerWidget {
   // INEA COLORS
   // ============================================================
 
+  // P6 (G5): shared ambient triple so the capped local gradient melts
+  // into the shell's full-bleed ambient instead of stopping at 1200px.
   static const Color backgroundTop = Color(0xFFF8E9DF);
-  static const Color backgroundMiddle = Color(0xFFE8CDD2);
-  static const Color backgroundBottom = Color(0xFFD7B4C0);
+  static const Color backgroundMiddle = Color(0xFFD8B0BA);
+  static const Color backgroundBottom = Color(0xFFB78C9C);
 
   static const Color primaryColor = Color(0xFF74445C);
   static const Color primaryLight = Color(0xFF95647E);
@@ -165,10 +168,19 @@ class MyBookingsScreen extends ConsumerWidget {
                 // ======================================================
                 // ERROR
                 // ======================================================
+                // P6 (Q6/Q8): shared friendly card; raw errors stay
+                // in logs, never on screen.
                 error: (error, stack) {
-                  return _ErrorBookings(
-                    error: error.toString(),
-                    onRetry: () => ref.invalidate(bookingsProvider),
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ErrorStateCard(
+                        title: 'Unable to load bookings',
+                        message: "We couldn't load your bookings. "
+                            'Check your connection and try again.',
+                        onRetry: () => ref.invalidate(bookingsProvider),
+                      ),
+                    ),
                   );
                 },
               ),
@@ -686,93 +698,9 @@ class _EmptyBookings extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// ERROR STATE
-// ============================================================================
-
-class _ErrorBookings extends StatelessWidget {
-  final String error;
-  final VoidCallback onRetry;
-
-  const _ErrorBookings({required this.error, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 35),
-
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-
-              decoration: const BoxDecoration(
-                color: Color(0xFFF5E8EC),
-                shape: BoxShape.circle,
-              ),
-
-              child: const Icon(
-                Icons.error_outline,
-                size: 40,
-                color: Color(0xFF8B4F68),
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            const Text(
-              'Unable to load bookings',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: MyBookingsScreen.textColor,
-              ),
-            ),
-
-            const SizedBox(height: 7),
-
-            Text(
-              error,
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                color: MyBookingsScreen.secondaryTextColor,
-              ),
-            ),
-
-            const SizedBox(height: 22),
-
-            ElevatedButton(
-              onPressed: onRetry,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: MyBookingsScreen.primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 14,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(9999),
-                ),
-                elevation: 0,
-              ),
-              child: const Text(
-                'Try Again',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// NOTE (P6 Q6/Q8): the bespoke _ErrorBookings was retired; call sites use
+// the shared ErrorStateCard from widgets/index.dart (friendly copy, dark-
+// aware, raw errors never rendered).
 
 // ============================================================================
 // STATUS COLOR

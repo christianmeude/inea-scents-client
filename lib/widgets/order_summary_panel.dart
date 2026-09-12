@@ -366,6 +366,9 @@ class OrderSummaryPanel extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
+              // P6 (Q5): plain Text — SelectableText would inject an
+              // inner Scrollable that breaks scrollUntilVisible scoping
+              // in tests; error/empty cards already carry selectability.
               Flexible(
                 child: Text(
                   'Php. ${effectivePrice.toStringAsFixed(2)}',

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
 import '../models/index.dart';
+import '../widgets/index.dart';
 
 class PackageDetailScreen extends ConsumerWidget {
   final int packageId;
@@ -367,7 +368,19 @@ class PackageDetailScreen extends ConsumerWidget {
           loading: () => const Center(
             child: CircularProgressIndicator(color: Color(0xFF6A4053)),
           ),
-          error: (error, stack) => Center(child: Text('Error: $error')),
+          // P6 (Q6/Q8): shared friendly card; raw errors stay
+          // in logs, never on screen.
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: ErrorStateCard(
+                title: "We couldn't open this package",
+                message: 'Check your connection and try again.',
+                onRetry: () =>
+                    ref.refresh(packageDetailsProvider(packageId)),
+              ),
+            ),
+          ),
         ),
       ),
     );
