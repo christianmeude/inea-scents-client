@@ -8,7 +8,6 @@ import 'auth/auth_api_client.dart';
 import 'availability/availability_api_client.dart';
 import 'bookings/bookings_api_client.dart';
 import 'packages/packages_api_client.dart';
-import 'wishlist/wishlist_api_client.dart';
 
 /// Inea Scents API `v1.0.0`.
 ///
@@ -25,7 +24,6 @@ class RestClient {
   AvailabilityApiClient? _availability;
   BookingsApiClient? _bookings;
   PackagesApiClient? _packages;
-  WishlistApiClient? _wishlist;
 
   AuthApiClient get auth => _auth ??= AuthApiClient(_dio, baseUrl: _baseUrl);
 
@@ -37,7 +35,4 @@ class RestClient {
 
   PackagesApiClient get packages =>
       _packages ??= PackagesApiClient(_dio, baseUrl: _baseUrl);
-
-  WishlistApiClient get wishlist =>
-      _wishlist ??= WishlistApiClient(_dio, baseUrl: _baseUrl);
 }

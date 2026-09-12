@@ -22,12 +22,21 @@ import '../widgets/index.dart';
 class BookingScreen extends ConsumerStatefulWidget {
   final int packageId;
 
-  /// Preselected headcount tier carried from a tier card (`?pax=`).
-  /// Honored when it matches the package's tiers; otherwise the first
+  /// Preselected headcount option carried from a package card (`?pax=`).
+  /// Honored when it matches the package's options; otherwise the first
   /// available option wins as before.
   final int? initialPax;
 
-  const BookingScreen({super.key, required this.packageId, this.initialPax});
+  /// Date carried from the calendar (`?date=`); preferred over the default
+  /// when it is not in the past.
+  final DateTime? initialDate;
+
+  const BookingScreen({
+    super.key,
+    required this.packageId,
+    this.initialPax,
+    this.initialDate,
+  });
 
   @override
   ConsumerState<BookingScreen> createState() => _BookingScreenState();
@@ -77,9 +86,20 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       final notifier = ref.read(bookingFlowProvider.notifier);
       notifier.ensureFreshForPackage(widget.packageId);
       // Notifier-owned defaults (provider writes are forbidden in initState).
+      // A carried `?date=` wins over the default when not in the past.
       final flow = ref.read(bookingFlowProvider);
       if (flow.selectedDate == null) {
-        notifier.setSelectedDate(DateTime.now().add(const Duration(days: 3)));
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final carried = widget.initialDate;
+        final carriedDay = carried == null
+            ? null
+            : DateTime(carried.year, carried.month, carried.day);
+        notifier.setSelectedDate(
+          carriedDay != null && !carriedDay.isBefore(today)
+              ? carriedDay
+              : now.add(const Duration(days: 3)),
+        );
       }
       // Freeform clock time, prefilled like the old default slot so the
       // schedule step is submittable before the user opens the picker.

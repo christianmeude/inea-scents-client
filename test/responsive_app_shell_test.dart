@@ -358,11 +358,6 @@ void main() {
                   builder: (context, state) =>
                       const Text('Profile Screen Page'),
                 ),
-                GoRoute(
-                  path: '/wishlist',
-                  builder: (context, state) =>
-                      const Text('Wishlist Screen Page'),
-                ),
               ],
             ),
           ],
@@ -439,11 +434,8 @@ void main() {
         expect(find.text('Booking Flow 99'), findsOneWidget);
         expect(find.byIcon(Icons.calendar_today), findsOneWidget);
 
-        // 10. Test /wishlist route highlights PROFILE
-        router.go('/wishlist');
-        await tester.pumpAndSettle();
-        expect(find.text('Wishlist Screen Page'), findsOneWidget);
-        expect(find.byIcon(Icons.person), findsOneWidget);
+        // 10. Unknown /wishlist route is gone (wishlist retired, owner Q15).
+        expect(find.text('Wishlist Screen Page'), findsNothing);
       },
     );
 

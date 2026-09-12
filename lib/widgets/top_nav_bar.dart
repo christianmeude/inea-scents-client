@@ -173,8 +173,7 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
         return 2;
       } else if (location.contains('calendar')) {
         return 3;
-      } else if (location.contains('profile') ||
-          location.contains('wishlist')) {
+      } else if (location.contains('profile')) {
         return 4;
       } else if (location == '/' || location.contains('home')) {
         return 0;

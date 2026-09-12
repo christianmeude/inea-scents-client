@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:inea_scents_client/api/models/package.dart';
 import 'package:inea_scents_client/models/index.dart';
 import 'package:inea_scents_client/providers/index.dart';
 import 'package:inea_scents_client/screens/packages_screen.dart';

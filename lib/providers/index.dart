@@ -184,28 +184,6 @@ final packageDetailsProvider = FutureProvider.family<Package, int>((
   return data;
 });
 
-// Wishlist providers
-class WishlistNotifier extends AsyncNotifier<List<Package>> {
-  @override
-  Future<List<Package>> build() async {
-    final apiClient = ref.watch(apiClientProvider);
-    final response = await apiClient.wishlist.getApiWishlist();
-    return response.data ?? [];
-  }
-
-  Future<void> toggle(int packageId) async {
-    final apiClient = ref.read(apiClientProvider);
-    await apiClient.wishlist.postApiWishlistToggle(
-      body: ApiWishlistToggleRequestBody(packageId: packageId),
-    );
-    ref.invalidateSelf();
-  }
-}
-
-final wishlistProvider = AsyncNotifierProvider<WishlistNotifier, List<Package>>(
-  WishlistNotifier.new,
-);
-
 // Availability provider
 class AvailabilityState {
   final int month;

@@ -42,7 +42,10 @@ final filteredPackagesProvider = Provider<AsyncValue<List<Package>>>((ref) {
 });
 
 class PackagesScreen extends ConsumerStatefulWidget {
-  const PackagesScreen({super.key});
+  /// Date carried from the calendar (`?date=`); forwarded with each card.
+  final DateTime? initialDate;
+
+  const PackagesScreen({super.key, this.initialDate});
 
   @override
   ConsumerState<PackagesScreen> createState() => _PackagesScreenState();
@@ -422,6 +425,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                           return PackageCard(
                             package: entry.package,
                             optionPax: entry.option?.pax,
+                            initialDate: widget.initialDate,
                           );
                         },
                       );

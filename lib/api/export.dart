@@ -7,7 +7,6 @@ export 'auth/auth_api_client.dart';
 export 'availability/availability_api_client.dart';
 export 'bookings/bookings_api_client.dart';
 export 'packages/packages_api_client.dart';
-export 'wishlist/wishlist_api_client.dart';
 // Data classes
 export 'models/user.dart';
 export 'models/auth_response.dart';
@@ -22,9 +21,6 @@ export 'models/post_api_bookings_response.dart';
 export 'models/api_bookings_request_body.dart';
 export 'models/get_api_packages_response.dart';
 export 'models/get_api_packages_package_response.dart';
-export 'models/get_api_wishlist_response.dart';
-export 'models/post_api_wishlist_toggle_response.dart';
-export 'models/api_wishlist_toggle_request_body.dart';
 export 'models/payment_method.dart';
 // Root client
 export 'rest_client.dart';

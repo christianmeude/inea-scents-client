@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/index.dart';
-import '../widgets/index.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -13,7 +12,6 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
-    final wishlistAsync = ref.watch(wishlistProvider);
 
     // ============================================================
     // COLORS
@@ -350,65 +348,6 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  // ==================================================
-                  // WISHLIST TITLE
-                  // ==================================================
-                  const _SectionHeader(
-                    title: 'My Wishlist',
-                    subtitle: 'Your favorite scents',
-                    icon: Icons.favorite_rounded,
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  // ==================================================
-                  // WISHLIST
-                  // ==================================================
-                  wishlistAsync.when(
-                    data: (wishlist) {
-                      if (wishlist.isEmpty) {
-                        return const _EmptyWishlist();
-                      }
-
-                      return GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.72,
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 16,
-                            ),
-
-                        itemCount: wishlist.length,
-
-                        itemBuilder: (context, index) {
-                          return PackageCard(package: wishlist[index]);
-                        },
-                      );
-                    },
-
-                    loading: () {
-                      return const SizedBox(
-                        height: 220,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: primaryColor,
-                          ),
-                        ),
-                      );
-                    },
-
-                    error: (error, stack) {
-                      return _WishlistError(error: error);
-                    },
                   ),
 
                   const SizedBox(height: 28),
@@ -806,158 +745,6 @@ class _SettingDivider extends StatelessWidget {
         height: 1,
         thickness: 0.7,
         color: Colors.white.withValues(alpha: 0.55),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// EMPTY WISHLIST
-// ============================================================================
-
-class _EmptyWishlist extends StatelessWidget {
-  const _EmptyWishlist();
-
-  @override
-  Widget build(BuildContext context) {
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
-    const primaryColor = Color(0xFF74445C);
-
-    return Container(
-      width: double.infinity,
-
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 38),
-
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.30),
-        borderRadius: BorderRadius.circular(24),
-
-        border: Border.all(color: Colors.white.withValues(alpha: 0.55)),
-      ),
-
-      child: Column(
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-
-            decoration: BoxDecoration(
-              color: primaryColor.withValues(alpha: 0.10),
-              shape: BoxShape.circle,
-            ),
-
-            child: const Icon(
-              Icons.favorite_border_rounded,
-              color: primaryColor,
-              size: 28,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          const Text(
-            'Your wishlist is empty',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          const SizedBox(height: 6),
-
-          const Text(
-            'Save your favorite scents here\nand find them easily later.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: secondaryTextColor,
-              fontSize: 12,
-              height: 1.4,
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          ElevatedButton(
-            onPressed: () {
-              // Usually the BottomNavBar is used, but if we need a direct action:
-              // context.go('/packages');
-              // The routing in this app for the packages tab is likely the initial route or /packages.
-              // Assuming go_router is available, let's just go to the home/packages tab.
-              context.go('/');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(9999),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              'Explore Packages',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// WISHLIST ERROR
-// ============================================================================
-
-class _WishlistError extends StatelessWidget {
-  final Object error;
-
-  const _WishlistError({required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
-
-    return Container(
-      width: double.infinity,
-
-      padding: const EdgeInsets.all(24),
-
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.30),
-        borderRadius: BorderRadius.circular(22),
-
-        border: Border.all(color: Colors.white.withValues(alpha: 0.55)),
-      ),
-
-      child: Column(
-        children: [
-          const Icon(Icons.cloud_off_rounded, size: 38, color: textColor),
-
-          const SizedBox(height: 10),
-
-          const Text(
-            'Unable to load wishlist',
-            style: TextStyle(
-              color: textColor,
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            '$error',
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: secondaryTextColor, fontSize: 11),
-          ),
-        ],
       ),
     );
   }

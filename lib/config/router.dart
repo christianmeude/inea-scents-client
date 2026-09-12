@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../screens/index.dart';
+import '../models/index.dart';
 import '../widgets/index.dart';
 
 class AppRouter {
@@ -37,7 +38,12 @@ class AppRouter {
           ),
           GoRoute(
             path: '/packages',
-            builder: (context, state) => const PackagesScreen(),
+            builder: (context, state) {
+              final initialDate = tryParseDateParam(
+                state.queryParameters['date'],
+              );
+              return PackagesScreen(initialDate: initialDate);
+            },
           ),
           GoRoute(
             path: '/package-details/:id',
@@ -46,9 +52,13 @@ class AppRouter {
               final initialPax = int.tryParse(
                 state.queryParameters['pax'] ?? '',
               );
+              final initialDate = tryParseDateParam(
+                state.queryParameters['date'],
+              );
               return PackageDetailScreen(
                 packageId: packageId,
                 initialPax: initialPax,
+                initialDate: initialDate,
               );
             },
           ),
@@ -59,9 +69,13 @@ class AppRouter {
               final initialPax = int.tryParse(
                 state.queryParameters['pax'] ?? '',
               );
+              final initialDate = tryParseDateParam(
+                state.queryParameters['date'],
+              );
               return BookingScreen(
                 packageId: packageId,
                 initialPax: initialPax,
+                initialDate: initialDate,
               );
             },
           ),
@@ -72,10 +86,6 @@ class AppRouter {
           GoRoute(
             path: '/calendar',
             builder: (context, state) => const CalendarScreen(),
-          ),
-          GoRoute(
-            path: '/wishlist',
-            builder: (context, state) => const ProfileScreen(),
           ),
           GoRoute(
             path: '/profile',

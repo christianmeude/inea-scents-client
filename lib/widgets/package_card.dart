@@ -11,11 +11,15 @@ class PackageCard extends StatefulWidget {
   /// step ("50 PAX — ₱4,499") instead of the whole package.
   final int? optionPax;
 
+  /// Date carried from the calendar (`?date=`); forwarded with the push.
+  final DateTime? initialDate;
+
   const PackageCard({
     super.key,
     required this.package,
     this.onTap,
     this.optionPax,
+    this.initialDate,
   });
 
   @override
@@ -32,10 +36,13 @@ class _PackageCardState extends State<PackageCard> {
     } else {
       final option = widget.optionPax;
       final id = widget.package.id;
+      final query = <String>[
+        if (option != null) 'pax=$option',
+        if (widget.initialDate != null)
+          'date=${formatDateParam(widget.initialDate!)}',
+      ];
       context.push(
-        option == null
-            ? '/package-details/$id'
-            : '/package-details/$id?pax=$option',
+        '/package-details/$id${query.isEmpty ? '' : '?${query.join('&')}'}',
       );
     }
   }

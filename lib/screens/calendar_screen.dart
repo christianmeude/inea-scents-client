@@ -571,7 +571,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   final dateStr =
                       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
                   ref.read(bookingFlowProvider.notifier).setSelectedDate(d);
-                  context.push('/packages');
+                  context.push('/packages?date=$dateStr');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(

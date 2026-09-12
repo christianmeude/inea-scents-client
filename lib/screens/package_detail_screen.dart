@@ -7,14 +7,18 @@ import '../models/index.dart';
 class PackageDetailScreen extends ConsumerWidget {
   final int packageId;
 
-  /// Preselected headcount tier carried from a tier card (`?pax=`).
-  /// Forwarded to the booking flow; ignored when not a valid tier.
+  /// Preselected headcount option carried from a package card (`?pax=`).
+  /// Forwarded to the booking flow; ignored when not a valid option.
   final int? initialPax;
+
+  /// Date carried from the calendar (`?date=`); forwarded to booking.
+  final DateTime? initialDate;
 
   const PackageDetailScreen({
     super.key,
     required this.packageId,
     this.initialPax,
+    this.initialDate,
   });
 
   @override
@@ -325,10 +329,13 @@ class PackageDetailScreen extends ConsumerWidget {
                               );
                               return;
                             }
+                            final query = <String>[
+                              if (initialPax != null) 'pax=$initialPax',
+                              if (initialDate != null)
+                                'date=${formatDateParam(initialDate!)}',
+                            ];
                             context.push(
-                              initialPax == null
-                                  ? '/booking/$id'
-                                  : '/booking/$id?pax=$initialPax',
+                              '/booking/$id${query.isEmpty ? '' : '?${query.join('&')}'}',
                             );
                           },
                           style: ElevatedButton.styleFrom(
