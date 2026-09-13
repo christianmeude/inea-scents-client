@@ -70,18 +70,6 @@ class ReservationDetailsPanel extends StatelessWidget {
         // ========================================================
         Container(
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: surfaceBorder, width: 1.0),
-            boxShadow: [
-              BoxShadow(
-                color: plum.withValues(alpha: 0.06),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,19 +148,6 @@ class ReservationDetailsPanel extends StatelessWidget {
                 : optionPriceLabel(effectivePax);
             return Container(
               width: double.infinity,
-              decoration: BoxDecoration(
-                color: surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                    color: surfaceBorder, width: 1.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: plum.withValues(alpha: 0.06),
-                    blurRadius: 18,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,18 +252,6 @@ class ReservationDetailsPanel extends StatelessWidget {
         // ========================================================
         Container(
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: surfaceBorder, width: 1.0),
-            boxShadow: [
-              BoxShadow(
-                color: plum.withValues(alpha: 0.06),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -396,18 +359,6 @@ class ReservationDetailsPanel extends StatelessWidget {
         // ========================================================
         Container(
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: surfaceBorder, width: 1.0),
-            boxShadow: [
-              BoxShadow(
-                color: plum.withValues(alpha: 0.06),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

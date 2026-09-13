@@ -112,18 +112,6 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: surfaceBorder, width: 1.0),
-        boxShadow: [
-          BoxShadow(
-            color: IneaCalendar.plum.withValues(alpha: 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,8 +280,13 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                 if (widget.selectedDate == null) return false;
                 return isSameDay(widget.selectedDate, day);
               },
-              enabledDayPredicate: (day) =>
-                  !bookedDays.contains(DateTime(day.year, day.month, day.day)),
+              enabledDayPredicate: (day) {
+                final now = DateTime.now();
+                final today = DateTime(now.year, now.month, now.day);
+                final cellDay = DateTime(day.year, day.month, day.day);
+                if (cellDay.isBefore(today)) return false;
+                return !bookedDays.contains(cellDay);
+              },
               onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
                   _focusedDay = focusedDay;
@@ -324,80 +317,7 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
               ),
             ),
           ],
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: widget.selectedDate != null
-                  ? const Color(0xFF22C55E).withValues(alpha: 0.08)
-                  : chipColor,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: widget.selectedDate != null
-                    ? const Color(0xFF22C55E).withValues(alpha: 0.3)
-                    : surfaceBorder,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: widget.selectedDate != null
-                        ? const Color(0xFF22C55E).withValues(alpha: 0.15)
-                        : chipColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    widget.selectedDate != null
-                        ? Icons.event_available_rounded
-                        : Icons.event_note_rounded,
-                    color: widget.selectedDate != null
-                        ? const Color(0xFF16A34A)
-                        : bodyColor,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.selectedDate != null
-                            ? 'SELECTED DATE'
-                            : 'NO DATE SELECTED',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.8,
-                          color: widget.selectedDate != null
-                              ? const Color(0xFF16A34A)
-                              : bodyColor,
-                        ),
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        widget.selectedDate != null
-                            ? _formatFullDate(widget.selectedDate!)
-                            : 'Please choose a date from calendar',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: widget.selectedDate != null
-                              ? titleColor
-                              : bodyColor,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+
         ],
       ),
     );

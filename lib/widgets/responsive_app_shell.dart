@@ -102,12 +102,16 @@ class ResponsiveAppShell extends StatelessWidget {
           // P7: flat theme background — decorative ambient layers were
           // stripped app-wide per owner direction; the theme scaffold
           // color (light cream / dark night) carries both modes.
-          body: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: isDesktopView ? maxWidth : double.infinity,
+          body: SingleChildScrollView(
+            key: const Key('app_shell_scroll_view'),
+            physics: const BouncingScrollPhysics(),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: isDesktopView ? maxWidth : double.infinity,
+                ),
+                child: child,
               ),
-              child: child,
             ),
           ),
           bottomNavigationBar: isDesktopView

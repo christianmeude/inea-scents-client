@@ -358,13 +358,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
     final packageAsync = ref.watch(packageDetailsProvider(widget.packageId));
 
-    return Scaffold(
-      // P7: flat theme scaffold background.
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
             child: packageAsync.when(
               data: (package) {
                 if (_currentStep == 5) {
@@ -405,11 +402,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
-      ),
-    );
+            ), // when
+          ), // ConstrainedBox
+        ), // Center
+    ); // SafeArea
   }
 
   // ==========================================================================
@@ -424,92 +420,90 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _buildDesktopHeader(package),
         // P7: ONE page-level scroll (flow + summary scroll together);
         // the summary stays pinned at the top of its column.
-        Expanded(
-          child: SingleChildScrollView(
-            key: const Key('desktop_middle_scroll_view'),
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ------------------------------------------------------
-                // FLOW COLUMN (LEFT): IN-PLACE CROSS-FADE
-                // ------------------------------------------------------
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      switchInCurve: Curves.easeInOut,
-                      switchOutCurve: Curves.easeInOut,
-                      layoutBuilder:
-                          (Widget? currentChild,
-                              List<Widget> previousChildren) {
-                        return Stack(
-                          alignment: Alignment.topLeft,
-                          children: <Widget>[
-                            ...previousChildren,
-                            ?currentChild,
-                          ],
-                        );
-                      },
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(opacity: animation, child: child);
-                      },
-                  child: isPayment
-                      ? DesktopPaymentPanel(
-                          key: const ValueKey('desktop_payment_panel_view'),
-                          package: package,
-                          selectedDate: _selectedDate,
-                          selectedTime: _selectedTime,
-                          selectedPax: _selectedPax,
-                          paymentMethod: _paymentMethod,
-                          customerName: _customerNameController.text,
-                          customerEmail: _customerEmailController.text,
-                          customerPhone: _customerPhoneController.text,
-                          venueAddress: _venueAddressController.text,
-                          onCustomerNameChanged: (v) {
-                            _customerNameController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setCustomerName(v);
-                          },
-                          onCustomerEmailChanged: (v) {
-                            _customerEmailController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setCustomerEmail(v);
-                          },
-                          onCustomerPhoneChanged: (v) {
-                            _customerPhoneController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setCustomerPhone(v);
-                          },
-                          onVenueAddressChanged: (v) {
-                            _venueAddressController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setVenueAddress(v);
-                          },
-                          onPaymentMethodSelected: (method) {
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setPaymentMethod(method);
-                          },
-                          onBackToReservation: () {
-                            _goToStep(2);
-                          },
-                        )
-                      : Column(
-                          key: const ValueKey(
-                            'desktop_reservation_columns_view',
-                          ),
-                          children: [
-                            // FLOW: CALENDAR → DETAILS stacked in the page
-                            // scroll (P7: no nested column scrolls).
-                            ReservationCalendarPanel(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ------------------------------------------------------
+              // FLOW COLUMN (LEFT): IN-PLACE CROSS-FADE
+              // ------------------------------------------------------
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeInOut,
+                    switchOutCurve: Curves.easeInOut,
+                    layoutBuilder:
+                        (Widget? currentChild,
+                            List<Widget> previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topLeft,
+                        children: <Widget>[
+                          ...previousChildren,
+                          ?currentChild,
+                        ],
+                      );
+                    },
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(opacity: animation, child: child);
+                    },
+                child: isPayment
+                    ? DesktopPaymentPanel(
+                        key: const ValueKey('desktop_payment_panel_view'),
+                        package: package,
+                        selectedDate: _selectedDate,
+                        selectedTime: _selectedTime,
+                        selectedPax: _selectedPax,
+                        paymentMethod: _paymentMethod,
+                        customerName: _customerNameController.text,
+                        customerEmail: _customerEmailController.text,
+                        customerPhone: _customerPhoneController.text,
+                        venueAddress: _venueAddressController.text,
+                        onCustomerNameChanged: (v) {
+                          _customerNameController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setCustomerName(v);
+                        },
+                        onCustomerEmailChanged: (v) {
+                          _customerEmailController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setCustomerEmail(v);
+                        },
+                        onCustomerPhoneChanged: (v) {
+                          _customerPhoneController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setCustomerPhone(v);
+                        },
+                        onVenueAddressChanged: (v) {
+                          _venueAddressController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setVenueAddress(v);
+                        },
+                        onPaymentMethodSelected: (method) {
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setPaymentMethod(method);
+                        },
+                        onBackToReservation: () {
+                          _goToStep(2);
+                        },
+                      )
+                    : Row(
+                        key: const ValueKey(
+                          'desktop_reservation_columns_view',
+                        ),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // FLOW: CALENDAR and DETAILS side-by-side
+                          Expanded(
+                            child: ReservationCalendarPanel(
                               key: const Key(
                                   'reservation_calendar_panel'),
                               selectedDate: _selectedDate,
@@ -519,8 +513,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                     .setSelectedDate(date);
                               },
                             ),
-                            const SizedBox(height: 14),
-                            ReservationDetailsPanel(
+                          ),
+                          const SizedBox(width: 24),
+                          Expanded(
+                            child: ReservationDetailsPanel(
                               key: const Key(
                                   'reservation_details_panel'),
                               package: package,
@@ -540,11 +536,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                     .setPaymentMethod(method);
                               },
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-              ),
+                  ),
+            ),
 
               // ------------------------------------------------------
               // SUMMARY (RIGHT): PINNED AT TOP, SCROLLS WITH THE PAGE
@@ -591,7 +588,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ],
           ),
         ),
-      ),
       ],
     );
   }
@@ -608,117 +604,114 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _buildDesktopHeader(package),
         // P7: ONE page-level scroll; summary pinned at the top of
         // its column (no nested column scrolls).
-        Expanded(
-          child: SingleChildScrollView(
-            key: const Key('tablet_page_scroll_view'),
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left Column: Calendar & Customization / Payment
-                // (Cross-Faded)
-                Expanded(
-                  flex: 1,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
-                    child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  switchInCurve: Curves.easeInOut,
-                  switchOutCurve: Curves.easeInOut,
-                  layoutBuilder:
-                      (Widget? currentChild, List<Widget> previousChildren) {
-                        return Stack(
-                          alignment: Alignment.topLeft,
-                          children: <Widget>[
-                            ...previousChildren,
-                            ?currentChild,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left Column: Calendar & Customization / Payment
+              // (Cross-Faded)
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                  child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                switchInCurve: Curves.easeInOut,
+                switchOutCurve: Curves.easeInOut,
+                layoutBuilder:
+                    (Widget? currentChild, List<Widget> previousChildren) {
+                      return Stack(
+                        alignment: Alignment.topLeft,
+                        children: <Widget>[
+                          ...previousChildren,
+                          ?currentChild,
+                        ],
+                      );
+                    },
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+                child: isPayment
+                    ? DesktopPaymentPanel(
+                        key: const ValueKey('tablet_payment_panel_view'),
+                        package: package,
+                        selectedDate: _selectedDate,
+                        selectedTime: _selectedTime,
+                        selectedPax: _selectedPax,
+                        paymentMethod: _paymentMethod,
+                        customerName: _customerNameController.text,
+                        customerEmail: _customerEmailController.text,
+                        customerPhone: _customerPhoneController.text,
+                        venueAddress: _venueAddressController.text,
+                        onCustomerNameChanged: (v) {
+                          _customerNameController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setCustomerName(v);
+                        },
+                        onCustomerEmailChanged: (v) {
+                          _customerEmailController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setCustomerEmail(v);
+                        },
+                        onCustomerPhoneChanged: (v) {
+                          _customerPhoneController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setCustomerPhone(v);
+                        },
+                        onVenueAddressChanged: (v) {
+                          _venueAddressController.text = v;
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setVenueAddress(v);
+                        },
+                        onPaymentMethodSelected: (method) {
+                          ref
+                              .read(bookingFlowProvider.notifier)
+                              .setPaymentMethod(method);
+                        },
+                        onBackToReservation: () {
+                          _goToStep(2);
+                        },
+                      )
+                    : Column(
+                        children: [
+                          ReservationCalendarPanel(
+                            key: const Key('tablet_calendar_panel'),
+                            selectedDate: _selectedDate,
+                            onDateSelected: (date) {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setSelectedDate(date);
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            ReservationDetailsPanel(
+                              key: const Key('tablet_details_panel'),
+                              package: package,
+                              selectedPax: _selectedPax,
+                              onChangePax: () => _goChangePax(package),
+                              selectedTime: _selectedTime,
+                              onTimeSelected: (time) {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setSelectedTime(time);
+                              },
+                              paymentMethod: _paymentMethod,
+                              onPaymentMethodSelected: (method) {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setPaymentMethod(method);
+                              },
+                            ),
                           ],
-                        );
-                      },
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                  child: isPayment
-                      ? DesktopPaymentPanel(
-                          key: const ValueKey('tablet_payment_panel_view'),
-                          package: package,
-                          selectedDate: _selectedDate,
-                          selectedTime: _selectedTime,
-                          selectedPax: _selectedPax,
-                          paymentMethod: _paymentMethod,
-                          customerName: _customerNameController.text,
-                          customerEmail: _customerEmailController.text,
-                          customerPhone: _customerPhoneController.text,
-                          venueAddress: _venueAddressController.text,
-                          onCustomerNameChanged: (v) {
-                            _customerNameController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setCustomerName(v);
-                          },
-                          onCustomerEmailChanged: (v) {
-                            _customerEmailController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setCustomerEmail(v);
-                          },
-                          onCustomerPhoneChanged: (v) {
-                            _customerPhoneController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setCustomerPhone(v);
-                          },
-                          onVenueAddressChanged: (v) {
-                            _venueAddressController.text = v;
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setVenueAddress(v);
-                          },
-                          onPaymentMethodSelected: (method) {
-                            ref
-                                .read(bookingFlowProvider.notifier)
-                                .setPaymentMethod(method);
-                          },
-                          onBackToReservation: () {
-                            _goToStep(2);
-                          },
-                        )
-                      : Column(
-                          children: [
-                            ReservationCalendarPanel(
-                              key: const Key('tablet_calendar_panel'),
-                              selectedDate: _selectedDate,
-                              onDateSelected: (date) {
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setSelectedDate(date);
-                                },
-                              ),
-                              const SizedBox(height: 14),
-                              ReservationDetailsPanel(
-                                key: const Key('tablet_details_panel'),
-                                package: package,
-                                selectedPax: _selectedPax,
-                                onChangePax: () => _goChangePax(package),
-                                selectedTime: _selectedTime,
-                                onTimeSelected: (time) {
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setSelectedTime(time);
-                                },
-                                paymentMethod: _paymentMethod,
-                                onPaymentMethodSelected: (method) {
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setPaymentMethod(method);
-                                },
-                              ),
-                            ],
-                          ),
                         ),
                       ),
                     ),
+                  ),
 
               // Right Column: Order Summary (pinned at top)
               Expanded(
@@ -763,7 +756,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ],
           ),
         ),
-      ),
       ],
     );
   }
@@ -778,12 +770,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       children: [
         _buildHeader(showBack: true),
         _buildTimeline(),
-        Expanded(
-          child: SingleChildScrollView(
-            key: const Key('mobile_step_scroll_view'),
-            padding: const EdgeInsets.all(20),
-            child: _buildCurrentStep(package),
-          ),
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: _buildCurrentStep(package),
         ),
         Padding(
           padding: const EdgeInsets.all(20),
@@ -922,44 +911,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ),
           ),
           const SizedBox(width: 10),
-          Flexible(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _surface,
-                borderRadius: BorderRadius.circular(9999),
-                border: Border.all(color: _surfaceBorder),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    isPayment
-                        ? Icons.lock_outline_rounded
-                        : Icons.check_circle_rounded,
-                    size: 13,
-                    color: isPayment ? _title : const Color(0xFF16A34A),
-                  ),
-                  const SizedBox(width: 5),
-                  Flexible(
-                    child: Text(
-                      isPayment
-                          ? 'Secure In-Place Checkout'
-                          // P6: desktop is a 2-column flow + summary.
-                          : '2-Column Booking Flow',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: _title,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -1105,12 +1056,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       children: [
         if (MediaQuery.of(context).size.width < 768)
           _buildHeader(showBack: false),
-        Expanded(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 32),
           child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: content,
-            ),
+            child: content,
           ),
         ),
       ],

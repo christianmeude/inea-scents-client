@@ -138,9 +138,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 480;
 
-        return SingleChildScrollView(
-          key: const Key('desktop_payment_scroll_view'),
-          physics: const BouncingScrollPhysics(),
+        return Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,21 +148,6 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               // ========================================================
               Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: surfaceBorder,
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: titleColor.withValues(alpha: 0.06),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
                 padding: const EdgeInsets.all(16),
                 child: isNarrow
                     ? Column(
@@ -334,21 +317,6 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               // ========================================================
               Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: surfaceBorder,
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: titleColor.withValues(alpha: 0.06),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -491,21 +459,6 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               // ========================================================
               Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: surfaceBorder,
-                    width: 1.0,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: titleColor.withValues(alpha: 0.06),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
