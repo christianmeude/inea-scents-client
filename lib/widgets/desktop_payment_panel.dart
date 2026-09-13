@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/index.dart';
+import 'card_surfaces.dart';
 
 /// Desktop & Tablet Payment Panel for INEA Scents reservation flow.
 ///
@@ -105,6 +106,12 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
 
   @override
   Widget build(BuildContext context) {
+    // P7: all surfaces resolve through the shared helper so the dark
+    // toggle recolors the payment step.
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final chipColor = CardSurfaces.chipBg(context);
     final activeMethod = widget.paymentMethod ?? 'credit_card';
 
     // Customer-facing methods: Online (PayMongo) or Cash (admin confirm).
@@ -144,15 +151,15 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0x4D99868C),
+                    color: surfaceBorder,
                     width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: DesktopPaymentPanel.plum.withValues(alpha: 0.06),
+                      color: titleColor.withValues(alpha: 0.06),
                       blurRadius: 18,
                       offset: const Offset(0, 6),
                     ),
@@ -168,17 +175,17 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: DesktopPaymentPanel.cream,
+                                  color: chipColor,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.lock_outline_rounded,
-                                  color: DesktopPaymentPanel.plum,
+                                  color: titleColor,
                                   size: 22,
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Expanded(
+                              Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -187,7 +194,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
-                                        color: DesktopPaymentPanel.plum,
+                                        color: titleColor,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -213,17 +220,17 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                               alignment: Alignment.centerRight,
                               child: OutlinedButton.icon(
                                 onPressed: widget.onBackToReservation,
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.arrow_back_rounded,
                                   size: 15,
-                                  color: DesktopPaymentPanel.plum,
+                                  color: titleColor,
                                 ),
-                                label: const Text(
+                                label: Text(
                                   'Edit Selection',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: DesktopPaymentPanel.plum,
+                                    color: titleColor,
                                   ),
                                 ),
                                 style: OutlinedButton.styleFrom(
@@ -231,8 +238,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                     horizontal: 10,
                                     vertical: 6,
                                   ),
-                                  side: const BorderSide(
-                                    color: Color(0x4D99868C),
+                                  side: BorderSide(
+                                    color: surfaceBorder,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(9999),
@@ -248,17 +255,17 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: DesktopPaymentPanel.cream,
+                              color: chipColor,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.lock_outline_rounded,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                               size: 22,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -267,7 +274,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: DesktopPaymentPanel.plum,
+                                    color: titleColor,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -289,17 +296,17 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             const SizedBox(width: 8),
                             OutlinedButton.icon(
                               onPressed: widget.onBackToReservation,
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.arrow_back_rounded,
                                 size: 15,
-                                color: DesktopPaymentPanel.plum,
+                                color: titleColor,
                               ),
-                              label: const Text(
+                              label: Text(
                                 'Edit Selection',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: DesktopPaymentPanel.plum,
+                                  color: titleColor,
                                 ),
                               ),
                               style: OutlinedButton.styleFrom(
@@ -307,8 +314,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                   horizontal: 10,
                                   vertical: 6,
                                 ),
-                                side: const BorderSide(
-                                  color: Color(0x4D99868C),
+                                side: BorderSide(
+                                  color: surfaceBorder,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(9999),
@@ -328,15 +335,15 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0x4D99868C),
+                    color: surfaceBorder,
                     width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: DesktopPaymentPanel.plum.withValues(alpha: 0.06),
+                      color: titleColor.withValues(alpha: 0.06),
                       blurRadius: 18,
                       offset: const Offset(0, 6),
                     ),
@@ -351,23 +358,23 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: DesktopPaymentPanel.cream,
+                            color: chipColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.payment_rounded,
-                            color: DesktopPaymentPanel.plum,
+                            color: titleColor,
                             size: 20,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             '1. Select Payment Method',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -399,7 +406,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? methodColor.withValues(alpha: 0.08)
-                                      : DesktopPaymentPanel.cream.withValues(
+                                      : chipColor.withValues(
                                           alpha: 0.4,
                                         ),
                                   borderRadius: BorderRadius.circular(14),
@@ -438,7 +445,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                         fontWeight: FontWeight.w700,
                                         color: isSelected
                                             ? methodColor
-                                            : DesktopPaymentPanel.plum,
+                                            : titleColor,
                                       ),
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
@@ -447,7 +454,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                     const SizedBox(height: 2),
                                     Text(
                                       method['sublabel'] as String,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 9,
                                         color: DesktopPaymentPanel.mutedPlum,
                                       ),
@@ -485,15 +492,15 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0x4D99868C),
+                    color: surfaceBorder,
                     width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: DesktopPaymentPanel.plum.withValues(alpha: 0.06),
+                      color: titleColor.withValues(alpha: 0.06),
                       blurRadius: 18,
                       offset: const Offset(0, 6),
                     ),
@@ -508,12 +515,12 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: DesktopPaymentPanel.cream,
+                            color: chipColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.edit_note_rounded,
-                            color: DesktopPaymentPanel.plum,
+                            color: titleColor,
                             size: 20,
                           ),
                         ),
@@ -523,10 +530,10 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             activeMethod == 'credit_card'
                                 ? '2. Online Checkout'
                                 : '2. Offline Payment Instructions',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -601,7 +608,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             Expanded(
                               child: Text(
                                 'You will pay in cash on the event day. Our team will confirm your booking shortly.',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   color: Color(0xFF16A34A),
                                   fontWeight: FontWeight.w500,
@@ -624,15 +631,15 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0x4D99868C),
+                    color: surfaceBorder,
                     width: 1.0,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: DesktopPaymentPanel.plum.withValues(alpha: 0.06),
+                      color: titleColor.withValues(alpha: 0.06),
                       blurRadius: 18,
                       offset: const Offset(0, 6),
                     ),
@@ -647,23 +654,23 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: DesktopPaymentPanel.cream,
+                            color: chipColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.contacts_rounded,
-                            color: DesktopPaymentPanel.plum,
+                            color: titleColor,
                             size: 20,
                           ),
                         ),
                         const SizedBox(width: 10),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             '3. Contact & Venue Information',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -674,6 +681,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                     const SizedBox(height: 14),
                     if (isNarrow) ...[
                       _buildInputField(
+                        context,
                         label: 'Full Name',
                         hint: 'Customer Name',
                         controller: _customerNameController,
@@ -684,6 +692,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                       ),
                       const SizedBox(height: 12),
                       _buildInputField(
+                        context,
                         label: 'Email Address',
                         hint: 'name@example.com',
                         controller: _customerEmailController,
@@ -695,6 +704,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                       ),
                       const SizedBox(height: 12),
                       _buildInputField(
+                        context,
                         label: 'Contact Phone',
                         hint: '+63 9XX XXX XXXX',
                         controller: _customerPhoneController,
@@ -712,6 +722,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                       ),
                       const SizedBox(height: 12),
                       _buildInputField(
+                        context,
                         label: 'Event Venue / Address',
                         hint: 'e.g. Grand Ballroom, Makati',
                         controller: _venueAddressController,
@@ -725,6 +736,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         children: [
                           Expanded(
                             child: _buildInputField(
+                              context,
                               label: 'Full Name',
                               hint: 'Customer Name',
                               controller: _customerNameController,
@@ -737,6 +749,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildInputField(
+                              context,
                               label: 'Email Address',
                               hint: 'name@example.com',
                               controller: _customerEmailController,
@@ -754,6 +767,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         children: [
                           Expanded(
                             child: _buildInputField(
+                              context,
                               label: 'Contact Phone',
                               hint: '+63 9XX XXX XXXX',
                               controller: _customerPhoneController,
@@ -773,6 +787,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildInputField(
+                              context,
                               label: 'Event Venue / Address',
                               hint: 'e.g. Grand Ballroom, Makati',
                               controller: _venueAddressController,
@@ -801,11 +816,11 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: DesktopPaymentPanel.cream,
+                  color: chipColor,
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0x3399868C)),
+                  border: Border.all(color: surfaceBorder),
                 ),
-                child: const Wrap(
+                child: Wrap(
                   alignment: WrapAlignment.center,
                   spacing: 16,
                   runSpacing: 8,
@@ -826,7 +841,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                             ),
                           ),
                         ),
@@ -847,7 +862,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                             ),
                           ),
                         ),
@@ -868,7 +883,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: DesktopPaymentPanel.plum,
+                              color: titleColor,
                             ),
                           ),
                         ),
@@ -884,7 +899,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
     );
   }
 
-  Widget _buildInputField({
+  Widget _buildInputField(
+    BuildContext context, {
     required String label,
     required String hint,
     required TextEditingController controller,
@@ -896,23 +912,27 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
     bool obscureText = false,
     ValueChanged<String>? onChanged,
   }) {
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: DesktopPaymentPanel.plum,
+            color: titleColor,
           ),
         ),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0x3399868C)),
+            border: Border.all(color: surfaceBorder),
           ),
           child: TextField(
             key: Key(keyName),
@@ -922,18 +942,18 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
             inputFormatters: inputFormatters,
             obscureText: obscureText,
             onChanged: onChanged,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
-              color: DesktopPaymentPanel.plum,
+              color: titleColor,
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: const TextStyle(
+              hintStyle: TextStyle(
                 fontSize: 12,
-                color: DesktopPaymentPanel.mutedPlum,
+                color: bodyColor,
               ),
-              prefixIcon: Icon(icon, size: 18, color: DesktopPaymentPanel.plum),
+              prefixIcon: Icon(icon, size: 18, color: titleColor),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,

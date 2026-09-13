@@ -46,6 +46,13 @@ class BookingScreen extends ConsumerStatefulWidget {
 class _BookingScreenState extends ConsumerState<BookingScreen> {
   static const Color plum = Color(0xFF6A4053);
 
+  // P7: dark-aware surfaces through the shared helper.
+  Color get _surface => CardSurfaces.cardBg(context);
+  Color get _surfaceBorder => CardSurfaces.cardBorder(context);
+  Color get _title => CardSurfaces.title(context);
+  Color get _body => CardSurfaces.body(context);
+  Color get _chip => CardSurfaces.chipBg(context);
+
   /// P4 state shape: selections are owned by [bookingFlowProvider].
   /// The screen watches (see build) and dispatches — no local mirror.
   /// Text controllers stay local per Flutter requirements and commit
@@ -352,6 +359,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final packageAsync = ref.watch(packageDetailsProvider(widget.packageId));
 
     return Scaffold(
+      // P7: flat theme scaffold background.
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
@@ -414,21 +422,30 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     return Column(
       children: [
         _buildDesktopHeader(package),
+        // P7: ONE page-level scroll (flow + summary scroll together);
+        // the summary stays pinned at the top of its column.
         Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ------------------------------------------------------
-              // COLUMNS 1 & 2 (LEFT & MIDDLE): IN-PLACE CROSS-FADE
-              // ------------------------------------------------------
-              Expanded(
-                flex: 2,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  switchInCurve: Curves.easeInOut,
-                  switchOutCurve: Curves.easeInOut,
-                  layoutBuilder:
-                      (Widget? currentChild, List<Widget> previousChildren) {
+          child: SingleChildScrollView(
+            key: const Key('desktop_middle_scroll_view'),
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ------------------------------------------------------
+                // FLOW COLUMN (LEFT): IN-PLACE CROSS-FADE
+                // ------------------------------------------------------
+                Expanded(
+                  flex: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      switchInCurve: Curves.easeInOut,
+                      switchOutCurve: Curves.easeInOut,
+                      layoutBuilder:
+                          (Widget? currentChild,
+                              List<Widget> previousChildren) {
                         return Stack(
                           alignment: Alignment.topLeft,
                           children: <Widget>[
@@ -437,9 +454,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           ],
                         );
                       },
-                  transitionBuilder: (child, animation) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
                   child: isPayment
                       ? DesktopPaymentPanel(
                           key: const ValueKey('desktop_payment_panel_view'),
@@ -485,77 +502,57 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             _goToStep(2);
                           },
                         )
-                      : Row(
+                      : Column(
                           key: const ValueKey(
                             'desktop_reservation_columns_view',
                           ),
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // FLOW COLUMN (LEFT): CALENDAR → DETAILS, stacked
-                            // in one scroll view (P6: the 3-column split was
-                            // too noisy; summary keeps its own column).
-                            Expanded(
-                              flex: 2,
-                              child: SingleChildScrollView(
-                                key: const Key('desktop_middle_scroll_view'),
-                                physics: const BouncingScrollPhysics(),
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  8,
-                                  8,
-                                  16,
-                                ),
-                                child: Column(
-                                  children: [
-                                    ReservationCalendarPanel(
-                                      key: const Key(
-                                          'reservation_calendar_panel'),
-                                      selectedDate: _selectedDate,
-                                      onDateSelected: (date) {
-                                        ref
-                                            .read(bookingFlowProvider.notifier)
-                                            .setSelectedDate(date);
-                                      },
-                                    ),
-                                    const SizedBox(height: 14),
-                                    ReservationDetailsPanel(
-                                      key: const Key(
-                                          'reservation_details_panel'),
-                                      package: package,
-                                      selectedPax: _selectedPax,
-                                      onChangePax: () =>
-                                          _goChangePax(package),
-                                      selectedTime: _selectedTime,
-                                      onTimeSelected: (time) {
-                                        ref
-                                            .read(bookingFlowProvider.notifier)
-                                            .setSelectedTime(time);
-                                      },
-                                      paymentMethod: _paymentMethod,
-                                      onPaymentMethodSelected: (method) {
-                                        ref
-                                            .read(bookingFlowProvider.notifier)
-                                            .setPaymentMethod(method);
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            // FLOW: CALENDAR → DETAILS stacked in the page
+                            // scroll (P7: no nested column scrolls).
+                            ReservationCalendarPanel(
+                              key: const Key(
+                                  'reservation_calendar_panel'),
+                              selectedDate: _selectedDate,
+                              onDateSelected: (date) {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setSelectedDate(date);
+                              },
+                            ),
+                            const SizedBox(height: 14),
+                            ReservationDetailsPanel(
+                              key: const Key(
+                                  'reservation_details_panel'),
+                              package: package,
+                              selectedPax: _selectedPax,
+                              onChangePax: () =>
+                                  _goChangePax(package),
+                              selectedTime: _selectedTime,
+                              onTimeSelected: (time) {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setSelectedTime(time);
+                              },
+                              paymentMethod: _paymentMethod,
+                              onPaymentMethodSelected: (method) {
+                                ref
+                                    .read(bookingFlowProvider.notifier)
+                                    .setPaymentMethod(method);
+                              },
                             ),
                           ],
                         ),
-                ),
+                      ),
+                    ),
               ),
 
               // ------------------------------------------------------
-              // COLUMN 3 (RIGHT): STICKY FLOATING ORDER SUMMARY
+              // SUMMARY (RIGHT): PINNED AT TOP, SCROLLS WITH THE PAGE
               // ------------------------------------------------------
               Expanded(
                 flex: 1,
-                child: SingleChildScrollView(
-                  key: const Key('desktop_summary_scroll_view'),
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
                   child: OrderSummaryPanel(
                     key: const Key('order_summary_side_panel'),
                     package: package,
@@ -594,6 +591,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ],
           ),
         ),
+      ),
       ],
     );
   }
@@ -608,14 +606,23 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     return Column(
       children: [
         _buildDesktopHeader(package),
+        // P7: ONE page-level scroll; summary pinned at the top of
+        // its column (no nested column scrolls).
         Expanded(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Left Column: Calendar & Customization / Payment (Scrollable & Cross-Faded)
-              Expanded(
-                flex: 1,
-                child: AnimatedSwitcher(
+          child: SingleChildScrollView(
+            key: const Key('tablet_page_scroll_view'),
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Left Column: Calendar & Customization / Payment
+                // (Cross-Faded)
+                Expanded(
+                  flex: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
+                    child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
                   switchInCurve: Curves.easeInOut,
                   switchOutCurve: Curves.easeInOut,
@@ -677,16 +684,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             _goToStep(2);
                           },
                         )
-                      : SingleChildScrollView(
-                          key: const Key('tablet_left_scroll_view'),
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
-                          child: Column(
-                            children: [
-                              ReservationCalendarPanel(
-                                key: const Key('tablet_calendar_panel'),
-                                selectedDate: _selectedDate,
-                                onDateSelected: (date) {
+                      : Column(
+                          children: [
+                            ReservationCalendarPanel(
+                              key: const Key('tablet_calendar_panel'),
+                              selectedDate: _selectedDate,
+                              onDateSelected: (date) {
                                   ref
                                       .read(bookingFlowProvider.notifier)
                                       .setSelectedDate(date);
@@ -714,16 +717,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             ],
                           ),
                         ),
-                ),
-              ),
+                      ),
+                    ),
 
-              // Right Column: Order Summary (Sticky side-panel)
+              // Right Column: Order Summary (pinned at top)
               Expanded(
                 flex: 1,
-                child: SingleChildScrollView(
-                  key: const Key('tablet_right_scroll_view'),
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
                   child: OrderSummaryPanel(
                     key: const Key('tablet_order_summary_panel'),
                     package: package,
@@ -762,6 +763,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ],
           ),
         ),
+      ),
       ],
     );
   }
@@ -837,8 +839,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         notifier.nextStep();
                       }
                     },
+              // P7: theme ElevatedButton drives both modes.
               style: ElevatedButton.styleFrom(
-                backgroundColor: plum,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(9999),
                 ),
@@ -849,7 +851,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.5,
-                        color: Colors.white,
                       ),
                     )
                   : Text(
@@ -858,7 +859,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           : _currentStep == 3
                           ? 'Proceed to Payment'
                           : 'Next',
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: const TextStyle(fontSize: 16),
                     ),
             ),
           ),
@@ -890,11 +891,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 } catch (_) {}
               }
             },
-            icon: const Icon(Icons.arrow_back_rounded, color: plum, size: 20),
-            label: const Text(
+            icon: Icon(Icons.arrow_back_rounded, color: _title, size: 20),
+            label: Text(
               'Back',
               style: TextStyle(
-                color: plum,
+                color: _title,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -904,17 +905,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          Container(height: 18, width: 1, color: const Color(0x3399868C)),
+          Container(height: 18, width: 1, color: _surfaceBorder),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               isPayment
                   ? 'Payment & Checkout — ${package.name ?? "Custom Experience"}'
                   : 'Reservation — ${package.name ?? "Custom Experience"}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: plum,
+                color: _title,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -925,9 +926,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: _surface,
                 borderRadius: BorderRadius.circular(9999),
-                border: Border.all(color: const Color(0x3399868C)),
+                border: Border.all(color: _surfaceBorder),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -937,7 +938,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ? Icons.lock_outline_rounded
                         : Icons.check_circle_rounded,
                     size: 13,
-                    color: isPayment ? plum : const Color(0xFF16A34A),
+                    color: isPayment ? _title : const Color(0xFF16A34A),
                   ),
                   const SizedBox(width: 5),
                   Flexible(
@@ -946,10 +947,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           ? 'Secure In-Place Checkout'
                           // P6: desktop is a 2-column flow + summary.
                           : '2-Column Reservation Flow',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: plum,
+                        color: _title,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1134,9 +1135,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 30),
       decoration: BoxDecoration(
-        color: Colors.white,
+                color: _surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0x4D99868C)),
+        border: Border.all(color: _surfaceBorder),
         boxShadow: [
           BoxShadow(
             color: plum.withValues(alpha: 0.08),
@@ -1151,16 +1152,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: iconColor, shape: BoxShape.circle),
-            child: Icon(iconData, color: Colors.white, size: 40),
+            child: Icon(iconData,                   color: _surface, size: 40),
           ),
           const SizedBox(height: 20),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
-              color: plum,
+              color: _title,
             ),
           ),
           const SizedBox(height: 18),
@@ -1170,9 +1171,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               child: Text(
                 line,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Color(0x8A6A4053),
+                  color: _body,
                   height: 1.4,
                 ),
               ),
@@ -1251,10 +1252,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   }
                 }
               },
-              icon: const Icon(Icons.arrow_back, color: plum, size: 20),
-              label: const Text(
+              icon: Icon(Icons.arrow_back, color: _title, size: 20),
+              label: Text(
                 'Back',
-                style: TextStyle(color: plum, fontSize: 14),
+                style: TextStyle(color: _title, fontSize: 14),
               ),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1269,7 +1270,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             height: 45,
             child: Stack(
               alignment: Alignment.center,
-              children: const [
+              children: [
                 Positioned(
                   top: 0,
                   left: 0,
@@ -1280,7 +1281,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2,
                       height: 1,
-                      color: plum,
+                      color: _title,
                     ),
                   ),
                 ),
@@ -1293,7 +1294,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       fontFamily: 'GreatVibes',
                       fontSize: 32,
                       height: 1,
-                      color: plum,
+                      color: _title,
                     ),
                   ),
                 ),
@@ -1303,10 +1304,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
           if (showBack)
             Row(
-              children: const [
-                Icon(Icons.chat_bubble_rounded, color: plum),
-                SizedBox(width: 15),
-                Icon(Icons.calendar_today_rounded, color: plum),
+              children: [
+                Icon(Icons.chat_bubble_rounded, color: _title),
+                const SizedBox(width: 15),
+                Icon(Icons.calendar_today_rounded, color: _title),
               ],
             )
           else
@@ -1353,10 +1354,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           shape: BoxShape.circle,
                         ),
                         child: isPast || isCurrent
-                            ? const Icon(
+                            ? Icon(
                                 Icons.check,
                                 size: 12,
-                                color: Colors.white,
+                                color: _surface,
                               )
                             : null,
                       ),
@@ -1440,27 +1441,27 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _surface,
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: const Color(0x4D99868C)),
+                  border: Border.all(color: _surfaceBorder),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.check_circle_rounded,
                       size: 16,
-                      color: plum,
+                      color: _title,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         effectivePax == null
                             ? 'Headcount to be confirmed'
-                            : '$effectivePax Guests$priceLabel',
-                        style: const TextStyle(
+                            : '$effectivePax PAX$priceLabel',
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: plum,
+                          color: _title,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1469,14 +1470,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     GestureDetector(
                       key: const Key('pax_change_link'),
                       onTap: () => _goChangePax(package),
-                      child: const MouseRegion(
+                      child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: Text(
                           'Change',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: plum,
+                            color: _title,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -1502,9 +1503,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _surface,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: const Color(0x4D99868C)),
+              border: Border.all(color: _surfaceBorder),
             ),
             child: InkWell(
               key: const Key('event_time_picker_button'),
@@ -1518,7 +1519,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFDF4F5),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0x3399868C)),
+                  border: Border.all(color: _surfaceBorder),
                 ),
                 child: Row(
                   children: [
@@ -1534,7 +1535,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           fontWeight: _selectedTime == null
                               ? FontWeight.normal
                               : FontWeight.w700,
-                          color: plum,
+                          color: _title,
                         ),
                       ),
                     ),
@@ -1551,12 +1552,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Order Details',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: plum,
+              color: _title,
             ),
           ),
           const SizedBox(height: 15),
@@ -1568,70 +1569,70 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: _surface,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: const Color(0x4D99868C)),
+                    border: Border.all(color: _surfaceBorder),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Details',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Color(0xFF6A4053),
+                          color: _title,
                         ),
                       ),
                       const SizedBox(height: 15),
                       Text(
                         'Package Variation: ${package.name}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         'Inclusion/s:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 5),
                       ...(package.inclusions ?? []).map(
                         (e) => Text(
                           '• $e',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF6A4053),
+                            color: _title,
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         'Free:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 5),
                       ...(package.freebies ?? []).map(
                         (e) => Text(
                           '• $e',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF6A4053),
+                            color: _title,
                           ),
                         ),
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         'Selected Date:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 5),
@@ -1639,46 +1640,50 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         _selectedDate != null
                             ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
                             : 'Not selected',
-                        style: const TextStyle(fontSize: 13, color: plum),
+                        style: TextStyle(fontSize: 13, color: _title),
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         'Selected Time:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 5),
                       Text(
                         TimeSlot.display(_selectedTime),
-                        style: const TextStyle(fontSize: 13, color: plum),
+                        style: TextStyle(fontSize: 13, color: _title),
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         'Selected Pax:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 5),
                       Text(
                         '${_selectedPax ?? 50} PAX',
-                        style: const TextStyle(fontSize: 13, color: plum),
+                        style: TextStyle(fontSize: 13, color: _title),
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         'Total Cost:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Color(0x8A6A4053),
+                          color: _body,
                         ),
                       ),
                       const SizedBox(height: 5),
                       Text(
                         'Php. ${package.priceForPax(_selectedPax).toStringAsFixed(2)}',
-                        style: const TextStyle(fontSize: 13, color: plum),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: _title,
+                        ),
                       ),
                     ],
                   ),
@@ -1689,9 +1694,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 flex: 2,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: _surface,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: const Color(0x4D99868C)),
+                    border: Border.all(color: _surfaceBorder),
                   ),
                   child: Column(
                     children: [
@@ -1711,15 +1716,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   package.images![0],
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(
+                                      Icon(
                                         Icons.local_florist,
-                                        color: plum,
+                                        color: _title,
                                         size: 32,
                                       ),
                                 )
-                              : const Icon(
+                              : Icon(
                                   Icons.local_florist,
-                                  color: plum,
+                                  color: _title,
                                   size: 32,
                                 ),
                         ),
@@ -1731,24 +1736,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           children: [
                             Text(
                               package.name ?? '',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
+                                color: _title,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               package.description ?? '',
                               maxLines: 3,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: Color(0xFF99868C),
+                                color: _body,
                               ),
                             ),
                             const SizedBox(height: 12),
                             Text(
                               'Php. ${(package.price ?? 4499.0).toStringAsFixed(2)}',
-                              style: const TextStyle(fontSize: 13, color: plum),
+                              style: TextStyle(fontSize: 13, color: _title),
                             ),
                           ],
                         ),
@@ -1760,21 +1766,21 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'Your Contact Details',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: plum,
+              color: _title,
             ),
           ),
           const SizedBox(height: 15),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _surface,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: const Color(0x4D99868C)),
+              border: Border.all(color: _surfaceBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1834,37 +1840,37 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Price Details',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: plum,
+              color: _title,
             ),
           ),
           const SizedBox(height: 15),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _surface,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: const Color(0x4D99868C)),
+              border: Border.all(color: _surfaceBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   package.name ?? '',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: plum,
+                    color: _title,
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   'Inclusions:',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF99868C)),
+                  style: TextStyle(fontSize: 12, color: _body),
                 ),
                 const SizedBox(height: 10),
                 // Live package data — same source as the desktop summary.
@@ -1885,9 +1891,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                           flex: 4,
                           child: Text(
                             '• ${item['label']}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Color(0xFF6A4053),
+                              color: _title,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -1917,9 +1923,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ),
                         Text(
                           item['val']!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Color(0xFF6A4053),
+                            color: _title,
                           ),
                         ),
                       ],
@@ -1931,9 +1937,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   alignment: Alignment.centerRight,
                   child: Text(
                     'Total: Php. ${package.priceForPax(_selectedPax).toStringAsFixed(2)}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
-                      color: Color(0xFF99868C),
+                      color: _body,
                     ),
                   ),
                 ),
@@ -1944,19 +1950,19 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _surface,
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: const Color(0x4D99868C)),
+              border: Border.all(color: _surfaceBorder),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Choose Payment Method',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: plum,
+                    color: _title,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -1996,11 +2002,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                       )
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
+                                // P7 (Q4): constant width; color signals state.
                                 border: Border.all(
                                   color: isSel
                                       ? (m['color'] as Color)
-                                      : const Color(0x3399868C),
-                                  width: isSel ? 1.5 : 1.0,
+                                      : _surfaceBorder,
+                                  width: 1.0,
                                 ),
                               ),
                               child: Text(
@@ -2037,12 +2044,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     required TextInputType textInputType,
     required ValueChanged<String> onChanged,
   }) {
+    // P7 (Q4): enabled/focused borders share width 1.0 — only the
+    // color changes, so focus never shifts layout.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(fontSize: 13, color: Color(0xFF6A4053)),
+          style: TextStyle(fontSize: 13, color: _title),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -2050,25 +2059,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           controller: controller,
           keyboardType: textInputType,
           onChanged: onChanged,
-          style: const TextStyle(fontSize: 14, color: Color(0xFF6A4053)),
+          style: TextStyle(fontSize: 14, color: _title),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(fontSize: 13, color: Color(0x8A6A4053)),
-            prefixIcon: Icon(icon, size: 20, color: const Color(0x8A6A4053)),
+            hintStyle: TextStyle(fontSize: 13, color: _body),
+            prefixIcon: Icon(icon, size: 20, color: _body),
             isDense: true,
             contentPadding: const EdgeInsets.symmetric(
               vertical: 14,
               horizontal: 12,
             ),
             filled: true,
-            fillColor: const Color(0xFFFDF9F5),
+            fillColor: _chip,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: Color(0x3399868C)),
+              borderSide: BorderSide(color: _surfaceBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: plum, width: 1.5),
+              borderSide: BorderSide(color: _title, width: 1.0),
             ),
           ),
         ),

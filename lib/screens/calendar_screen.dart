@@ -20,23 +20,22 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   // INEA COLORS
   // ============================================================
 
-  static const Color backgroundTop = Color(0xFFF8E9DF);
-  static const Color backgroundMiddle = Color(0xFFD8B0BA);
-  static const Color backgroundBottom = Color(0xFFB78C9C);
-
   static const Color primary = Color(0xFF74445C);
-  static const Color primaryDark = Color(0xFF633E50);
-  static const Color secondary = Color(0xFF765867);
 
   static const Color available = Color(0xFF6F927A);
   static const Color booked = Color(0xFFC28A52);
 
   @override
   Widget build(BuildContext context) {
+    // P7: chrome resolves through the shared helper; brand accents
+    // (selected day, markers) stay fixed in both modes.
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final chipColor = CardSurfaces.chipBg(context);
     final availabilityAsync = ref.watch(availabilityProvider);
 
+    // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      backgroundColor: backgroundTop,
 
       // ========================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
@@ -57,18 +56,18 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.42),
+                      color: chipColor,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.65),
+                        color: surfaceBorder,
                       ),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.refresh_rounded,
                         size: 20,
-                        color: primaryDark,
+                        color: titleColor,
                       ),
                       onPressed: () {
                         ref.read(availabilityProvider.notifier).refresh();
@@ -83,61 +82,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       // ========================================================
       // BODY
       // ========================================================
-      body: Stack(
-        children: [
-          // ----------------------------------------------------
-          // BACKGROUND
-          // ----------------------------------------------------
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [backgroundTop, backgroundMiddle, backgroundBottom],
-              ),
-            ),
-          ),
-
-          // ----------------------------------------------------
-          // BACKGROUND GLOWS
-          // ----------------------------------------------------
-          Positioned(
-            top: -130,
-            left: -120,
-            child: _BlurCircle(
-              size: 390,
-              color: const Color(0xFFEBC9B8).withValues(alpha: 0.72),
-            ),
-          ),
-
-          Positioned(
-            top: 100,
-            right: -160,
-            child: _BlurCircle(
-              size: 360,
-              color: const Color(0xFFD3A4AF).withValues(alpha: 0.60),
-            ),
-          ),
-
-          Positioned(
-            bottom: -180,
-            left: -130,
-            child: _BlurCircle(
-              size: 430,
-              color: const Color(0xFF9C8491).withValues(alpha: 0.48),
-            ),
-          ),
-
-          // ----------------------------------------------------
-          // CONTENT
-          // ----------------------------------------------------
-          SafeArea(
+      // P7: flat theme background; decorative gradient removed.
+      body: SafeArea(
             child: availabilityAsync.when(
               loading: () {
-                return const Center(
+                return Center(
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: primary,
+                    color: titleColor,
                   ),
                 );
               },
@@ -164,8 +116,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 return _buildCalendar(availabilityState);
               },
             ),
-          ),
-        ],
       ),
     );
   }
@@ -175,6 +125,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   // ============================================================
 
   Widget _buildCalendar(AvailabilityState availabilityState) {
+    // P7: content chrome resolves through the shared helper.
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
     final availability = availabilityState.data;
     final now = DateTime.now();
     DateTime focusedDay = DateTime(
@@ -196,7 +151,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         : dates[_dayOnly(_selectedDay!)];
 
     return RefreshIndicator(
-      color: primary,
+      color: titleColor,
       onRefresh: () async {
         ref.read(availabilityProvider.notifier).refresh();
       },
@@ -210,10 +165,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           // ====================================================
           // PAGE TITLE
           // ====================================================
-          const Text(
+          Text(
             'Availability',
             style: TextStyle(
-              color: primaryDark,
+              color: titleColor,
               fontSize: 26,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.1,
@@ -222,10 +177,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
           const SizedBox(height: 5),
 
-          const Text(
+          Text(
             'Choose a date for your scent experience.',
             style: TextStyle(
-              color: secondary,
+              color: bodyColor,
               fontSize: 13,
               fontWeight: FontWeight.w400,
             ),
@@ -238,11 +193,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           // ====================================================
           Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.93),
+              color: surface,
               borderRadius: BorderRadius.circular(24),
 
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: surfaceBorder,
                 width: 1,
               ),
 
@@ -312,25 +267,25 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 // ==================================================
                 // HEADER
                 // ==================================================
-                headerStyle: const HeaderStyle(
+                headerStyle: HeaderStyle(
                   titleCentered: true,
 
                   formatButtonVisible: false,
 
                   leftChevronIcon: Icon(
                     Icons.chevron_left_rounded,
-                    color: primary,
+                    color: titleColor,
                     size: 28,
                   ),
 
                   rightChevronIcon: Icon(
                     Icons.chevron_right_rounded,
-                    color: primary,
+                    color: titleColor,
                     size: 28,
                   ),
 
                   titleTextStyle: TextStyle(
-                    color: primaryDark,
+                    color: titleColor,
                     fontSize: 17,
                     fontWeight: FontWeight.w700,
                   ),
@@ -341,15 +296,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 // ==================================================
                 // DAYS OF WEEK
                 // ==================================================
-                daysOfWeekStyle: const DaysOfWeekStyle(
+                daysOfWeekStyle: DaysOfWeekStyle(
                   weekdayStyle: TextStyle(
-                    color: secondary,
+                    color: bodyColor,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                   ),
 
                   weekendStyle: TextStyle(
-                    color: secondary,
+                    color: bodyColor,
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                   ),
@@ -363,14 +318,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                   cellMargin: const EdgeInsets.all(3),
 
-                  defaultTextStyle: const TextStyle(
-                    color: primaryDark,
+                  defaultTextStyle: TextStyle(
+                    color: titleColor,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
 
-                  weekendTextStyle: const TextStyle(
-                    color: primaryDark,
+                  weekendTextStyle: TextStyle(
+                    color: titleColor,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -380,8 +335,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     fontSize: 13,
                   ),
 
-                  todayTextStyle: const TextStyle(
-                    color: primary,
+                  todayTextStyle: TextStyle(
+                    color: titleColor,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
@@ -392,6 +347,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     fontWeight: FontWeight.w700,
                   ),
 
+                  // Brand accent stays plum in both modes (white
+                  // day number keeps full contrast on it).
                   selectedDecoration: const BoxDecoration(
                     color: primary,
                     shape: BoxShape.circle,
@@ -460,152 +417,189 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
           const SizedBox(height: 20),
 
-          // ====================================================
-          // LEGEND
-          // ====================================================
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.48),
-              borderRadius: BorderRadius.circular(18),
-
-              border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
-            ),
-
-            child: const Row(
-              children: [
-                Expanded(
-                  child: _Legend(color: available, label: 'Available'),
-                ),
-
-                Expanded(
-                  child: _Legend(color: booked, label: 'Booked'),
-                ),
-              ],
-            ),
-          ),
-
-          // ====================================================
-          // SELECTED DATE
-          // ====================================================
-          if (_selectedDay != null) ...[
-            const SizedBox(height: 18),
-
-            Container(
-              padding: const EdgeInsets.all(17),
-
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.92),
-                borderRadius: BorderRadius.circular(20),
-
-                border: Border.all(color: available.withValues(alpha: 0.25)),
-
-                boxShadow: [
-                  BoxShadow(
-                    color: primary.withValues(alpha: 0.07),
-                    blurRadius: 16,
-                    offset: const Offset(0, 7),
-                  ),
-                ],
-              ),
-
-              child: Row(
-                children: [
-                  Container(
-                    width: 46,
-                    height: 46,
-
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5EFE8),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-
-                    child: const Icon(
-                      Icons.event_available_rounded,
-                      color: available,
-                      size: 23,
-                    ),
-                  ),
-
-                  const SizedBox(width: 13),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'SELECTED DATE',
-                          style: TextStyle(
-                            color: Color(0xFF9A7A89),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1,
-                          ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-                          _formatDate(_selectedDay!),
-                          style: const TextStyle(
-                            color: primaryDark,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-
-                        const SizedBox(height: 2),
-
-                        Text(
-                          selectedStatus ?? 'Available',
-                          style: const TextStyle(
-                            color: available,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  final d = _selectedDay!;
-                  final dateStr =
-                      '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-                  ref.read(bookingFlowProvider.notifier).setSelectedDate(d);
-                  context.push('/packages?date=$dateStr');
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Selected $dateStr — choose a package to book',
-                      ),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                label: Text('Continue with ${_formatDate(_selectedDay!)}'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(9999),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          // Legend + selection agenda: stacked on mobile, side by
+          // side on web (P7 impeccable adapt).
+          _buildAgendaColumn(selectedStatus),
 
           const SizedBox(height: 10),
         ],
       ),
+    );
+  }
+
+  /// Legend + selected-date panel + continue action. Stacked on
+  /// mobile, legend | selection side-by-side on web.
+  Widget _buildAgendaColumn(String? selectedStatus) {
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
+    final chipColor = CardSurfaces.chipBg(context);
+    final legendCard = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+
+      decoration: BoxDecoration(
+        color: chipColor,
+        borderRadius: BorderRadius.circular(18),
+
+        border: Border.all(color: surfaceBorder),
+      ),
+
+      child: const Row(
+        children: [
+          Expanded(
+            child: _Legend(color: available, label: 'Available'),
+          ),
+
+          Expanded(
+            child: _Legend(color: booked, label: 'Booked'),
+          ),
+        ],
+      ),
+    );
+
+    final selection = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ====================================================
+        // SELECTED DATE
+        // ====================================================
+        if (_selectedDay != null) ...[
+          const SizedBox(height: 18),
+
+          Container(
+            padding: const EdgeInsets.all(17),
+
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(20),
+
+              border: Border.all(color: available.withValues(alpha: 0.25)),
+
+              boxShadow: [
+                BoxShadow(
+                  color: primary.withValues(alpha: 0.07),
+                  blurRadius: 16,
+                  offset: const Offset(0, 7),
+                ),
+              ],
+            ),
+
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+
+                  decoration: BoxDecoration(
+                    color: chipColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+
+                  child: const Icon(
+                    Icons.event_available_rounded,
+                    color: available,
+                    size: 23,
+                  ),
+                ),
+
+                const SizedBox(width: 13),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'SELECTED DATE',
+                        style: TextStyle(
+                          color: bodyColor,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Text(
+                        _formatDate(_selectedDay!),
+                        style: TextStyle(
+                          color: titleColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+
+                      const SizedBox(height: 2),
+
+                      Text(
+                        selectedStatus ?? 'Available',
+                        style: const TextStyle(
+                          color: available,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                final d = _selectedDay!;
+                final dateStr =
+                    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+                ref.read(bookingFlowProvider.notifier).setSelectedDate(d);
+                context.push('/packages?date=$dateStr');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Selected $dateStr — choose a package to book',
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+              label: Text('Continue with ${_formatDate(_selectedDay!)}'),
+              // P7: theme ElevatedButton drives both modes.
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(9999),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+
+    // P7 impeccable adapt: stacked on mobile, legend | selection
+    // side-by-side on web.
+    final wide = MediaQuery.of(context).size.width >
+        ResponsiveAppShell.tabletBreakpoint;
+    if (!wide) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          legendCard,
+          const SizedBox(height: 20),
+          selection,
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: legendCard),
+        const SizedBox(width: 16),
+        Expanded(child: selection),
+      ],
     );
   }
 
@@ -730,7 +724,6 @@ class _CalendarDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const primary = Color(0xFF74445C);
-    const primaryDark = Color(0xFF633E50);
     const available = Color(0xFF6F927A);
     const booked = Color(0xFFC28A52);
 
@@ -768,7 +761,7 @@ class _CalendarDay extends StatelessWidget {
                   ? const Color(0xFFC9BBC0)
                   : selected
                   ? Colors.white
-                  : primaryDark,
+                  : CardSurfaces.title(context),
 
               fontSize: 13,
 
@@ -825,8 +818,8 @@ class _Legend extends StatelessWidget {
 
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF765867),
+          style: TextStyle(
+            color: CardSurfaces.body(context),
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),
@@ -840,48 +833,3 @@ class _Legend extends StatelessWidget {
 // the shared ErrorStateCard from widgets/index.dart (friendly copy, dark-
 // aware, raw errors never rendered).
 
-// ============================================================================
-// BLURRED BACKGROUND CIRCLE
-// ============================================================================
-
-class _BlurCircle extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const _BlurCircle({required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return ImageFiltered(
-      imageFilter: const ColorFilter.matrix([
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-      ]),
-
-      child: Container(
-        width: size,
-        height: size,
-
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      ),
-    );
-  }
-}

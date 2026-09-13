@@ -150,17 +150,19 @@ void main() {
         expect(find.text('3. Choose Event Time'), findsOneWidget);
         expect(find.text('4. Payment Method'), findsOneWidget);
 
-        // Verify contents inside Right column (Sticky Order Summary)
+        // Verify contents inside Right column (Sticky Order Summary) — P7 C distilled
         expect(find.text('Order Summary'), findsOneWidget);
-        expect(find.text('Live Preview'), findsOneWidget);
-        expect(find.text('Price Breakdown'), findsOneWidget);
+        expect(find.textContaining('PAX ·'), findsWidgets);
+        expect(find.text('Inclusions'), findsOneWidget);
         expect(find.text('Proceed to Payment'), findsOneWidget);
-        expect(find.text('Php. 4500.00'), findsOneWidget);
+        expect(find.text('₱4500.00'), findsOneWidget);
       },
     );
 
     testWidgets(
-      'R1: Order Summary side-panel remains sticky and visible during middle column scrolling',
+      // P7: one page scroll carries flow + summary together; the summary
+      // stays pinned at the top of its column and reachable throughout.
+      'R1: Page scroll carries flow and summary together on desktop',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -172,41 +174,37 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        // Single page-level scroll (no nested column scrolls remain).
+        final pageScrollFinder = find.byKey(
+          const Key('desktop_middle_scroll_view'),
+        );
+        expect(pageScrollFinder, findsOneWidget);
+
         // Check initial position of Order Summary panel
         final initialSummaryPos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
-        final initialButtonPos = tester.getTopLeft(
-          find.text('Proceed to Payment'),
-        );
 
-        // Find middle scroll view and scroll down by 400 pixels
-        final middleScrollFinder = find.byKey(
-          const Key('desktop_middle_scroll_view'),
+        // Drag from the summary side so the vertical page scroll receives
+        // the gesture (center of the page scroll sits over the horizontal
+        // calendar PageView, which would steal a pure-vertical drag's hit).
+        final summaryCenter = tester.getCenter(
+          find.byKey(const Key('order_summary_side_panel')),
         );
-        expect(middleScrollFinder, findsOneWidget);
-
-        await tester.drag(middleScrollFinder, const Offset(0, -300));
+        await tester.dragFrom(summaryCenter, const Offset(0, -300));
         await tester.pumpAndSettle();
 
-        // Check position of Order Summary panel after middle column scroll
+        // Summary travels with the page (pinned top, not independently
+        // scrollable).
         final scrolledSummaryPos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
-        final scrolledButtonPos = tester.getTopLeft(
-          find.text('Proceed to Payment'),
-        );
-
-        // The Order Summary panel position must remain unchanged (sticky/fixed in viewport)
-        expect(scrolledSummaryPos.dy, equals(initialSummaryPos.dy));
+        expect(scrolledSummaryPos.dy, lessThan(initialSummaryPos.dy));
         expect(scrolledSummaryPos.dx, equals(initialSummaryPos.dx));
-        expect(scrolledButtonPos.dy, equals(initialButtonPos.dy));
 
-        // Verify Order Summary and CTA button are still 100% visible and interactive
-        expect(
-          find.byKey(const Key('order_summary_side_panel')),
-          findsOneWidget,
-        );
+        // CTA stays reachable through the page scroll.
+        await tester.ensureVisible(find.text('Proceed to Payment'));
+        await tester.pumpAndSettle();
         expect(find.text('Proceed to Payment'), findsOneWidget);
       },
     );
@@ -299,7 +297,7 @@ void main() {
         // first-option fallback: no `?pax=` was passed, so 20 wins).
         expect(find.text('2. Your Package'), findsOneWidget);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-        expect(find.text('20 Guests'), findsOneWidget);
+        expect(find.text('20 PAX'), findsOneWidget);
         expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
 
         // No in-flow pax selectors remain (the summary echo of the
@@ -308,7 +306,7 @@ void main() {
         expect(
           find.descendant(
             of: find.byKey(const Key('reservation_details_panel')),
-            matching: find.textContaining('PAX'),
+            matching: find.textContaining('Guests'),
           ),
           findsNothing,
         );
@@ -382,8 +380,9 @@ void main() {
         await tester.tap(cashFinder);
         await tester.pumpAndSettle();
 
-        // Verify Order Summary displays 'CASH' badge
-        expect(find.text('CASH'), findsWidgets);
+        // Verify Order Summary still renders distilled one-liner (payment chip removed per C)
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.textContaining('PAX ·'), findsOneWidget);
       },
     );
 
@@ -515,8 +514,9 @@ void main() {
           await tester.tap(day15Finder.first);
           await tester.pumpAndSettle();
 
-          // Verify Order Summary has date updated
-          expect(find.text('Date'), findsOneWidget);
+          // Verify Order Summary one-liner updated (P7 C distilled, no separate Date label)
+          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.textContaining('PAX ·'), findsWidgets);
         }
       },
     );
@@ -692,7 +692,7 @@ void main() {
         // P6: pax is read-only (locked step + Change link); payment
         // toggles remain interactive. Time keeps its default.
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-        expect(find.text('20 Guests'), findsOneWidget);
+        expect(find.text('20 PAX'), findsOneWidget);
 
         // Freeform time keeps its default through selection changes
         expect(find.text('2:00 PM'), findsWidgets);
@@ -706,10 +706,10 @@ void main() {
         await tester.tap(cashFinder);
         await tester.pumpAndSettle();
 
-        expect(find.text('CASH'), findsOneWidget);
-        expect(find.text('20 Guests'), findsWidgets);
+        expect(find.textContaining('PAX ·'), findsWidgets);
+        expect(find.text('20 PAX'), findsWidgets);
 
-        // Oscillate across desktop/tablet boundary multiple times
+        // Oscillate across desktop/tablet boundary multiple times (P7 C: payment chip removed, verify distilled summary persists)
         for (int i = 0; i < 3; i++) {
           tester.view.physicalSize = const Size(1023, 800); // Tablet
           await tester.pumpAndSettle();
@@ -717,7 +717,8 @@ void main() {
             find.byKey(const Key('tablet_order_summary_panel')),
             findsOneWidget,
           );
-          expect(find.text('CASH'), findsOneWidget);
+          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.textContaining('PAX ·'), findsOneWidget);
 
           tester.view.physicalSize = const Size(1025, 800); // Desktop
           await tester.pumpAndSettle();
@@ -725,7 +726,8 @@ void main() {
             find.byKey(const Key('order_summary_side_panel')),
             findsOneWidget,
           );
-          expect(find.text('CASH'), findsOneWidget);
+          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.textContaining('PAX ·'), findsOneWidget);
         }
 
         // Oscillate across tablet/mobile boundary multiple times
@@ -743,7 +745,8 @@ void main() {
             find.byKey(const Key('tablet_order_summary_panel')),
             findsOneWidget,
           );
-          expect(find.text('CASH'), findsOneWidget);
+          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.textContaining('PAX ·'), findsOneWidget);
         }
       },
     );
@@ -851,10 +854,11 @@ void main() {
         );
         await tester.pump();
 
-        // Verify null fallbacks
-        expect(find.text('Perfume Package'), findsOneWidget);
-        expect(find.text('Php. 4500.00'), findsOneWidget);
-        expect(find.text('Not selected'), findsOneWidget);
+        // Verify null fallbacks — P7 C distilled (no image/name, `₱` only, Inclusions fallback)
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Inclusions'), findsOneWidget);
+        expect(find.text('₱4500.00'), findsOneWidget);
+        expect(find.textContaining('Not selected'), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       },
     );
@@ -1040,7 +1044,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('June 15, 2034'), findsOneWidget);
-        expect(find.text('Jun 15, 2034'), findsOneWidget);
+        expect(find.textContaining('Jun 15, 2034'), findsOneWidget);
       },
     );
 
@@ -1081,7 +1085,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Order Summary'), findsOneWidget);
-        expect(find.text('Price Breakdown'), findsOneWidget);
+        expect(find.text('Inclusions'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );
@@ -1123,7 +1127,8 @@ void main() {
     });
 
     testWidgets(
-      'Tablet View (2-Column): Order Summary side-panel remains sticky during left column scroll',
+      // P7: one page scroll carries both tablet columns together.
+      'Tablet View (2-Column): page scroll carries flow and summary together',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(900, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1141,18 +1146,21 @@ void main() {
         final initialSummaryPos = tester.getTopLeft(
           find.byKey(const Key('tablet_order_summary_panel')),
         );
-        final leftScrollFinder = find.byKey(
-          const Key('tablet_left_scroll_view'),
+        final pageScrollFinder = find.byKey(
+          const Key('tablet_page_scroll_view'),
         );
-        expect(leftScrollFinder, findsOneWidget);
+        expect(pageScrollFinder, findsOneWidget);
 
-        await tester.drag(leftScrollFinder, const Offset(0, -350));
+        final tabletSummaryCenter = tester.getCenter(
+          find.byKey(const Key('tablet_order_summary_panel')),
+        );
+        await tester.dragFrom(tabletSummaryCenter, const Offset(0, -350));
         await tester.pumpAndSettle();
 
         final scrolledSummaryPos = tester.getTopLeft(
           find.byKey(const Key('tablet_order_summary_panel')),
         );
-        expect(scrolledSummaryPos.dy, equals(initialSummaryPos.dy));
+        expect(scrolledSummaryPos.dy, lessThan(initialSummaryPos.dy));
         expect(scrolledSummaryPos.dx, equals(initialSummaryPos.dx));
         expect(
           find.byKey(const Key('tablet_order_summary_panel')),
@@ -1175,34 +1183,25 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Proceed to Payment then Confirm & Pay to trigger success view - scroll within tablet_right_scroll_view
+        // Proceed to Payment then Confirm & Pay to trigger success view
+        // (P7: single page scroll).
         final proceedBtn = find.text('Proceed to Payment');
-        await tester.scrollUntilVisible(
-          proceedBtn,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('tablet_right_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
-        );
+        await tester.ensureVisible(proceedBtn);
+        await tester.pumpAndSettle();
         expect(proceedBtn, findsOneWidget);
         await tester.tap(proceedBtn);
         await tester.pumpAndSettle();
 
         final confirmBtn = find.text('Confirm & Pay');
-        await tester.scrollUntilVisible(
-          confirmBtn,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('tablet_right_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
-        );
+        await tester.ensureVisible(confirmBtn);
+        await tester.pumpAndSettle();
         expect(confirmBtn, findsOneWidget);
 
         // Fill contact & venue information required for submission
         await fillPaymentContacts(tester);
 
+        await tester.ensureVisible(confirmBtn);
+        await tester.pumpAndSettle();
         await tester.tap(confirmBtn);
         await tester.pumpAndSettle();
 
@@ -1255,7 +1254,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('March 10, 2018'), findsOneWidget);
-        expect(find.text('Mar 10, 2018'), findsOneWidget);
+        expect(find.textContaining('Mar 10, 2018'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );
@@ -1333,13 +1332,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Record Order Summary position and values before transition
+        // Record Order Summary position and values before transition (P7 C distilled)
         final summaryBeforePos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
-        expect(find.text('Live Preview'), findsOneWidget);
-        expect(find.text('Price Breakdown'), findsOneWidget);
-        expect(find.text('Php. 4500.00'), findsOneWidget);
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Inclusions'), findsOneWidget);
+        expect(find.text('₱4500.00'), findsOneWidget);
 
         // Trigger payment transition
         await tester.tap(find.text('Proceed to Payment'));
@@ -1367,7 +1366,7 @@ void main() {
 
         // Summary button has updated to 'Confirm & Pay'
         expect(find.text('Confirm & Pay'), findsOneWidget);
-        expect(find.text('Php. 4500.00'), findsOneWidget);
+        expect(find.text('₱4500.00'), findsOneWidget);
       },
     );
 
@@ -1500,9 +1499,10 @@ void main() {
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
-        // 1. Initial method is Online: explainer, no card capture, no retired methods
+        // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (no payment chip)
         expect(find.text('2. Online Checkout'), findsOneWidget);
-        expect(find.text('ONLINE'), findsWidgets);
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.textContaining('PAX ·'), findsOneWidget);
         expect(
           find.byKey(const Key('online_checkout_explainer')),
           findsOneWidget,
@@ -1518,7 +1518,8 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('2. Offline Payment Instructions'), findsOneWidget);
-        expect(find.text('CASH'), findsWidgets);
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.textContaining('PAX ·'), findsOneWidget);
       },
     );
 
@@ -1702,16 +1703,10 @@ void main() {
         );
         expect(find.text('Proceed to Payment'), findsOneWidget);
 
-        // Tap Proceed to Payment in tablet Order Summary
+        // Tap Proceed to Payment in tablet Order Summary (P7: page scroll).
         final proceedBtn = find.text('Proceed to Payment');
-        await tester.scrollUntilVisible(
-          proceedBtn,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('tablet_right_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
-        );
+        await tester.ensureVisible(proceedBtn);
+        await tester.pumpAndSettle();
         await tester.tap(proceedBtn);
         await tester.pump(const Duration(milliseconds: 150));
 
@@ -1733,7 +1728,10 @@ void main() {
         await fillPaymentContacts(tester);
 
         // Confirm & Pay completes tablet flow
-        await tester.tap(find.text('Confirm & Pay'));
+        final confirmBtn = find.text('Confirm & Pay');
+        await tester.ensureVisible(confirmBtn);
+        await tester.pumpAndSettle();
+        await tester.tap(confirmBtn);
         await tester.pumpAndSettle();
 
         expect(find.text('Payment Successful'), findsOneWidget);
@@ -1811,14 +1809,8 @@ void main() {
         await tester.pumpAndSettle();
 
         final proceedBtn = find.text('Proceed to Payment');
-        await tester.scrollUntilVisible(
-          proceedBtn,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('desktop_summary_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
-        );
+        await tester.ensureVisible(proceedBtn);
+        await tester.pumpAndSettle();
         expect(proceedBtn, findsOneWidget);
         await tester.tap(proceedBtn);
         await tester.pumpAndSettle();
@@ -1992,14 +1984,8 @@ void main() {
         await tester.pumpAndSettle();
 
         final proceedBtn = find.text('Proceed to Payment');
-        await tester.scrollUntilVisible(
-          proceedBtn,
-          100,
-          scrollable: find.descendant(
-            of: find.byKey(const Key('tablet_right_scroll_view')),
-            matching: find.byType(Scrollable),
-          ),
-        );
+        await tester.ensureVisible(proceedBtn);
+        await tester.pumpAndSettle();
         await tester.tap(proceedBtn);
         await tester.pumpAndSettle();
 
@@ -2029,7 +2015,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // P6: pax is read-only; select Online on reservation step.
-        expect(find.text('20 Guests'), findsOneWidget);
+        expect(find.text('20 PAX'), findsOneWidget);
 
         final onlineOption = find.descendant(
           of: find.byKey(const Key('reservation_details_panel')),
@@ -2040,13 +2026,16 @@ void main() {
         await tester.tap(onlineOption);
         await tester.pumpAndSettle();
 
-        expect(find.text('ONLINE'), findsWidgets);
-        expect(find.text('20 Guests'), findsWidgets);
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('20 PAX'), findsWidgets);
 
         // Rapidly toggle forward and backward 3 times
         for (int i = 0; i < 3; i++) {
           // Proceed to Payment
-          await tester.tap(find.text('Proceed to Payment'));
+          final proceed = find.text('Proceed to Payment');
+          await tester.ensureVisible(proceed);
+          await tester.pumpAndSettle();
+          await tester.tap(proceed);
           await tester.pump(const Duration(milliseconds: 100));
           expect(find.byType(FadeTransition), findsWidgets);
           await tester.pumpAndSettle();
@@ -2056,7 +2045,10 @@ void main() {
           );
 
           // Edit Selection (Back to Reservation)
-          await tester.tap(find.text('Edit Selection'));
+          final editSel = find.text('Edit Selection');
+          await tester.ensureVisible(editSel);
+          await tester.pumpAndSettle();
+          await tester.tap(editSel);
           await tester.pump(const Duration(milliseconds: 100));
           expect(find.byType(FadeTransition), findsWidgets);
           await tester.pumpAndSettle();
@@ -2066,15 +2058,21 @@ void main() {
           );
         }
 
-        // State is preserved
-        expect(find.text('ONLINE'), findsWidgets);
-        expect(find.text('20 Guests'), findsWidgets);
+        // State is preserved (payment chip removed per C, but PAX one-liner persists)
+        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('20 PAX'), findsWidgets);
 
         // Final proceed to payment and confirm
-        await tester.tap(find.text('Proceed to Payment'));
+        final finalProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(finalProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(finalProceed);
         await tester.pumpAndSettle();
         await fillPaymentContacts(tester);
-        await tester.tap(find.text('Confirm & Pay'));
+        final finalConfirm = find.text('Confirm & Pay');
+        await tester.ensureVisible(finalConfirm);
+        await tester.pumpAndSettle();
+        await tester.tap(finalConfirm);
         await tester.pumpAndSettle();
 
         expect(find.text('Payment Successful'), findsOneWidget);

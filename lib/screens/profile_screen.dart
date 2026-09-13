@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../providers/index.dart';
+import '../widgets/index.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -18,36 +17,18 @@ class ProfileScreen extends ConsumerWidget {
     // ============================================================
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    const backgroundTop = Color(0xFFF8E9DF);
-    const backgroundMiddle = Color(0xFFD8B0BA);
-    const backgroundBottom = Color(0xFFB78C9C);
-
-    const primaryColor = Color(0xFF74445C);
     final textColor =
         isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
     final secondaryTextColor =
         isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
 
     // Solid card surfaces matching the rest of the app (Q3).
-    final cardBg =
-        isDark ? const Color(0xFF1C1618) : Colors.white;
-    final cardBorder = isDark
-        ? const Color(0xFF36222C)
-        : const Color(0x4D99868C);
     final circleBg = isDark
         ? const Color(0xFF36222C)
         : const Color(0xFFFDF4F5);
     final circleBorder = isDark
         ? const Color(0xFFFDF4F5).withValues(alpha: 0.25)
         : const Color(0x4D99868C);
-    final gradientColors = isDark
-        ? const [
-            Color(0xFF151012),
-            Color(0xFF1C1618),
-            Color(0xFF2A1B23),
-          ]
-        : const [backgroundTop, backgroundMiddle, backgroundBottom];
-
     final userName = authState.user?.name ?? 'User';
     final userEmail = authState.user?.email ?? '';
 
@@ -56,8 +37,8 @@ class ProfileScreen extends ConsumerWidget {
         ? userName.trim().substring(0, 1).toUpperCase()
         : 'U';
 
+    // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      backgroundColor: backgroundTop,
 
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
@@ -101,92 +82,9 @@ class ProfileScreen extends ConsumerWidget {
           : null,
 
       // ============================================================
-      // BODY
+      // BODY (P7: flat theme background; decorative gradient removed)
       // ============================================================
-      body: Stack(
-        children: [
-          // ========================================================
-          // GRADIENT BACKGROUND
-          // ========================================================
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: gradientColors,
-              ),
-            ),
-          ),
-
-          // ========================================================
-          // TOP-LEFT GLOW
-          // ========================================================
-          Positioned(
-            top: -130,
-            left: -120,
-            child: _BlurCircle(
-              size: 390,
-              // P6 (Q1): muted in dark so glows never wash out.
-              color: const Color(0xFFEBC9B8)
-                  .withValues(alpha: isDark ? 0.12 : 0.75),
-            ),
-          ),
-
-          // ========================================================
-          // TOP-RIGHT GLOW
-          // ========================================================
-          Positioned(
-            top: 80,
-            right: -150,
-            child: _BlurCircle(
-              size: 370,
-              color: const Color(0xFFD3A4AF)
-                  .withValues(alpha: isDark ? 0.10 : 0.72),
-            ),
-          ),
-
-          // ========================================================
-          // BOTTOM-LEFT GLOW
-          // ========================================================
-          Positioned(
-            bottom: -170,
-            left: -130,
-            child: _BlurCircle(
-              size: 430,
-              color: const Color(0xFF9C8491)
-                  .withValues(alpha: isDark ? 0.10 : 0.65),
-            ),
-          ),
-
-          // ========================================================
-          // BOTTOM-RIGHT GLOW
-          // ========================================================
-          Positioned(
-            bottom: -150,
-            right: -120,
-            child: _BlurCircle(
-              size: 420,
-              color: const Color(0xFF69384F)
-                  .withValues(alpha: isDark ? 0.14 : 0.55),
-            ),
-          ),
-
-          // ========================================================
-          // CENTER GLOW
-          // ========================================================
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.28,
-            left: MediaQuery.of(context).size.width * 0.18,
-            child: _BlurCircle(
-              size: 420,
-              color: Colors.white.withValues(alpha: isDark ? 0.05 : 0.25),
-            ),
-          ),
-
-          // ========================================================
-          // CONTENT
-          // ========================================================
-          SafeArea(
+      body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
 
@@ -218,247 +116,42 @@ class ProfileScreen extends ConsumerWidget {
                   const SizedBox(height: 20),
 
                   // ==================================================
-                  // PROFILE CARD
+                  // PROFILE + SETTINGS (P7 impeccable adapt: stacked
+                  // on mobile, side-by-side on web)
                   // ==================================================
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-
-                    decoration: BoxDecoration(
-                      // P6 (Q3): solid card, never glass.
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(24),
-
-                      border: Border.all(
-                        color: cardBorder,
-                        width: 1,
-                      ),
-
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withValues(alpha: 0.10),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-
-                    child: Row(
-                      children: [
-                        // ==================================================
-                        // AVATAR
-                        // ==================================================
-                        Container(
-                          width: 68,
-                          height: 68,
-
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [Color(0xFF95647E), Color(0xFF74445C)],
-                            ),
-
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor.withValues(alpha: 0.25),
-                                blurRadius: 12,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-
-                          child: Center(
-                            child: Text(
-                              firstLetter,
-
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(width: 16),
-
-                        // ==================================================
-                        // USER INFORMATION
-                        // ==================================================
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-                              Text(
-                                userName,
-
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-
-                              const SizedBox(height: 5),
-
-                              Text(
-                                userEmail,
-
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-
-                                style: TextStyle(
-                                  color: secondaryTextColor,
-                                  fontSize: 12.5,
-                                ),
-                              ),
-
-                              const SizedBox(height: 10),
-
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
-                                ),
-
-                                decoration: BoxDecoration(
-                                  color: primaryColor.withValues(alpha: 0.10),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-
-                                child: const Text(
-                                  'INEA MEMBER',
-
-                                  style: TextStyle(
-                                    color: primaryColor,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // ==================================================
-                        // EDIT BUTTON
-                        // ==================================================
-                        Container(
-                          width: 38,
-                          height: 38,
-
-                          decoration: BoxDecoration(
-                            color: circleBg,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: circleBorder,
-                            ),
-                          ),
-
-                          child: IconButton(
-                            padding: EdgeInsets.zero,
-
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              color: primaryColor,
-                              size: 18,
-                            ),
-
-                            onPressed: () {},
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  // ==================================================
-                  // SETTINGS TITLE
-                  // ==================================================
-                  const _SectionHeader(
-                    title: 'Settings',
-                    subtitle: 'Account & preferences',
-                    icon: Icons.settings_outlined,
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  // ==================================================
-                  // SETTINGS CARD
-                  // ==================================================
-                  Container(
-                    width: double.infinity,
-
-                    decoration: BoxDecoration(
-                      // P6 (Q3): solid card, never glass.
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(24),
-
-                      border: Border.all(
-                        color: cardBorder,
-                      ),
-
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withValues(alpha: 0.08),
-                          blurRadius: 18,
-                          offset: const Offset(0, 7),
-                        ),
-                      ],
-                    ),
-
-                    child: Column(
-                      children: [
-                        _ProfileSettingTile(
-                          icon: Icons.person_outline_rounded,
-                          title: 'Edit Profile',
-                          subtitle: 'Update your personal information',
-                          onTap: () {},
-                        ),
-
-                        const _SettingDivider(),
-
-                        _ProfileSettingTile(
-                          icon: Icons.lock_outline_rounded,
-                          title: 'Change Password',
-                          subtitle: 'Keep your account secure',
-                          onTap: () {},
-                        ),
-
-                        const _SettingDivider(),
-
-                        _ProfileSettingTile(
-                          icon: Icons.help_outline_rounded,
-                          title: 'Help & Support',
-                          subtitle: 'Get assistance with your account',
-                          onTap: () {},
-                        ),
-
-                        const _SettingDivider(),
-
-                        _ProfileSettingTile(
-                          icon: Icons.logout_rounded,
-                          title: 'Logout',
-                          subtitle: 'Sign out of your account',
-                          isDestructive: true,
-                          showArrow: false,
-                          onTap: () {
-                            ref.read(authProvider.notifier).logout();
-
-                            context.go('/login');
-                          },
-                        ),
-                      ],
-                    ),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final settings = _SettingsColumn(
+                        onLogout: () {
+                          ref.read(authProvider.notifier).logout();
+                          context.go('/login');
+                        },
+                      );
+                      final profile = _ProfileCard(
+                        userName: userName,
+                        userEmail: userEmail,
+                        firstLetter: firstLetter,
+                      );
+                      if (constraints.maxWidth <=
+                          ResponsiveAppShell.tabletBreakpoint) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            profile,
+                            const SizedBox(height: 28),
+                            settings,
+                          ],
+                        );
+                      }
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: profile),
+                          const SizedBox(width: 16),
+                          Expanded(child: settings),
+                        ],
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 20),
@@ -499,8 +192,278 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
+    );
+  }
+}
+
+// ============================================================================
+// PROFILE CARD (P7: shared by stacked + side-by-side compositions)
+// ============================================================================
+
+class _ProfileCard extends StatelessWidget {
+  final String userName;
+  final String userEmail;
+  final String firstLetter;
+
+  const _ProfileCard({
+    required this.userName,
+    required this.userEmail,
+    required this.firstLetter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cardBg = CardSurfaces.cardBg(context);
+    final cardBorder = CardSurfaces.cardBorder(context);
+    final textColor = CardSurfaces.title(context);
+    final secondaryTextColor = CardSurfaces.body(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+
+      decoration: BoxDecoration(
+        // P6 (Q3): solid card, never glass.
+        color: cardBg,
+        borderRadius: BorderRadius.circular(24),
+
+        border: Border.all(
+          color: cardBorder,
+          width: 1,
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: CardSurfaces.plum.withValues(alpha: 0.10),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
+
+      child: Row(
+        children: [
+          // ==================================================
+          // AVATAR
+          // ==================================================
+          Container(
+            width: 68,
+            height: 68,
+
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF95647E), Color(0xFF74445C)],
+              ),
+
+              boxShadow: [
+                BoxShadow(
+                  color: CardSurfaces.plum.withValues(alpha: 0.25),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+
+            child: Center(
+              child: Text(
+                firstLetter,
+
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ==================================================
+          // USER INFORMATION
+          // ==================================================
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                Text(
+                  userName,
+
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                Text(
+                  userEmail,
+
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+
+                  style: TextStyle(
+                    color: secondaryTextColor,
+                    fontSize: 12.5,
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+
+                  decoration: BoxDecoration(
+                    color: CardSurfaces.plum.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+
+                  child: Text(
+                    'INEA MEMBER',
+
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ==================================================
+          // EDIT BUTTON
+          // ==================================================
+          Container(
+            width: 38,
+            height: 38,
+
+            decoration: BoxDecoration(
+              color: CardSurfaces.chipBg(context),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: CardSurfaces.cardBorder(context),
+              ),
+            ),
+
+            child: IconButton(
+              padding: EdgeInsets.zero,
+
+              icon: Icon(
+                Icons.edit_outlined,
+                color: textColor,
+                size: 18,
+              ),
+
+              onPressed: () {},
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// SETTINGS COLUMN (P7: header + card, shared by both compositions)
+// ============================================================================
+
+class _SettingsColumn extends StatelessWidget {
+  final VoidCallback onLogout;
+
+  const _SettingsColumn({required this.onLogout});
+
+  @override
+  Widget build(BuildContext context) {
+    final cardBg = CardSurfaces.cardBg(context);
+    final cardBorder = CardSurfaces.cardBorder(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionHeader(
+          title: 'Settings',
+          subtitle: 'Account & preferences',
+          icon: Icons.settings_outlined,
+        ),
+
+        const SizedBox(height: 14),
+
+        Container(
+          width: double.infinity,
+
+          decoration: BoxDecoration(
+            // P6 (Q3): solid card, never glass.
+            color: cardBg,
+            borderRadius: BorderRadius.circular(24),
+
+            border: Border.all(
+              color: cardBorder,
+            ),
+
+            boxShadow: [
+              BoxShadow(
+                color: CardSurfaces.plum.withValues(alpha: 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 7),
+              ),
+            ],
+          ),
+
+          child: Column(
+            children: [
+              _ProfileSettingTile(
+                icon: Icons.person_outline_rounded,
+                title: 'Edit Profile',
+                subtitle: 'Update your personal information',
+                onTap: () {},
+              ),
+
+              const _SettingDivider(),
+
+              _ProfileSettingTile(
+                icon: Icons.lock_outline_rounded,
+                title: 'Change Password',
+                subtitle: 'Keep your account secure',
+                onTap: () {},
+              ),
+
+              const _SettingDivider(),
+
+              _ProfileSettingTile(
+                icon: Icons.help_outline_rounded,
+                title: 'Help & Support',
+                subtitle: 'Get assistance with your account',
+                onTap: () {},
+              ),
+
+              const _SettingDivider(),
+
+              _ProfileSettingTile(
+                icon: Icons.logout_rounded,
+                title: 'Logout',
+                subtitle: 'Sign out of your account',
+                isDestructive: true,
+                showArrow: false,
+                onTap: onLogout,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -805,27 +768,3 @@ class _SettingDivider extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// BLURRED BACKGROUND CIRCLE
-// ============================================================================
-
-class _BlurCircle extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const _BlurCircle({required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return ImageFiltered(
-      imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-
-      child: Container(
-        width: size,
-        height: size,
-
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      ),
-    );
-  }
-}

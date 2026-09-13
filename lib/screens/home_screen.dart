@@ -9,9 +9,14 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final packagesAsync = ref.watch(packagesProvider);
+    // P7: surfaces resolve through the shared helper (banner art stays).
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
 
+    // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF4F5), // Off-white cream color
       body: SafeArea(
         child: Column(
           children: [
@@ -47,10 +52,10 @@ class HomeScreen extends ConsumerWidget {
                             child: Container(
                               height: 45,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: surface,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: const Color(0x4D99868C),
+                                  color: surfaceBorder,
                                 ),
                               ),
                               child: Row(
@@ -58,7 +63,7 @@ class HomeScreen extends ConsumerWidget {
                                   const SizedBox(width: 12),
                                   Icon(
                                     Icons.search,
-                                    color: const Color(0xFF99868C),
+                                    color: bodyColor,
                                     size: 20,
                                   ),
                                   const SizedBox(width: 12),
@@ -66,7 +71,7 @@ class HomeScreen extends ConsumerWidget {
                                     child: Text(
                                       'Search "Perfume" here',
                                       style: TextStyle(
-                                        color: const Color(0xFF99868C),
+                                        color: bodyColor,
                                         fontSize: 14,
                                       ),
                                       maxLines: 1,
@@ -78,14 +83,14 @@ class HomeScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(width: 15),
-                          const Icon(
+                          Icon(
                             Icons.chat_bubble_rounded,
-                            color: Color(0xFF6A4053),
+                            color: titleColor,
                           ),
                           const SizedBox(width: 15),
-                          const Icon(
+                          Icon(
                             Icons.calendar_today_rounded,
-                            color: Color(0xFF6A4053),
+                            color: titleColor,
                           ),
                         ],
                       ),
@@ -187,14 +192,14 @@ class HomeScreen extends ConsumerWidget {
                     // ============================================================
                     // POPULAR PACKAGES TITLE
                     // ============================================================
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
                         'Popular Packages',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF6A4053),
+                          color: titleColor,
                         ),
                       ),
                     ),

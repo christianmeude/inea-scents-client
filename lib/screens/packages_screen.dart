@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -105,19 +103,15 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
     final packagesAsync = ref.watch(filteredPackagesProvider);
 
     // ============================================================
-    // COLORS
+    // COLORS (P7: flat theme background + dark-aware text)
     // ============================================================
 
-    const backgroundTop = Color(0xFFF8E9DF);
-    const backgroundMiddle = Color(0xFFD8B0BA);
-    const backgroundBottom = Color(0xFFB78C9C);
+    final textColor = CardSurfaces.title(context);
+    final secondaryTextColor = CardSurfaces.body(context);
 
-    const primaryColor = Color(0xFF74445C);
-    const textColor = Color(0xFF633E50);
-    const secondaryTextColor = Color(0xFF765867);
-
+    // P7: no explicit color — the theme scaffold color (light cream /
+    // dark night) is the background.
     return Scaffold(
-      backgroundColor: backgroundTop,
 
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
@@ -140,7 +134,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.35),
+                      color: CardSurfaces.chipBg(context),
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: Colors.white.withValues(alpha: 0.55),
@@ -149,7 +143,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.tune_rounded,
                         color: textColor,
                         size: 20,
@@ -165,87 +159,9 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
           : null,
 
       // ============================================================
-      // BODY
+      // BODY (P7: flat theme background; decorative gradient removed)
       // ============================================================
-      body: Stack(
-        children: [
-          // ========================================================
-          // GRADIENT BACKGROUND
-          // ========================================================
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [backgroundTop, backgroundMiddle, backgroundBottom],
-              ),
-            ),
-          ),
-
-          // ========================================================
-          // TOP-LEFT GLOW
-          // ========================================================
-          Positioned(
-            top: -130,
-            left: -120,
-            child: _BlurCircle(
-              size: 390,
-              color: const Color(0xFFEBC9B8).withValues(alpha: 0.75),
-            ),
-          ),
-
-          // ========================================================
-          // TOP-RIGHT GLOW
-          // ========================================================
-          Positioned(
-            top: 80,
-            right: -150,
-            child: _BlurCircle(
-              size: 370,
-              color: const Color(0xFFD3A4AF).withValues(alpha: 0.72),
-            ),
-          ),
-
-          // ========================================================
-          // BOTTOM-LEFT GLOW
-          // ========================================================
-          Positioned(
-            bottom: -170,
-            left: -130,
-            child: _BlurCircle(
-              size: 430,
-              color: const Color(0xFF9C8491).withValues(alpha: 0.65),
-            ),
-          ),
-
-          // ========================================================
-          // BOTTOM-RIGHT GLOW
-          // ========================================================
-          Positioned(
-            bottom: -150,
-            right: -120,
-            child: _BlurCircle(
-              size: 420,
-              color: const Color(0xFF69384F).withValues(alpha: 0.55),
-            ),
-          ),
-
-          // ========================================================
-          // CENTER SOFT GLOW
-          // ========================================================
-          Positioned(
-            top: MediaQuery.of(context).size.height * 0.25,
-            left: MediaQuery.of(context).size.width * 0.20,
-            child: _BlurCircle(
-              size: 420,
-              color: Colors.white.withValues(alpha: 0.25),
-            ),
-          ),
-
-          // ========================================================
-          // MAIN CONTENT
-          // ========================================================
-          SafeArea(
+      body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
 
@@ -257,7 +173,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                   // ==================================================
                   // PAGE TITLE
                   // ==================================================
-                  const Text(
+                  Text(
                     'Our Collections',
                     style: TextStyle(
                       color: textColor,
@@ -269,7 +185,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
 
                   const SizedBox(height: 5),
 
-                  const Text(
+                  Text(
                     'Discover your perfect scent.',
                     style: TextStyle(
                       color: secondaryTextColor,
@@ -292,103 +208,16 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                   const SizedBox(height: 26),
 
                   // ==================================================
-                  // CATEGORY CHIPS
+                  // SECTION HEADER (P7: filter chips + item counter
+                  // removed — search narrows the grid directly)
                   // ==================================================
-                  SizedBox(
-                    height: 40,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: ['All', 'Wedding', 'Birthday', 'Corporate'].map(
-                        (cat) {
-                          final isSelected =
-                              ref.watch(packagesCategoryProvider) == cat;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: FilterChip(
-                              mouseCursor: SystemMouseCursors.click,
-                              label: Text(cat),
-                              selected: isSelected,
-                              onSelected: (val) {
-                                ref
-                                        .read(packagesCategoryProvider.notifier)
-                                        .state =
-                                    cat;
-                              },
-                              backgroundColor: Colors.white.withValues(
-                                alpha: 0.3,
-                              ),
-                              selectedColor: primaryColor,
-                              labelStyle: TextStyle(
-                                color: isSelected ? Colors.white : textColor,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                              side: BorderSide(
-                                color: isSelected
-                                    ? primaryColor
-                                    : Colors.white.withValues(alpha: 0.5),
-                              ),
-                            ),
-                          );
-                        },
-                      ).toList(),
+                  Text(
+                    'All Packages',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // ==================================================
-                  // SORT CHIPS
-                  // ==================================================
-                  SizedBox(
-                    height: 40,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: const [
-                        _SortChip(
-                          label: 'Price: Low to High',
-                          value: 'price_asc',
-                        ),
-                        _SortChip(
-                          label: 'Price: High to Low',
-                          value: 'price_desc',
-                        ),
-                        _SortChip(label: 'Top Rated', value: 'rating_desc'),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ==================================================
-                  // SECTION HEADER
-                  // ==================================================
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'All Packages',
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-
-                      packagesAsync.when(
-                        data: (packages) => Text(
-                          '${packages.length} items',
-                          style: const TextStyle(
-                            color: secondaryTextColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        loading: () => const SizedBox.shrink(),
-                        error: (_, _) => const SizedBox.shrink(),
-                      ),
-                    ],
                   ),
 
                   const SizedBox(height: 16),
@@ -474,8 +303,6 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
               ),
             ),
           ),
-        ],
-      ),
 
       // ============================================================
       // BODY WRAPPER END
@@ -620,31 +447,6 @@ class _EmptyPackages extends StatelessWidget {
 }
 
 // ============================================================================
-// BLURRED BACKGROUND CIRCLE
-// ============================================================================
-
-class _BlurCircle extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const _BlurCircle({required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return ImageFiltered(
-      imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-
-      child: Container(
-        width: size,
-        height: size,
-
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-      ),
-    );
-  }
-}
-
-// ============================================================================
 // SEARCH BAR (Interactive with hover and focus ring)
 // ============================================================================
 
@@ -729,44 +531,3 @@ class _SearchBarState extends State<_SearchBar> {
   }
 }
 
-// ============================================================================
-// SORT CHIP
-// ============================================================================
-
-class _SortChip extends ConsumerWidget {
-  final String label;
-  final String value;
-
-  const _SortChip({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentSort = ref.watch(packagesSortProvider);
-    final isSelected = currentSort == value;
-
-    return Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: FilterChip(
-        mouseCursor: SystemMouseCursors.click,
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (_) {
-          ref.read(packagesSortProvider.notifier).state = isSelected
-              ? 'none'
-              : value;
-        },
-        backgroundColor: Colors.white.withValues(alpha: 0.3),
-        selectedColor: const Color(0xFF95647E),
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : const Color(0xFF633E50),
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-        side: BorderSide(
-          color: isSelected
-              ? const Color(0xFF95647E)
-              : Colors.white.withValues(alpha: 0.5),
-        ),
-      ),
-    );
-  }
-}

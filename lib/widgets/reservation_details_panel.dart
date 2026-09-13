@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
+import 'card_surfaces.dart';
 
 /// Middle Column / Panel for INEA Scents reservation flow on desktop.
 /// Handles Package variation overview, the locked Pax summary (P6: the
@@ -34,6 +35,13 @@ class ReservationDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // P7: all surfaces resolve through the shared helper so the dark
+    // toggle recolors every card, chip, and label.
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
+    final chipColor = CardSurfaces.chipBg(context);
     final options = package.options;
     final paxList = options.isNotEmpty
         ? options.map((t) => t.pax).toList()
@@ -63,9 +71,9 @@ class ReservationDetailsPanel extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x4D99868C), width: 1.0),
+            border: Border.all(color: surfaceBorder, width: 1.0),
             boxShadow: [
               BoxShadow(
                 color: plum.withValues(alpha: 0.06),
@@ -83,12 +91,12 @@ class ReservationDetailsPanel extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: cream,
+                      color: chipColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.card_giftcard_rounded,
-                      color: plum,
+                      color: titleColor,
                       size: 20,
                     ),
                   ),
@@ -99,10 +107,10 @@ class ReservationDetailsPanel extends StatelessWidget {
                       children: [
                         Text(
                           package.name ?? 'Luxury Experience Package',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: plum,
+                            color: titleColor,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -110,10 +118,10 @@ class ReservationDetailsPanel extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           'Starting at ₱${(package.price ?? 4500.0).toStringAsFixed(2)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: mutedPlum,
+                            color: bodyColor,
                           ),
                         ),
                       ],
@@ -153,10 +161,10 @@ class ReservationDetailsPanel extends StatelessWidget {
             return Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: const Color(0x4D99868C), width: 1.0),
+                    color: surfaceBorder, width: 1.0),
                 boxShadow: [
                   BoxShadow(
                     color: plum.withValues(alpha: 0.06),
@@ -174,23 +182,23 @@ class ReservationDetailsPanel extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: cream,
+                          color: chipColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.people_outline_rounded,
-                          color: plum,
+                          color: titleColor,
                           size: 20,
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           '2. Your Package',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: plum,
+                            color: titleColor,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -205,19 +213,19 @@ class ReservationDetailsPanel extends StatelessWidget {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: cream,
+                      color: chipColor,
                       borderRadius: BorderRadius.circular(9999),
                       border: Border.all(
-                        color: const Color(0x4D99868C),
+                        color: surfaceBorder,
                         width: 1.0,
                       ),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.check_circle_rounded,
                           size: 14,
-                          color: plum,
+                          color: titleColor,
                         ),
                         const SizedBox(width: 6),
                         Expanded(
@@ -225,12 +233,12 @@ class ReservationDetailsPanel extends StatelessWidget {
                             effectivePax == null
                                 ? 'Headcount to be confirmed'
                                 : (price == null
-                                    ? '$effectivePax Guests'
-                                    : '$effectivePax Guests · $price'),
-                            style: const TextStyle(
+                                    ? '$effectivePax PAX'
+                                    : '$effectivePax PAX · $price'),
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: plum,
+                              color: titleColor,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -240,14 +248,14 @@ class ReservationDetailsPanel extends StatelessWidget {
                           GestureDetector(
                             key: const Key('pax_change_link'),
                             onTap: onChangePax,
-                            child: const MouseRegion(
+                            child: MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: Text(
                                 'Change',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: plum,
+                                  color: titleColor,
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
@@ -270,9 +278,9 @@ class ReservationDetailsPanel extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x4D99868C), width: 1.0),
+            border: Border.all(color: surfaceBorder, width: 1.0),
             boxShadow: [
               BoxShadow(
                 color: plum.withValues(alpha: 0.06),
@@ -290,23 +298,23 @@ class ReservationDetailsPanel extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: cream,
+                      color: chipColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.schedule_rounded,
-                      color: plum,
+                      color: titleColor,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Flexible(
+                  Flexible(
                     child: Text(
                       '3. Choose Event Time',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: plum,
+                        color: titleColor,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -314,9 +322,9 @@ class ReservationDetailsPanel extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4),
-              const Text(
+              Text(
                 'One booking lasts 3–4 hrs.',
-                style: TextStyle(fontSize: 12, color: mutedPlum),
+                style: TextStyle(fontSize: 12, color: bodyColor),
               ),
               const SizedBox(height: 12),
               InkWell(
@@ -348,30 +356,30 @@ class ReservationDetailsPanel extends StatelessWidget {
                     vertical: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: cream.withValues(alpha: 0.5),
+                    color: chipColor.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0x3399868C)),
+                    border: Border.all(color: surfaceBorder),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.schedule_rounded, size: 16, color: plum),
+                      Icon(Icons.schedule_rounded, size: 16, color: titleColor),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           selectedTime == null
                               ? 'Select time'
                               : TimeSlot.display(selectedTime),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: plum,
+                            color: titleColor,
                           ),
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.access_time_rounded,
                         size: 16,
-                        color: mutedPlum,
+                        color: bodyColor,
                       ),
                     ],
                   ),
@@ -389,9 +397,9 @@ class ReservationDetailsPanel extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0x4D99868C), width: 1.0),
+            border: Border.all(color: surfaceBorder, width: 1.0),
             boxShadow: [
               BoxShadow(
                 color: plum.withValues(alpha: 0.06),
@@ -409,23 +417,23 @@ class ReservationDetailsPanel extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: cream,
+                      color: chipColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.payment_rounded,
-                      color: plum,
+                      color: titleColor,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Flexible(
+                  Flexible(
                     child: Text(
                       '4. Payment Method',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: plum,
+                        color: titleColor,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -453,14 +461,14 @@ class ReservationDetailsPanel extends StatelessWidget {
                             duration: const Duration(milliseconds: 200),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: isSelected ? cream : Colors.white,
+                              color: isSelected ? chipColor : surface,
                               borderRadius: BorderRadius.circular(12),
                               // P6 (Q4): constant border width — focus/selection
                               // never shifts layout; color alone signals state.
                               border: Border.all(
                                 color: isSelected
-                                    ? plum
-                                    : const Color(0x3399868C),
+                                    ? titleColor
+                                    : surfaceBorder,
                                 width: 1.0,
                               ),
                             ),

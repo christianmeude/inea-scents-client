@@ -25,9 +25,14 @@ class PackageDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final packageAsync = ref.watch(packageDetailsProvider(packageId));
+    // P7: surfaces resolve through the shared helper.
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
 
+    // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF4F5),
       body: SafeArea(
         child: packageAsync.when(
           data: (package) {
@@ -42,9 +47,9 @@ class PackageDetailScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.arrow_back,
-                          color: Color(0xFF6A4053),
+                          color: titleColor,
                         ),
                         tooltip: 'Back',
                         mouseCursor: SystemMouseCursors.click,
@@ -55,23 +60,23 @@ class PackageDetailScreen extends ConsumerWidget {
                         child: Container(
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: surface,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0x4D99868C)),
+                            border: Border.all(color: surfaceBorder),
                           ),
                           child: Row(
                             children: [
                               const SizedBox(width: 12),
                               Icon(
                                 Icons.search,
-                                color: const Color(0xFF99868C),
+                                color: bodyColor,
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
                               Text(
                                 'Search "Perfume" here',
                                 style: TextStyle(
-                                  color: const Color(0xFF99868C),
+                                  color: bodyColor,
                                   fontSize: 14,
                                 ),
                               ),
@@ -80,58 +85,51 @@ class PackageDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      const Icon(
+                      Icon(
                         Icons.chat_bubble_rounded,
-                        color: Color(0xFF6A4053),
+                        color: titleColor,
                       ),
                       const SizedBox(width: 15),
-                      const Icon(
+                      Icon(
                         Icons.calendar_today_rounded,
-                        color: Color(0xFF6A4053),
+                        color: titleColor,
                       ),
                     ],
                   ),
                 ),
 
-                // Content
+                // Content (P7 impeccable adapt: stacked card on
+                // mobile, gallery + facts side-by-side on web)
                 Expanded(
                   child: SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0x4D99868C)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Banner
-                            ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
-                              ),
-                              child: AspectRatio(
-                                aspectRatio: 1.4,
-                                child: Container(
-                                  color: const Color(0xFFF3EBE1),
-                                  child:
-                                      (package.images != null &&
-                                          package.images!.isNotEmpty)
-                                      ? Image.network(
-                                          package.images![0],
-                                          fit: BoxFit.cover,
-                                        )
-                                      : const Center(
-                                          child: Text(
-                                            "Package Image Placeholder",
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final wide = constraints.maxWidth >
+                              ResponsiveAppShell.tabletBreakpoint;
+                          final cardDecoration = BoxDecoration(
+                            color: surface,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: surfaceBorder),
+                          );
+                          if (!wide) {
+                            return Container(
+                              decoration: cardDecoration,
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  // Banner
+                                  ClipRRect(
+                                    borderRadius:
+                                        const BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
+                                    ),
+                                    child: _buildGalleryVisual(
+                                        context, package),
+                                  ),
 
                             Padding(
                               padding: const EdgeInsets.all(20),
@@ -140,10 +138,10 @@ class PackageDetailScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     package.name ?? '',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
-                                      color: Color(0xFF6A4053),
+                                      color: titleColor,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -157,17 +155,17 @@ class PackageDetailScreen extends ConsumerWidget {
                                       const SizedBox(width: 4),
                                       Text(
                                         '${package.rating ?? 4.5}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
-                                          color: Color(0xFF6A4053),
+                                          color: titleColor,
                                         ),
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
                                         '(${package.reviewsCount ?? 232} reviews)',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 14,
-                                          color: Color(0xFF99868C),
+                                          color: bodyColor,
                                         ),
                                       ),
                                     ],
@@ -176,19 +174,19 @@ class PackageDetailScreen extends ConsumerWidget {
                                   Text(
                                     package.description ??
                                         'Perfect for intimate celebrations...',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
-                                      color: Color(0xFF99868C),
+                                      color: bodyColor,
                                       height: 1.4,
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  const Text(
+                                  Text(
                                     'Includes:',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: Color(0xFF6A4053),
+                                      color: titleColor,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
@@ -209,9 +207,9 @@ class PackageDetailScreen extends ConsumerWidget {
                                           Expanded(
                                             child: Text(
                                               inclusion,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 13,
-                                                color: Color(0xFF6A4053),
+                                                color: titleColor,
                                                 height: 1.3,
                                               ),
                                             ),
@@ -224,12 +222,12 @@ class PackageDetailScreen extends ConsumerWidget {
                                   // Free items if any
                                   if (package.freebies != null &&
                                       package.freebies!.isNotEmpty) ...[
-                                    const Text(
+                                    Text(
                                       'Free:',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
-                                        color: Color(0xFF6A4053),
+                                        color: titleColor,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
@@ -254,9 +252,7 @@ class PackageDetailScreen extends ConsumerWidget {
                                                 freebie,
                                                 style: TextStyle(
                                                   fontSize: 13,
-                                                  color: const Color(
-                                                    0xFF6A4053,
-                                                  ),
+                                                  color: titleColor,
                                                   height: 1.3,
                                                 ),
                                               ),
@@ -271,6 +267,34 @@ class PackageDetailScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
+                      );
+                      }
+
+                      // Web: gallery + facts side by side in the page scroll.
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              decoration: cardDecoration,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: _buildGalleryVisual(
+                                    context, package),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              decoration: cardDecoration,
+                              child: _buildInfoColumn(context, package),
+                            ),
+                          ),
+                        ],
+                      );
+                        },
                       ),
                     ),
                   ),
@@ -283,9 +307,9 @@ class PackageDetailScreen extends ConsumerWidget {
                     vertical: 15,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: surface,
                     border: Border(
-                      top: BorderSide(color: const Color(0x4D99868C)),
+                      top: BorderSide(color: surfaceBorder),
                     ),
                   ),
                   child: SafeArea(
@@ -302,17 +326,17 @@ class PackageDetailScreen extends ConsumerWidget {
                                 initialPax == null
                                     ? 'Starting at ₱${(package.price ?? 4499.0).toStringAsFixed(0)}'
                                     : '₱${package.priceForPax(initialPax).toStringAsFixed(0)} · $initialPax PAX',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: Color(0xFF6A4053),
+                                  color: titleColor,
                                 ),
                               ),
-                              const Text(
+                              Text(
                                 'One booking lasts 3–4 hrs.',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFF99868C),
+                                  color: bodyColor,
                                 ),
                               ),
                             ],
@@ -339,9 +363,9 @@ class PackageDetailScreen extends ConsumerWidget {
                               '/booking/$id${query.isEmpty ? '' : '?${query.join('&')}'}',
                             );
                           },
+                          // P7: no explicit colors — the theme ElevatedButton
+                          // (plum/white light, cream/night dark) drives both.
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6A4053), // Plum
-                            foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 25,
                               vertical: 12,
@@ -382,6 +406,165 @@ class PackageDetailScreen extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Gallery visual shared by the stacked (mobile) and side-by-side
+  /// (web) compositions. Callers own the clipping.
+  Widget _buildGalleryVisual(BuildContext context, Package package) {
+    return AspectRatio(
+      aspectRatio: 1.4,
+      child: Container(
+        color: CardSurfaces.chipBg(context),
+        child: (package.images != null && package.images!.isNotEmpty)
+            ? Image.network(
+                package.images![0],
+                fit: BoxFit.cover,
+              )
+            : const Center(
+                child: Text(
+                  'Package Image Placeholder',
+                ),
+              ),
+      ),
+    );
+  }
+
+  /// Facts column shared by both compositions.
+  Widget _buildInfoColumn(BuildContext context, Package package) {
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            package.name ?? '',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: titleColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(
+                Icons.star,
+                size: 16,
+                color: Colors.amber,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${package.rating ?? 4.5}',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '(${package.reviewsCount ?? 232} reviews)',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: bodyColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            package.description ??
+                'Perfect for intimate celebrations...',
+            style: TextStyle(
+              fontSize: 13,
+              color: bodyColor,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Includes:',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: titleColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          ...(package.inclusions ?? []).map(
+            (inclusion) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '•  ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      inclusion,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: titleColor,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 15),
+          // Free items if any
+          if (package.freebies != null &&
+              package.freebies!.isNotEmpty) ...[
+            Text(
+              'Free:',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: titleColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            ...package.freebies!.map(
+              (freebie) => Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 4,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '•  ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        freebie,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: titleColor,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

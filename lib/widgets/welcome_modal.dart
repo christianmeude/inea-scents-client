@@ -1,11 +1,18 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'card_surfaces.dart';
 
 class WelcomeModal extends StatelessWidget {
   const WelcomeModal({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // P7: solid dark-aware card through the shared helper.
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
+    final chipColor = CardSurfaces.chipBg(context);
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
       child: Dialog(
@@ -14,10 +21,10 @@ class WelcomeModal extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8E9DF),
+            color: surface,
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: surfaceBorder,
               width: 1.5,
             ),
             boxShadow: [
@@ -35,33 +42,33 @@ class WelcomeModal extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.6),
+                  color: chipColor,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.auto_awesome,
-                  color: Color(0xFF74445C),
+                  color: titleColor,
                   size: 36,
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Welcome to Inea Scents',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF633E50),
+                  color: titleColor,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Discover and curate the perfect perfume experience for your next unforgettable event.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
                   height: 1.5,
-                  color: Color(0xFF765867),
+                  color: bodyColor,
                 ),
               ),
               const SizedBox(height: 32),
@@ -69,9 +76,8 @@ class WelcomeModal extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () => Navigator.of(context).pop(),
+                  // P7: theme ElevatedButton drives both modes.
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF74445C),
-                    foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(9999),

@@ -35,8 +35,8 @@ void main() {
     });
   });
 
-  group('ux_polish fixed ambient', () {
-    testWidgets('shell paints a fixed full-bleed ambient behind content',
+  group('ux_polish flat background (P7)', () {
+    testWidgets('shell renders content on the flat theme background',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1.0;
@@ -44,20 +44,25 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: ResponsiveAppShell(child: Text('content')),
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const ResponsiveAppShell(child: Text('content')),
         ),
       );
       await tester.pumpAndSettle();
 
-      // Ambient layer wraps the gradient in an IgnorePointer so it never
-      // intercepts gestures; content still renders on top.
+      // No decorative gradient layers remain behind the content.
       expect(
         find.descendant(
           of: find.byType(ResponsiveAppShell),
-          matching: find.byType(IgnorePointer),
+          matching: find.byWidgetPredicate(
+            (w) =>
+                w is Container &&
+                w.decoration is BoxDecoration &&
+                (w.decoration as BoxDecoration).gradient != null,
+          ),
         ),
-        findsOneWidget,
+        findsNothing,
       );
       expect(find.text('content'), findsOneWidget);
     });
@@ -135,10 +140,10 @@ void main() {
 
       expect(find.text('2. Your Package'), findsOneWidget);
       expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-      expect(find.text('70 Guests · ₱6399'), findsOneWidget);
+      expect(find.text('70 PAX · ₱6399'), findsOneWidget);
       expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
       expect(find.text('2. Choose Available Pax'), findsNothing);
-      expect(find.text('70 PAX'), findsNothing);
+      expect(find.text('70 Guests'), findsNothing);
 
       await tester.tap(find.byKey(const Key('pax_change_link')));
       await tester.pumpAndSettle();
@@ -168,7 +173,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // First option wins silently; no Change link without a callback.
-      expect(find.text('50 Guests · ₱4499'), findsOneWidget);
+      expect(find.text('50 PAX · ₱4499'), findsOneWidget);
       expect(find.byKey(const Key('pax_change_link')), findsNothing);
       expect(tester.takeException(), isNull);
     });
@@ -244,6 +249,100 @@ void main() {
       );
       await tester.pump();
       expect(find.byType(SkeletonPackageCard), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('ux_polish P7 surfaces', () {
+    testWidgets('CardSurfaces resolves light and dark fills', (
+      WidgetTester tester,
+    ) async {
+      Color? light;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: Builder(
+            builder: (context) {
+              light = CardSurfaces.cardBg(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(light, equals(Colors.white));
+
+      Color? dark;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Theme(
+            data: AppTheme.darkTheme,
+            child: Builder(
+              builder: (context) {
+                dark = CardSurfaces.cardBg(context);
+                return const SizedBox();
+              },
+            ),
+          ),
+        ),
+      );
+      expect(dark, equals(const Color(0xFF1C1618)));
+    });
+
+    testWidgets('details panel renders dark surfaces without crashing', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: ReservationDetailsPanel(
+                package: _cardPackage(),
+                selectedPax: 70,
+                onChangePax: () {},
+                selectedTime: '14:00:00',
+                onTimeSelected: (_) {},
+                paymentMethod: 'cash',
+                onPaymentMethodSelected: (_) {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final panel = tester.widget<ReservationDetailsPanel>(
+        find.byType(ReservationDetailsPanel),
+      );
+      expect(panel.selectedPax, equals(70));
+      expect(find.text('70 PAX · ₱6399'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('order summary renders dark surfaces without crashing', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: OrderSummaryPanel(
+                package: _cardPackage(),
+                selectedDate: DateTime(2030, 5, 4),
+                selectedTime: '14:00:00',
+                selectedPax: 70,
+                paymentMethod: 'cash',
+                isLoading: false,
+                onProceed: () {},
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Order Summary'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

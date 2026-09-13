@@ -30,8 +30,8 @@ class MyBookingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bookingsAsync = ref.watch(bookingsProvider);
 
+    // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      backgroundColor: backgroundTop,
 
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
@@ -58,54 +58,10 @@ class MyBookingsScreen extends ConsumerWidget {
           : null,
 
       // ============================================================
-      // BODY
+      // BODY (P7: flat theme background; decorative gradient removed)
       // ============================================================
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [backgroundTop, backgroundMiddle, backgroundBottom],
-          ),
-        ),
-
-        child: SafeArea(
-          child: Stack(
-            children: [
-              // ======================================================
-              // SOFT BACKGROUND CIRCLES
-              // ======================================================
-              Positioned(
-                top: -110,
-                left: -120,
-                child: _SoftCircle(
-                  size: 300,
-                  color: const Color(0xFFEBC9B8).withValues(alpha: 0.50),
-                ),
-              ),
-
-              Positioned(
-                top: 180,
-                right: -150,
-                child: _SoftCircle(
-                  size: 330,
-                  color: const Color(0xFFD3A4AF).withValues(alpha: 0.30),
-                ),
-              ),
-
-              Positioned(
-                bottom: -170,
-                left: -120,
-                child: _SoftCircle(
-                  size: 360,
-                  color: const Color(0xFFB78C9C).withValues(alpha: 0.22),
-                ),
-              ),
-
-              // ======================================================
-              // BOOKINGS CONTENT
-              // ======================================================
-              bookingsAsync.when(
+      body: SafeArea(
+        child: bookingsAsync.when(
                 data: (bookings) {
                   if (bookings.isEmpty) {
                     return const _EmptyBookings();
@@ -121,12 +77,12 @@ class MyBookingsScreen extends ConsumerWidget {
                       // ==================================================
                       // PAGE HEADER
                       // ==================================================
-                      const Text(
+                      Text(
                         'My Bookings',
                         style: TextStyle(
                           fontSize: 26,
                           fontWeight: FontWeight.w600,
-                          color: textColor,
+                          color: CardSurfaces.title(context),
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -136,19 +92,55 @@ class MyBookingsScreen extends ConsumerWidget {
                       Text(
                         '${bookings.length} '
                         '${bookings.length == 1 ? 'booking' : 'bookings'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: secondaryTextColor,
+                          color: CardSurfaces.body(context),
                         ),
                       ),
 
                       const SizedBox(height: 20),
 
                       // ==================================================
-                      // BOOKING CARDS
+                      // BOOKING CARDS (P7 impeccable adapt: single
+                      // column on mobile, pairs on web — rows size to
+                      // the tallest card, so nothing overflows)
                       // ==================================================
-                      ...bookings.map(
-                        (booking) => _BookingCard(booking: booking),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final cards = bookings
+                              .map(
+                                (booking) =>
+                                    _BookingCard(booking: booking),
+                              )
+                              .toList();
+                          if (constraints.maxWidth <=
+                              ResponsiveAppShell.tabletBreakpoint) {
+                            return Column(children: cards);
+                          }
+                          final rows = <Widget>[];
+                          for (var i = 0; i < cards.length; i += 2) {
+                            final pair = cards.sublist(
+                              i,
+                              (i + 2).clamp(0, cards.length),
+                            );
+                            rows.add(
+                              Row(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  for (final card in pair)
+                                    Expanded(child: card),
+                                  if (pair.length == 1)
+                                    const Expanded(
+                                      child: SizedBox.shrink(),
+                                    ),
+                                ],
+                              ),
+                            );
+                            rows.add(const SizedBox(height: 2));
+                          }
+                          return Column(children: rows);
+                        },
                       ),
                     ],
                     ),
@@ -184,10 +176,7 @@ class MyBookingsScreen extends ConsumerWidget {
                   );
                 },
               ),
-            ],
-          ),
         ),
-      ),
     );
   }
 }
@@ -224,7 +213,7 @@ class _BrandName extends StatelessWidget {
               color: brandColor,
               shadows: [
                 Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
+                  color: CardSurfaces.chipBg(context),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -250,7 +239,7 @@ class _BrandName extends StatelessWidget {
               color: brandColor,
               shadows: [
                 Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
+                  color: CardSurfaces.chipBg(context),
                   blurRadius: 1.5,
                   offset: const Offset(1, 1),
                 ),
@@ -281,11 +270,11 @@ class _BookingCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 18),
 
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.94),
+        color: CardSurfaces.cardBg(context),
         borderRadius: BorderRadius.circular(22),
 
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.85),
+          color: CardSurfaces.cardBorder(context),
           width: 1,
         ),
 
@@ -316,13 +305,13 @@ class _BookingCard extends StatelessWidget {
                   height: 48,
 
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1DDE5),
+                    color: CardSurfaces.chipBg(context),
                     borderRadius: BorderRadius.circular(15),
                   ),
 
-                  child: const Icon(
+                  child: Icon(
                     Icons.local_mall_outlined,
-                    color: MyBookingsScreen.primaryColor,
+                    color: CardSurfaces.title(context),
                     size: 23,
                   ),
                 ),
@@ -334,13 +323,13 @@ class _BookingCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'BOOKING REFERENCE',
                         style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.1,
-                          color: Color(0xFF9A7A89),
+                          color: CardSurfaces.body(context),
                         ),
                       ),
 
@@ -350,10 +339,10 @@ class _BookingCard extends StatelessWidget {
                         booking.bookingReference ?? 'N/A',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: MyBookingsScreen.textColor,
+                          color: CardSurfaces.title(context),
                           letterSpacing: 0.2,
                         ),
                       ),
@@ -373,7 +362,7 @@ class _BookingCard extends StatelessWidget {
             // ==========================================================
             // DIVIDER
             // ==========================================================
-            Container(height: 1, color: const Color(0xFFF0E1E5)),
+            Container(height: 1, color: CardSurfaces.cardBorder(context)),
 
             const SizedBox(height: 17),
 
@@ -382,21 +371,21 @@ class _BookingCard extends StatelessWidget {
             // ==========================================================
             Text(
               booking.package?.name ?? 'Unknown Package',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: MyBookingsScreen.textColor,
+                color: CardSurfaces.title(context),
                 letterSpacing: -0.2,
               ),
             ),
 
             const SizedBox(height: 5),
 
-            const Text(
+            Text(
               'INEA Scents Perfume Experience',
               style: TextStyle(
                 fontSize: 11,
-                color: Color(0xFF9A7A89),
+                color: CardSurfaces.body(context),
                 letterSpacing: 0.2,
               ),
             ),
@@ -447,22 +436,22 @@ class _BookingCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
 
               decoration: BoxDecoration(
-                color: MyBookingsScreen.backgroundTop,
+                color: CardSurfaces.chipBg(context),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: MyBookingsScreen.borderColor.withValues(alpha: 0.65),
+                  color: CardSurfaces.cardBorder(context),
                 ),
               ),
 
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Package Price',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: MyBookingsScreen.secondaryTextColor,
+                      color: CardSurfaces.body(context),
                     ),
                   ),
 
@@ -470,10 +459,10 @@ class _BookingCard extends StatelessWidget {
                     booking.package != null
                         ? 'Php. ${booking.package!.price?.toStringAsFixed(2) ?? '0.00'}'
                         : 'N/A',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: MyBookingsScreen.primaryColor,
+                      color: CardSurfaces.title(context),
                     ),
                   ),
                 ],
@@ -511,11 +500,11 @@ class _BookingDetailRow extends StatelessWidget {
           height: 34,
 
           decoration: BoxDecoration(
-            color: const Color(0xFFF5E8EC),
+            color: CardSurfaces.chipBg(context),
             borderRadius: BorderRadius.circular(10),
           ),
 
-          child: Icon(icon, size: 17, color: MyBookingsScreen.primaryColor),
+          child: Icon(icon, size: 17, color: CardSurfaces.title(context)),
         ),
 
         const SizedBox(width: 11),
@@ -526,10 +515,10 @@ class _BookingDetailRow extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF9A7A89),
+                  color: CardSurfaces.body(context),
                   letterSpacing: 0.4,
                 ),
               ),
@@ -540,10 +529,10 @@ class _BookingDetailRow extends StatelessWidget {
                 value,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: MyBookingsScreen.textColor,
+                  color: CardSurfaces.title(context),
                 ),
               ),
             ],
@@ -623,7 +612,7 @@ class _EmptyBookings extends StatelessWidget {
               height: 90,
 
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.75),
+                color: CardSurfaces.chipBg(context),
                 shape: BoxShape.circle,
 
                 boxShadow: [
@@ -646,25 +635,25 @@ class _EmptyBookings extends StatelessWidget {
 
             const SizedBox(height: 22),
 
-            const Text(
+            Text(
               'No bookings yet',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: MyBookingsScreen.textColor,
+                color: CardSurfaces.title(context),
               ),
             ),
 
             const SizedBox(height: 8),
 
-            const Text(
+            Text(
               'Your perfume experiences and upcoming '
               'events will appear here.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
                 height: 1.5,
-                color: MyBookingsScreen.secondaryTextColor,
+                color: CardSurfaces.body(context),
               ),
             ),
 
@@ -674,9 +663,8 @@ class _EmptyBookings extends StatelessWidget {
               onPressed: () {
                 context.go('/');
               },
+              // P7: theme ElevatedButton drives both modes.
               style: ElevatedButton.styleFrom(
-                backgroundColor: MyBookingsScreen.primaryColor,
-                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 14,
@@ -722,23 +710,3 @@ Color _getStatusColor(String status) {
   }
 }
 
-// ============================================================================
-// SOFT BACKGROUND CIRCLE
-// ============================================================================
-
-class _SoftCircle extends StatelessWidget {
-  final double size;
-  final Color color;
-
-  const _SoftCircle({required this.size, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-
-      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-    );
-  }
-}

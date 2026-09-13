@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
+import 'card_surfaces.dart';
+import 'inclusions_list.dart';
 
-/// A sticky floating Order Summary side-panel designed for desktop (3-column)
-/// and tablet (2-column) reservation flows in INEA Scents.
+/// Distilled Order Summary side-panel (P7 C):
+/// header one-liner {pax} PAX · {date} · {time}, Inclusions + Free via
+/// shared InclusionsList, no image/rating/Live chip/dot-leaders/payment
+/// chip/total-name duplication, `₱` only, wrap-don't-truncate.
 class OrderSummaryPanel extends StatelessWidget {
   static const Color plum = Color(0xFF6A4053);
-  static const Color mutedPlum = Color(0xFF99868C);
-  static const Color cream = Color(0xFFFDF4F5);
 
   final Package package;
   final DateTime? selectedDate;
@@ -50,25 +52,33 @@ class OrderSummaryPanel extends StatelessWidget {
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
-  static String _paymentMethodLabel(String id) {
-    return switch (id) {
-      'credit_card' => 'ONLINE',
-      'cash' => 'CASH',
-      // Legacy payloads may still carry retired methods; display verbatim.
-      _ => id.toUpperCase(),
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
     final effectivePrice = package.priceForPax(selectedPax);
+    final inclusions = package.inclusions ?? const <String>[];
+    final freebies = package.freebies ?? const <String>[];
+
+    // Fallback sample data when package carries null lists (mirrors
+    // previous placeholder inclusions): keeps visual parity without
+    // touching API contract.
+    final displayInclusions = inclusions.isNotEmpty
+        ? inclusions
+        : const ['Customized Logo', '4 Signature Scents', '2 Event Staff'];
+    final displayFreebies =
+        freebies.isNotEmpty ? freebies : const ['Selfie Mirror'];
+
+    final oneLiner =
+        '${selectedPax ?? 50} PAX · ${_formatDate(selectedDate)} · ${TimeSlot.display(selectedTime)}';
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x4D99868C), width: 1.0),
+        border: Border.all(color: surfaceBorder, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: plum.withValues(alpha: 0.08),
@@ -82,302 +92,87 @@ class OrderSummaryPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ========================================================
-          // PANEL HEADER
-          // ========================================================
+          // Panel header (no Live chip per C).
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: cream,
+                  color: CardSurfaces.chipBg(context),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.receipt_long_rounded,
-                  color: plum,
+                  color: titleColor,
                   size: 20,
                 ),
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Order Summary',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: plum,
+                    color: titleColor,
                     letterSpacing: 0.2,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF22C55E).withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(9999),
-                  ),
-                  child: const Text(
-                    'Live Preview',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF16A34A),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  softWrap: true,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
-          // ========================================================
-          // PACKAGE CARD PREVIEW
-          // ========================================================
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: cream.withValues(alpha: 0.6),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0x2699868C)),
-            ),
-            child: Row(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    color: const Color(0xFFF3EBE1),
-                    child:
-                        (package.images != null && package.images!.isNotEmpty)
-                        ? Image.network(
-                            package.images!.first,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.local_florist,
-                                  color: plum,
-                                  size: 24,
-                                ),
-                          )
-                        : const Icon(
-                            Icons.local_florist,
-                            color: plum,
-                            size: 24,
-                          ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        package.name ?? 'Perfume Package',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: plum,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.star_rounded,
-                            size: 13,
-                            color: Colors.amber,
-                          ),
-                          const SizedBox(width: 3),
-                          Expanded(
-                            child: Text(
-                              '${package.rating ?? 4.8} (${package.reviewsCount ?? 140})',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: mutedPlum,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '₱${effectivePrice.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: plum,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // ========================================================
-          // SELECTED SCHEDULE / DETAILS BADGES
-          // ========================================================
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0x3399868C)),
-            ),
-            child: Column(
-              children: [
-                _buildDetailRow(
-                  icon: Icons.calendar_today_rounded,
-                  label: 'Date',
-                  value: _formatDate(selectedDate),
-                  isEmphasized: selectedDate != null,
-                ),
-                const Divider(color: Color(0x1F99868C), height: 8),
-                _buildDetailRow(
-                  icon: Icons.access_time_rounded,
-                  label: 'Time',
-                  value: TimeSlot.display(selectedTime),
-                  isEmphasized: selectedTime != null,
-                ),
-                const Divider(color: Color(0x1F99868C), height: 8),
-                _buildDetailRow(
-                  icon: Icons.people_outline_rounded,
-                  label: 'Capacity',
-                  value: '${selectedPax ?? 50} PAX',
-                  isEmphasized: selectedPax != null,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // ========================================================
-          // BREAKDOWN LINE ITEMS (DOTTED LEADERS)
-          // ========================================================
-          const Text(
-            'Price Breakdown',
+          // Header one-liner {pax} PAX · {date} · {time} — wrap, don't truncate.
+          Text(
+            oneLiner,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: plum,
+              color: titleColor,
+              height: 1.3,
             ),
-          ),
-          _buildDottedLineItem(
-            'Base Package',
-            '₱${effectivePrice.toStringAsFixed(2)}',
-          ),
-          if (package.inclusions != null && package.inclusions!.isNotEmpty)
-            ...package.inclusions!.map(
-              (inc) => _buildDottedLineItem(inc, 'Included'),
-            )
-          else ...[
-            _buildDottedLineItem('Customized Logo', 'Included'),
-            _buildDottedLineItem('4 Signature Scents', 'Included'),
-            _buildDottedLineItem('2 Event Staff', 'Included'),
-          ],
-          if (package.freebies != null && package.freebies!.isNotEmpty)
-            ...package.freebies!.map((fb) => _buildDottedLineItem(fb, 'Free'))
-          else
-            _buildDottedLineItem('Selfie Mirror', 'Free'),
-
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8),
-            child: Divider(color: Color(0x3399868C), thickness: 1),
+            softWrap: true,
           ),
 
-          // ========================================================
-          // PAYMENT METHOD PREVIEW
-          // ========================================================
-          if (paymentMethod != null) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Flexible(
-                  child: Text(
-                    'Payment:',
-                    style: TextStyle(fontSize: 12, color: mutedPlum),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: cream,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: const Color(0x3399868C)),
-                    ),
-                    child: Text(
-                      _paymentMethodLabel(paymentMethod!),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: plum,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-          ],
+          const SizedBox(height: 14),
 
-          // ========================================================
-          // TOTAL AMOUNT ROW
-          // ========================================================
+          // Inclusions + Free via shared helper.
+          InclusionsList(
+            inclusions: displayInclusions,
+            freebies: displayFreebies,
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: Divider(color: surfaceBorder, thickness: 1),
+          ),
+
+          // Total — `₱` only, wrap-don't-truncate.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Flexible(
-                child: Text(
-                  'Total Amount',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: plum,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+              Text(
+                'Total',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
                 ),
               ),
               const SizedBox(width: 8),
-              // P6 (Q5): plain Text — SelectableText would inject an
-              // inner Scrollable that breaks scrollUntilVisible scoping
-              // in tests; error/empty cards already carry selectability.
               Flexible(
                 child: Text(
-                  'Php. ${effectivePrice.toStringAsFixed(2)}',
-                  style: const TextStyle(
+                  '₱${effectivePrice.toStringAsFixed(2)}',
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: plum,
+                    color: titleColor,
                   ),
-                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                  textAlign: TextAlign.end,
                 ),
               ),
             ],
@@ -385,17 +180,13 @@ class OrderSummaryPanel extends StatelessWidget {
 
           const SizedBox(height: 14),
 
-          // ========================================================
-          // ACTION BUTTON (STICKY CTA)
-          // ========================================================
+          // CTA.
           SizedBox(
             width: double.infinity,
             height: 46,
             child: ElevatedButton(
               onPressed: isLoading ? null : onProceed,
               style: ElevatedButton.styleFrom(
-                backgroundColor: plum,
-                foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(9999),
@@ -418,87 +209,6 @@ class OrderSummaryPanel extends StatelessWidget {
                         letterSpacing: 0.3,
                       ),
                     ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow({
-    required IconData icon,
-    required String label,
-    required String value,
-    required bool isEmphasized,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: isEmphasized ? plum : mutedPlum),
-        const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 11, color: mutedPlum)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isEmphasized ? FontWeight.w600 : FontWeight.normal,
-              color: isEmphasized ? plum : mutedPlum,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDottedLineItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.5),
-      child: Row(
-        children: [
-          Flexible(
-            flex: 6,
-            child: Text(
-              '• $label',
-              style: const TextStyle(fontSize: 11, color: plum),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            flex: 3,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final count = (constraints.maxWidth / 10).floor().clamp(1, 30);
-                return ClipRect(
-                  child: Text(
-                    '. ' * count,
-                    maxLines: 1,
-                    overflow: TextOverflow.clip,
-                    style: const TextStyle(
-                      color: Color(0x5999868C),
-                      fontSize: 9,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(width: 4),
-          Flexible(
-            flex: 3,
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: plum,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

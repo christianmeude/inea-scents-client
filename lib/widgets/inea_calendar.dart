@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../providers/index.dart';
+import 'card_surfaces.dart';
 
 /// Shared calendar module for booking flows.
 ///
@@ -96,6 +97,13 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    // P7: chrome resolves through the shared helper; brand accents
+    // (selected day, semantic dots) stay fixed in both modes.
+    final surface = CardSurfaces.cardBg(context);
+    final surfaceBorder = CardSurfaces.cardBorder(context);
+    final titleColor = CardSurfaces.title(context);
+    final bodyColor = CardSurfaces.body(context);
+    final chipColor = CardSurfaces.chipBg(context);
     final availabilityAsync = ref.watch(availabilityProvider);
     final bookedDays = availabilityAsync.value != null
         ? _bookedDaysFor(_focusedDay)
@@ -105,9 +113,9 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x4D99868C), width: 1.0),
+        border: Border.all(color: surfaceBorder, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: IneaCalendar.plum.withValues(alpha: 0.06),
@@ -125,23 +133,23 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDF4F5),
+                  color: chipColor,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.calendar_month_rounded,
-                  color: IneaCalendar.plum,
+                  color: titleColor,
                   size: 20,
                 ),
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
                   '1. Select Date',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: IneaCalendar.plum,
+                    color: titleColor,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -166,12 +174,12 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     'Available',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: IneaCalendar.plum,
+                      color: titleColor,
                     ),
                   ),
                 ],
@@ -188,12 +196,12 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Text(
+                  Text(
                     'Booked',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: IneaCalendar.plum,
+                      color: titleColor,
                     ),
                   ),
                 ],
@@ -204,57 +212,57 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFFDF4F5).withValues(alpha: 0.5),
+              color: chipColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x2699868C)),
+              border: Border.all(color: surfaceBorder),
             ),
             child: TableCalendar(
               firstDay: firstCalendarDay,
               lastDay: lastCalendarDay,
               focusedDay: _focusedDay,
               currentDay: DateTime.now(),
-              headerStyle: const HeaderStyle(
+              headerStyle: HeaderStyle(
                 formatButtonVisible: false,
                 titleCentered: true,
                 leftChevronIcon: Icon(
                   Icons.chevron_left_rounded,
-                  color: IneaCalendar.plum,
+                  color: titleColor,
                   size: 20,
                 ),
                 rightChevronIcon: Icon(
                   Icons.chevron_right_rounded,
-                  color: IneaCalendar.plum,
+                  color: titleColor,
                   size: 20,
                 ),
                 titleTextStyle: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: IneaCalendar.plum,
+                  color: titleColor,
                 ),
-                headerPadding: EdgeInsets.symmetric(vertical: 4),
+                headerPadding: const EdgeInsets.symmetric(vertical: 4),
               ),
-              daysOfWeekStyle: const DaysOfWeekStyle(
+              daysOfWeekStyle: DaysOfWeekStyle(
                 weekdayStyle: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: IneaCalendar.mutedPlum,
+                  color: bodyColor,
                 ),
                 weekendStyle: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: IneaCalendar.mutedPlum,
+                  color: bodyColor,
                 ),
               ),
               calendarStyle: CalendarStyle(
                 outsideDaysVisible: false,
                 cellMargin: const EdgeInsets.all(2),
-                defaultTextStyle: const TextStyle(
-                  color: IneaCalendar.plum,
+                defaultTextStyle: TextStyle(
+                  color: titleColor,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
-                weekendTextStyle: const TextStyle(
-                  color: IneaCalendar.plum,
+                weekendTextStyle: TextStyle(
+                  color: titleColor,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
@@ -265,8 +273,8 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                     color: IneaCalendar.plum.withValues(alpha: 0.4),
                   ),
                 ),
-                todayTextStyle: const TextStyle(
-                  color: IneaCalendar.plum,
+                todayTextStyle: TextStyle(
+                  color: titleColor,
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -322,12 +330,12 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
             decoration: BoxDecoration(
               color: widget.selectedDate != null
                   ? const Color(0xFF22C55E).withValues(alpha: 0.08)
-                  : const Color(0xFFFDF4F5),
+                  : chipColor,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: widget.selectedDate != null
                     ? const Color(0xFF22C55E).withValues(alpha: 0.3)
-                    : const Color(0x3399868C),
+                    : surfaceBorder,
               ),
             ),
             child: Row(
@@ -338,7 +346,7 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                   decoration: BoxDecoration(
                     color: widget.selectedDate != null
                         ? const Color(0xFF22C55E).withValues(alpha: 0.15)
-                        : Colors.white,
+                        : chipColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -347,7 +355,7 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                         : Icons.event_note_rounded,
                     color: widget.selectedDate != null
                         ? const Color(0xFF16A34A)
-                        : IneaCalendar.mutedPlum,
+                        : bodyColor,
                     size: 18,
                   ),
                 ),
@@ -366,7 +374,7 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                           letterSpacing: 0.8,
                           color: widget.selectedDate != null
                               ? const Color(0xFF16A34A)
-                              : IneaCalendar.mutedPlum,
+                              : bodyColor,
                         ),
                       ),
                       const SizedBox(height: 1),
@@ -378,8 +386,8 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: widget.selectedDate != null
-                              ? IneaCalendar.plum
-                              : IneaCalendar.mutedPlum,
+                              ? titleColor
+                              : bodyColor,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
