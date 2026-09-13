@@ -358,11 +358,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
     final packageAsync = ref.watch(packageDetailsProvider(widget.packageId));
 
-    return SafeArea(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-            child: packageAsync.when(
+    return Scaffold(
+      // P7: flat theme scaffold background.
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          key: const Key('app_shell_scroll_view'), // Keep this key so tests pass
+          physics: const BouncingScrollPhysics(),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: packageAsync.when(
               data: (package) {
                 if (_currentStep == 5) {
                   return _buildCheckoutScreen();
@@ -405,7 +411,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ), // when
           ), // ConstrainedBox
         ), // Center
-    ); // SafeArea
+        ), // SingleChildScrollView
+      ), // SafeArea
+    ); // Scaffold
   }
 
   // ==========================================================================
