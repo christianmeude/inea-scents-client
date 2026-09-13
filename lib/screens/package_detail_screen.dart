@@ -47,10 +47,7 @@ class PackageDetailScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: titleColor,
-                        ),
+                        icon: Icon(Icons.arrow_back, color: titleColor),
                         tooltip: 'Back',
                         mouseCursor: SystemMouseCursors.click,
                         onPressed: () => context.pop(),
@@ -67,11 +64,7 @@ class PackageDetailScreen extends ConsumerWidget {
                           child: Row(
                             children: [
                               const SizedBox(width: 12),
-                              Icon(
-                                Icons.search,
-                                color: bodyColor,
-                                size: 20,
-                              ),
+                              Icon(Icons.search, color: bodyColor, size: 20),
                               const SizedBox(width: 12),
                               Text(
                                 'Search "Perfume" here',
@@ -85,15 +78,9 @@ class PackageDetailScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 15),
-                      Icon(
-                        Icons.chat_bubble_rounded,
-                        color: titleColor,
-                      ),
+                      Icon(Icons.chat_bubble_rounded, color: titleColor),
                       const SizedBox(width: 15),
-                      Icon(
-                        Icons.calendar_today_rounded,
-                        color: titleColor,
-                      ),
+                      Icon(Icons.calendar_today_rounded, color: titleColor),
                     ],
                   ),
                 ),
@@ -102,199 +89,217 @@ class PackageDetailScreen extends ConsumerWidget {
                 // mobile, gallery + facts side-by-side on web)
                 Expanded(
                   child: SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final wide = constraints.maxWidth >
-                              ResponsiveAppShell.tabletBreakpoint;
-                          final cardDecoration = BoxDecoration(
-                            color: surface,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: surfaceBorder),
-                          );
-                          if (!wide) {
-                            return Container(
-                              decoration: cardDecoration,
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  // Banner
-                                  ClipRRect(
-                                    borderRadius:
-                                        const BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
-                                    child: _buildGalleryVisual(
-                                        context, package),
-                                  ),
-
-                            Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    package.name ?? '',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500,
-                                      color: titleColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 1200),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final wide =
+                                  constraints.maxWidth >
+                                  ResponsiveAppShell.tabletBreakpoint;
+                              final cardDecoration = BoxDecoration(
+                                color: surface,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: surfaceBorder),
+                              );
+                              if (!wide) {
+                                return Container(
+                                  decoration: cardDecoration,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(
-                                        Icons.star,
-                                        size: 16,
-                                        color: Colors.amber,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${package.rating ?? 4.5}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: titleColor,
+                                      // Banner
+                                      ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
+                                        ),
+                                        child: _buildGalleryVisual(
+                                          context,
+                                          package,
                                         ),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '(${package.reviewsCount ?? 232} reviews)',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: bodyColor,
+
+                                      Padding(
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              package.name ?? '',
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: titleColor,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                  Icons.star,
+                                                  size: 16,
+                                                  color: Colors.amber,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '${package.rating ?? 4.5}',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: titleColor,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '(${package.reviewsCount ?? 232} reviews)',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: bodyColor,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Text(
+                                              package.description ??
+                                                  'Perfect for intimate celebrations...',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: bodyColor,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Text(
+                                              'Includes:',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: titleColor,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            ...(package.inclusions ?? []).map(
+                                              (inclusion) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 4,
+                                                ),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const Text(
+                                                      '•  ',
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        inclusion,
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: titleColor,
+                                                          height: 1.3,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 15),
+                                            // Free items if any
+                                            if (package.freebies != null &&
+                                                package
+                                                    .freebies!
+                                                    .isNotEmpty) ...[
+                                              Text(
+                                                'Free:',
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: titleColor,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              ...package.freebies!.map(
+                                                (freebie) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        bottom: 4,
+                                                      ),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      const Text(
+                                                        '•  ',
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          freebie,
+                                                          style: TextStyle(
+                                                            fontSize: 13,
+                                                            color: titleColor,
+                                                            height: 1.3,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 20),
-                                  Text(
-                                    package.description ??
-                                        'Perfect for intimate celebrations...',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: bodyColor,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Text(
-                                    'Includes:',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: titleColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  ...(package.inclusions ?? []).map(
-                                    (inclusion) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 4),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            '•  ',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Text(
-                                              inclusion,
-                                              style: TextStyle(
-                                                fontSize: 13,
-                                                color: titleColor,
-                                                height: 1.3,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 15),
-                                  // Free items if any
-                                  if (package.freebies != null &&
-                                      package.freebies!.isNotEmpty) ...[
-                                    Text(
-                                      'Free:',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: titleColor,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    ...package.freebies!.map(
-                                      (freebie) => Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 4,
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              '•  ',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Text(
-                                                freebie,
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: titleColor,
-                                                  height: 1.3,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                      }
+                                );
+                              }
 
-                      // Web: gallery + facts side by side in the page scroll.
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: cardDecoration,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: _buildGalleryVisual(
-                                    context, package),
-                              ),
-                            ),
+                              // Web: gallery + facts side by side in the page scroll.
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: cardDecoration,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: _buildGalleryVisual(
+                                          context,
+                                          package,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(
+                                      decoration: cardDecoration,
+                                      child: _buildInfoColumn(context, package),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              decoration: cardDecoration,
-                              child: _buildInfoColumn(context, package),
-                            ),
-                          ),
-                        ],
-                      );
-                        },
+                        ),
                       ),
                     ),
                   ),
@@ -308,9 +313,7 @@ class PackageDetailScreen extends ConsumerWidget {
                   ),
                   decoration: BoxDecoration(
                     color: surface,
-                    border: Border(
-                      top: BorderSide(color: surfaceBorder),
-                    ),
+                    border: Border(top: BorderSide(color: surfaceBorder)),
                   ),
                   child: SafeArea(
                     top: false,
@@ -400,8 +403,7 @@ class PackageDetailScreen extends ConsumerWidget {
               child: ErrorStateCard(
                 title: "We couldn't open this package",
                 message: 'Check your connection and try again.',
-                onRetry: () =>
-                    ref.refresh(packageDetailsProvider(packageId)),
+                onRetry: () => ref.refresh(packageDetailsProvider(packageId)),
               ),
             ),
           ),
@@ -418,15 +420,8 @@ class PackageDetailScreen extends ConsumerWidget {
       child: Container(
         color: CardSurfaces.chipBg(context),
         child: (package.images != null && package.images!.isNotEmpty)
-            ? Image.network(
-                package.images![0],
-                fit: BoxFit.cover,
-              )
-            : const Center(
-                child: Text(
-                  'Package Image Placeholder',
-                ),
-              ),
+            ? Image.network(package.images![0], fit: BoxFit.cover)
+            : const Center(child: Text('Package Image Placeholder')),
       ),
     );
   }
@@ -451,38 +446,23 @@ class PackageDetailScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(
-                Icons.star,
-                size: 16,
-                color: Colors.amber,
-              ),
+              const Icon(Icons.star, size: 16, color: Colors.amber),
               const SizedBox(width: 4),
               Text(
                 '${package.rating ?? 4.5}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: titleColor,
-                ),
+                style: TextStyle(fontSize: 14, color: titleColor),
               ),
               const SizedBox(width: 4),
               Text(
                 '(${package.reviewsCount ?? 232} reviews)',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: bodyColor,
-                ),
+                style: TextStyle(fontSize: 14, color: bodyColor),
               ),
             ],
           ),
           const SizedBox(height: 20),
           Text(
-            package.description ??
-                'Perfect for intimate celebrations...',
-            style: TextStyle(
-              fontSize: 13,
-              color: bodyColor,
-              height: 1.4,
-            ),
+            package.description ?? 'Perfect for intimate celebrations...',
+            style: TextStyle(fontSize: 13, color: bodyColor, height: 1.4),
           ),
           const SizedBox(height: 20),
           Text(
@@ -502,10 +482,7 @@ class PackageDetailScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     '•  ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                   Expanded(
                     child: Text(
@@ -523,8 +500,7 @@ class PackageDetailScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 15),
           // Free items if any
-          if (package.freebies != null &&
-              package.freebies!.isNotEmpty) ...[
+          if (package.freebies != null && package.freebies!.isNotEmpty) ...[
             Text(
               'Free:',
               style: TextStyle(
@@ -536,9 +512,7 @@ class PackageDetailScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             ...package.freebies!.map(
               (freebie) => Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 4,
-                ),
+                padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

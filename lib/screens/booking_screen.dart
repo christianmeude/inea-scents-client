@@ -359,7 +359,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final packageAsync = ref.watch(packageDetailsProvider(widget.packageId));
 
     return Scaffold(
-      // P7: flat theme scaffold background.
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(

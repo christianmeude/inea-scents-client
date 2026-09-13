@@ -112,7 +112,6 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
     // P7: no explicit color — the theme scaffold color (light cream /
     // dark night) is the background.
     return Scaffold(
-
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
@@ -162,11 +161,14 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
       // BODY (P7: flat theme background; decorative gradient removed)
       // ============================================================
       body: SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
 
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
 
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -241,20 +243,20 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                             // mobile / tablet / desktop.
                             gridDelegate:
                                 ResponsiveAppShell.gridDelegateForWidth(
-                              constraints.maxWidth,
-                            ),
+                                  constraints.maxWidth,
+                                ),
 
                             itemCount: _packageEntries(packages).length,
 
-                        itemBuilder: (context, index) {
-                          final entry = _packageEntries(packages)[index];
+                            itemBuilder: (context, index) {
+                              final entry = _packageEntries(packages)[index];
 
-                          return PackageCard(
-                            package: entry.package,
-                            optionPax: entry.option?.pax,
-                            initialDate: widget.initialDate,
-                          );
-                        },
+                              return PackageCard(
+                                package: entry.package,
+                                optionPax: entry.option?.pax,
+                                initialDate: widget.initialDate,
+                              );
+                            },
                           );
                         },
                       );
@@ -271,8 +273,8 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                             physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
                                 ResponsiveAppShell.gridDelegateForWidth(
-                              constraints.maxWidth,
-                            ),
+                                  constraints.maxWidth,
+                                ),
                             itemCount: 4,
                             itemBuilder: (context, index) {
                               return const SkeletonPackageCard();
@@ -290,10 +292,10 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     error: (error, stack) {
                       return ErrorStateCard(
                         title: 'Unable to load packages',
-                        message: "We couldn't load the packages. "
+                        message:
+                            "We couldn't load the packages. "
                             'Check your connection and try again.',
-                        onRetry: () =>
-                            ref.invalidate(packagesProvider),
+                        onRetry: () => ref.invalidate(packagesProvider),
                       );
                     },
                   ),
@@ -303,6 +305,8 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
               ),
             ),
           ),
+        ),
+      ),
 
       // ============================================================
       // BODY WRAPPER END
@@ -398,10 +402,12 @@ class _EmptyPackages extends StatelessWidget {
   Widget build(BuildContext context) {
     // P6 (Q1): solid + dark-aware, like every other state card.
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
-    final secondaryTextColor =
-        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
+    final textColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF633E50);
+    final secondaryTextColor = isDark
+        ? const Color(0xFFC4ACAC)
+        : const Color(0xFF765867);
 
     return Container(
       width: double.infinity,
@@ -411,9 +417,7 @@ class _EmptyPackages extends StatelessWidget {
         color: isDark ? const Color(0xFF1C1618) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isDark
-              ? const Color(0xFF36222C)
-              : const Color(0x4D99868C),
+          color: isDark ? const Color(0xFF36222C) : const Color(0x4D99868C),
         ),
       ),
 
@@ -530,4 +534,3 @@ class _SearchBarState extends State<_SearchBar> {
     );
   }
 }
-

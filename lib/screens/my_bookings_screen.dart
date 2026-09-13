@@ -32,7 +32,6 @@ class MyBookingsScreen extends ConsumerWidget {
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
@@ -62,121 +61,131 @@ class MyBookingsScreen extends ConsumerWidget {
       // ============================================================
       body: SafeArea(
         child: bookingsAsync.when(
-                data: (bookings) {
-                  if (bookings.isEmpty) {
-                    return const _EmptyBookings();
-                  }
+          data: (bookings) {
+            if (bookings.isEmpty) {
+              return const _EmptyBookings();
+            }
 
-                  return RefreshIndicator(
-                    color: primaryColor,
-                    onRefresh: () => ref.refresh(bookingsProvider.future),
-                    child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
-                    children: [
-                      // ==================================================
-                      // PAGE HEADER
-                      // ==================================================
-                      Text(
-                        'My Bookings',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w600,
-                          color: CardSurfaces.title(context),
-                          letterSpacing: -0.3,
-                        ),
+            return RefreshIndicator(
+              color: primaryColor,
+              onRefresh: () => ref.refresh(bookingsProvider.future),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 1200),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // ==================================================
+                          // PAGE HEADER
+                          // ==================================================
+                          Text(
+                            'My Bookings',
+                            style: TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w600,
+                              color: CardSurfaces.title(context),
+                              letterSpacing: -0.3,
+                            ),
+                          ),
+
+                          const SizedBox(height: 5),
+
+                          Text(
+                            '${bookings.length} '
+                            '${bookings.length == 1 ? 'booking' : 'bookings'}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: CardSurfaces.body(context),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // ==================================================
+                          // BOOKING CARDS (P7 impeccable adapt: single
+                          // column on mobile, pairs on web — rows size to
+                          // the tallest card, so nothing overflows)
+                          // ==================================================
+                          LayoutBuilder(
+                            builder: (context, constraints) {
+                              final cards = bookings
+                                  .map(
+                                    (booking) => _BookingCard(booking: booking),
+                                  )
+                                  .toList();
+                              if (constraints.maxWidth <=
+                                  ResponsiveAppShell.tabletBreakpoint) {
+                                return Column(children: cards);
+                              }
+                              final rows = <Widget>[];
+                              for (var i = 0; i < cards.length; i += 2) {
+                                final pair = cards.sublist(
+                                  i,
+                                  (i + 2).clamp(0, cards.length),
+                                );
+                                rows.add(
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      for (final card in pair)
+                                        Expanded(child: card),
+                                      if (pair.length == 1)
+                                        const Expanded(
+                                          child: SizedBox.shrink(),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                                rows.add(const SizedBox(height: 2));
+                              }
+                              return Column(children: rows);
+                            },
+                          ),
+                        ],
                       ),
-
-                      const SizedBox(height: 5),
-
-                      Text(
-                        '${bookings.length} '
-                        '${bookings.length == 1 ? 'booking' : 'bookings'}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: CardSurfaces.body(context),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // ==================================================
-                      // BOOKING CARDS (P7 impeccable adapt: single
-                      // column on mobile, pairs on web — rows size to
-                      // the tallest card, so nothing overflows)
-                      // ==================================================
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final cards = bookings
-                              .map(
-                                (booking) =>
-                                    _BookingCard(booking: booking),
-                              )
-                              .toList();
-                          if (constraints.maxWidth <=
-                              ResponsiveAppShell.tabletBreakpoint) {
-                            return Column(children: cards);
-                          }
-                          final rows = <Widget>[];
-                          for (var i = 0; i < cards.length; i += 2) {
-                            final pair = cards.sublist(
-                              i,
-                              (i + 2).clamp(0, cards.length),
-                            );
-                            rows.add(
-                              Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  for (final card in pair)
-                                    Expanded(child: card),
-                                  if (pair.length == 1)
-                                    const Expanded(
-                                      child: SizedBox.shrink(),
-                                    ),
-                                ],
-                              ),
-                            );
-                            rows.add(const SizedBox(height: 2));
-                          }
-                          return Column(children: rows);
-                        },
-                      ),
-                    ],
                     ),
-                  );
-                },
-
-                // ======================================================
-                // LOADING
-                // ======================================================
-                loading: () => const Center(
-                  child: CircularProgressIndicator(
-                    color: primaryColor,
-                    strokeWidth: 2.5,
                   ),
                 ),
-
-                // ======================================================
-                // ERROR
-                // ======================================================
-                // P6 (Q6/Q8): shared friendly card; raw errors stay
-                // in logs, never on screen.
-                error: (error, stack) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: ErrorStateCard(
-                        title: 'Unable to load bookings',
-                        message: "We couldn't load your bookings. "
-                            'Check your connection and try again.',
-                        onRetry: () => ref.invalidate(bookingsProvider),
-                      ),
-                    ),
-                  );
-                },
               ),
+            );
+          },
+
+          // ======================================================
+          // LOADING
+          // ======================================================
+          loading: () => const Center(
+            child: CircularProgressIndicator(
+              color: primaryColor,
+              strokeWidth: 2.5,
+            ),
+          ),
+
+          // ======================================================
+          // ERROR
+          // ======================================================
+          // P6 (Q6/Q8): shared friendly card; raw errors stay
+          // in logs, never on screen.
+          error: (error, stack) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ErrorStateCard(
+                  title: 'Unable to load bookings',
+                  message:
+                      "We couldn't load your bookings. "
+                      'Check your connection and try again.',
+                  onRetry: () => ref.invalidate(bookingsProvider),
+                ),
+              ),
+            );
+          },
         ),
+      ),
     );
   }
 }
@@ -273,10 +282,7 @@ class _BookingCard extends StatelessWidget {
         color: CardSurfaces.cardBg(context),
         borderRadius: BorderRadius.circular(22),
 
-        border: Border.all(
-          color: CardSurfaces.cardBorder(context),
-          width: 1,
-        ),
+        border: Border.all(color: CardSurfaces.cardBorder(context), width: 1),
 
         boxShadow: [
           BoxShadow(
@@ -423,8 +429,8 @@ class _BookingCard extends StatelessWidget {
               value: booking.pax == null
                   ? 'N/A'
                   : booking.pax == 1
-                      ? '1 PAX'
-                      : '${booking.pax} PAX',
+                  ? '1 PAX'
+                  : '${booking.pax} PAX',
             ),
 
             const SizedBox(height: 18),
@@ -438,9 +444,7 @@ class _BookingCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: CardSurfaces.chipBg(context),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: CardSurfaces.cardBorder(context),
-                ),
+                border: Border.all(color: CardSurfaces.cardBorder(context)),
               ),
 
               child: Row(
@@ -709,4 +713,3 @@ Color _getStatusColor(String status) {
       return const Color(0xFF8B7B84);
   }
 }
-

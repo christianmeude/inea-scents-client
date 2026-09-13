@@ -36,7 +36,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-
       // ========================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ========================================================
@@ -58,9 +57,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     decoration: BoxDecoration(
                       color: chipColor,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: surfaceBorder,
-                      ),
+                      border: Border.all(color: surfaceBorder),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
@@ -84,38 +81,39 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       // ========================================================
       // P7: flat theme background; decorative gradient removed.
       body: SafeArea(
-            child: availabilityAsync.when(
-              loading: () {
-                return Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: titleColor,
-                  ),
-                );
-              },
+        child: availabilityAsync.when(
+          loading: () {
+            return Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: titleColor,
+              ),
+            );
+          },
 
-              // P6 (Q6/Q8): shared friendly card; raw errors stay
-              // in logs, never on screen.
-              error: (error, _) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ErrorStateCard(
-                      title: 'Unable to load availability',
-                      message: "We couldn't load the calendar. "
-                          'Check your connection and try again.',
-                      onRetry: () {
-                        ref.read(availabilityProvider.notifier).refresh();
-                      },
-                    ),
-                  ),
-                );
-              },
+          // P6 (Q6/Q8): shared friendly card; raw errors stay
+          // in logs, never on screen.
+          error: (error, _) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: ErrorStateCard(
+                  title: 'Unable to load availability',
+                  message:
+                      "We couldn't load the calendar. "
+                      'Check your connection and try again.',
+                  onRetry: () {
+                    ref.read(availabilityProvider.notifier).refresh();
+                  },
+                ),
+              ),
+            );
+          },
 
-              data: (availabilityState) {
-                return _buildCalendar(availabilityState);
-              },
-            ),
+          data: (availabilityState) {
+            return _buildCalendar(availabilityState);
+          },
+        ),
       ),
     );
   }
@@ -196,10 +194,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               color: surface,
               borderRadius: BorderRadius.circular(24),
 
-              border: Border.all(
-                color: surfaceBorder,
-                width: 1,
-              ),
+              border: Border.all(color: surfaceBorder, width: 1),
 
               boxShadow: [
                 BoxShadow(
@@ -581,16 +576,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
     // P7 impeccable adapt: stacked on mobile, legend | selection
     // side-by-side on web.
-    final wide = MediaQuery.of(context).size.width >
-        ResponsiveAppShell.tabletBreakpoint;
+    final wide =
+        MediaQuery.of(context).size.width > ResponsiveAppShell.tabletBreakpoint;
     if (!wide) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          legendCard,
-          const SizedBox(height: 20),
-          selection,
-        ],
+        children: [legendCard, const SizedBox(height: 20), selection],
       );
     }
     return Row(
@@ -832,4 +823,3 @@ class _Legend extends StatelessWidget {
 // NOTE (P6 Q6/Q8): the bespoke _CalendarError was retired; call sites use
 // the shared ErrorStateCard from widgets/index.dart (friendly copy, dark-
 // aware, raw errors never rendered).
-

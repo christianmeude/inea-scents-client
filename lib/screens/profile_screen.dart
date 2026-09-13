@@ -17,15 +17,15 @@ class ProfileScreen extends ConsumerWidget {
     // ============================================================
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final textColor =
-        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
-    final secondaryTextColor =
-        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
+    final textColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF633E50);
+    final secondaryTextColor = isDark
+        ? const Color(0xFFC4ACAC)
+        : const Color(0xFF765867);
 
     // Solid card surfaces matching the rest of the app (Q3).
-    final circleBg = isDark
-        ? const Color(0xFF36222C)
-        : const Color(0xFFFDF4F5);
+    final circleBg = isDark ? const Color(0xFF36222C) : const Color(0xFFFDF4F5);
     final circleBorder = isDark
         ? const Color(0xFFFDF4F5).withValues(alpha: 0.25)
         : const Color(0x4D99868C);
@@ -39,7 +39,6 @@ class ProfileScreen extends ConsumerWidget {
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
@@ -61,10 +60,7 @@ class ProfileScreen extends ConsumerWidget {
                     decoration: BoxDecoration(
                       color: circleBg,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: circleBorder,
-                        width: 1,
-                      ),
+                      border: Border.all(color: circleBorder, width: 1),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
@@ -85,113 +81,109 @@ class ProfileScreen extends ConsumerWidget {
       // BODY (P7: flat theme background; decorative gradient removed)
       // ============================================================
       body: SafeArea(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
 
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
 
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ==================================================
-                  // PAGE TITLE
-                  // ==================================================
-                  Text(
-                    'My Profile',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-
-                  const SizedBox(height: 5),
-
-                  Text(
-                    'Manage your account and preferences.',
-                    style: TextStyle(color: secondaryTextColor, fontSize: 13),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ==================================================
-                  // PROFILE + SETTINGS (P7 impeccable adapt: stacked
-                  // on mobile, side-by-side on web)
-                  // ==================================================
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final settings = _SettingsColumn(
-                        onLogout: () {
-                          ref.read(authProvider.notifier).logout();
-                          context.go('/login');
-                        },
-                      );
-                      final profile = _ProfileCard(
-                        userName: userName,
-                        userEmail: userEmail,
-                        firstLetter: firstLetter,
-                      );
-                      if (constraints.maxWidth <=
-                          ResponsiveAppShell.tabletBreakpoint) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            profile,
-                            const SizedBox(height: 28),
-                            settings,
-                          ],
-                        );
-                      }
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: profile),
-                          const SizedBox(width: 16),
-                          Expanded(child: settings),
-                        ],
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // ==================================================
-                  // BRAND FOOTER
-                  // ==================================================
-                  const Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          'INEA',
-                          style: TextStyle(
-                            color: Color(0xFF6D3E55),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                            letterSpacing: 4,
-                          ),
-                        ),
-
-                        SizedBox(height: 1),
-
-                        Text(
-                          'Scents',
-                          style: TextStyle(
-                            color: Color(0xFF6D3E55),
-                            fontSize: 15,
-                            fontStyle: FontStyle.italic,
-                            fontFamily: 'serif',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-                ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ==================================================
+              // PAGE TITLE
+              // ==================================================
+              Text(
+                'My Profile',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
               ),
-            ),
+
+              const SizedBox(height: 5),
+
+              Text(
+                'Manage your account and preferences.',
+                style: TextStyle(color: secondaryTextColor, fontSize: 13),
+              ),
+
+              const SizedBox(height: 20),
+
+              // ==================================================
+              // PROFILE + SETTINGS (P7 impeccable adapt: stacked
+              // on mobile, side-by-side on web)
+              // ==================================================
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final settings = _SettingsColumn(
+                    onLogout: () {
+                      ref.read(authProvider.notifier).logout();
+                      context.go('/login');
+                    },
+                  );
+                  final profile = _ProfileCard(
+                    userName: userName,
+                    userEmail: userEmail,
+                    firstLetter: firstLetter,
+                  );
+                  if (constraints.maxWidth <=
+                      ResponsiveAppShell.tabletBreakpoint) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [profile, const SizedBox(height: 28), settings],
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: profile),
+                      const SizedBox(width: 16),
+                      Expanded(child: settings),
+                    ],
+                  );
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              // ==================================================
+              // BRAND FOOTER
+              // ==================================================
+              const Center(
+                child: Column(
+                  children: [
+                    Text(
+                      'INEA',
+                      style: TextStyle(
+                        color: Color(0xFF6D3E55),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: 4,
+                      ),
+                    ),
+
+                    SizedBox(height: 1),
+
+                    Text(
+                      'Scents',
+                      style: TextStyle(
+                        color: Color(0xFF6D3E55),
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        fontFamily: 'serif',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10),
+            ],
           ),
+        ),
+      ),
     );
   }
 }
@@ -226,10 +218,7 @@ class _ProfileCard extends StatelessWidget {
         color: cardBg,
         borderRadius: BorderRadius.circular(24),
 
-        border: Border.all(
-          color: cardBorder,
-          width: 1,
-        ),
+        border: Border.all(color: cardBorder, width: 1),
 
         boxShadow: [
           BoxShadow(
@@ -311,10 +300,7 @@ class _ProfileCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
 
-                  style: TextStyle(
-                    color: secondaryTextColor,
-                    fontSize: 12.5,
-                  ),
+                  style: TextStyle(color: secondaryTextColor, fontSize: 12.5),
                 ),
 
                 const SizedBox(height: 10),
@@ -355,19 +341,13 @@ class _ProfileCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: CardSurfaces.chipBg(context),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: CardSurfaces.cardBorder(context),
-              ),
+              border: Border.all(color: CardSurfaces.cardBorder(context)),
             ),
 
             child: IconButton(
               padding: EdgeInsets.zero,
 
-              icon: Icon(
-                Icons.edit_outlined,
-                color: textColor,
-                size: 18,
-              ),
+              icon: Icon(Icons.edit_outlined, color: textColor, size: 18),
 
               onPressed: () {},
             ),
@@ -410,9 +390,7 @@ class _SettingsColumn extends StatelessWidget {
             color: cardBg,
             borderRadius: BorderRadius.circular(24),
 
-            border: Border.all(
-              color: cardBorder,
-            ),
+            border: Border.all(color: cardBorder),
 
             boxShadow: [
               BoxShadow(
@@ -558,10 +536,12 @@ class _SectionHeader extends StatelessWidget {
     // P6 (Q1/Q3): dark-aware, solid icon chip.
     final isDark = Theme.of(context).brightness == Brightness.dark;
     const primaryColor = Color(0xFF74445C);
-    final textColor =
-        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
-    final secondaryTextColor =
-        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
+    final textColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF633E50);
+    final secondaryTextColor = isDark
+        ? const Color(0xFFC4ACAC)
+        : const Color(0xFF765867);
 
     return Row(
       children: [
@@ -570,9 +550,7 @@ class _SectionHeader extends StatelessWidget {
           height: 42,
 
           decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF36222C)
-                : const Color(0xFFFDF4F5),
+            color: isDark ? const Color(0xFF36222C) : const Color(0xFFFDF4F5),
             shape: BoxShape.circle,
 
             border: Border.all(
@@ -610,10 +588,7 @@ class _SectionHeader extends StatelessWidget {
               Text(
                 subtitle,
 
-                style: TextStyle(
-                  color: secondaryTextColor,
-                  fontSize: 11.5,
-                ),
+                style: TextStyle(color: secondaryTextColor, fontSize: 11.5),
               ),
             ],
           ),
@@ -649,15 +624,17 @@ class _ProfileSettingTile extends StatelessWidget {
     // P6 (Q1): dark-aware tile text.
     final isDark = Theme.of(context).brightness == Brightness.dark;
     const primaryColor = Color(0xFF74445C);
-    final textColor =
-        isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
-    final secondaryTextColor =
-        isDark ? const Color(0xFFC4ACAC) : const Color(0xFF765867);
+    final textColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF633E50);
+    final secondaryTextColor = isDark
+        ? const Color(0xFFC4ACAC)
+        : const Color(0xFF765867);
 
     final itemColor = isDestructive
         ? isDark
-            ? const Color(0xFFF0A6B0)
-            : const Color(0xFF9A4F5D)
+              ? const Color(0xFFF0A6B0)
+              : const Color(0xFF9A4F5D)
         : (isDark ? const Color(0xFFFDF4F5) : primaryColor);
 
     return Material(
@@ -767,4 +744,3 @@ class _SettingDivider extends StatelessWidget {
     );
   }
 }
-
