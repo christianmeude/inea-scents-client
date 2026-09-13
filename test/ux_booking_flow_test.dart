@@ -90,7 +90,7 @@ void main() {
           home: Scaffold(
             body: DesktopPaymentPanel(
               package: _fourOptionPackage(),
-              paymentMethod: 'credit_card',
+              paymentMethod: 'online',
               onPaymentMethodSelected: (_) {},
             ),
           ),
@@ -161,3 +161,4 @@ void main() {
     });
   });
 }
+

@@ -121,8 +121,8 @@ void main() {
         );
 
         // Verify desktop header is present
-        expect(find.text('2-Column Reservation Flow'), findsOneWidget);
-        expect(find.textContaining('Reservation —'), findsOneWidget);
+        expect(find.text('2-Column Booking Flow'), findsOneWidget);
+        expect(find.text('Booking'), findsOneWidget);
 
         // Layout coordinate verification:
         // Calendar above Details in the flow column; summary to the right.
@@ -1141,7 +1141,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Tablet header badge should reflect 2-Column flow
-        expect(find.text('2-Column Reservation Flow'), findsOneWidget);
+        expect(find.text('2-Column Booking Flow'), findsOneWidget);
 
         final initialSummaryPos = tester.getTopLeft(
           find.byKey(const Key('tablet_order_summary_panel')),
@@ -1384,15 +1384,15 @@ void main() {
         await tester.pumpAndSettle();
 
         // Initial reservation header (P6: desktop is 2-column)
-        expect(find.textContaining('Reservation —'), findsOneWidget);
-        expect(find.text('2-Column Reservation Flow'), findsOneWidget);
+        expect(find.text('Booking'), findsOneWidget);
+        expect(find.text('2-Column Booking Flow'), findsOneWidget);
 
         // Proceed to payment
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
         // Payment header updates
-        expect(find.textContaining('Payment & Checkout —'), findsOneWidget);
+        expect(find.text('Payment & Checkout'), findsOneWidget);
         expect(find.text('Secure In-Place Checkout'), findsOneWidget);
         expect(find.byIcon(Icons.lock_outline_rounded), findsWidgets);
       },
@@ -2104,7 +2104,7 @@ void main() {
             home: Scaffold(
               body: DesktopPaymentPanel(
                 package: minimalPackage,
-                paymentMethod: 'credit_card',
+                paymentMethod: 'online',
                 onPaymentMethodSelected: (_) {},
               ),
             ),
@@ -2146,7 +2146,7 @@ void main() {
           ..setCustomerEmail('maria@example.com')
           ..setCustomerPhone('+639171234567')
           ..setVenueAddress('The Peninsula Manila')
-          ..setPaymentMethod('credit_card');
+          ..setPaymentMethod('online');
         await notifier.submitBooking();
         await notifier.startPolling();
         notifier.goToStep(5);
@@ -2229,7 +2229,7 @@ void main() {
             ..setCustomerEmail('maria@example.com')
             ..setCustomerPhone('+639171234567')
             ..setVenueAddress('The Peninsula Manila')
-            ..setPaymentMethod('credit_card');
+            ..setPaymentMethod('online');
           await notifier.submitBooking();
           await notifier.startPolling();
           notifier.goToStep(5);
@@ -2250,3 +2250,6 @@ void main() {
     );
   });
 }
+
+
+

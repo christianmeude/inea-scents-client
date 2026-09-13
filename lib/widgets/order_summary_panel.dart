@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
+import '../config/offering.dart';
 import 'card_surfaces.dart';
 import 'inclusions_list.dart';
 
@@ -66,9 +67,9 @@ class OrderSummaryPanel extends StatelessWidget {
     // touching API contract.
     final displayInclusions = inclusions.isNotEmpty
         ? inclusions
-        : const ['Customized Logo', '4 Signature Scents', '2 Event Staff'];
+        : Offering.inclusions;
     final displayFreebies =
-        freebies.isNotEmpty ? freebies : const ['Selfie Mirror'];
+        freebies.isNotEmpty ? freebies : Offering.freebies;
 
     final oneLiner =
         '${selectedPax ?? 50} PAX · ${_formatDate(selectedDate)} · ${TimeSlot.display(selectedTime)}';

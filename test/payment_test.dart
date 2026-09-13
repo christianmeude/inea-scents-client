@@ -16,7 +16,7 @@ void main() {
 
   group('isOnlinePaymentString', () {
     test('returns true for online wallet/checkout methods', () {
-      expect(isOnlinePaymentString('credit_card'), isTrue);
+      expect(isOnlinePaymentString('online'), isTrue);
       expect(isOnlinePaymentString('gcash'), isTrue);
       expect(isOnlinePaymentString('maya'), isTrue);
     });
@@ -44,3 +44,4 @@ void main() {
     });
   });
 }
+

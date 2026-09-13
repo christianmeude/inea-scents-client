@@ -30,7 +30,7 @@ void main() {
         ..setCustomerEmail('maria@example.com')
         ..setCustomerPhone('+639171234567')
         ..setVenueAddress('The Peninsula Manila')
-        ..setPaymentMethod('credit_card');
+        ..setPaymentMethod('online');
 
       final booking = await notifier.submitBooking();
       expect(booking, isNotNull);
@@ -97,7 +97,7 @@ void main() {
       ..setCustomerName('Maria Clara')
       ..setCustomerEmail('not-an-email')
       ..setVenueAddress('The Peninsula Manila')
-      ..setPaymentMethod('credit_card');
+      ..setPaymentMethod('online');
 
     final booking = await notifier.submitBooking();
     expect(booking, isNull);
@@ -130,7 +130,7 @@ void main() {
         ..setCustomerName('Maria Clara')
         ..setCustomerEmail('maria@example.com')
         ..setVenueAddress('The Peninsula Manila')
-        ..setPaymentMethod('credit_card');
+        ..setPaymentMethod('online');
 
       final booking = await notifier.submitBooking();
       expect(booking, isNotNull);
@@ -164,7 +164,7 @@ void main() {
         ..setCustomerName('Maria Clara')
         ..setCustomerEmail('maria@example.com')
         ..setVenueAddress('The Peninsula Manila')
-        ..setPaymentMethod('credit_card');
+        ..setPaymentMethod('online');
 
       await notifier.submitBooking();
       final polling = notifier.startPolling(
@@ -208,7 +208,7 @@ void main() {
         ..setCustomerEmail('maria@example.com')
         ..setCustomerPhone('+639171234567')
         ..setVenueAddress('The Peninsula Manila')
-        ..setPaymentMethod('credit_card');
+        ..setPaymentMethod('online');
 
       await notifier.submitBooking();
       await notifier.startPolling(interval: const Duration(milliseconds: 50));
@@ -246,7 +246,7 @@ void main() {
         ..setCustomerEmail('maria@example.com')
         ..setCustomerPhone('+639171234567')
         ..setVenueAddress('The Peninsula Manila')
-        ..setPaymentMethod('credit_card');
+        ..setPaymentMethod('online');
 
       await notifier.submitBooking();
       await notifier.startPolling();
@@ -330,7 +330,7 @@ void main() {
         ..setCustomerEmail('maria@example.com')
         ..setCustomerPhone('+639171234567')
         ..setVenueAddress('The Peninsula Manila')
-        ..setPaymentMethod('credit_card');
+        ..setPaymentMethod('online');
 
       await notifier.submitBooking();
       expect(
@@ -348,3 +348,4 @@ void main() {
     },
   );
 }
+

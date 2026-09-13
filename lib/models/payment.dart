@@ -3,7 +3,7 @@ library;
 
 import '../api/export.dart';
 
-const Set<String> _onlineWalletJsonValues = {'credit_card', 'gcash', 'maya'};
+const Set<String> _onlineWalletJsonValues = {'online', 'credit_card', 'gcash', 'maya'};
 
 /// Returns true for payment methods that are settled online via a checkout
 /// link (PayMongo), as opposed to [PaymentMethod.cash] and

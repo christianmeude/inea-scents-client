@@ -61,7 +61,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   int? get _selectedPax => ref.read(bookingFlowProvider).selectedPax;
   String? get _selectedTime => ref.read(bookingFlowProvider).selectedTime;
   String get _paymentMethod =>
-      ref.read(bookingFlowProvider).paymentMethod ?? 'credit_card';
+      ref.read(bookingFlowProvider).paymentMethod ?? 'online';
   final TextEditingController _customerNameController = TextEditingController();
   final TextEditingController _customerEmailController =
       TextEditingController();
@@ -115,7 +115,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         notifier.setSelectedTime('14:00:00');
       }
       if (flow.paymentMethod == null) {
-        notifier.setPaymentMethod('credit_card');
+        notifier.setPaymentMethod('online');
       }
     });
     _loadPackage();
@@ -288,7 +288,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final state = ref.read(bookingFlowProvider);
     final notifier = ref.read(bookingFlowProvider.notifier);
     if (state.paymentMethod == null) {
-      notifier.setPaymentMethod('credit_card');
+      notifier.setPaymentMethod('online');
     }
   }
 
@@ -910,8 +910,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           Expanded(
             child: Text(
               isPayment
-                  ? 'Payment & Checkout — ${package.name ?? "Custom Experience"}'
-                  : 'Reservation — ${package.name ?? "Custom Experience"}',
+                  ? 'Payment & Checkout'
+                  : 'Booking',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -946,7 +946,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       isPayment
                           ? 'Secure In-Place Checkout'
                           // P6: desktop is a 2-column flow + summary.
-                          : '2-Column Reservation Flow',
+                          : '2-Column Booking Flow',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -1972,7 +1972,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   children:
                       [
                         {
-                          'id': 'credit_card',
+                          'id': 'online',
                           'label': 'Online',
                           'color': const Color(0xFFEB001B),
                         },

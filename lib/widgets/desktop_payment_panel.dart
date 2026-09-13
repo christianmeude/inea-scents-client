@@ -112,14 +112,14 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
     final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
     final chipColor = CardSurfaces.chipBg(context);
-    final activeMethod = widget.paymentMethod ?? 'credit_card';
+    final activeMethod = widget.paymentMethod ?? 'online';
 
     // Customer-facing methods: Online (PayMongo) or Cash (admin confirm).
     // bank_transfer is retired (owner Q14-B); the enum keeps it for
     // legacy payloads but no picker offers it.
     final paymentMethods = [
       {
-        'id': 'credit_card',
+        'id': 'online',
         'label': 'Online',
         'sublabel': 'PayMongo secure checkout',
         'color': const Color(0xFFEB001B),
@@ -201,7 +201,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                     ),
                                     SizedBox(height: 2),
                                     Text(
-                                      'Select payment method and enter details to complete your reservation.',
+                                      'Select payment method and enter details to complete your booking.',
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: DesktopPaymentPanel.mutedPlum,
@@ -281,7 +281,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  'Select payment method and enter details to complete your reservation.',
+                                  'Select payment method and enter details to complete your booking.',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: DesktopPaymentPanel.mutedPlum,
@@ -527,7 +527,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            activeMethod == 'credit_card'
+                            activeMethod == 'online'
                                 ? '2. Online Checkout'
                                 : '2. Offline Payment Instructions',
                             style: TextStyle(
@@ -545,7 +545,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
 
                     // Online = PayMongo link flow: no card is captured here.
                     // Tapping Confirm & Pay opens the secure checkout page.
-                    if (activeMethod == 'credit_card') ...[
+                    if (activeMethod == 'online') ...[
                       Container(
                         key: const Key('online_checkout_explainer'),
                         padding: const EdgeInsets.all(12),

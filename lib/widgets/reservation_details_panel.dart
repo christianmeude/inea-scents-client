@@ -55,7 +55,7 @@ class ReservationDetailsPanel extends StatelessWidget {
     // Customer-facing methods only: Online (PayMongo) or Cash.
     final paymentMethods = [
       {
-        'id': 'credit_card',
+        'id': 'online',
         'label': 'Online',
         'color': const Color(0xFFEB001B),
       },
@@ -449,7 +449,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                     runSpacing: 6,
                     children: paymentMethods.map((method) {
                       final isSelected =
-                          (paymentMethod ?? 'credit_card') == method['id'];
+                          (paymentMethod ?? 'online') == method['id'];
                       return SizedBox(
                         width: cardW,
                         child: InkWell(

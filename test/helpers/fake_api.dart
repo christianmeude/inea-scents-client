@@ -43,7 +43,7 @@ class FakeApiBackend {
     'event_date': '2026-09-01T02:00:00.000Z',
     'event_time': '14:00:00',
     'venue_address': 'The Peninsula Manila',
-    'payment_method': 'credit_card',
+    'payment_method': 'online',
     'status': status,
     if (checkoutUrl != null) 'checkout_url': checkoutUrl,
   };
@@ -142,3 +142,4 @@ RestClient buildFakeRestClient(FakeApiBackend backend) {
     ..httpClientAdapter = FakeHttpClientAdapter(backend);
   return RestClient(dio);
 }
+
