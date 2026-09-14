@@ -1,8 +1,15 @@
-# 🎉 INEA Scents - Flutter Mobile Application
+# Inea Scents - Mobile Application
 
-> A complete, production-ready Flutter mobile app for INEA Scents perfume bar booking platform
+> A complete, production-ready Flutter mobile app for the Inea Scents perfume bar booking platform.
 
-## ⚡ Quick Start (2 minutes)
+## 🌍 The Ecosystem
+
+The Inea Scents platform consists of three separate repositories. This repository relies on the backend for API endpoints:
+1. **`inea_scents_client` (This Repo)**: Flutter cross-platform mobile/web application for customer bookings.
+2. **`inea-scents`**: Laravel backend, PostgreSQL database, and Admin Dashboard.
+3. **`inea-scents-landing`**: React/Vite customer-facing marketing website.
+
+## ⚡ Quick Start
 
 ```bash
 # 1. Install dependencies
@@ -15,78 +22,14 @@ flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-**That's it!** The app will launch on your device/emulator. See [QUICK_START.md](QUICK_START.md) for more details.
+*Note: Ensure the `inea-scents` backend is running locally or configured to point to the production API, or the app will not be able to fetch data.*
 
-## 📚 Documentation
+## 📋 Prerequisites
 
-- **[QUICK_START.md](QUICK_START.md)** - 5-minute setup guide (START HERE!)
-- **[DELIVERY_SUMMARY.md](DELIVERY_SUMMARY.md)** - Complete project overview
-- **[IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md)** - Architecture and features
-- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - All API endpoints
-- **[FILE_INVENTORY.md](FILE_INVENTORY.md)** - Complete file listing
-
-## 🎯 What's Included
-
-✅ **9 Screens** - Complete UI matching Figma designs
-- Splash, Login, Register, Home, Packages, Package Details, Booking (5 steps), My Bookings, Profile
-
-✅ **10 API Endpoints** - Full backend integration
-- Authentication, Packages, Bookings, Calendar, Wishlist
-
-✅ **State Management** - Riverpod with 8 providers
-- Auth, Packages, Bookings, Wishlist, Booking Form
-
-✅ **Routing** - Go Router with 9 named routes
-- Deep linking support, route guards
-
-✅ **Security** - JWT token management
-- Flutter Secure Storage, Bearer token interceptor
-
-✅ **Data Models** - 5 Freezed models
-- Type-safe, JSON serializable, immutable
-
-## 🏗️ Architecture
-
-```
-Models → Services → Providers → Screens → Widgets
-  ↓         ↓          ↓         ↓        ↓
-Freezed   DioClient  Riverpod  ConsumerWidget  Reusable
- (5)      (API)      (8)       (9)            (2)
-```
-
-## 🔌 Connectivity
-
-**Backend API:** `https://inea-scents.onrender.com/api`
-
-All endpoints are fully integrated:
-- POST `/register` - Create account
-- POST `/login` - Authenticate
-- GET `/packages` - List packages
-- POST `/bookings` - Create booking
-- GET `/bookings` - Get user bookings
-- GET `/wishlist` - Get favorites
-- ... and more!
-
-See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for complete reference.
-
-## 📱 Screenshots
-
-The app includes these fully-functional screens:
-
-1. **Splash Screen** - 3-second intro with logo
-2. **Login Screen** - Email + password authentication
-3. **Register Screen** - New user signup
-4. **Home Screen** - Featured packages and popular items
-5. **Packages Screen** - Browse all packages with search
-6. **Package Details** - Full info with gallery
-7. **Booking Flow** (5-step):
-   - Select package
-   - Choose scents
-   - Pick date (calendar) + PAX
-   - Enter customer details
-   - Select payment method
-8. **My Bookings** - View all orders with status
-9. **Profile** - User info, wishlist, settings
+- Flutter 3.12.0 or higher
+- Dart 3.0 or higher
+- Android Studio / Xcode (depending on target platform)
+- Connected device, emulator, or Chrome (for web testing)
 
 ## 🛠️ Technology Stack
 
@@ -96,182 +39,43 @@ The app includes these fully-functional screens:
 - **Routing**: go_router 7.0.0
 - **Data Models**: freezed + json_serializable
 - **Storage**: flutter_secure_storage (encrypted)
-- **UI Components**: table_calendar
-
-## 🔐 Security
-
-- ✅ JWT tokens stored in encrypted flutter_secure_storage
-- ✅ HTTPS-only API calls
-- ✅ Bearer token auto-injected in all requests
-- ✅ Automatic logout on token expiration
-- ✅ No credentials in code
-
-## 📋 Prerequisites
-
-- Flutter 3.12.0 or higher
-- Dart 3.0 or higher
-- An Android device/emulator OR iOS simulator OR Chrome for web
-- Internet connection (to reach backend API)
 
 ## ✨ Features
 
-**Authentication**
-- User registration and login
-- Secure token storage
-- Auto-logout on expiration
+- **Authentication**: Secure login/registration with encrypted JWT tokens.
+- **Package Browsing**: View available perfume packages, search, and browse galleries.
+- **Booking Flow**: Multi-step booking process including calendar selection, scent picking, and customer details.
+- **User Profile**: Manage bookings, wishlist, and account settings.
+- **Offline Resilience**: Clean error handling and loading states.
 
-**Package Browsing**
-- List all packages
-- View detailed package information
-- Gallery with multiple images
-- Search functionality
+## 🔌 Connectivity
 
-**Booking System**
-- Multi-step booking form
-- Calendar date selection
-- Scent selection
-- Customer information
-- Payment method selection
+**Backend API:**
+This mobile client connects to the `inea-scents` Laravel backend. By default, it may point to `https://inea-scents.onrender.com/api` or your local development server (`http://127.0.0.1:8000/api`).
 
-**User Management**
-- User profile page
-- Wishlist management
-- Booking history
-- Settings (edit profile, logout)
+All endpoints are fully integrated in `lib/services/dio_client.dart`:
+- `POST /register`, `POST /login` (Auth)
+- `GET /packages`, `GET /wishlist` (Browsing)
+- `POST /bookings`, `GET /bookings` (Orders)
 
-**UI/UX**
-- Responsive design
-- Error handling
-- Loading states
-- Beautiful gradient UI
-- Bottom navigation bar
+## 📁 Project Structure
 
-## 📊 Project Structure
-
+```text
+lib/
+├── main.dart                 # Entry point
+├── config/router.dart        # Navigation setup
+├── models/                   # Data classes (Freezed)
+├── services/dio_client.dart  # API client
+├── providers/                # State management (Riverpod)
+├── screens/                  # All UI screens (9 total)
+└── widgets/                  # Reusable components
 ```
-inea_scents_client/
-├── lib/
-│   ├── main.dart                 # Entry point
-│   ├── config/router.dart        # Navigation setup
-│   ├── models/                   # Data classes
-│   ├── services/dio_client.dart  # API client
-│   ├── providers/                # State management
-│   ├── screens/                  # All 9 UI screens
-│   └── widgets/                  # Reusable components
-├── pubspec.yaml                  # Dependencies
-└── [Documentation Files]
-```
-
-See [FILE_INVENTORY.md](FILE_INVENTORY.md) for complete file listing.
-
-## 🚀 Getting Started
-
-### 1. First Time Setup
-
-```bash
-cd inea_scents_client
-flutter pub get
-```
-
-### 2. Generate Code
-
-```bash
-flutter pub run build_runner build --delete-conflicting-outputs
-```
-
-This generates:
-- `.freezed.dart` files (immutable models)
-- `.g.dart` files (JSON serialization)
-
-### 3. Run
-
-```bash
-flutter run
-```
-
-### 4. Test
-
-1. See splash screen (3 seconds)
-2. Login/Register
-3. Browse packages
-4. Complete booking flow
-5. View bookings
-
-## 📚 Documentation Guide
-
-| Document | Best For |
-|----------|----------|
-| [QUICK_START.md](QUICK_START.md) | Getting the app running fast |
-| [DELIVERY_SUMMARY.md](DELIVERY_SUMMARY.md) | Understanding the full project |
-| [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) | Learning the architecture |
-| [API_DOCUMENTATION.md](API_DOCUMENTATION.md) | Backend integration details |
-| [FILE_INVENTORY.md](FILE_INVENTORY.md) | File-by-file breakdown |
 
 ## 🐛 Troubleshooting
 
-### Code generation failed?
-```bash
-flutter clean
-flutter pub get
-flutter pub run build_runner build --delete-conflicting-outputs
-```
-
-### Can't connect to API?
-- Verify backend is running at `https://inea-scents.onrender.com`
-- Check network connectivity
-- Look at console logs for Dio errors
-
-### Build failing?
-```bash
-rm -rf .dart_tool build/
-flutter pub get
-flutter pub run build_runner build
-```
-
-### Need more help?
-See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md#-troubleshooting) for detailed troubleshooting.
-
-## 📞 Support
-
-- **Flutter Docs**: https://flutter.dev
-- **Riverpod Docs**: https://riverpod.dev
-- **Go Router**: https://pub.dev/packages/go_router
-- **Backend API**: https://inea-scents.onrender.com/docs
-
-## ✅ Checklist Before Launching
-
-- [ ] Flutter SDK installed and updated
-- [ ] `flutter pub get` completed
-- [ ] `flutter pub run build_runner build` completed
-- [ ] No errors in `flutter analyze`
-- [ ] Device/emulator connected
-- [ ] Backend API is running
-- [ ] Ready to `flutter run`!
-
-## 🎊 You're All Set!
-
-The application is **production-ready** with:
-
-✅ Complete feature set
-✅ Full API integration
-✅ Proper error handling
-✅ Clean architecture
-✅ Type-safe code
-✅ Secure authentication
-✅ Beautiful UI
-
-**Ready to launch?** Run `flutter run` now! 🚀
+- **Code generation failed?** Run `flutter clean && flutter pub get` before running `build_runner`.
+- **Can't connect to API?** Verify the backend repository is running and reachable from your emulator (e.g., use `10.0.2.2` instead of `127.0.0.1` for Android Emulator).
+- **Build failing?** Clear cache: `rm -rf .dart_tool build/` then retry fetching dependencies.
 
 ---
-
-## 📝 Version Info
-
-- **Flutter**: 3.12.2+
-- **Build Date**: 2024
-- **Status**: Production Ready ✅
-
----
-
-**Made with ❤️ using Flutter, Riverpod, and Go Router**
-
-Questions? See the documentation files above for detailed information!
+*Status: Production Ready*
