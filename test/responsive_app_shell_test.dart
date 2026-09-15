@@ -51,7 +51,7 @@ void main() {
 
         // Verify TopNavBar navigation items
         expect(find.text('HOME'), findsOneWidget);
-        expect(find.text('MESSAGES'), findsOneWidget);
+        expect(find.text('PACKAGES'), findsOneWidget);
         expect(find.text('BOOKINGS'), findsOneWidget);
         expect(find.text('CALENDAR'), findsOneWidget);
         expect(find.text('PROFILE'), findsOneWidget);
@@ -319,7 +319,7 @@ void main() {
                   builder: (context, state) => const Text('Home Screen Page'),
                 ),
                 GoRoute(
-                  path: '/messages',
+                  path: '/packages',
                   builder: (context, state) =>
                       const Text('Packages Screen Page'),
                 ),
@@ -362,14 +362,14 @@ void main() {
         expect(find.text('Home Screen Page'), findsOneWidget);
         expect(find.byIcon(Icons.home), findsOneWidget); // Active icon for HOME
 
-        // 2. Navigate to MESSAGES via tab click
-        await tester.tap(find.text('MESSAGES'));
+        // 2. Navigate to PACKAGES via tab click
+        await tester.tap(find.text('PACKAGES'));
         await tester.pumpAndSettle();
         expect(find.text('Packages Screen Page'), findsOneWidget);
         expect(
-          find.byIcon(Icons.chat_bubble),
+          find.byIcon(Icons.card_giftcard),
           findsOneWidget,
-        ); // Active icon for MESSAGES
+        ); // Active icon for PACKAGES
 
         // 3. Navigate to BOOKINGS via tab click
         await tester.tap(find.text('BOOKINGS'));
@@ -404,18 +404,18 @@ void main() {
         expect(find.text('Home Screen Page'), findsOneWidget);
         expect(find.byIcon(Icons.home), findsOneWidget);
 
-        // 7. Navigate to MESSAGES via the MESSAGES nav item
+        // 7. Navigate to PACKAGES via the PACKAGES nav item
         // (the old 'Explore Packages' CTA was removed; the toggle
         // occupies the right cluster per the landing standard).
-        await tester.tap(find.text('MESSAGES'));
+        await tester.tap(find.text('PACKAGES'));
         await tester.pumpAndSettle();
         expect(find.text('Packages Screen Page'), findsOneWidget);
         // debug
         print('Location: ' + router.routeInformationProvider.value.uri.path);
         try {
-          expect(find.byIcon(Icons.chat_bubble), findsOneWidget);
+          expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
         } catch (e) {
-          print('chat_bubble not found. outline found? ' + find.byIcon(Icons.chat_bubble_outline).evaluate().isNotEmpty.toString());
+          print('card_giftcard not found. outline found? ' + find.byIcon(Icons.card_giftcard_outlined).evaluate().isNotEmpty.toString());
           print('location in router is: ' + router.location);
           print('uri path is: ' + router.routeInformationProvider.value.uri.path);
           rethrow;
@@ -447,14 +447,14 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final router = GoRouter(
-        initialLocation: '/messages',
+        initialLocation: '/packages',
         routes: [
           ShellRoute(
             builder: (context, state, child) =>
                 ResponsiveAppShell(child: child),
             routes: [
               GoRoute(
-                path: '/messages',
+                path: '/packages',
                 builder: (context, state) => const Text('Packages Page'),
               ),
               GoRoute(
@@ -475,7 +475,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // On /messages, BottomNavBar is visible
+      // On /packages, BottomNavBar is visible
       expect(find.byType(BottomNavBar), findsOneWidget);
 
       // On /package-details/1, BottomNavBar is hidden
@@ -509,7 +509,7 @@ void main() {
                   builder: (context, state) => const Text('Home Screen'),
                 ),
                 GoRoute(
-                  path: '/messages',
+                  path: '/packages',
                   builder: (context, state) => const Text('Packages Screen'),
                 ),
                 GoRoute(
@@ -539,7 +539,7 @@ void main() {
         expect(find.byType(BottomNavBar), findsNothing);
 
         // Verify tapping each tab at 768px width
-        await tester.tap(find.text('MESSAGES'));
+        await tester.tap(find.text('PACKAGES'));
         await tester.pumpAndSettle();
         expect(find.text('Packages Screen'), findsOneWidget);
 
@@ -555,7 +555,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Profile Screen'), findsOneWidget);
 
-        await tester.tap(find.text('MESSAGES'));
+        await tester.tap(find.text('PACKAGES'));
         await tester.pumpAndSettle();
         expect(find.text('Packages Screen'), findsOneWidget);
       },
@@ -581,7 +581,7 @@ void main() {
                   builder: (context, state) => const Text('Home Page'),
                 ),
                 GoRoute(
-                  path: '/messages',
+                  path: '/packages',
                   builder: (context, state) => const Text('Packages Page'),
                 ),
               ],
@@ -596,9 +596,9 @@ void main() {
 
         expect(find.text('Home Page'), findsOneWidget);
 
-        // Find FocusableActionDetector for MESSAGES nav item
+        // Find FocusableActionDetector for PACKAGES nav item
         final packagesDetectorFinder = find.ancestor(
-          of: find.text('MESSAGES'),
+          of: find.text('PACKAGES'),
           matching: find.byType(FocusableActionDetector),
         );
         expect(packagesDetectorFinder, findsOneWidget);
@@ -744,7 +744,7 @@ void main() {
                 builder: (context, state) => const Text('Home'),
               ),
               GoRoute(
-                path: '/messages',
+                path: '/packages',
                 builder: (context, state) => const Text('Packages'),
               ),
             ],
@@ -757,9 +757,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find MESSAGES FocusableActionDetector (currently unselected)
+      // Find PACKAGES FocusableActionDetector (currently unselected)
       final packagesDetectorFinder = find.ancestor(
-        of: find.text('MESSAGES'),
+        of: find.text('PACKAGES'),
         matching: find.byType(FocusableActionDetector),
       );
       expect(packagesDetectorFinder, findsOneWidget);
@@ -810,7 +810,7 @@ void main() {
                 builder: (context, state) => const Text('Mobile Home'),
               ),
               GoRoute(
-                path: '/messages',
+                path: '/packages',
                 builder: (context, state) => const Text('Mobile Packages'),
               ),
               GoRoute(
@@ -834,7 +834,7 @@ void main() {
       expect(find.text('Mobile Home'), findsOneWidget);
 
       // Tap Packages in BottomNavBar
-      await tester.tap(find.text('MESSAGES'));
+      await tester.tap(find.text('PACKAGES'));
       await tester.pumpAndSettle();
       expect(find.text('Mobile Packages'), findsOneWidget);
 

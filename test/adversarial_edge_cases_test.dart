@@ -120,14 +120,14 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         final router = GoRouter(
-          initialLocation: '/messages?category=Wedding&sort=price_asc',
+          initialLocation: '/packages?category=Wedding&sort=price_asc',
           routes: [
             ShellRoute(
               builder: (context, state, child) =>
                   ResponsiveAppShell(child: child),
               routes: [
                 GoRoute(
-                  path: '/messages',
+                  path: '/packages',
                   builder: (context, state) => Text(
                     'Packages category=${state.queryParameters['category']}',
                   ),
@@ -150,9 +150,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Verify query params rendered and MESSAGES tab is active
+        // Verify query params rendered and PACKAGES tab is active
         expect(find.text('Packages category=Wedding'), findsOneWidget);
-        expect(find.byIcon(Icons.chat_bubble), findsOneWidget);
+        expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
 
         // Navigate to calendar with query params
         router.go('/calendar?month=12&year=2026');
@@ -330,7 +330,7 @@ void main() {
 
       expect(find.byType(BottomNavBar), findsOneWidget);
       // Tapping each bottom nav item without GoRouter should not throw
-      await tester.tap(find.text('MESSAGES'));
+      await tester.tap(find.text('PACKAGES'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('BOOKINGS'));
       await tester.pumpAndSettle();

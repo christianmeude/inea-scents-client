@@ -132,7 +132,9 @@ class BottomNavBar extends StatelessWidget {
           location = router.location;
         } catch (_) {}
       }
-      if (location.contains('package')) {
+      if (location.contains('package-details')) {
+        return 0;
+      } else if (location.contains('package')) {
         return 1;
       } else if (location.contains('booking')) {
         return 2;
@@ -140,7 +142,7 @@ class BottomNavBar extends StatelessWidget {
         return 3;
       } else if (location.contains('profile')) {
         return 4;
-      } else if (location == '/' || location.contains('home') || location.contains('package-details')) {
+      } else if (location == '/' || location.contains('home')) {
         return 0;
       }
       return 0;
