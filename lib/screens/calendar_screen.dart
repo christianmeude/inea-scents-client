@@ -154,13 +154,14 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ref.read(availabilityProvider.notifier).refresh();
       },
 
-      child: ListView(
-        physics: const BouncingScrollPhysics(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth >= ResponsiveAppShell.tabletBreakpoint;
 
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
-
-        children: [
-          // ====================================================
+          final titleContent = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+// ====================================================
           // PAGE TITLE
           // ====================================================
           Text(
@@ -185,8 +186,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
 
           const SizedBox(height: 22),
+            ],
+          );
 
-          // ====================================================
+          final calendarCard = // ====================================================
           // CALENDAR CARD
           // ====================================================
           Container(
@@ -408,27 +411,53 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ),
               ),
             ),
-          ),
+          );
 
-          const SizedBox(height: 20),
+          if (isDesktop) {
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+                  children: [
+                    titleContent,
+                    const SizedBox(height: 22),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 7, child: calendarCard),
+                        const SizedBox(width: 24),
+                        Expanded(flex: 4, child: _buildAgendaColumn(selectedStatus, isDesktop: true)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
 
-          // Legend + selection agenda: stacked on mobile, side by
-          // side on web (P7 impeccable adapt).
-          _buildAgendaColumn(selectedStatus),
-
-          const SizedBox(height: 10),
-        ],
+          return ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+            children: [
+              titleContent,
+              const SizedBox(height: 22),
+              calendarCard,
+              const SizedBox(height: 20),
+              _buildAgendaColumn(selectedStatus, isDesktop: false),
+              const SizedBox(height: 10),
+            ],
+          );
+        },
       ),
     );
   }
 
   /// Legend + selected-date panel + continue action. Stacked on
   /// mobile, legend | selection side-by-side on web.
-  Widget _buildAgendaColumn(String? selectedStatus) {
-    final surface = CardSurfaces.cardBg(context);
+  Widget _buildAgendaColumn(String? selectedStatus, {bool isDesktop = false}) {
     final surfaceBorder = CardSurfaces.cardBorder(context);
-    final titleColor = CardSurfaces.title(context);
-    final bodyColor = CardSurfaces.body(context);
     final chipColor = CardSurfaces.chipBg(context);
     final legendCard = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -460,87 +489,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         // SELECTED DATE
         // ====================================================
         if (_selectedDay != null) ...[
-          const SizedBox(height: 18),
 
-          Container(
-            padding: const EdgeInsets.all(17),
-
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(20),
-
-              border: Border.all(color: available.withValues(alpha: 0.25)),
-
-              boxShadow: [
-                BoxShadow(
-                  color: primary.withValues(alpha: 0.07),
-                  blurRadius: 16,
-                  offset: const Offset(0, 7),
-                ),
-              ],
-            ),
-
-            child: Row(
-              children: [
-                Container(
-                  width: 46,
-                  height: 46,
-
-                  decoration: BoxDecoration(
-                    color: chipColor,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-
-                  child: const Icon(
-                    Icons.event_available_rounded,
-                    color: available,
-                    size: 23,
-                  ),
-                ),
-
-                const SizedBox(width: 13),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'SELECTED DATE',
-                        style: TextStyle(
-                          color: bodyColor,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1,
-                        ),
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      Text(
-                        _formatDate(_selectedDay!),
-                        style: TextStyle(
-                          color: titleColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-
-                      const SizedBox(height: 2),
-
-                      Text(
-                        selectedStatus ?? 'Available',
-                        style: const TextStyle(
-                          color: available,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
@@ -576,9 +525,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
     // P7 impeccable adapt: stacked on mobile, legend | selection
     // side-by-side on web.
-    final wide =
-        MediaQuery.of(context).size.width > ResponsiveAppShell.tabletBreakpoint;
-    if (!wide) {
+    if (!isDesktop) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [legendCard, const SizedBox(height: 20), selection],

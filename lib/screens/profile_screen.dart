@@ -135,13 +135,19 @@ class ProfileScreen extends ConsumerWidget {
                       children: [profile, const SizedBox(height: 28), settings],
                     );
                   }
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: profile),
-                      const SizedBox(width: 16),
-                      Expanded(child: settings),
-                    ],
+
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          profile,
+                          const SizedBox(height: 28),
+                          settings,
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
@@ -150,33 +156,8 @@ class ProfileScreen extends ConsumerWidget {
 
               // ==================================================
               // BRAND FOOTER
-              // ==================================================
               const Center(
-                child: Column(
-                  children: [
-                    Text(
-                      'INEA',
-                      style: TextStyle(
-                        color: Color(0xFF6D3E55),
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 4,
-                      ),
-                    ),
-
-                    SizedBox(height: 1),
-
-                    Text(
-                      'Scents',
-                      style: TextStyle(
-                        color: Color(0xFF6D3E55),
-                        fontSize: 15,
-                        fontStyle: FontStyle.italic,
-                        fontFamily: 'serif',
-                      ),
-                    ),
-                  ],
-                ),
+                child: AppLogo(),
               ),
 
               const SizedBox(height: 10),
@@ -301,31 +282,6 @@ class _ProfileCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
 
                   style: TextStyle(color: secondaryTextColor, fontSize: 12.5),
-                ),
-
-                const SizedBox(height: 10),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-
-                  decoration: BoxDecoration(
-                    color: CardSurfaces.plum.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-
-                  child: Text(
-                    'INEA MEMBER',
-
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1,
-                    ),
-                  ),
                 ),
               ],
             ),

@@ -132,9 +132,11 @@ class MyBookingsScreen extends ConsumerWidget {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      for (final card in pair)
-                                        Expanded(child: card),
-                                      if (pair.length == 1)
+                                      Expanded(child: pair[0]),
+                                      if (pair.length > 1) ...[
+                                        const SizedBox(width: 24),
+                                        Expanded(child: pair[1]),
+                                      ] else
                                         const Expanded(
                                           child: SizedBox.shrink(),
                                         ),
@@ -276,7 +278,7 @@ class _BookingCard extends StatelessWidget {
     final statusColor = _getStatusColor(status);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 18),
+      margin: const EdgeInsets.only(bottom: 24),
 
       decoration: BoxDecoration(
         color: CardSurfaces.cardBg(context),
@@ -294,7 +296,7 @@ class _BookingCard extends StatelessWidget {
       ),
 
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(24),
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

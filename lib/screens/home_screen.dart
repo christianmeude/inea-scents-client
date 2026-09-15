@@ -10,10 +10,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final packagesAsync = ref.watch(packagesProvider);
     // P7: surfaces resolve through the shared helper (banner art stays).
-    final surface = CardSurfaces.cardBg(context);
-    final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
-    final bodyColor = CardSurfaces.body(context);
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
@@ -44,160 +41,12 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // ============================================================
-                        // SEARCH AND ACTIONS
-                        // ============================================================
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  height: 45,
-                                  decoration: BoxDecoration(
-                                    color: surface,
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: surfaceBorder),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: 12),
-                                      Icon(
-                                        Icons.search,
-                                        color: bodyColor,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          'Search "Perfume" here',
-                                          style: TextStyle(
-                                            color: bodyColor,
-                                            fontSize: 14,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              Icon(
-                                Icons.chat_bubble_rounded,
-                                color: titleColor,
-                              ),
-                              const SizedBox(width: 15),
-                              Icon(
-                                Icons.calendar_today_rounded,
-                                color: titleColor,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 25),
-
-                        // ============================================================
-                        // BANNER
-                        // ============================================================
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Container(
-                            height: 220,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF3EBE1),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFF6A4053,
-                                  ).withValues(alpha: 0.05),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
-                            ),
-                            // Here normally would be an Image.asset with the beautiful banner
-                            // As placeholder, we'll recreate the layout simply
-                            child: Stack(
-                              children: [
-                                Positioned(
-                                  top: 20,
-                                  left: 20,
-                                  right: 20,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Icon(
-                                            Icons.local_florist,
-                                            size: 24,
-                                            color: Color(0xFFC0A062),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          const Expanded(
-                                            child: Text(
-                                              'INEA SCENTS',
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 1.5,
-                                                color: Color(0xFFC0A062),
-                                              ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const Text(
-                                        '— PERFUME BAR —',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          letterSpacing: 2,
-                                          color: Color(0xFFC0A062),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 15),
-                                      const Text(
-                                        'Make Every Moment\nUnforgettable',
-                                        style: TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFF4A3424),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Text(
-                                        'A personalized perfume experience\nfor your special celebrations.',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF4A3424),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // In a real app we would use the image from assets here.
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 30),
-
-                        // ============================================================
                         // POPULAR PACKAGES TITLE
                         // ============================================================
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Text(
-                            'Popular Packages',
+                            'Our Packages',
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w500,
