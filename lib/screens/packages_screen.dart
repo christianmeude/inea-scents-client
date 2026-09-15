@@ -175,17 +175,6 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                   const SizedBox(height: 20),
 
                   // ==================================================
-                  // SEARCH BAR
-                  // ==================================================
-                  _SearchBar(
-                    onChanged: (val) =>
-                        ref.read(packagesSearchQueryProvider.notifier).state =
-                            val,
-                  ),
-
-                  const SizedBox(height: 26),
-
-                  // ==================================================
                   // SECTION HEADER (P7: filter chips + item counter
                   // removed — search narrows the grid directly)
                   // ==================================================
@@ -421,91 +410,6 @@ class _EmptyPackages extends StatelessWidget {
             style: TextStyle(color: secondaryTextColor, fontSize: 13),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// SEARCH BAR (Interactive with hover and focus ring)
-// ============================================================================
-
-class _SearchBar extends StatefulWidget {
-  final ValueChanged<String> onChanged;
-
-  const _SearchBar({required this.onChanged});
-
-  @override
-  State<_SearchBar> createState() => _SearchBarState();
-}
-
-class _SearchBarState extends State<_SearchBar> {
-  bool _isHovered = false;
-  bool _isFocused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    const primaryColor = Color(0xFF74445C);
-    const inputColor = Color(0xFF95647E);
-
-    return FocusableActionDetector(
-      mouseCursor: SystemMouseCursors.text,
-      onShowHoverHighlight: (h) => setState(() => _isHovered = h),
-      onShowFocusHighlight: (f) => setState(() => _isFocused = f),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 54,
-        decoration: BoxDecoration(
-          color: _isFocused
-              ? const Color(0xFFA5748E)
-              : (_isHovered ? const Color(0xFF9E6D87) : inputColor),
-          borderRadius: BorderRadius.circular(12),
-          // P6 (Q4): constant width — the glow ring below signals
-          // focus so neighbors never shift.
-          border: Border.all(
-            color: _isFocused
-                ? Colors.white
-                : Colors.white.withValues(alpha: _isHovered ? 0.95 : 0.80),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withValues(alpha: 0.12),
-              blurRadius: 14,
-              offset: const Offset(0, 6),
-            ),
-            if (_isFocused)
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.35),
-                blurRadius: 8,
-                spreadRadius: 1,
-              ),
-          ],
-        ),
-        child: Focus(
-          onFocusChange: (f) => setState(() => _isFocused = f),
-          child: TextField(
-            style: const TextStyle(color: Colors.white, fontSize: 14),
-            cursorColor: Colors.white,
-            onChanged: widget.onChanged,
-            decoration: const InputDecoration(
-              hintText: 'Search "Perfume" here',
-              hintStyle: TextStyle(color: Color(0xBFFFFFFF), fontSize: 14),
-              prefixIcon: Icon(
-                Icons.search_rounded,
-                color: Colors.white,
-                size: 22,
-              ),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 16,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

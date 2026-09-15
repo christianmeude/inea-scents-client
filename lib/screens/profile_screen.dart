@@ -160,7 +160,7 @@ class ProfileScreen extends ConsumerWidget {
                 child: Opacity(
                   opacity: 0.3,
                   child: Transform.scale(
-                    scale: 0.6,
+                    scale: 0.5,
                     child: const AppLogo(),
                   ),
                 ),
@@ -360,7 +360,6 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.person_outline_rounded,
                 title: 'Edit Profile',
-                subtitle: 'Update your personal information',
                 onTap: () {},
               ),
 
@@ -369,7 +368,6 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.lock_outline_rounded,
                 title: 'Change Password',
-                subtitle: 'Keep your account secure',
                 onTap: () {},
               ),
 
@@ -378,7 +376,6 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.help_outline_rounded,
                 title: 'Help & Support',
-                subtitle: 'Get assistance with your account',
                 onTap: () {},
               ),
 
@@ -387,7 +384,6 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.logout_rounded,
                 title: 'Logout',
-                subtitle: 'Sign out of your account',
                 isDestructive: true,
                 showArrow: false,
                 onTap: onLogout,
@@ -478,7 +474,6 @@ class _BrandName extends StatelessWidget {
 class _ProfileSettingTile extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String subtitle;
   final VoidCallback onTap;
   final bool isDestructive;
   final bool showArrow;
@@ -486,7 +481,6 @@ class _ProfileSettingTile extends StatelessWidget {
   const _ProfileSettingTile({
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.onTap,
     this.isDestructive = false,
     this.showArrow = true,
@@ -565,14 +559,6 @@ class _ProfileSettingTile extends StatelessWidget {
 
                     const SizedBox(height: 3),
 
-                    Text(
-                      subtitle,
-
-                      style: TextStyle(
-                        color: secondaryTextColor,
-                        fontSize: 10.5,
-                      ),
-                    ),
                   ],
                 ),
               ),

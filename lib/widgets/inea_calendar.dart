@@ -58,6 +58,11 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
     if (widget.selectedDate != null &&
         widget.selectedDate != oldWidget.selectedDate) {
       _focusedDay = _clampDay(widget.selectedDate!);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(availabilityProvider.notifier)
+            .setMonth(_focusedDay.month, _focusedDay.year);
+      });
     }
   }
 
@@ -133,7 +138,7 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '1. Select Date',
+                  'Select Date',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -276,10 +281,47 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              selectedDayPredicate: (day) {
+                            selectedDayPredicate: (day) {
                 if (widget.selectedDate == null) return false;
                 return isSameDay(widget.selectedDate, day);
               },
+              calendarBuilders: CalendarBuilders(
+                disabledBuilder: (context, day, focusedDay) {
+                  final now = DateTime.now();
+                  final today = DateTime(now.year, now.month, now.day);
+                  final cellDay = DateTime(day.year, day.month, day.day);
+                  final isPast = cellDay.isBefore(today);
+                  final isFull = bookedDays.contains(cellDay);
+                  
+                  return Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${day.day}',
+                          style: TextStyle(
+                            color: titleColor.withValues(alpha: 0.3),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (isFull && !isPast)
+                          Text(
+                            'Full',
+                            style: TextStyle(
+                              color: titleColor.withValues(alpha: 0.4),
+                              fontSize: 8,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
               enabledDayPredicate: (day) {
                 final now = DateTime.now();
                 final today = DateTime(now.year, now.month, now.day);

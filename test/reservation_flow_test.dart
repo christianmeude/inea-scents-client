@@ -122,7 +122,7 @@ void main() {
 
         // Verify desktop header is present
 
-        expect(find.text('Booking'), findsOneWidget);
+        expect(find.text('01 Details'), findsOneWidget);
 
         // Layout coordinate verification:
         // Calendar above Details in the flow column; summary to the right.
@@ -140,15 +140,15 @@ void main() {
         expect(detailsPos.dx, lessThan(summaryPos.dx));
 
         // Verify contents inside the flow column (Calendar)
-        expect(find.text('1. Select Date'), findsOneWidget);
+        expect(find.text('Select Date'), findsOneWidget);
         expect(find.text('Available'), findsWidgets);
         expect(find.text('Booked'), findsWidgets);
 
         // Verify contents inside the flow column (Details, PAX read-only)
-        expect(find.text('2. Your Package'), findsOneWidget);
+        expect(find.text('Your Package'), findsOneWidget);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-        expect(find.text('3. Choose Event Time'), findsOneWidget);
-        expect(find.text('4. Payment Method'), findsOneWidget);
+        expect(find.text('Choose Event Time'), findsOneWidget);
+        expect(find.text('Payment Method'), findsOneWidget);
 
         // Verify contents inside Right column (Sticky Order Summary) — P7 C distilled
         expect(find.text('Order Summary'), findsOneWidget);
@@ -295,7 +295,7 @@ void main() {
 
         // Read-only row carries the locked headcount step (silent
         // first-option fallback: no `?pax=` was passed, so 20 wins).
-        expect(find.text('2. Your Package'), findsOneWidget);
+        expect(find.text('Your Package'), findsOneWidget);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('20 PAX'), findsOneWidget);
         expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
@@ -327,7 +327,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Picker shows the current time with the duration hint
-        expect(find.text('3. Choose Event Time'), findsOneWidget);
+        expect(find.text('Choose Event Time'), findsOneWidget);
         expect(
           find.text('One booking lasts 3–4 hrs.'),
           findsOneWidget,
@@ -415,7 +415,7 @@ void main() {
         await fillPaymentContacts(tester);
 
         // Tap 'Confirm & Pay' on payment step
-        final confirmButtonFinder = find.text('Confirm & Pay');
+        final confirmButtonFinder = find.textContaining('Confirm & Pay');
         expect(confirmButtonFinder, findsOneWidget);
         await tester.tap(confirmButtonFinder);
         await tester.pumpAndSettle();
@@ -782,7 +782,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('1. Select Date'), findsOneWidget);
+        expect(find.text('Select Date'), findsOneWidget);
 
 
         // Navigate calendar month using next chevron
@@ -937,8 +937,8 @@ void main() {
         await tester.tap(cardFinder);
         await tester.pumpAndSettle();
 
-        expect(find.text('Confirm & Pay'), findsOneWidget);
-        await tester.tap(find.text('Confirm & Pay'));
+        expect(find.textContaining('Confirm & Pay'), findsOneWidget);
+        await tester.tap(find.textContaining('Confirm & Pay'));
         await tester.pumpAndSettle();
 
         // Step 5: Success screen
@@ -1211,7 +1211,7 @@ void main() {
         await tester.tap(proceedBtn);
         await tester.pumpAndSettle();
 
-        final confirmBtn = find.text('Confirm & Pay');
+        final confirmBtn = find.textContaining('Confirm & Pay');
         await tester.ensureVisible(confirmBtn);
         await tester.pumpAndSettle();
         expect(confirmBtn, findsOneWidget);
@@ -1334,7 +1334,7 @@ void main() {
           findsOneWidget,
         );
         expect(find.text('Payment & Checkout Details'), findsOneWidget);
-        expect(find.text('1. Select Payment Method'), findsOneWidget);
+        expect(find.text('Select Payment Method'), findsOneWidget);
       },
     );
 
@@ -1384,7 +1384,7 @@ void main() {
         );
 
         // Summary button has updated to 'Confirm & Pay'
-        expect(find.text('Confirm & Pay'), findsOneWidget);
+        expect(find.textContaining('Confirm & Pay'), findsOneWidget);
         expect(find.text('₱4500.00'), findsOneWidget);
       },
     );
@@ -1403,7 +1403,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Initial reservation header (P6: desktop is 2-column)
-        expect(find.text('Booking'), findsOneWidget);
+        expect(find.text('01 Details'), findsOneWidget);
 
 
         // Proceed to payment
@@ -1411,7 +1411,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Payment header updates
-        expect(find.text('Payment & Checkout'), findsOneWidget);
+        expect(find.text('04 Checkout'), findsOneWidget);
 
         expect(find.byIcon(Icons.lock_outline_rounded), findsWidgets);
       },
@@ -1519,7 +1519,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (no payment chip)
-        expect(find.text('2. Online Checkout'), findsOneWidget);
+        expect(find.text('Online Checkout'), findsOneWidget);
         expect(find.text('Order Summary'), findsOneWidget);
         expect(find.textContaining('PAX ·'), findsOneWidget);
         expect(
@@ -1536,7 +1536,7 @@ void main() {
         await tester.tap(cashMethodFinder.first);
         await tester.pumpAndSettle();
 
-        expect(find.text('2. Offline Payment Instructions'), findsOneWidget);
+        expect(find.text('Offline Payment Instructions'), findsOneWidget);
         expect(find.text('Order Summary'), findsOneWidget);
         expect(find.textContaining('PAX ·'), findsOneWidget);
       },
@@ -1615,7 +1615,7 @@ void main() {
         );
 
         // Step 2: Confirm & Pay in persistent Order Summary
-        final confirmBtn = find.text('Confirm & Pay');
+        final confirmBtn = find.textContaining('Confirm & Pay');
         expect(confirmBtn, findsOneWidget);
 
         // Fill contact & venue information required for submission
@@ -1682,7 +1682,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Price Details'), findsOneWidget);
         expect(find.text('Choose Payment Method'), findsOneWidget);
-        expect(find.text('Confirm & Pay'), findsOneWidget);
+        expect(find.textContaining('Confirm & Pay'), findsOneWidget);
 
         await tester.scrollUntilVisible(
           find.text('Back'),
@@ -1711,7 +1711,7 @@ void main() {
         );
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
-        await tester.tap(find.text('Confirm & Pay'));
+        await tester.tap(find.textContaining('Confirm & Pay'));
         await tester.pumpAndSettle();
 
         expect(find.text('Payment Successful'), findsOneWidget);
@@ -1760,13 +1760,13 @@ void main() {
           find.byKey(const Key('tablet_order_summary_panel')),
           findsOneWidget,
         );
-        expect(find.text('Confirm & Pay'), findsOneWidget);
+        expect(find.textContaining('Confirm & Pay'), findsOneWidget);
 
         // Fill contact & venue information required for submission
         await fillPaymentContacts(tester);
 
         // Confirm & Pay completes tablet flow
-        final confirmBtn = find.text('Confirm & Pay');
+        final confirmBtn = find.textContaining('Confirm & Pay');
         await tester.ensureVisible(confirmBtn);
         await tester.pumpAndSettle();
         await tester.tap(confirmBtn);
@@ -1898,7 +1898,7 @@ void main() {
           find.byKey(const Key('tablet_order_summary_panel')),
           findsOneWidget,
         );
-        expect(find.text('Confirm & Pay'), findsOneWidget);
+        expect(find.textContaining('Confirm & Pay'), findsOneWidget);
 
         // Resize back to Desktop (1400px) -> Still in Payment step
         tester.view.physicalSize = const Size(1400, 800);
@@ -1912,7 +1912,7 @@ void main() {
           find.byKey(const Key('order_summary_side_panel')),
           findsOneWidget,
         );
-        expect(find.text('Confirm & Pay'), findsOneWidget);
+        expect(find.textContaining('Confirm & Pay'), findsOneWidget);
       },
     );
 
@@ -2107,7 +2107,7 @@ void main() {
         await tester.tap(finalProceed);
         await tester.pumpAndSettle();
         await fillPaymentContacts(tester);
-        final finalConfirm = find.text('Confirm & Pay');
+        final finalConfirm = find.textContaining('Confirm & Pay');
         await tester.ensureVisible(finalConfirm);
         await tester.pumpAndSettle();
         await tester.tap(finalConfirm);
@@ -2151,7 +2151,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Payment & Checkout Details'), findsOneWidget);
-        expect(find.text('2. Online Checkout'), findsOneWidget);
+        expect(find.text('Online Checkout'), findsOneWidget);
         expect(
           find.byKey(const Key('online_checkout_explainer')),
           findsOneWidget,
@@ -2221,7 +2221,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Payment Successful'), findsNothing);
-        expect(find.text('1. Select Date'), findsOneWidget);
+        expect(find.text('Select Date'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );

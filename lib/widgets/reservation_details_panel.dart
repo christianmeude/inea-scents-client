@@ -169,7 +169,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          '2. Your Package',
+                          'Your Package',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -220,18 +220,22 @@ class ReservationDetailsPanel extends StatelessWidget {
                           ),
                         ),
                         if (onChangePax != null)
-                          GestureDetector(
-                            key: const Key('pax_change_link'),
-                            onTap: onChangePax,
-                            child: MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: Text(
-                                'Change',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: titleColor,
-                                  decoration: TextDecoration.underline,
+                          Flexible(
+                            child: GestureDetector(
+                              key: const Key('pax_change_link'),
+                              onTap: onChangePax,
+                              child: MouseRegion(
+                                cursor: SystemMouseCursors.click,
+                                child: Text(
+                                  'Change',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: ReservationDetailsPanel.plum,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),
@@ -273,7 +277,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                   const SizedBox(width: 10),
                   Flexible(
                     child: Text(
-                      '3. Choose Event Time',
+                      'Choose Event Time',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -380,7 +384,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                   const SizedBox(width: 10),
                   Flexible(
                     child: Text(
-                      '4. Payment Method',
+                      'Payment Method',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,

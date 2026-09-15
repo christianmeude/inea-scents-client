@@ -44,6 +44,7 @@ class BookingScreen extends ConsumerStatefulWidget {
 }
 
 class _BookingScreenState extends ConsumerState<BookingScreen> {
+  bool _isInitialized = false;
   static const Color plum = Color(0xFF6A4053);
 
   // P7: dark-aware surfaces through the shared helper.
@@ -119,6 +120,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       }
     });
     _loadPackage();
+    setState(() { _isInitialized = true; });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _prefillFromUser();
@@ -332,6 +334,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_isInitialized) return const SizedBox.shrink();
     ref.watch(bookingFlowProvider);
     ref.listen<AsyncValue<Package>>(packageDetailsProvider(widget.packageId), (
       prev,
@@ -903,23 +906,46 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           const SizedBox(width: 8),
           Container(height: 18, width: 1, color: _surfaceBorder),
           const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              isPayment
-                  ? 'Payment & Checkout'
-                  : 'Booking',
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: _title,
+                                        Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildBreadcrumb('01 Details', true),
+                  _breadcrumbArrow(),
+                  _buildBreadcrumb('02 Package', _currentStep >= 1),
+                  _breadcrumbArrow(),
+                  _buildBreadcrumb('03 Date & Time', _currentStep >= 2),
+                  _breadcrumbArrow(),
+                  _buildBreadcrumb('04 Checkout', _currentStep >= 3),
+                  _breadcrumbArrow(),
+                  _buildBreadcrumb('05 Confirmed', _currentStep >= 5),
+                ],
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(width: 10),
         ],
       ),
+    );
+  }
+
+
+  Widget _buildBreadcrumb(String text, bool active) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+        color: active ? _title : _title.withValues(alpha: 0.4),
+      ),
+    );
+  }
+
+  Widget _breadcrumbArrow() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Icon(Icons.arrow_right_alt_rounded, size: 14, color: _title.withValues(alpha: 0.3)),
     );
   }
 

@@ -138,7 +138,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('2. Your Package'), findsOneWidget);
+      expect(find.text('Your Package'), findsOneWidget);
       expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
       expect(find.text('70 PAX · ₱6399'), findsOneWidget);
       expect(find.byKey(const Key('pax_change_link')), findsOneWidget);

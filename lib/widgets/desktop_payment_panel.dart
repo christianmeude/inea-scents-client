@@ -122,8 +122,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
         'id': 'online',
         'label': 'Online',
         'sublabel': 'PayMongo secure checkout',
-        'color': const Color(0xFFEB001B),
-        'icon': Icons.credit_card_rounded,
+        'color': const Color(0xFF6A4053),
+        'icon': Icons.qr_code_2,
       },
       {
         'id': 'cash',
@@ -336,9 +336,9 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Expanded(
+                        Flexible(
                           child: Text(
-                            '1. Select Payment Method',
+                            'Select Payment Method',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -478,11 +478,11 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Expanded(
+                        Flexible(
                           child: Text(
                             activeMethod == 'online'
-                                ? '2. Online Checkout'
-                                : '2. Offline Payment Instructions',
+                                ? 'Online Checkout'
+                                : 'Offline Payment Instructions',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -617,9 +617,9 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Expanded(
+                        Flexible(
                           child: Text(
-                            '3. Contact & Venue Information',
+                            'Tell us about your event',
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
@@ -790,7 +790,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            '256-Bit SSL Encrypted',
+                            'Secure checkout via PayMongo. Complete your payment instantly using QRPh.',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,

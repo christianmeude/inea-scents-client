@@ -52,35 +52,6 @@ class PackageDetailScreen extends ConsumerWidget {
                         mouseCursor: SystemMouseCursors.click,
                         onPressed: () => context.pop(),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: surface,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: surfaceBorder),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 12),
-                              Icon(Icons.search, color: bodyColor, size: 20),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Search "Perfume" here',
-                                style: TextStyle(
-                                  color: bodyColor,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      Icon(Icons.chat_bubble_rounded, color: titleColor),
-                      const SizedBox(width: 15),
-                      Icon(Icons.calendar_today_rounded, color: titleColor),
                     ],
                   ),
                 ),
