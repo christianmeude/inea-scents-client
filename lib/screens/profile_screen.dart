@@ -156,8 +156,14 @@ class ProfileScreen extends ConsumerWidget {
 
               // ==================================================
               // BRAND FOOTER
-              const Center(
-                child: AppLogo(),
+              Center(
+                child: Opacity(
+                  opacity: 0.3,
+                  child: Transform.scale(
+                    scale: 0.6,
+                    child: const AppLogo(),
+                  ),
+                ),
               ),
 
               const SizedBox(height: 10),

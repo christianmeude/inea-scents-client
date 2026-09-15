@@ -222,7 +222,7 @@ class AvailabilityNotifier extends AsyncNotifier<AvailabilityState> {
       nextM = 1;
       nextY++;
     }
-    state = const AsyncLoading();
+    state = const AsyncLoading<AvailabilityState>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => _fetch(nextM, nextY));
   }
 
@@ -235,7 +235,7 @@ class AvailabilityNotifier extends AsyncNotifier<AvailabilityState> {
       prevM = 12;
       prevY--;
     }
-    state = const AsyncLoading();
+    state = const AsyncLoading<AvailabilityState>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => _fetch(prevM, prevY));
   }
 
@@ -244,14 +244,14 @@ class AvailabilityNotifier extends AsyncNotifier<AvailabilityState> {
     if (current != null && current.month == month && current.year == year) {
       return;
     }
-    state = const AsyncLoading();
+    state = const AsyncLoading<AvailabilityState>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => _fetch(month, year));
   }
 
   void refresh() async {
     final current = state.value;
     if (current == null) return;
-    state = const AsyncLoading();
+    state = const AsyncLoading<AvailabilityState>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => _fetch(current.month, current.year));
   }
 }

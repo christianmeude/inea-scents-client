@@ -140,7 +140,7 @@ class BottomNavBar extends StatelessWidget {
         return 3;
       } else if (location.contains('profile')) {
         return 4;
-      } else if (location == '/' || location.contains('home')) {
+      } else if (location == '/' || location.contains('home') || location.contains('package-details')) {
         return 0;
       }
       return 0;

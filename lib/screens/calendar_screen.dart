@@ -82,6 +82,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       // P7: flat theme background; decorative gradient removed.
       body: SafeArea(
         child: availabilityAsync.when(
+          skipLoadingOnReload: true,
+
           loading: () {
             return Center(
               child: CircularProgressIndicator(
@@ -459,29 +461,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   Widget _buildAgendaColumn(String? selectedStatus, {bool isDesktop = false}) {
     final surfaceBorder = CardSurfaces.cardBorder(context);
     final chipColor = CardSurfaces.chipBg(context);
-    final legendCard = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-
-      decoration: BoxDecoration(
-        color: chipColor,
-        borderRadius: BorderRadius.circular(18),
-
-        border: Border.all(color: surfaceBorder),
-      ),
-
-      child: const Row(
-        children: [
-          Expanded(
-            child: _Legend(color: available, label: 'Available'),
-          ),
-
-          Expanded(
-            child: _Legend(color: booked, label: 'Booked'),
-          ),
-        ],
-      ),
-    );
-
     final selection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -500,7 +479,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 final dateStr =
                     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
                 ref.read(bookingFlowProvider.notifier).setSelectedDate(d);
-                context.push('/packages?date=$dateStr');
+                context.push('/home?date=$dateStr');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -528,17 +507,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     if (!isDesktop) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [legendCard, const SizedBox(height: 20), selection],
+        children: [selection],
       );
     }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: legendCard),
-        const SizedBox(width: 16),
-        Expanded(child: selection),
-      ],
-    );
+    return selection;
   }
 
   // ============================================================
@@ -665,11 +637,11 @@ class _CalendarDay extends StatelessWidget {
     const available = Color(0xFF6F927A);
     const booked = Color(0xFFC28A52);
 
-    final hasStatus = status != null;
+    
 
     final isAvailable = status?.toLowerCase() == 'available';
 
-    final statusColor = isAvailable ? available : booked;
+    
 
     return Container(
       margin: const EdgeInsets.all(3),
@@ -709,21 +681,7 @@ class _CalendarDay extends StatelessWidget {
             ),
           ),
 
-          if (hasStatus)
-            Positioned(
-              bottom: 5,
-              child: Container(
-                width: 5,
-                height: 5,
 
-                decoration: BoxDecoration(
-                  color: selected
-                      ? Colors.white.withValues(alpha: 0.9)
-                      : statusColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -734,40 +692,6 @@ class _CalendarDay extends StatelessWidget {
 // LEGEND
 // ============================================================================
 
-class _Legend extends StatelessWidget {
-  final Color color;
-  final String label;
-
-  const _Legend({required this.color, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-
-        const SizedBox(width: 7),
-
-        Flexible(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: CardSurfaces.body(context),
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        ),
-      ],
-    );
-  }
-}
 
 // NOTE (P6 Q6/Q8): the bespoke _CalendarError was retired; call sites use
 // the shared ErrorStateCard from widgets/index.dart (friendly copy, dark-

@@ -175,7 +175,7 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
         return 3;
       } else if (location.contains('profile')) {
         return 4;
-      } else if (location == '/' || location.contains('home')) {
+      } else if (location == '/' || location.contains('home') || location.contains('package-details')) {
         return 0;
       }
       return -1;
