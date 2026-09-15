@@ -3,7 +3,6 @@ export 'bottom_nav_bar.dart';
 export 'top_nav_bar.dart';
 export 'responsive_app_shell.dart';
 export 'skeleton_package_card.dart';
-export 'welcome_modal.dart';
 export 'app_logo.dart';
 export 'custom_text_field.dart';
 export 'order_summary_panel.dart';

@@ -754,13 +754,15 @@ class _Legend extends StatelessWidget {
 
         const SizedBox(width: 7),
 
-        Text(
-          label,
-          style: TextStyle(
-            color: CardSurfaces.body(context),
+        Flexible(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: CardSurfaces.body(context),
             fontSize: 11,
             fontWeight: FontWeight.w600,
           ),
+        ),
         ),
       ],
     );

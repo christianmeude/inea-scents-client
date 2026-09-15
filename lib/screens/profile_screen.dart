@@ -330,14 +330,6 @@ class _SettingsColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader(
-          title: 'Settings',
-          subtitle: 'Account & preferences',
-          icon: Icons.settings_outlined,
-        ),
-
-        const SizedBox(height: 14),
-
         Container(
           width: double.infinity,
 
@@ -472,87 +464,6 @@ class _BrandName extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// SECTION HEADER
-// ============================================================================
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // P6 (Q1/Q3): dark-aware, solid icon chip.
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    const primaryColor = Color(0xFF74445C);
-    final textColor = isDark
-        ? const Color(0xFFFDF4F5)
-        : const Color(0xFF633E50);
-    final secondaryTextColor = isDark
-        ? const Color(0xFFC4ACAC)
-        : const Color(0xFF765867);
-
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF36222C) : const Color(0xFFFDF4F5),
-            shape: BoxShape.circle,
-
-            border: Border.all(
-              color: isDark
-                  ? const Color(0xFFFDF4F5).withValues(alpha: 0.25)
-                  : const Color(0x4D99868C),
-            ),
-          ),
-
-          child: Icon(
-            icon,
-            color: isDark ? const Color(0xFFFDF4F5) : primaryColor,
-            size: 20,
-          ),
-        ),
-
-        const SizedBox(width: 12),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(height: 2),
-
-              Text(
-                subtitle,
-
-                style: TextStyle(color: secondaryTextColor, fontSize: 11.5),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 // ============================================================================
 // PROFILE SETTING TILE
