@@ -84,6 +84,21 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
+  /// Selected-state caption: `Saturday, September 26` (grill critique #8 —
+  /// say what the selection means instead of relying on the legend alone).
+  String _formatWeekdayDate(DateTime date) {
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return '${weekdays[date.weekday - 1]}, ${_formatFullDate(date)}';
+  }
+
   Set<DateTime> _bookedDaysFor(DateTime focusedMonth) {
     final availability = ref.read(availabilityProvider).value;
     if (availability == null) return const {};
@@ -281,7 +296,7 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-                            selectedDayPredicate: (day) {
+              selectedDayPredicate: (day) {
                 if (widget.selectedDate == null) return false;
                 return isSameDay(widget.selectedDate, day);
               },
@@ -292,30 +307,30 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                   final cellDay = DateTime(day.year, day.month, day.day);
                   final isPast = cellDay.isBefore(today);
                   final isFull = bookedDays.contains(cellDay);
-                  
+
                   return Center(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${day.day}',
-                          style: TextStyle(
-                            color: titleColor.withValues(alpha: 0.3),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (isFull && !isPast)
+                        children: [
                           Text(
-                            'Full',
+                            '${day.day}',
                             style: TextStyle(
-                              color: titleColor.withValues(alpha: 0.4),
-                              fontSize: 8,
-                              fontWeight: FontWeight.w600,
+                              color: titleColor.withValues(alpha: 0.3),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
+                          if (isFull && !isPast)
+                            Text(
+                              'Full',
+                              style: TextStyle(
+                                color: titleColor.withValues(alpha: 0.4),
+                                fontSize: 8,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -359,7 +374,30 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
               ),
             ),
           ],
-
+          if (widget.selectedDate != null && !isLoading) ...[
+            const SizedBox(height: 10),
+            Text(
+              _formatWeekdayDate(widget.selectedDate!),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: titleColor,
+                height: 1.3,
+              ),
+              softWrap: true,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Available for your event',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: bodyColor,
+                height: 1.3,
+              ),
+              softWrap: true,
+            ),
+          ],
         ],
       ),
     );

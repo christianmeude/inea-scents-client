@@ -221,9 +221,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                     horizontal: 10,
                                     vertical: 6,
                                   ),
-                                  side: BorderSide(
-                                    color: surfaceBorder,
-                                  ),
+                                  side: BorderSide(color: surfaceBorder),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(9999),
                                   ),
@@ -297,9 +295,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                   horizontal: 10,
                                   vertical: 6,
                                 ),
-                                side: BorderSide(
-                                  color: surfaceBorder,
-                                ),
+                                side: BorderSide(color: surfaceBorder),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(9999),
                                 ),
@@ -374,9 +370,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                 decoration: BoxDecoration(
                                   color: isSelected
                                       ? methodColor.withValues(alpha: 0.08)
-                                      : chipColor.withValues(
-                                          alpha: 0.4,
-                                        ),
+                                      : chipColor.withValues(alpha: 0.4),
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
                                     color: isSelected
@@ -504,12 +498,12 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: const Color(
-                            0xFFEB001B,
+                            0xFF6A4053,
                           ).withValues(alpha: 0.06),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
                             color: const Color(
-                              0xFFEB001B,
+                              0xFF6A4053,
                             ).withValues(alpha: 0.25),
                           ),
                         ),
@@ -518,7 +512,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             Icon(
                               Icons.lock_outline_rounded,
                               size: 18,
-                              color: Color(0xFFEB001B),
+                              color: Color(0xFF6A4053),
                             ),
                             SizedBox(width: 10),
                             Expanded(
@@ -528,7 +522,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                 'no card details are entered here.',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFFEB001B),
+                                  color: Color(0xFF6A4053),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -586,10 +580,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                 decoration: BoxDecoration(
                   color: surface,
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: surfaceBorder,
-                    width: 1.0,
-                  ),
+                  border: Border.all(color: surfaceBorder, width: 1.0),
                   boxShadow: [
                     BoxShadow(
                       color: titleColor.withValues(alpha: 0.06),
@@ -832,7 +823,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            '100% Secure Checkout',
+                            'Payments processed by PayMongo',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
@@ -902,10 +893,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
             ),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(
-                fontSize: 12,
-                color: bodyColor,
-              ),
+              hintStyle: TextStyle(fontSize: 12, color: bodyColor),
               prefixIcon: Icon(icon, size: 18, color: titleColor),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../models/index.dart';
 import '../config/theme.dart';
+import '../utils/peso.dart';
 
 class PackageCard extends StatefulWidget {
   final Package package;
@@ -150,10 +151,7 @@ class _PackageCardState extends State<PackageCard> {
                                   );
                                 },
                               )
-                            : _MonogramTile(
-                                name: package.name,
-                                isDark: isDark,
-                              ),
+                            : _MonogramTile(name: package.name, isDark: isDark),
                       ),
                     ),
                   ),
@@ -229,21 +227,11 @@ class _PackageCardState extends State<PackageCard> {
                         ),
                       ],
                     ),
+                    // Description lives on the detail screen only
+                    // (grill Q3-final): cards stay dense, no price echo.
                     const SizedBox(height: 12),
                     Text(
-                      package.description ??
-                          'Perfect for intimate celebrations and small gatherings.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: secondaryTextColor,
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Php. ${package.priceForPax(widget.optionPax).toStringAsFixed(2)}',
+                      formatPeso(package.priceForPax(widget.optionPax)),
                       style: TextStyle(
                         fontSize: 15,
                         color: primaryTextColor,
@@ -295,9 +283,7 @@ class _MonogramTile extends StatelessWidget {
             color: (isDark ? const Color(0xFFFDF4F5) : AppTheme.primary)
                 .withValues(alpha: 0.12),
             border: Border.all(
-              color: (isDark
-                      ? const Color(0xFFFDF4F5)
-                      : AppTheme.primary)
+              color: (isDark ? const Color(0xFFFDF4F5) : AppTheme.primary)
                   .withValues(alpha: 0.35),
               width: 1.5,
             ),
@@ -308,9 +294,7 @@ class _MonogramTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: isDark
-                  ? const Color(0xFFFDF4F5)
-                  : AppTheme.primary,
+              color: isDark ? const Color(0xFFFDF4F5) : AppTheme.primary,
             ),
           ),
         ),

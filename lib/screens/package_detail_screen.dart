@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
 import '../models/index.dart';
+import '../utils/peso.dart';
 import '../widgets/index.dart';
 
 class PackageDetailScreen extends ConsumerWidget {
@@ -298,8 +299,8 @@ class PackageDetailScreen extends ConsumerWidget {
                             children: [
                               Text(
                                 initialPax == null
-                                    ? 'Starting at ₱${(package.price ?? 4499.0).toStringAsFixed(0)}'
-                                    : '₱${package.priceForPax(initialPax).toStringAsFixed(0)} · $initialPax PAX',
+                                    ? 'Starting at ${formatPeso(package.price ?? 4499.0)}'
+                                    : '${formatPeso(package.priceForPax(initialPax))} · $initialPax PAX',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,

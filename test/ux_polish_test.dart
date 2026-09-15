@@ -7,12 +7,12 @@ import 'package:inea_scents_client/widgets/index.dart';
 /// P6 Visual polish proofs: responsive grids (G2), fixed ambient (G3/G4/G5),
 /// monogram fallback (G6-A), read-only Pax row, shared error card (Q6/Q8).
 Package _cardPackage() => const Package(
-      id: 7,
-      name: 'Unified Celebration Bar',
-      price: 4499,
-      paxOptions: [50, 70, 100, 150],
-      paxPrices: {50: 4499.0, 70: 6399.0, 100: 8799.0, 150: 13119.0},
-    );
+  id: 7,
+  name: 'Unified Celebration Bar',
+  price: 4499,
+  paxOptions: [50, 70, 100, 150],
+  paxPrices: {50: 4499.0, 70: 6399.0, 100: 8799.0, 150: 13119.0},
+);
 
 void main() {
   group('ux_polish grids 2-3-4', () {
@@ -36,8 +36,9 @@ void main() {
   });
 
   group('ux_polish flat background (P7)', () {
-    testWidgets('shell renders content on the flat theme background',
-        (WidgetTester tester) async {
+    testWidgets('shell renders content on the flat theme background', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(1280, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -69,8 +70,9 @@ void main() {
   });
 
   group('ux_polish monogram fallback', () {
-    testWidgets('imageless card renders a monogram tile, never a void',
-        (WidgetTester tester) async {
+    testWidgets('imageless card renders a monogram tile, never a void', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.lightTheme,
@@ -92,8 +94,9 @@ void main() {
       expect(find.byType(Image), findsNothing);
     });
 
-    testWidgets('monogram tile renders in dark theme without crashing',
-        (WidgetTester tester) async {
+    testWidgets('monogram tile renders in dark theme without crashing', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
@@ -115,8 +118,9 @@ void main() {
   });
 
   group('ux_polish read-only pax', () {
-    testWidgets('details panel shows locked row with Change, no selector',
-        (WidgetTester tester) async {
+    testWidgets('details panel shows locked row with Change, no selector', (
+      WidgetTester tester,
+    ) async {
       var changed = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -138,9 +142,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Your Package'), findsOneWidget);
+      expect(find.text('Unified Celebration Bar'), findsOneWidget);
       expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-      expect(find.text('70 PAX · ₱6399'), findsOneWidget);
+      expect(find.text('70 PAX · ₱6,399.00'), findsOneWidget);
       expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
       expect(find.text('2. Choose Available Pax'), findsNothing);
       expect(find.text('70 Guests'), findsNothing);
@@ -150,8 +154,9 @@ void main() {
       expect(changed, isTrue);
     });
 
-    testWidgets('missing pax falls back quietly without crashing',
-        (WidgetTester tester) async {
+    testWidgets('missing pax falls back quietly without crashing', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.lightTheme,
@@ -173,15 +178,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // First option wins silently; no Change link without a callback.
-      expect(find.text('50 PAX · ₱4499'), findsOneWidget);
+      expect(find.text('50 PAX · ₱4,499.00'), findsOneWidget);
       expect(find.byKey(const Key('pax_change_link')), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });
 
   group('ux_polish shared error card', () {
-    testWidgets('friendly copy renders, raw error hidden, retry fires',
-        (WidgetTester tester) async {
+    testWidgets('friendly copy renders, raw error hidden, retry fires', (
+      WidgetTester tester,
+    ) async {
       var retried = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -190,7 +196,8 @@ void main() {
             body: SingleChildScrollView(
               child: ErrorStateCard(
                 title: 'Unable to load packages',
-                message: "We couldn't load the packages. "
+                message:
+                    "We couldn't load the packages. "
                     'Check your connection and try again.',
                 onRetry: () => retried = true,
               ),
@@ -209,8 +216,9 @@ void main() {
       expect(retried, isTrue);
     });
 
-    testWidgets('error card renders in dark theme without crashing',
-        (WidgetTester tester) async {
+    testWidgets('error card renders in dark theme without crashing', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
@@ -218,7 +226,8 @@ void main() {
             body: SingleChildScrollView(
               child: ErrorStateCard(
                 title: 'Unable to load bookings',
-                message: "We couldn't load your bookings. "
+                message:
+                    "We couldn't load your bookings. "
                     'Check your connection and try again.',
                 onRetry: () {},
               ),
@@ -233,8 +242,9 @@ void main() {
   });
 
   group('ux_polish skeleton dark', () {
-    testWidgets('loading skeleton renders in dark theme without flashing',
-        (WidgetTester tester) async {
+    testWidgets('loading skeleton renders in dark theme without flashing', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
@@ -315,7 +325,7 @@ void main() {
         find.byType(ReservationDetailsPanel),
       );
       expect(panel.selectedPax, equals(70));
-      expect(find.text('70 PAX · ₱6399'), findsOneWidget);
+      expect(find.text('70 PAX · ₱6,399.00'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -342,7 +352,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Order Summary'), findsOneWidget);
+      expect(find.text('Your Booking'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

@@ -145,17 +145,17 @@ void main() {
         expect(find.text('Booked'), findsWidgets);
 
         // Verify contents inside the flow column (Details, PAX read-only)
-        expect(find.text('Your Package'), findsOneWidget);
+        expect(find.text('Dior Women Luxury Experience'), findsWidgets);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('Choose Event Time'), findsOneWidget);
         expect(find.text('Payment Method'), findsOneWidget);
 
         // Verify contents inside Right column (Sticky Order Summary) — P7 C distilled
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.textContaining('PAX ·'), findsWidgets);
         expect(find.text('Inclusions'), findsOneWidget);
         expect(find.text('Proceed to Payment'), findsOneWidget);
-        expect(find.text('₱4500.00'), findsOneWidget);
+        expect(find.text('₱4,500.00'), findsOneWidget);
       },
     );
 
@@ -175,9 +175,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Single page-level scroll (no nested column scrolls remain).
-        final pageScrollFinder = find.byKey(
-          const Key('app_shell_scroll_view'),
-        );
+        final pageScrollFinder = find.byKey(const Key('app_shell_scroll_view'));
         expect(pageScrollFinder, findsOneWidget);
 
         // Check initial position of Order Summary panel
@@ -258,10 +256,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // On mobile: Timeline and mobile scroll view are rendered
-        expect(
-          find.byKey(const Key('app_shell_scroll_view')),
-          findsOneWidget,
-        );
+        expect(find.byKey(const Key('app_shell_scroll_view')), findsOneWidget);
         expect(find.text('Schedule'), findsWidgets);
         expect(find.text('Next'), findsOneWidget);
 
@@ -295,7 +290,7 @@ void main() {
 
         // Read-only row carries the locked headcount step (silent
         // first-option fallback: no `?pax=` was passed, so 20 wins).
-        expect(find.text('Your Package'), findsOneWidget);
+        expect(find.text('Dior Women Luxury Experience'), findsWidgets);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('20 PAX'), findsOneWidget);
         expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
@@ -328,10 +323,7 @@ void main() {
 
         // Picker shows the current time with the duration hint
         expect(find.text('Choose Event Time'), findsOneWidget);
-        expect(
-          find.text('One booking lasts 3–4 hrs.'),
-          findsOneWidget,
-        );
+        expect(find.text('One booking lasts 3–4 hrs.'), findsOneWidget);
         expect(find.text('2:00 PM'), findsWidgets);
 
         // Opening the picker surfaces the clock dialog; cancelling keeps time
@@ -381,7 +373,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Verify Order Summary still renders distilled one-liner (payment chip removed per C)
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.textContaining('PAX ·'), findsOneWidget);
       },
     );
@@ -463,10 +455,7 @@ void main() {
         // 3. Resize to Mobile (375px) -> 1 column
         tester.view.physicalSize = const Size(375, 667);
         await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('app_shell_scroll_view')),
-          findsOneWidget,
-        );
+        expect(find.byKey(const Key('app_shell_scroll_view')), findsOneWidget);
         expect(
           find.byKey(const Key('tablet_order_summary_panel')),
           findsNothing,
@@ -515,7 +504,7 @@ void main() {
           await tester.pumpAndSettle();
 
           // Verify Order Summary one-liner updated (P7 C distilled, no separate Date label)
-          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.text('Your Booking'), findsOneWidget);
           expect(find.textContaining('PAX ·'), findsWidgets);
         }
       },
@@ -547,10 +536,7 @@ void main() {
 
       // P6 (Q6/Q8): shared friendly card — plain copy plus a
       // single Try Again action, raw errors never rendered.
-      expect(
-        find.text("We couldn't open this booking"),
-        findsOneWidget,
-      );
+      expect(find.text("We couldn't open this booking"), findsOneWidget);
       expect(find.text('Try Again'), findsOneWidget);
       expect(find.textContaining('Network timeout'), findsNothing);
     });
@@ -664,10 +650,7 @@ void main() {
         // 5. 767px (<768px) -> Mobile 1-Column
         tester.view.physicalSize = const Size(767, 800);
         await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('app_shell_scroll_view')),
-          findsOneWidget,
-        );
+        expect(find.byKey(const Key('app_shell_scroll_view')), findsOneWidget);
         expect(
           find.byKey(const Key('tablet_order_summary_panel')),
           findsNothing,
@@ -717,7 +700,7 @@ void main() {
             find.byKey(const Key('tablet_order_summary_panel')),
             findsOneWidget,
           );
-          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.text('Your Booking'), findsOneWidget);
           expect(find.textContaining('PAX ·'), findsOneWidget);
 
           tester.view.physicalSize = const Size(1025, 800); // Desktop
@@ -726,7 +709,7 @@ void main() {
             find.byKey(const Key('order_summary_side_panel')),
             findsOneWidget,
           );
-          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.text('Your Booking'), findsOneWidget);
           expect(find.textContaining('PAX ·'), findsOneWidget);
         }
 
@@ -745,7 +728,7 @@ void main() {
             find.byKey(const Key('tablet_order_summary_panel')),
             findsOneWidget,
           );
-          expect(find.text('Order Summary'), findsOneWidget);
+          expect(find.text('Your Booking'), findsOneWidget);
           expect(find.textContaining('PAX ·'), findsOneWidget);
         }
       },
@@ -784,7 +767,6 @@ void main() {
 
         expect(find.text('Select Date'), findsOneWidget);
 
-
         // Navigate calendar month using next chevron
         final nextChevronFinder = find.byIcon(Icons.chevron_right_rounded);
         expect(nextChevronFinder, findsOneWidget);
@@ -796,8 +778,6 @@ void main() {
         expect(prevChevronFinder, findsOneWidget);
         await tester.tap(prevChevronFinder);
         await tester.pumpAndSettle();
-
-
       },
     );
 
@@ -855,9 +835,9 @@ void main() {
         await tester.pump();
 
         // Verify null fallbacks — P7 C distilled (no image/name, `₱` only, Inclusions fallback)
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('Inclusions'), findsOneWidget);
-        expect(find.text('₱4500.00'), findsOneWidget);
+        expect(find.text('₱4,500.00'), findsOneWidget);
         expect(find.textContaining('Not selected'), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       },
@@ -879,7 +859,7 @@ void main() {
 
         // Step 2: Schedule & locked Pax
 
-        expect(find.text('Your Package'), findsOneWidget);
+        expect(find.text('Dior Women Luxury Experience'), findsWidgets);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
         expect(find.text('30 PAX'), findsNothing);
@@ -963,9 +943,7 @@ void main() {
         // Step 2: freeform time picker shows the default with duration hint
         expect(find.text('Choose Event Time'), findsOneWidget);
         expect(find.text('One booking lasts 3–4 hrs.'), findsOneWidget);
-        final pickerFinder = find.byKey(
-          const Key('event_time_picker_button'),
-        );
+        final pickerFinder = find.byKey(const Key('event_time_picker_button'));
         await tester.scrollUntilVisible(
           pickerFinder,
           100,
@@ -1009,11 +987,9 @@ void main() {
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
 
-
         // Test Back button from Step 3 -> returns to Step 2
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
-
 
         // Verify no placeholder text "Step 1 details here" appears anywhere
         expect(find.textContaining('details here'), findsNothing);
@@ -1103,7 +1079,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('Inclusions'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
@@ -1161,13 +1137,10 @@ void main() {
 
         // Tablet header badge should reflect 2-Column flow
 
-
         final initialSummaryPos = tester.getTopLeft(
           find.byKey(const Key('tablet_order_summary_panel')),
         );
-        final pageScrollFinder = find.byKey(
-          const Key('app_shell_scroll_view'),
-        );
+        final pageScrollFinder = find.byKey(const Key('app_shell_scroll_view'));
         expect(pageScrollFinder, findsOneWidget);
 
         final tabletSummaryCenter = tester.getCenter(
@@ -1272,7 +1245,6 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-
         expect(find.textContaining('Mar 10, 2018'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
@@ -1355,9 +1327,9 @@ void main() {
         final summaryBeforePos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('Inclusions'), findsOneWidget);
-        expect(find.text('₱4500.00'), findsOneWidget);
+        expect(find.text('₱4,500.00'), findsOneWidget);
 
         // Trigger payment transition
         await tester.tap(find.text('Proceed to Payment'));
@@ -1385,7 +1357,7 @@ void main() {
 
         // Summary button has updated to 'Confirm & Pay'
         expect(find.textContaining('Confirm & Pay'), findsOneWidget);
-        expect(find.text('₱4500.00'), findsOneWidget);
+        expect(find.text('₱4,500.00'), findsOneWidget);
       },
     );
 
@@ -1404,7 +1376,6 @@ void main() {
 
         // Initial reservation header (P6: desktop is 2-column)
         expect(find.text('01 Details'), findsOneWidget);
-
 
         // Proceed to payment
         await tester.tap(find.text('Proceed to Payment'));
@@ -1520,7 +1491,7 @@ void main() {
 
         // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (no payment chip)
         expect(find.text('Online Checkout'), findsOneWidget);
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.textContaining('PAX ·'), findsOneWidget);
         expect(
           find.byKey(const Key('online_checkout_explainer')),
@@ -1537,7 +1508,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Offline Payment Instructions'), findsOneWidget);
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.textContaining('PAX ·'), findsOneWidget);
       },
     );
@@ -1696,7 +1667,6 @@ void main() {
         );
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
-
 
         // Advance back to mobile payment and complete
         await tester.scrollUntilVisible(
@@ -1939,10 +1909,7 @@ void main() {
           find.byKey(const Key('online_checkout_explainer')),
           findsOneWidget,
         );
-        expect(
-          find.byKey(const Key('payment_card_number')),
-          findsNothing,
-        );
+        expect(find.byKey(const Key('payment_card_number')), findsNothing);
         expect(find.byKey(const Key('payment_card_cvv')), findsNothing);
         expect(find.byKey(const Key('payment_card_expiry')), findsNothing);
 
@@ -2064,7 +2031,7 @@ void main() {
         await tester.tap(onlineOption);
         await tester.pumpAndSettle();
 
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('20 PAX'), findsWidgets);
 
         // Rapidly toggle forward and backward 3 times
@@ -2097,7 +2064,7 @@ void main() {
         }
 
         // State is preserved (payment chip removed per C, but PAX one-liner persists)
-        expect(find.text('Order Summary'), findsOneWidget);
+        expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('20 PAX'), findsWidgets);
 
         // Final proceed to payment and confirm
@@ -2226,68 +2193,62 @@ void main() {
       },
     );
 
-    testWidgets(
-      'Done on the success screen resets the flow',
-      (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1200, 800);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
+    testWidgets('Done on the success screen resets the flow', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-        final backend = FakeApiBackend();
-        final container = ProviderContainer(
-          overrides: [
-            packageDetailsProvider(42).overrideWith((ref) => testPackage),
-            apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
-          ],
-        );
-        addTearDown(container.dispose);
+      final backend = FakeApiBackend();
+      final container = ProviderContainer(
+        overrides: [
+          packageDetailsProvider(42).overrideWith((ref) => testPackage),
+          apiClientProvider.overrideWithValue(buildFakeRestClient(backend)),
+        ],
+      );
+      addTearDown(container.dispose);
 
-        await tester.pumpWidget(
-          UncontrolledProviderScope(
-            container: container,
-            child: MaterialApp(
-              theme: AppTheme.lightTheme,
-              home: const ResponsiveAppShell(
-                child: BookingScreen(packageId: 42),
-              ),
-            ),
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            home: const ResponsiveAppShell(child: BookingScreen(packageId: 42)),
           ),
-        );
-        await tester.pumpAndSettle();
+        ),
+      );
+      await tester.pumpAndSettle();
 
-        await tester.runAsync(() async {
-          final notifier = container.read(bookingFlowProvider.notifier);
-          notifier
-            ..setSelectedPackage(testPackage)
-            ..setSelectedDate(DateTime(2026, 9, 30))
-            ..setSelectedTime('2:00 PM - 5:00 PM')
-            ..setSelectedPax(50)
-            ..setCustomerName('Maria Clara')
-            ..setCustomerEmail('maria@example.com')
-            ..setCustomerPhone('+639171234567')
-            ..setVenueAddress('The Peninsula Manila')
-            ..setPaymentMethod('online');
-          await notifier.submitBooking();
-          await notifier.startPolling();
-          notifier.goToStep(5);
-        });
-        await tester.pumpAndSettle();
+      await tester.runAsync(() async {
+        final notifier = container.read(bookingFlowProvider.notifier);
+        notifier
+          ..setSelectedPackage(testPackage)
+          ..setSelectedDate(DateTime(2026, 9, 30))
+          ..setSelectedTime('2:00 PM - 5:00 PM')
+          ..setSelectedPax(50)
+          ..setCustomerName('Maria Clara')
+          ..setCustomerEmail('maria@example.com')
+          ..setCustomerPhone('+639171234567')
+          ..setVenueAddress('The Peninsula Manila')
+          ..setPaymentMethod('online');
+        await notifier.submitBooking();
+        await notifier.startPolling();
+        notifier.goToStep(5);
+      });
+      await tester.pumpAndSettle();
 
-        expect(find.text('Payment Successful'), findsOneWidget);
-        await tester.tap(find.text('Done'));
-        await tester.pumpAndSettle();
+      expect(find.text('Payment Successful'), findsOneWidget);
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
 
-        final state = container.read(bookingFlowProvider);
-        expect(state.booking, isNull);
-        expect(state.checkoutStatus, BookingCheckoutStatus.idle);
-        expect(state.currentStep, 2);
-        // No takeException: Done falls back to context.go('/home'), which
-        // asserts without a GoRouter in this harness (caught in product).
-      },
-    );
+      final state = container.read(bookingFlowProvider);
+      expect(state.booking, isNull);
+      expect(state.checkoutStatus, BookingCheckoutStatus.idle);
+      expect(state.currentStep, 2);
+      // No takeException: Done falls back to context.go('/home'), which
+      // asserts without a GoRouter in this harness (caught in product).
+    });
   });
 }
-
-
-

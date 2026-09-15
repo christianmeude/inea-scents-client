@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/index.dart';
 import '../config/offering.dart';
+import '../utils/peso.dart';
 import 'card_surfaces.dart';
 import 'inclusions_list.dart';
 
-/// Distilled Order Summary side-panel (P7 C):
+/// Distilled booking side-panel (P7 C + grill rounds 1-3, 2026-09-15):
+/// `Your Booking` heading (Booking avoids `order` per CONTEXT.md),
+/// proper-noun package line, PAX-tier context line (tiers are a lookup —
+/// no fictional base+increment math), full weekday date + venue rows,
+/// `₱`-canonical total, amount-in-CTA. The `{pax} PAX · {date} · {time}`
+/// one-liner is kept verbatim (test-pinned).
 /// header one-liner {pax} PAX · {date} · {time}, Inclusions + Free via
 /// shared InclusionsList, no image/rating/Live chip/dot-leaders/payment
 /// chip/total-name duplication, `₱` only, wrap-don't-truncate.
@@ -21,6 +27,9 @@ class OrderSummaryPanel extends StatelessWidget {
   final bool isLoading;
   final bool isSticky;
 
+  /// Venue as entered at checkout; null/empty renders `Not yet provided`.
+  final String? venueAddress;
+
   const OrderSummaryPanel({
     super.key,
     required this.package,
@@ -32,6 +41,7 @@ class OrderSummaryPanel extends StatelessWidget {
     this.actionButtonText = 'Confirm & Pay',
     this.isLoading = false,
     this.isSticky = true,
+    this.venueAddress,
   });
 
   String _formatDate(DateTime? date) {
@@ -53,6 +63,34 @@ class OrderSummaryPanel extends StatelessWidget {
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
+  /// Explicit contract date: `Saturday, September 26, 2026`.
+  String _formatFullDate(DateTime date) {
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return '${weekdays[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final surface = CardSurfaces.cardBg(context);
@@ -68,11 +106,28 @@ class OrderSummaryPanel extends StatelessWidget {
     final displayInclusions = inclusions.isNotEmpty
         ? inclusions
         : Offering.inclusions;
-    final displayFreebies =
-        freebies.isNotEmpty ? freebies : Offering.freebies;
+    final displayFreebies = freebies.isNotEmpty ? freebies : Offering.freebies;
 
     final oneLiner =
         '${selectedPax ?? 50} PAX · ${_formatDate(selectedDate)} · ${TimeSlot.display(selectedTime)}';
+
+    // Tier context: truthful one-liner about the lookup model — the total
+    // is the server-side tier for the chosen PAX, `from` is the floor.
+    final tierOptions = package.options;
+    final tierFloor = tierOptions.isEmpty
+        ? (package.price ?? 4500.0)
+        : tierOptions.map((t) => t.price).reduce((a, b) => a < b ? a : b);
+    final tierLine = 'Priced by PAX tier · from ${formatPeso(tierFloor)}';
+
+    final venue = (venueAddress ?? '').trim();
+    final venueLine = venue.isEmpty
+        ? 'Venue — Not yet provided'
+        : 'Venue · $venue';
+
+    // Amount-in-CTA (grill Q5): only the default submit text carries it.
+    final ctaText = actionButtonText == 'Confirm & Pay'
+        ? 'Confirm & Pay ${formatPeso(effectivePrice)}'
+        : actionButtonText;
 
     return Container(
       width: double.infinity,
@@ -111,7 +166,7 @@ class OrderSummaryPanel extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Order Summary',
+                  'Your Booking',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -126,6 +181,31 @@ class OrderSummaryPanel extends StatelessWidget {
 
           const SizedBox(height: 10),
 
+          // Proper-noun package line + tier context (grill Q3a/Q4).
+          Text(
+            package.name ?? 'Perfume Bar',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: titleColor,
+              height: 1.3,
+            ),
+            softWrap: true,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            tierLine,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: CardSurfaces.body(context),
+              height: 1.3,
+            ),
+            softWrap: true,
+          ),
+
+          const SizedBox(height: 10),
+
           // Header one-liner {pax} PAX · {date} · {time} — wrap, don't truncate.
           Text(
             oneLiner,
@@ -133,6 +213,45 @@ class OrderSummaryPanel extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: titleColor,
+              height: 1.3,
+            ),
+            softWrap: true,
+          ),
+
+          // Explicit contract rows (grill critique #3).
+          if (selectedDate != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              _formatFullDate(selectedDate!),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: titleColor,
+                height: 1.3,
+              ),
+              softWrap: true,
+            ),
+          ],
+          if (selectedTime != null) ...[
+            const SizedBox(height: 2),
+            Text(
+              '${TimeSlot.display(selectedTime)} · 3–4 hrs',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: CardSurfaces.body(context),
+                height: 1.3,
+              ),
+              softWrap: true,
+            ),
+          ],
+          const SizedBox(height: 2),
+          Text(
+            venueLine,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: CardSurfaces.body(context),
               height: 1.3,
             ),
             softWrap: true,
@@ -166,7 +285,7 @@ class OrderSummaryPanel extends StatelessWidget {
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
-                  '₱${effectivePrice.toStringAsFixed(2)}',
+                  formatPeso(effectivePrice),
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -203,7 +322,7 @@ class OrderSummaryPanel extends StatelessWidget {
                       ),
                     )
                   : Text(
-                      actionButtonText,
+                      ctaText,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,

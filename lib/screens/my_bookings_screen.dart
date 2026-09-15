@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/index.dart';
 import '../models/index.dart';
+import '../utils/peso.dart';
 import '../widgets/index.dart';
 
 class MyBookingsScreen extends ConsumerWidget {
@@ -463,7 +464,7 @@ class _BookingCard extends StatelessWidget {
 
                   Text(
                     booking.package != null
-                        ? 'Php. ${booking.package!.price?.toStringAsFixed(2) ?? '0.00'}'
+                        ? formatPeso(booking.package!.price ?? 0.0)
                         : 'N/A',
                     style: TextStyle(
                       fontSize: 16,

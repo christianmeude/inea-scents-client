@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import '../config/offering.dart';
 import '../models/index.dart';
+import '../utils/peso.dart';
 import 'card_surfaces.dart';
+import 'inclusions_list.dart';
 
 /// Middle Column / Panel for INEA Scents reservation flow on desktop.
 /// Handles Package variation overview, the locked Pax summary (P6: the
@@ -49,16 +52,13 @@ class ReservationDetailsPanel extends StatelessWidget {
 
     String? optionPriceLabel(int pax) {
       if (options.isEmpty) return null;
-      return '₱${package.priceForPax(pax).toStringAsFixed(0)}';
+      return formatPeso(package.priceForPax(pax));
     }
 
     // Customer-facing methods only: Online (PayMongo) or Cash.
+    // Selected state is plum — red reads as error (grill critique #5).
     final paymentMethods = [
-      {
-        'id': 'online',
-        'label': 'Online',
-        'color': const Color(0xFFEB001B),
-      },
+      {'id': 'online', 'label': 'Online', 'color': plum},
       {'id': 'cash', 'label': 'Cash', 'color': const Color(0xFF16A34A)},
     ];
 
@@ -105,30 +105,73 @@ class ReservationDetailsPanel extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Starting at ₱${(package.price ?? 4500.0).toStringAsFixed(2)}',
+                          'Starting at ${formatPeso(package.price ?? 4500.0)}',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: bodyColor,
                           ),
                         ),
+                        const SizedBox(height: 6),
+                        // Package facts (grill critique #7): headcount range
+                        // + duration hint give the middle column weight.
+                        // Staff lives in Inclusions below; no invented data.
+                        if (paxList.isNotEmpty)
+                          Text(
+                            paxList.length > 1
+                                ? '${paxList.first}–${paxList.last} PAX — 3–4 hrs'
+                                : '${paxList.first} PAX — 3–4 hrs',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xDE6A4053),
+                              height: 1.35,
+                            ),
+                          ),
                       ],
                     ),
                   ),
                 ],
               ),
-              if (package.description != null &&
-                  package.description!.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Text(
-                  package.description!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xDE6A4053),
-                    height: 1.35,
+              // Description lives on the package detail screen only
+              // (grill Q3-final): no server-copy price echo here.
+              Theme(
+                data: Theme.of(
+                  context,
+                ).copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  tilePadding: EdgeInsets.zero,
+                  childrenPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    Icons.spa_outlined,
+                    size: 16,
+                    color: titleColor,
                   ),
+                  title: Text(
+                    "What's included",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  ),
+                  iconColor: titleColor,
+                  collapsedIconColor: titleColor,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: InclusionsList(
+                        inclusions: (package.inclusions?.isNotEmpty ?? false)
+                            ? package.inclusions!
+                            : Offering.inclusions,
+                        freebies: (package.freebies?.isNotEmpty ?? false)
+                            ? package.freebies!
+                            : Offering.freebies,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ],
           ),
         ),
@@ -141,8 +184,8 @@ class ReservationDetailsPanel extends StatelessWidget {
         // ========================================================
         Builder(
           builder: (context) {
-            final effectivePax = selectedPax ??
-                (paxList.isNotEmpty ? paxList.first : null);
+            final effectivePax =
+                selectedPax ?? (paxList.isNotEmpty ? paxList.first : null);
             final price = effectivePax == null
                 ? null
                 : optionPriceLabel(effectivePax);
@@ -152,35 +195,8 @@ class ReservationDetailsPanel extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: chipColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Icon(
-                          Icons.people_outline_rounded,
-                          color: titleColor,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'Your Package',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: titleColor,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
+                  // No generic label (grill Q3a) — the proper-noun card
+                  // above already says what this is.
                   Container(
                     key: const Key('pax_readonly_row'),
                     padding: const EdgeInsets.symmetric(
@@ -190,10 +206,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: chipColor,
                       borderRadius: BorderRadius.circular(9999),
-                      border: Border.all(
-                        color: surfaceBorder,
-                        width: 1.0,
-                      ),
+                      border: Border.all(color: surfaceBorder, width: 1.0),
                     ),
                     child: Row(
                       children: [
@@ -208,8 +221,8 @@ class ReservationDetailsPanel extends StatelessWidget {
                             effectivePax == null
                                 ? 'Headcount to be confirmed'
                                 : (price == null
-                                    ? '$effectivePax PAX'
-                                    : '$effectivePax PAX · $price'),
+                                      ? '$effectivePax PAX'
+                                      : '$effectivePax PAX · $price'),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -421,9 +434,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                               // P6 (Q4): constant border width — focus/selection
                               // never shifts layout; color alone signals state.
                               border: Border.all(
-                                color: isSelected
-                                    ? titleColor
-                                    : surfaceBorder,
+                                color: isSelected ? titleColor : surfaceBorder,
                                 width: 1.0,
                               ),
                             ),

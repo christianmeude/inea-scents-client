@@ -14,12 +14,12 @@ import 'helpers/fake_api.dart';
 /// per-pax pricing (Q5 regression), Online/Cash-only payment (Q14-B),
 /// and notifier-owned state (Q8).
 Package _fourOptionPackage() => const Package(
-      id: 7,
-      name: 'Unified Celebration Bar',
-      price: 4499,
-      paxOptions: [50, 70, 100, 150],
-      paxPrices: {50: 4499.0, 70: 6399.0, 100: 8799.0, 150: 13119.0},
-    );
+  id: 7,
+  name: 'Unified Celebration Bar',
+  price: 4499,
+  paxOptions: [50, 70, 100, 150],
+  paxPrices: {50: 4499.0, 70: 6399.0, 100: 8799.0, 150: 13119.0},
+);
 
 void main() {
   group('ux_booking options model', () {
@@ -52,13 +52,16 @@ void main() {
   });
 
   group('ux_booking packages screen', () {
-    testWidgets('one tiered package renders four PAX cards with prices',
-        (WidgetTester tester) async {
+    testWidgets('one tiered package renders four PAX cards with prices', (
+      WidgetTester tester,
+    ) async {
       SharedPreferences.setMockInitialValues({'first_launch': false});
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            packagesProvider.overrideWith((ref) async => [_fourOptionPackage()]),
+            packagesProvider.overrideWith(
+              (ref) async => [_fourOptionPackage()],
+            ),
           ],
           child: const MaterialApp(home: PackagesScreen()),
         ),
@@ -69,10 +72,10 @@ void main() {
         expect(find.text(label), findsOneWidget);
       }
       for (final price in [
-        'Php. 4499.00',
-        'Php. 6399.00',
-        'Php. 8799.00',
-        'Php. 13119.00',
+        '₱4,499.00',
+        '₱6,399.00',
+        '₱8,799.00',
+        '₱13,119.00',
       ]) {
         expect(find.text(price), findsOneWidget);
       }
@@ -83,37 +86,40 @@ void main() {
   });
 
   group('ux_booking payment methods', () {
-    testWidgets('Online default shows explainer, no card capture, no retired methods',
-        (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1200, 1000);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: DesktopPaymentPanel(
-              package: _fourOptionPackage(),
-              paymentMethod: 'online',
-              onPaymentMethodSelected: (_) {},
+    testWidgets(
+      'Online default shows explainer, no card capture, no retired methods',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1200, 1000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: DesktopPaymentPanel(
+                package: _fourOptionPackage(),
+                paymentMethod: 'online',
+                onPaymentMethodSelected: (_) {},
+              ),
             ),
           ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        );
+        await tester.pumpAndSettle();
 
-      expect(find.text('Online'), findsOneWidget);
-      expect(find.text('Cash'), findsOneWidget);
-      expect(find.text('Bank Transfer'), findsNothing);
-      expect(
-        find.byKey(const Key('online_checkout_explainer')),
-        findsOneWidget,
-      );
-      expect(find.text('Card Number'), findsNothing);
-    });
+        expect(find.text('Online'), findsOneWidget);
+        expect(find.text('Cash'), findsOneWidget);
+        expect(find.text('Bank Transfer'), findsNothing);
+        expect(
+          find.byKey(const Key('online_checkout_explainer')),
+          findsOneWidget,
+        );
+        expect(find.text('Card Number'), findsNothing);
+      },
+    );
 
-    testWidgets('Cash shows offline instructions with admin confirmation',
-        (WidgetTester tester) async {
+    testWidgets('Cash shows offline instructions with admin confirmation', (
+      WidgetTester tester,
+    ) async {
       tester.view.physicalSize = const Size(1200, 1000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -169,4 +175,3 @@ void main() {
     });
   });
 }
-
