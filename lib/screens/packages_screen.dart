@@ -5,39 +5,6 @@ import '../providers/index.dart';
 import '../widgets/index.dart';
 import '../models/index.dart';
 
-final packagesSearchQueryProvider = StateProvider<String>((ref) => '');
-final packagesSortProvider = StateProvider<String>((ref) => 'none');
-final packagesCategoryProvider = StateProvider<String>((ref) => 'All');
-
-final filteredPackagesProvider = Provider<AsyncValue<List<Package>>>((ref) {
-  final asyncPackages = ref.watch(packagesProvider);
-  final query = ref.watch(packagesSearchQueryProvider).toLowerCase();
-  final sort = ref.watch(packagesSortProvider);
-  final category = ref.watch(packagesCategoryProvider);
-
-  return asyncPackages.whenData((packages) {
-    var filtered = packages.where((p) {
-      final nameMatches = p.name?.toLowerCase().contains(query) ?? false;
-      final categoryMatches =
-          category == 'All' ||
-          (p.name?.toLowerCase().contains(category.toLowerCase()) ?? false) ||
-          (p.description?.toLowerCase().contains(category.toLowerCase()) ??
-              false);
-      return nameMatches && categoryMatches;
-    }).toList();
-
-    if (sort == 'price_asc') {
-      filtered.sort((a, b) => (a.price ?? 0).compareTo(b.price ?? 0));
-    } else if (sort == 'price_desc') {
-      filtered.sort((a, b) => (b.price ?? 0).compareTo(a.price ?? 0));
-    } else if (sort == 'rating_desc') {
-      filtered.sort((a, b) => (b.rating ?? 0).compareTo(a.rating ?? 0));
-    }
-
-    return filtered;
-  });
-});
-
 class PackagesScreen extends ConsumerStatefulWidget {
   /// Date carried from the calendar (`?date=`); forwarded with each card.
   final DateTime? initialDate;
@@ -76,7 +43,7 @@ List<_PackageEntry> _packageEntries(List<Package> packages) {
 class _PackagesScreenState extends ConsumerState<PackagesScreen> {
   @override
   Widget build(BuildContext context) {
-    final packagesAsync = ref.watch(filteredPackagesProvider);
+    final packagesAsync = ref.watch(packagesProvider);
 
     // ============================================================
     // COLORS (P7: flat theme background + dark-aware text)
