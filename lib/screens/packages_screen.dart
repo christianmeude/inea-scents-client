@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/index.dart';
 import '../widgets/index.dart';
@@ -75,29 +74,6 @@ List<_PackageEntry> _packageEntries(List<Package> packages) {
 }
 
 class _PackagesScreenState extends ConsumerState<PackagesScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkFirstLaunch();
-    });
-  }
-
-  Future<void> _checkFirstLaunch() async {
-    final prefs = await SharedPreferences.getInstance();
-    final isFirstLaunch = prefs.getBool('first_launch') ?? true;
-
-    if (isFirstLaunch) {
-      await prefs.setBool('first_launch', false);
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const WelcomeModal(),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final packagesAsync = ref.watch(filteredPackagesProvider);
