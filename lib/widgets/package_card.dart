@@ -202,31 +202,34 @@ class _PackageCardState extends State<PackageCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        const Icon(Icons.star, size: 14, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${package.rating ?? 4.5}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: primaryTextColor,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            '(${package.reviewsCount ?? 232} reviews)',
+                    // C2: zero-rating packages render without the trust row —
+                    // check the raw rating before the display fallback.
+                    if (package.rating != null && package.rating! > 0)
+                      Row(
+                        children: [
+                          const Icon(Icons.star, size: 14, color: Colors.amber),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${package.rating ?? 4.5}',
                             style: TextStyle(
                               fontSize: 13,
-                              color: secondaryTextColor,
+                              color: primaryTextColor,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              '(${package.reviewsCount ?? 232} reviews)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: secondaryTextColor,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     // Description lives on the detail screen only
                     // (grill Q3-final): cards stay dense, no price echo.
                     const SizedBox(height: 12),

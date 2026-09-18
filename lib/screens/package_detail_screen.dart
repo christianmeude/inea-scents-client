@@ -110,31 +110,35 @@ class PackageDetailScreen extends ConsumerWidget {
                                               ),
                                             ),
                                             const SizedBox(height: 8),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.star,
-                                                  size: 16,
-                                                  color: Colors.amber,
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  '${package.rating ?? 4.5}',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: titleColor,
+                                            // C2: hide trust row when raw
+                                            // rating is null or <= 0.
+                                            if (package.rating != null &&
+                                                package.rating! > 0)
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.star,
+                                                    size: 16,
+                                                    color: Colors.amber,
                                                   ),
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Text(
-                                                  '(${package.reviewsCount ?? 232} reviews)',
-                                                  style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: bodyColor,
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '${package.rating ?? 4.5}',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: titleColor,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    '(${package.reviewsCount ?? 232} reviews)',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: bodyColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             const SizedBox(height: 20),
                                             Text(
                                               package.description ??
@@ -416,21 +420,23 @@ class PackageDetailScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              const Icon(Icons.star, size: 16, color: Colors.amber),
-              const SizedBox(width: 4),
-              Text(
-                '${package.rating ?? 4.5}',
-                style: TextStyle(fontSize: 14, color: titleColor),
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '(${package.reviewsCount ?? 232} reviews)',
-                style: TextStyle(fontSize: 14, color: bodyColor),
-              ),
-            ],
-          ),
+          // C2: hide trust row when raw rating is null or <= 0.
+          if (package.rating != null && package.rating! > 0)
+            Row(
+              children: [
+                const Icon(Icons.star, size: 16, color: Colors.amber),
+                const SizedBox(width: 4),
+                Text(
+                  '${package.rating ?? 4.5}',
+                  style: TextStyle(fontSize: 14, color: titleColor),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '(${package.reviewsCount ?? 232} reviews)',
+                  style: TextStyle(fontSize: 14, color: bodyColor),
+                ),
+              ],
+            ),
           const SizedBox(height: 20),
           Text(
             package.description ?? 'Perfect for intimate celebrations...',
