@@ -22,8 +22,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   static const Color primary = Color(0xFF74445C);
 
-  static const Color available = Color(0xFF6F927A);
-  static const Color booked = Color(0xFFC28A52);
+  // C4: no dot indicators — day cells render without markers.
 
   @override
   Widget build(BuildContext context) {
@@ -224,16 +223,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   return isSameDay(_selectedDay, day);
                 },
 
-                eventLoader: (day) {
-                  final status = dates[_dayOnly(day)];
-
-                  if (status == null) {
-                    return const [];
-                  }
-
-                  return [status];
-                },
-
+                // C4: no dot indicators — eventLoader removed so no
+                // markers are rendered for available days.
                 enabledDayPredicate: (day) {
                   final status = dates[_dayOnly(day)];
 
@@ -363,22 +354,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                     ),
                   ),
 
-                  markerDecoration: const BoxDecoration(
-                    color: available,
-                    shape: BoxShape.circle,
-                  ),
-
-                  markersMaxCount: 1,
-
-                  markerSize: 5,
-
-                  markerMargin: const EdgeInsets.only(top: 2),
+                  // C4: marker styling removed — no dot indicators.
                 ),
 
                 // ==================================================
                 // CUSTOM DATE CELLS
                 // ==================================================
                 calendarBuilders: CalendarBuilders(
+                  // C4: explicitly no markers — day cells render no dots.
+                  markerBuilder: (context, day, events) => null,
                   defaultBuilder: (context, day, focusedDay) {
                     final status = dates[_dayOnly(day)];
 
@@ -634,14 +618,9 @@ class _CalendarDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const primary = Color(0xFF74445C);
-    const available = Color(0xFF6F927A);
-    const booked = Color(0xFFC28A52);
 
-    
-
-    final isAvailable = status?.toLowerCase() == 'available';
-
-    
+    // C4: no dot indicators — status kept for availability logic only,
+    // day states stay legible via selected/today/disabled styling below.
 
     return Container(
       margin: const EdgeInsets.all(3),
