@@ -64,6 +64,36 @@ class ResponsiveAppShell extends StatelessWidget {
     );
   }
 
+  /// C3: Home package-grid delegate. Column counts follow
+  /// [getGridColumnCount] (2 → 3 → 4); the tile ratio hugs the
+  /// PackageCard content (image at AspectRatio 1.15 + fixed body)
+  /// so tablet/desktop tiles don't leave a void below the price.
+  /// Mobile band keeps the established 0.52 — mobile untouched.
+  static SliverGridDelegate homeGridDelegateForWidth(
+    double width, {
+    double crossAxisSpacing = 15,
+    double mainAxisSpacing = 15,
+  }) {
+    final cols = getGridColumnCount(width);
+    double ratio;
+    if (width < mobileBreakpoint) {
+      ratio = 0.52;
+    } else {
+      final cellW = (width - crossAxisSpacing * (cols - 1)) / cols;
+      // Measured card body below the image (~104px at 1.0x text:
+      // name + rating + price rows + 12px vertical padding each side).
+      const imageAspect = 1.15;
+      const cardBodyHeight = 104.0;
+      ratio = cellW / (cellW / imageAspect + cardBodyHeight);
+    }
+    return SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: cols,
+      childAspectRatio: ratio,
+      crossAxisSpacing: crossAxisSpacing,
+      mainAxisSpacing: mainAxisSpacing,
+    );
+  }
+
   /// Returns `true` if the screen width is strictly in the Desktop range (`> 1024px`).
   static bool isDesktop(BuildContext context) {
     return MediaQuery.of(context).size.width > tabletBreakpoint;

@@ -87,12 +87,8 @@ class HomeScreen extends ConsumerWidget {
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     gridDelegate:
-                                        ResponsiveAppShell.gridDelegateForWidth(
+                                        ResponsiveAppShell.homeGridDelegateForWidth(
                                           constraints.maxWidth,
-                                          // Adjusted for card height to prevent overflow
-                                          childAspectRatio: 0.52,
-                                          crossAxisSpacing: 15,
-                                          mainAxisSpacing: 15,
                                         ),
                                     itemCount: packages.length,
                                     itemBuilder: (context, index) {
@@ -113,11 +109,8 @@ class HomeScreen extends ConsumerWidget {
                                   physics:
                                       const NeverScrollableScrollPhysics(),
                                   gridDelegate:
-                                      ResponsiveAppShell.gridDelegateForWidth(
+                                      ResponsiveAppShell.homeGridDelegateForWidth(
                                         constraints.maxWidth,
-                                        childAspectRatio: 0.52,
-                                        crossAxisSpacing: 15,
-                                        mainAxisSpacing: 15,
                                       ),
                                   itemCount: 4,
                                   itemBuilder: (context, index) {
