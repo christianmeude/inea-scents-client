@@ -81,10 +81,11 @@ class ProfileScreen extends ConsumerWidget {
       // BODY (P7: flat theme background; decorative gradient removed)
       // ============================================================
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+        // C9: no-scroll fit at 360x800 — fixed header/cards plus an
+        // Expanded logo zone that centers the muted mark in the
+        // card-edge-to-screen-bottom space instead of scrolling.
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,14 +103,14 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 4),
 
               Text(
                 'Manage your account and preferences.',
                 style: TextStyle(color: secondaryTextColor, fontSize: 13),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
               // ==================================================
               // PROFILE + SETTINGS (P7 impeccable adapt: stacked
@@ -132,7 +133,7 @@ class ProfileScreen extends ConsumerWidget {
                       ResponsiveAppShell.tabletBreakpoint) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [profile, const SizedBox(height: 28), settings],
+                      children: [profile, const SizedBox(height: 16), settings],
                     );
                   }
 
@@ -143,7 +144,7 @@ class ProfileScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           profile,
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 16),
                           settings,
                         ],
                       ),
@@ -152,21 +153,23 @@ class ProfileScreen extends ConsumerWidget {
                 },
               ),
 
-              const SizedBox(height: 20),
-
               // ==================================================
-              // BRAND FOOTER
-              Center(
-                child: Opacity(
-                  opacity: 0.3,
-                  child: Transform.scale(
-                    scale: 0.5,
-                    child: const AppLogo(),
+              // BRAND FOOTER (C9: muted mark optically centered in
+              // the card-edge-to-screen-bottom zone; SizedBox
+              // bounds the AppLogo FittedBox so its layout box
+              // stays compact — Transform.scale kept the full-size
+              // box and pushed 360x800 into scroll/overflow).
+              Expanded(
+                child: Center(
+                  child: Opacity(
+                    opacity: 0.3,
+                    child: SizedBox(
+                      width: 120,
+                      child: const AppLogo(),
+                    ),
                   ),
                 ),
               ),
-
-              const SizedBox(height: 10),
             ],
           ),
         ),
