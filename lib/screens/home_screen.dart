@@ -41,6 +41,16 @@ class HomeScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // C1: concierge next step — date-first entry into
+                        // the booking flow (P4 order), above the fold.
+                        // ============================================================
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: NextStepCard(),
+                        ),
+
+                        const SizedBox(height: 24),
+
                         // POPULAR PACKAGES TITLE
                         // ============================================================
                         Padding(
@@ -94,10 +104,27 @@ class HomeScreen extends ConsumerWidget {
                                 },
                               );
                             },
-                            loading: () => const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF6A4053),
-                              ),
+                            // C1 (Q10): skeleton grid unifies Home loading
+                            // with Packages — no raw spinner divergence.
+                            loading: () => LayoutBuilder(
+                              builder: (context, constraints) {
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  physics:
+                                      const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      ResponsiveAppShell.gridDelegateForWidth(
+                                        constraints.maxWidth,
+                                        childAspectRatio: 0.52,
+                                        crossAxisSpacing: 15,
+                                        mainAxisSpacing: 15,
+                                      ),
+                                  itemCount: 4,
+                                  itemBuilder: (context, index) {
+                                    return const SkeletonPackageCard();
+                                  },
+                                );
+                              },
                             ),
                             // P6 (Q6/Q8): shared friendly card; raw
                             // errors stay in logs, never on screen.
