@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../models/index.dart';
 import '../config/theme.dart';
+import '../providers/index.dart';
 
-class PackageCard extends StatefulWidget {
+class PackageCard extends ConsumerStatefulWidget {
   final Package package;
   final VoidCallback? onTap;
 
@@ -21,12 +23,13 @@ class PackageCard extends StatefulWidget {
   });
 
   @override
-  State<PackageCard> createState() => _PackageCardState();
+  ConsumerState<PackageCard> createState() => _PackageCardState();
 }
 
-class _PackageCardState extends State<PackageCard> {
+class _PackageCardState extends ConsumerState<PackageCard> {
   bool _isHovered = false;
   bool _isFocused = false;
+  bool _isTogglingWishlist = false;
 
   void _handleTap() {
     if (widget.onTap != null) {
@@ -42,9 +45,32 @@ class _PackageCardState extends State<PackageCard> {
     }
   }
 
+  bool _isWishlisted(AsyncValue<List<Package>> wishlist) {
+    return wishlist.valueOrNull?.any((item) => item.id == widget.package.id) ??
+        false;
+  }
+
+  Future<void> _toggleWishlist() async {
+    final packageId = widget.package.id;
+    if (packageId == null || _isTogglingWishlist) return;
+
+    setState(() => _isTogglingWishlist = true);
+    try {
+      await ref.read(wishlistProvider.notifier).toggle(packageId);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to update your wishlist.')),
+      );
+    } finally {
+      if (mounted) setState(() => _isTogglingWishlist = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final package = widget.package;
+    final isWishlisted = _isWishlisted(ref.watch(wishlistProvider));
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final cardBg = isDark
@@ -165,27 +191,60 @@ class _PackageCardState extends State<PackageCard> {
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: badgeBg,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(18),
-                          bottomLeft: Radius.circular(10),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          tooltip: isWishlisted
+                              ? 'Remove from wishlist'
+                              : 'Add to wishlist',
+                          onPressed: _isTogglingWishlist
+                              ? null
+                              : _toggleWishlist,
+                          icon: Icon(
+                            _isTogglingWishlist
+                                ? Icons.sync_rounded
+                                : isWishlisted
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: isWishlisted
+                                ? const Color(0xFF9A4F5D)
+                                : primaryTextColor,
+                            size: 20,
+                          ),
+                          style: IconButton.styleFrom(
+                            backgroundColor: badgeBg,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(18),
+                                bottomLeft: Radius.circular(10),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'View Package',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: primaryTextColor,
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: badgeBg,
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(18),
+                              bottomLeft: Radius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'View Package',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: primaryTextColor,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ],

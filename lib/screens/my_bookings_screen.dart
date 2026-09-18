@@ -112,42 +112,55 @@ class MyBookingsScreen extends ConsumerWidget {
                     color: primaryColor,
                     onRefresh: () => ref.refresh(bookingsProvider.future),
                     child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
-                    children: [
-                      // ==================================================
-                      // PAGE HEADER
-                      // ==================================================
-                      const Text(
-                        'My Bookings',
-                        style: TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                          letterSpacing: -0.3,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                      children: [
+                        // ==================================================
+                        // PAGE HEADER
+                        // ==================================================
+                        const Text(
+                          'My Bookings',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                            letterSpacing: -0.3,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 5),
+                        const SizedBox(height: 5),
 
-                      Text(
-                        '${bookings.length} '
-                        '${bookings.length == 1 ? 'booking' : 'bookings'}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: secondaryTextColor,
+                        Text(
+                          '${bookings.length} '
+                          '${bookings.length == 1 ? 'booking' : 'bookings'}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: secondaryTextColor,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
-                      // ==================================================
-                      // BOOKING CARDS
-                      // ==================================================
-                      ...bookings.map(
-                        (booking) => _BookingCard(booking: booking),
-                      ),
-                    ],
+                        // ==================================================
+                        // BOOKING CARDS
+                        // ==================================================
+                        ...bookings.map(
+                          (booking) => _BookingCard(booking: booking),
+                        ),
+                        const SizedBox(height: 4),
+                        OutlinedButton.icon(
+                          onPressed: () => context.go('/packages'),
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: const Text('BOOK ANOTHER PACKAGE'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: primaryColor,
+                            side: BorderSide(
+                              color: primaryColor.withValues(alpha: 0.35),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
@@ -422,8 +435,8 @@ class _BookingCard extends StatelessWidget {
               value: booking.pax == null
                   ? 'N/A'
                   : booking.pax == 1
-                      ? '1 guest'
-                      : '${booking.pax} guests',
+                  ? '1 guest'
+                  : '${booking.pax} guests',
             ),
 
             const SizedBox(height: 18),
@@ -660,7 +673,7 @@ class _EmptyBookings extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                context.go('/');
+                context.go('/packages');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: MyBookingsScreen.primaryColor,

@@ -6,15 +6,9 @@ import 'providers/index.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Landing parity: stored choice wins; otherwise resolve the OS brightness
-  // once (no live System follow).
+  // Stored choice wins; fresh installs start in light mode.
   final persisted = await loadPersistedThemeMode();
-  final initial =
-      persisted ??
-      (WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.dark
-          ? ThemeMode.dark
-          : ThemeMode.light);
+  final initial = persisted ?? ThemeMode.light;
   runApp(
     ProviderScope(
       overrides: [themeModeProvider.overrideWith((ref) => initial)],

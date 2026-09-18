@@ -40,6 +40,11 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
     return day;
   }
 
+  DateTime _today() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -285,8 +290,15 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                 return isSameDay(widget.selectedDate, day);
               },
               enabledDayPredicate: (day) =>
+                  !DateTime(day.year, day.month, day.day).isBefore(_today()) &&
                   !bookedDays.contains(DateTime(day.year, day.month, day.day)),
               onDaySelected: (selectedDay, focusedDay) {
+                final day = DateTime(
+                  selectedDay.year,
+                  selectedDay.month,
+                  selectedDay.day,
+                );
+                if (day.isBefore(_today())) return;
                 setState(() {
                   _focusedDay = focusedDay;
                 });

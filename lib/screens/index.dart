@@ -9,3 +9,4 @@ export 'calendar_screen.dart';
 export 'my_bookings_screen.dart';
 export 'profile_screen.dart';
 export 'forgot_password_screen.dart';
+export 'profile_actions_screen.dart';

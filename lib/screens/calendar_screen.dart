@@ -31,6 +31,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   static const Color booked = Color(0xFFC28A52);
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(availabilityProvider.notifier).refresh();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final availabilityAsync = ref.watch(availabilityProvider);
 
@@ -167,6 +176,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   Widget _buildCalendar(AvailabilityState availabilityState) {
     final availability = availabilityState.data;
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     DateTime focusedDay = DateTime(
       availabilityState.year,
       availabilityState.month,
@@ -249,7 +259,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
 
               child: TableCalendar<String>(
-                firstDay: DateTime.now(),
+                firstDay: today,
 
                 lastDay: DateTime(DateTime.now().year + 1, 12, 31),
 
@@ -272,10 +282,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 enabledDayPredicate: (day) {
                   final status = dates[_dayOnly(day)];
 
-                  return status != null && _isAvailable(status);
+                  return !day.isBefore(today) &&
+                      status != null &&
+                      _isAvailable(status);
                 },
 
                 onDaySelected: (selectedDay, focusedDay) {
+                  if (selectedDay.isBefore(today)) return;
                   final status = dates[_dayOnly(selectedDay)] ?? '';
 
                   if (!_isAvailable(status)) {

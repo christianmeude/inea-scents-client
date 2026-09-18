@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/index.dart';
 import '../providers/index.dart';
 import '../widgets/index.dart';
 
@@ -14,6 +15,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
     final wishlistAsync = ref.watch(wishlistProvider);
+    final bookingsAsync = ref.watch(bookingsProvider);
 
     // ============================================================
     // COLORS
@@ -354,6 +356,31 @@ class ProfileScreen extends ConsumerWidget {
 
                   const SizedBox(height: 28),
 
+                  const _SectionHeader(
+                    title: 'Upcoming Booking',
+                    subtitle: 'Your next INEA Scents experience',
+                    icon: Icons.event_available_outlined,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  bookingsAsync.when(
+                    data: (bookings) {
+                      final upcoming = _nextBooking(bookings);
+                      if (upcoming == null) {
+                        return const _EmptyUpcomingBooking();
+                      }
+
+                      return _UpcomingBookingCard(booking: upcoming);
+                    },
+                    loading: () => const _UpcomingBookingLoading(),
+                    error: (error, stack) => _UpcomingBookingError(
+                      onRetry: () => ref.invalidate(bookingsProvider),
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+
                   // ==================================================
                   // WISHLIST TITLE
                   // ==================================================
@@ -453,7 +480,7 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.person_outline_rounded,
                           title: 'Edit Profile',
                           subtitle: 'Update your personal information',
-                          onTap: () {},
+                          onTap: () => context.push('/edit-profile'),
                         ),
 
                         const _SettingDivider(),
@@ -462,7 +489,7 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.lock_outline_rounded,
                           title: 'Change Password',
                           subtitle: 'Keep your account secure',
-                          onTap: () {},
+                          onTap: () => context.push('/change-password'),
                         ),
 
                         const _SettingDivider(),
@@ -471,7 +498,7 @@ class ProfileScreen extends ConsumerWidget {
                           icon: Icons.help_outline_rounded,
                           title: 'Help & Support',
                           subtitle: 'Get assistance with your account',
-                          onTap: () {},
+                          onTap: () => context.push('/help-support'),
                         ),
 
                         const _SettingDivider(),
@@ -530,6 +557,247 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+Booking? _nextBooking(List<Booking> bookings) {
+  final upcoming =
+      bookings.where((booking) => booking.eventDate != null).toList()
+        ..sort((a, b) => a.eventDate!.compareTo(b.eventDate!));
+
+  if (upcoming.isEmpty) return null;
+  final today = DateTime.now();
+  return upcoming.firstWhere(
+    (booking) => !booking.eventDate!.isBefore(today),
+    orElse: () => upcoming.first,
+  );
+}
+
+class _UpcomingBookingCard extends StatelessWidget {
+  final Booking booking;
+
+  const _UpcomingBookingCard({required this.booking});
+
+  @override
+  Widget build(BuildContext context) {
+    final eventDate = booking.eventDate;
+    final dateLabel = eventDate == null
+        ? 'Date to be confirmed'
+        : '${eventDate.day.toString().padLeft(2, '0')}/'
+              '${eventDate.month.toString().padLeft(2, '0')}/'
+              '${eventDate.year}';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.58),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.72)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF74445C).withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.calendar_month_outlined,
+                color: Color(0xFF74445C),
+                size: 22,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  booking.package?.name ?? 'INEA Scents booking',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFF633E50),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              _BookingStatusLabel(status: booking.status ?? 'Pending'),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _UpcomingBookingDetail(icon: Icons.event_outlined, text: dateLabel),
+          const SizedBox(height: 9),
+          _UpcomingBookingDetail(
+            icon: Icons.location_on_outlined,
+            text: booking.venueAddress ?? 'Venue to be confirmed',
+          ),
+          const SizedBox(height: 9),
+          _UpcomingBookingDetail(
+            icon: Icons.people_outline,
+            text: booking.pax == null
+                ? 'Guest count to be confirmed'
+                : '${booking.pax} ${booking.pax == 1 ? 'guest' : 'guests'}',
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => context.go('/bookings'),
+              icon: const Icon(Icons.arrow_forward_rounded, size: 17),
+              label: const Text('VIEW BOOKING DETAILS'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFF74445C),
+                side: BorderSide(
+                  color: const Color(0xFF74445C).withValues(alpha: 0.35),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UpcomingBookingDetail extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _UpcomingBookingDetail({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: const Color(0xFF765867), size: 17),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Color(0xFF765867), fontSize: 12.5),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BookingStatusLabel extends StatelessWidget {
+  final String status;
+
+  const _BookingStatusLabel({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFF74445C).withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        status.toUpperCase(),
+        style: const TextStyle(
+          color: Color(0xFF74445C),
+          fontSize: 9,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.7,
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyUpcomingBooking extends StatelessWidget {
+  const _EmptyUpcomingBooking();
+
+  @override
+  Widget build(BuildContext context) {
+    return _ProfileMessageCard(
+      icon: Icons.event_busy_outlined,
+      message: 'No upcoming bookings yet.',
+      actionLabel: 'BROWSE PACKAGES',
+      onPressed: () => context.push('/packages'),
+    );
+  }
+}
+
+class _UpcomingBookingLoading extends StatelessWidget {
+  const _UpcomingBookingLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+      height: 100,
+      child: Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 2.5,
+          color: Color(0xFF74445C),
+        ),
+      ),
+    );
+  }
+}
+
+class _UpcomingBookingError extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _UpcomingBookingError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return _ProfileMessageCard(
+      icon: Icons.cloud_off_outlined,
+      message: 'Unable to load your booking.',
+      actionLabel: 'TRY AGAIN',
+      onPressed: onRetry,
+    );
+  }
+}
+
+class _ProfileMessageCard extends StatelessWidget {
+  final IconData icon;
+  final String message;
+  final String actionLabel;
+  final VoidCallback onPressed;
+
+  const _ProfileMessageCard({
+    required this.icon,
+    required this.message,
+    required this.actionLabel,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.42),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.65)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: const Color(0xFF74445C), size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: Color(0xFF633E50)),
+            ),
+          ),
+          TextButton(onPressed: onPressed, child: Text(actionLabel)),
         ],
       ),
     );

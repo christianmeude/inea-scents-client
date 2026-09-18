@@ -5,6 +5,8 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
+import '../models/user.dart';
+
 part 'user_api_client.g.dart';
 
 @RestApi()
@@ -14,4 +16,8 @@ abstract class UserApiClient {
   /// Get authenticated user details
   @GET('/api/user')
   Future<dynamic> getApiUser();
+
+  /// Update authenticated user details
+  @PUT('/api/user')
+  Future<User> putApiUser({@Body() required Map<String, dynamic> body});
 }

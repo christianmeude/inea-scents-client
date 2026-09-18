@@ -73,7 +73,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           .read(bookingFlowProvider.notifier)
           .ensureFreshForPackage(widget.packageId);
     });
-    _selectedDate = DateTime.now().add(const Duration(days: 3));
+    _selectedDate =
+        ref.read(bookingFlowProvider).selectedDate ??
+        DateTime.now().add(const Duration(days: 3));
     // Freeform clock time, prefilled like the old default slot so the
     // schedule step is submittable before the user opens the picker.
     _selectedTime = '14:00:00';
@@ -1567,7 +1569,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.access_time_rounded, size: 18, color: plum),
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 18,
+                      color: plum,
+                    ),
                   ],
                 ),
               ),

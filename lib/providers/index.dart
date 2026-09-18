@@ -142,6 +142,25 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState();
   }
 
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final user = await _apiClient.user.putApiUser(
+        body: {'name': name, 'email': email},
+      );
+      state = state.copyWith(user: user, isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: _getErrorMessage(e),
+      );
+      rethrow;
+    }
+  }
+
   Future<void> refreshProfile() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
@@ -480,13 +499,27 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
 
   Future<Booking?> submitBooking() async {
     final email = state.customerEmail?.trim() ?? '';
+    final selectedDate = state.selectedDate;
     if (state.selectedPackage == null ||
-        state.selectedDate == null ||
+        selectedDate == null ||
         state.selectedTime == null ||
         state.selectedPax == null ||
         (state.paymentMethod ?? '').isEmpty) {
       state = state.copyWith(
         errorMessage: 'Please fill in all required fields',
+      );
+      return null;
+    }
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final bookingDay = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+    if (bookingDay.isBefore(today)) {
+      state = state.copyWith(
+        errorMessage: 'Please choose today or a future date',
       );
       return null;
     }
@@ -541,7 +574,7 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
               ? state.customerPhone!.trim()
               : null,
           pax: state.selectedPax!,
-          eventDate: state.selectedDate!,
+          eventDate: selectedDate,
           eventTime: TimeSlot.toEventTime(state.selectedTime),
           venueAddress: state.venueAddress!.trim(),
           paymentMethod: PaymentMethod.fromJson(state.paymentMethod!),
@@ -570,6 +603,8 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
         booking: booking,
         checkoutStatus: status,
       );
+      _ref.invalidate(availabilityProvider);
+      _refreshBookingsList();
       return booking;
     } catch (e) {
       state = state.copyWith(
@@ -695,9 +730,12 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
     final terminal =
         state.checkoutStatus == BookingCheckoutStatus.confirmed ||
         state.checkoutStatus == BookingCheckoutStatus.cancelled;
+    final completedOfflineBooking =
+        state.currentStep >= 5 &&
+        state.checkoutStatus == BookingCheckoutStatus.awaitingAdmin;
     final mismatch =
         state.selectedPackage != null && state.selectedPackage!.id != packageId;
-    if (terminal || mismatch) reset();
+    if (terminal || completedOfflineBooking || mismatch) reset();
   }
 }
 
