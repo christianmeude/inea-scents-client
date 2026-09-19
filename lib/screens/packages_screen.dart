@@ -140,30 +140,62 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                             ]
                           : opts;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PackageOfferingHero(package: offering),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Choose your Pax Choice',
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          for (final choice in choices) ...[
-                            PaxChoiceRow(
-                              packageId: offering.id,
-                              pax: choice.pax,
-                              price: choice.price,
-                              initialDate: widget.initialDate,
-                            ),
-                            const SizedBox(height: 10),
-                          ],
-                        ],
+                      return LayoutBuilder(
+                        builder: (context, constraints) {
+                          // C21: compact hero (200 mobile / 240 desktop)
+                          // + full Pax Choice list below. Desktop fills
+                          // the 1200 cap with a 2-column grid; mobile
+                          // stays single-column (360px safe).
+                          final wide = constraints.maxWidth >= 768;
+                          final rows = <Widget>[
+                            for (final choice in choices) ...[
+                              PaxChoiceRow(
+                                packageId: offering.id,
+                                pax: choice.pax,
+                                price: choice.price,
+                                initialDate: widget.initialDate,
+                              ),
+                            ],
+                          ];
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PackageOfferingHero(package: offering),
+                              const SizedBox(height: 20),
+                              Text(
+                                'Choose your Pax Choice',
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              if (!wide) ...[
+                                for (int i = 0; i < rows.length; i++) ...[
+                                  rows[i],
+                                  if (i < rows.length - 1)
+                                    const SizedBox(height: 10),
+                                ],
+                              ] else
+                                GridView.builder(
+                                  shrinkWrap: true,
+                                  physics:
+                                      const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 12,
+                                    mainAxisSpacing: 12,
+                                    // Roomy rows: ~76px tall at 1200 cap.
+                                    mainAxisExtent: 78,
+                                  ),
+                                  itemCount: rows.length,
+                                  itemBuilder: (context, i) => rows[i],
+                                ),
+                            ],
+                          );
+                        },
                       );
                     },
 

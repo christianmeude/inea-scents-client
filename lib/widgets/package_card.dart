@@ -252,7 +252,8 @@ class _PackageCardState extends State<PackageCard> {
   }
 }
 
-/// C17: single-Offering hero — image, Offering name, starting price,
+/// C21: compact Offering banner — 180-220px mobile, capped desktop.
+/// Row layout: image thumb + Offering name, starting price,
 /// inclusions/freebies teaser. Static; the Pax Choice rows below drive
 /// booking via `/booking/:id?pax=&date=`.
 class PackageOfferingHero extends StatelessWidget {
@@ -277,84 +278,110 @@ class PackageOfferingHero extends StatelessWidget {
         ? teaserBits.join(' · ')
         : (package.description ?? '');
 
-    return Container(
-      key: const Key('offering_hero'),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.nightSurface : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primary.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Constraints here are finite (page caps at maxWidth 1200).
+        final wide = constraints.maxWidth >= 768;
+        // C21 acceptance: 180-220px mobile, capped desktop.
+        final bannerHeight = wide ? 240.0 : 200.0;
+        final imageWidth = wide ? 340.0 : 132.0;
+        final titleSize = wide ? 22.0 : 17.0;
+        final priceSize = wide ? 16.0 : 14.0;
+        final teaserSize = wide ? 13.0 : 12.0;
+        final pad = wide ? 20.0 : 14.0;
+
+        Widget image() {
+          final img = Container(
+            width: imageWidth,
+            height: bannerHeight,
+            color: isDark ? AppTheme.night : AppTheme.neutralBg,
+            child: (package.images != null && package.images!.isNotEmpty)
+                ? Image.network(
+                    package.images![0],
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return _MonogramTile(
+                        name: package.name,
+                        isDark: isDark,
+                      );
+                    },
+                  )
+                : _MonogramTile(name: package.name, isDark: isDark),
+          );
+          return ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
             ),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
-                width: double.infinity,
-                color: isDark ? AppTheme.night : AppTheme.neutralBg,
-                child: (package.images != null && package.images!.isNotEmpty)
-                    ? Image.network(
-                        package.images![0],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _MonogramTile(
-                            name: package.name,
-                            isDark: isDark,
-                          );
-                        },
-                      )
-                    : _MonogramTile(name: package.name, isDark: isDark),
+            child: img,
+          );
+        }
+
+        return Container(
+          key: const Key('offering_hero'),
+          width: double.infinity,
+          height: bannerHeight,
+          decoration: BoxDecoration(
+            color: isDark ? AppTheme.nightSurface : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primary.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 5),
               ),
-            ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  package.name ?? '',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: titleColor,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              image(),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(pad),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        package.name ?? '',
+                        style: TextStyle(
+                          fontSize: titleSize,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Starting at ${formatPeso(starting)}',
+                        style: TextStyle(
+                          fontSize: priceSize,
+                          fontWeight: FontWeight.w500,
+                          color: titleColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (teaser.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          teaser,
+                          style:
+                              TextStyle(fontSize: teaserSize, color: bodyColor),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  'Starting at ${formatPeso(starting)}',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: titleColor,
-                  ),
-                ),
-                if (teaser.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(
-                    teaser,
-                    style: TextStyle(fontSize: 13, color: bodyColor),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -392,47 +419,63 @@ class PaxChoiceRow extends StatelessWidget {
         isDark ? const Color(0xFFFDF4F5) : AppTheme.primary;
     final bodyColor = isDark ? const Color(0xFFC4ACAC) : AppTheme.secondary;
 
-    return GestureDetector(
-      key: Key('pax_choice_$pax'),
-      behavior: HitTestBehavior.opaque,
-      onTap: () => _go(context),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: isDark ? AppTheme.nightSurface : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: AppTheme.primary.withValues(alpha: 0.12),
-            width: 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$pax Pax Choice',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: titleColor,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    formatPeso(price),
-                    style: TextStyle(fontSize: 14, color: bodyColor),
-                  ),
-                ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // C21: adapt row density: compact single-column mobile,
+        // roomier two-column desktop proportions.
+        final wide = constraints.maxWidth >= 768;
+        final vPad = wide ? 16.0 : 12.0;
+        final titleSize = wide ? 16.0 : 15.0;
+        final priceSize = wide ? 14.0 : 13.0;
+
+        return GestureDetector(
+          key: Key('pax_choice_$pax'),
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _go(context),
+          child: Container(
+            width: double.infinity,
+            padding:
+                EdgeInsets.symmetric(horizontal: 16, vertical: vPad),
+            decoration: BoxDecoration(
+              color: isDark ? AppTheme.nightSurface : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppTheme.primary.withValues(alpha: 0.12),
+                width: 1,
               ),
             ),
-            Icon(Icons.arrow_forward_rounded, size: 20, color: bodyColor),
-          ],
-        ),
-      ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$pax Pax Choice',
+                        style: TextStyle(
+                          fontSize: titleSize,
+                          fontWeight: FontWeight.w600,
+                          color: titleColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        formatPeso(price),
+                        style: TextStyle(fontSize: priceSize, color: bodyColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_rounded, size: 20, color: bodyColor),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
