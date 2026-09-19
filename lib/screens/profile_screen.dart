@@ -25,10 +25,6 @@ class ProfileScreen extends ConsumerWidget {
         : const Color(0xFF765867);
 
     // Solid card surfaces matching the rest of the app (Q3).
-    final circleBg = isDark ? const Color(0xFF36222C) : const Color(0xFFFDF4F5);
-    final circleBorder = isDark
-        ? const Color(0xFFFDF4F5).withValues(alpha: 0.25)
-        : const Color(0x4D99868C);
     final userName = authState.user?.name ?? 'User';
     final userEmail = authState.user?.email ?? '';
 
@@ -39,43 +35,9 @@ class ProfileScreen extends ConsumerWidget {
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      // ============================================================
-      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
-      // ============================================================
-      appBar: MediaQuery.of(context).size.width < 768
-          ? AppBar(
-              backgroundColor: Colors.transparent,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: true,
-
-              title: const _BrandName(),
-
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: circleBg,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: circleBorder, width: 1),
-                    ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.more_horiz_rounded,
-                        color: textColor,
-                        size: 22,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : null,
+      // C22: distilled — mobile AppBar removed (brand title + dead
+      // overflow action). Desktop TopNavBar covers nav.
+      appBar: null,
 
       // ============================================================
       // BODY (P7: flat theme background; decorative gradient removed)
@@ -163,23 +125,9 @@ class ProfileScreen extends ConsumerWidget {
                 },
               ),
 
-              // ==================================================
-              // BRAND FOOTER (C9: muted mark optically centered in
-              // the card-edge-to-screen-bottom zone; SizedBox
-              // bounds the AppLogo FittedBox so its layout box
-              // stays compact — Transform.scale kept the full-size
-              // box and pushed 360x800 into scroll/overflow).
-              Expanded(
-                child: Center(
-                  child: Opacity(
-                    opacity: 0.3,
-                    child: SizedBox(
-                      width: 120,
-                      child: const AppLogo(),
-                    ),
-                  ),
-                ),
-              ),
+              // C22: brand footer removed — AppLogo lives only on Home
+              // + auth screens. Spacer keeps the C9 no-scroll 360x800 fit.
+              const Expanded(child: SizedBox.shrink()),
             ],
           ),
         ),
@@ -408,77 +356,6 @@ class _SettingsColumn extends StatelessWidget {
     );
   }
 }
-
-// ============================================================================
-// INEA BRAND NAME
-// ============================================================================
-
-class _BrandName extends StatelessWidget {
-  const _BrandName();
-
-  @override
-  Widget build(BuildContext context) {
-    const brandColor = Color(0xFF6D3E55);
-
-    return SizedBox(
-      width: 130,
-      height: 58,
-
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-
-        children: [
-          Text(
-            'INEA',
-            textAlign: TextAlign.center,
-
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 5.2,
-              height: 0.85,
-              color: brandColor,
-
-              shadows: [
-                Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 3),
-
-          Text(
-            'Scents',
-            textAlign: TextAlign.center,
-
-            style: TextStyle(
-              fontSize: 22,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w300,
-              fontFamily: 'serif',
-              letterSpacing: 0.3,
-              height: 0.95,
-              color: brandColor,
-
-              shadows: [
-                Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 
 // ============================================================================
 // PROFILE SETTING TILE

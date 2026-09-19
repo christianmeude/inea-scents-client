@@ -953,6 +953,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              minimumSize: const Size(48, 48),
             ),
           ),
           const SizedBox(width: 8),
@@ -1259,6 +1260,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   // ==========================================================================
 
   Widget _buildHeader({required bool showBack}) {
+    // C22: distilled — plain-text brand mark + dead chat/calendar icons
+    // removed. Desktop TopNavBar covers nav; only the functional Back
+    // stays (48px touch). Edit paths untouched (no route deletions).
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       child: Row(
@@ -1286,59 +1290,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                minimumSize: const Size(48, 48),
               ),
             )
           else
             const SizedBox(width: 60),
 
-          // Logo
-          SizedBox(
-            width: 140,
-            height: 45,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Text(
-                    'INEA',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                      height: 1,
-                      color: _title,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Text(
-                    'Scents',
-                    style: TextStyle(
-                      fontFamily: 'GreatVibes',
-                      fontSize: 32,
-                      height: 1,
-                      color: _title,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          if (showBack)
-            Row(
-              children: [
-                Icon(Icons.chat_bubble_rounded, color: _title),
-                const SizedBox(width: 15),
-                Icon(Icons.calendar_today_rounded, color: _title),
-              ],
-            )
-          else
-            const SizedBox(width: 60),
+          const SizedBox(width: 60),
         ],
       ),
     );

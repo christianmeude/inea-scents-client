@@ -69,7 +69,7 @@ class NextStepCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Check availability for your date, then choose a package.',
+                  'Check availability for your date, then choose a Pax Choice.',
                   style: TextStyle(
                     color: isDark
                         ? const Color(0xFFC4ACAC)
