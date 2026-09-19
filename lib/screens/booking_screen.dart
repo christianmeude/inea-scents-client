@@ -167,8 +167,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       // The calendar only offers free days, but a chosen date can age past
       // midnight while the flow sits open. Reject here so a stale date never
       // reaches POST; the provider stays untouched.
-      final selectedDay = ref.read(bookingFlowProvider).selectedDate;
-      if (selectedDay != null && _isPastDay(selectedDay, DateTime.now())) {
+      final selectedDate = _selectedDate;
+      if (selectedDate != null && _isPastDay(selectedDate, DateTime.now())) {
         if (mounted) {
           ScaffoldMessenger.of(context)
             ..clearSnackBars()

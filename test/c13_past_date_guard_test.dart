@@ -189,6 +189,35 @@ void main() {
         expect(find.text('Payment Successful'), findsOneWidget);
       },
     );
+
+    testWidgets(
+      'after rejection, choosing a new date submits normally',
+      (WidgetTester tester) async {
+        final backend = FakeApiBackend();
+        final container = await pumpBooking(tester, backend: backend);
+        final yesterday =
+            DateTime.now().subtract(const Duration(days: 1));
+        presetSchedule(container, date: yesterday);
+
+        await driveToPayment(tester);
+        await tester.tap(find.textContaining('Confirm & Pay'));
+        await tester.pumpAndSettle();
+        expect(backend.createBookingCallCount, 0);
+
+        // Recovery: pick a fresh date and confirm again. Let the
+        // rejection SnackBar expire first so it can't cover the button.
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pumpAndSettle();
+        container
+            .read(bookingFlowProvider.notifier)
+            .setSelectedDate(DateTime.now());
+        await tester.tap(find.textContaining('Confirm & Pay'));
+        await tester.pumpAndSettle();
+
+        expect(backend.createBookingCallCount, 1);
+        expect(find.text('Payment Successful'), findsOneWidget);
+      },
+    );
   });
 
   group('C13 booking re-entry preserves the selected date', () {
