@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import '../config/offering.dart';
 import '../models/index.dart';
 import '../utils/peso.dart';
 import 'card_surfaces.dart';
-import 'inclusions_list.dart';
 
 /// Middle Column / Panel for INEA Scents reservation flow on desktop.
 /// Handles Package variation overview, the locked Pax summary (P6: the
 /// headcount step is chosen on the packages grid, never re-picked here),
-/// Time slot selection, Inclusions preview, and Payment Method selection.
+/// Time slot selection, and Payment Method selection.
+/// Included-info lives in the booking summary's InclusionsList (C7).
 // C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
 // customer-facing copy uses Booking / Pax Choice.
 class ReservationDetailsPanel extends StatelessWidget {
@@ -117,7 +116,8 @@ class ReservationDetailsPanel extends StatelessWidget {
                         const SizedBox(height: 6),
                         // Package facts (grill critique #7): headcount range
                         // + duration hint give the middle column weight.
-                        // Staff lives in Inclusions below; no invented data.
+                        // Staff lives in the booking summary Inclusions;
+                        // no invented data.
                         if (paxList.isNotEmpty)
                           Text(
                             paxList.length > 1
@@ -137,43 +137,8 @@ class ReservationDetailsPanel extends StatelessWidget {
               ),
               // Description lives on the package detail screen only
               // (grill Q3-final): no server-copy price echo here.
-              Theme(
-                data: Theme.of(
-                  context,
-                ).copyWith(dividerColor: Colors.transparent),
-                child: ExpansionTile(
-                  tilePadding: EdgeInsets.zero,
-                  childrenPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    Icons.spa_outlined,
-                    size: 16,
-                    color: titleColor,
-                  ),
-                  title: Text(
-                    "What's included",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: titleColor,
-                    ),
-                  ),
-                  iconColor: titleColor,
-                  collapsedIconColor: titleColor,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: InclusionsList(
-                        inclusions: (package.inclusions?.isNotEmpty ?? false)
-                            ? package.inclusions!
-                            : Offering.inclusions,
-                        freebies: (package.freebies?.isNotEmpty ?? false)
-                            ? package.freebies!
-                            : Offering.freebies,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // C7: included-info lives only in the booking summary
+              // (OrderSummaryPanel InclusionsList) — no duplicate accordion.
             ],
           ),
         ),
