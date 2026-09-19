@@ -29,6 +29,9 @@ class FakeApiBackend {
   /// When true, POST /api/bookings answers with an HTTP 500.
   bool failCreateBooking = false;
 
+  /// When true, GET /api/bookings answers with an HTTP 500.
+  bool failGetBookings = false;
+
   /// A single date for the given month/year marked as booked, or null.
   DateTime? bookedDate;
 
@@ -103,6 +106,9 @@ class FakeHttpClientAdapter implements HttpClientAdapter {
     }
 
     if (method == 'GET' && path == '/api/bookings') {
+      if (backend.failGetBookings) {
+        return _status(500, '{"detail":"bookings unavailable"}');
+      }
       backend.bookingsEndpointCallCount++;
       final resolved =
           backend.bookingsEndpointCallCount > backend.pollAttemptsToResolve;

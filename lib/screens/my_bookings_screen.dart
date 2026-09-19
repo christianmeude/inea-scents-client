@@ -30,13 +30,20 @@ class MyBookingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookingsAsync = ref.watch(bookingsProvider);
+    final isNarrow = MediaQuery.of(context).size.width < 768;
+    // C12: persistent book-another affordance is data-only — hidden on
+    // loading/error/empty (empty has its own CTA).
+    final hasBookings = bookingsAsync.maybeWhen(
+      data: (bookings) => bookings.isNotEmpty,
+      orElse: () => false,
+    );
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
-      appBar: MediaQuery.of(context).size.width < 768
+      appBar: isNarrow
           ? AppBar(
               backgroundColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
@@ -52,8 +59,39 @@ class MyBookingsScreen extends ConsumerWidget {
               // Keep the left side empty so the brand remains centered.
               leading: const SizedBox(),
 
-              // Keep the AppBar balanced.
-              actions: const [SizedBox(width: 58)],
+              // C12: book-another stays pinned on mobile; same 42px
+              // circle language as PackagesScreen/ProfileScreen so the
+              // brand stays centered. Hidden unless bookings data exists.
+              actions: [
+                if (hasBookings)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: CardSurfaces.chipBg(context),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.55),
+                          width: 1,
+                        ),
+                      ),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        tooltip: 'Book another Pax Choice',
+                        icon: Icon(
+                          Icons.add_rounded,
+                          color: CardSurfaces.title(context),
+                          size: 22,
+                        ),
+                        onPressed: () => context.go('/packages'),
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(width: 58),
+              ],
             )
           : null,
 
@@ -82,26 +120,56 @@ class MyBookingsScreen extends ConsumerWidget {
                         children: [
                           // ==================================================
                           // PAGE HEADER
+                          // C12: desktop/tablet has no AppBar, so the
+                          // trailing book-another action lives here.
+                          // Mobile keeps the AppBar icon only (no dup).
                           // ==================================================
-                          Text(
-                            'My Bookings',
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
-                              color: CardSurfaces.title(context),
-                              letterSpacing: -0.3,
-                            ),
-                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'My Bookings',
+                                      style: TextStyle(
+                                        fontSize: 26,
+                                        fontWeight: FontWeight.w600,
+                                        color: CardSurfaces.title(context),
+                                        letterSpacing: -0.3,
+                                      ),
+                                    ),
 
-                          const SizedBox(height: 5),
+                                    const SizedBox(height: 5),
 
-                          Text(
-                            '${bookings.length} '
-                            '${bookings.length == 1 ? 'booking' : 'bookings'}',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: CardSurfaces.body(context),
-                            ),
+                                    Text(
+                                      '${bookings.length} '
+                                      '${bookings.length == 1 ? 'booking' : 'bookings'}',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: CardSurfaces.body(context),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (!isNarrow) ...[
+                                const SizedBox(width: 16),
+                                OutlinedButton.icon(
+                                  onPressed: () =>
+                                      context.go('/packages'),
+                                  icon: const Icon(
+                                    Icons.add_rounded,
+                                    size: 18,
+                                  ),
+                                  label: const Text(
+                                    'Book another Pax Choice',
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
 
                           const SizedBox(height: 20),
@@ -668,7 +736,7 @@ class _EmptyBookings extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                context.go('/');
+                context.go('/packages');
               },
               // P7: theme ElevatedButton drives both modes.
               style: ElevatedButton.styleFrom(
@@ -682,7 +750,7 @@ class _EmptyBookings extends StatelessWidget {
                 elevation: 0,
               ),
               child: const Text(
-                'Explore Packages',
+                'Explore Pax Choices',
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
               ),
             ),
