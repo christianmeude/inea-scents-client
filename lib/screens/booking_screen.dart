@@ -296,20 +296,36 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       packageAsync.whenData((package) {
+        final flow = ref.read(bookingFlowProvider);
         final notifier = ref.read(bookingFlowProvider.notifier);
+        // C24: never blind-reset on load — setSelectedPackage drops pax to
+        // the lowest option. A same-package flow that already holds a valid
+        // pax (e.g. a carried ?pax=) keeps it.
+        final candidates = package.options.isNotEmpty
+            ? package.options.map((t) => t.pax).toList()
+            : (package.paxOptions ?? const <int>[]);
+        if (flow.selectedPackage?.id == package.id &&
+            flow.selectedPax != null &&
+            (candidates.isEmpty || candidates.contains(flow.selectedPax))) {
+          return;
+        }
+        final prevPax = flow.selectedPax;
         notifier.setSelectedPackage(package);
         _syncNotifierDefaults();
-        if (package.paxOptions != null && package.paxOptions!.isNotEmpty) {
-          // Honor a package option preselected from a package card; otherwise
+        if (candidates.isNotEmpty) {
+          // Honor a package option preselected from a package card; a
+          // still-valid previous choice wins over the default; otherwise
           // the first available option wins as before.
-          final options = package.options.map((t) => t.pax).toList();
-          final preselected = widget.initialPax;
-          final candidates = options.isNotEmpty ? options : package.paxOptions!;
-          final chosen =
-              (preselected != null && candidates.contains(preselected))
-              ? preselected
-              : candidates.first;
-          notifier.setSelectedPax(chosen);
+          if (prevPax != null && candidates.contains(prevPax)) {
+            notifier.setSelectedPax(prevPax);
+          } else {
+            final preselected = widget.initialPax;
+            final chosen =
+                (preselected != null && candidates.contains(preselected))
+                ? preselected
+                : candidates.first;
+            notifier.setSelectedPax(chosen);
+          }
         }
       });
     });
@@ -364,16 +380,49 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       next.whenData((package) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
+          final flow = ref.read(bookingFlowProvider);
           final flowNotifier = ref.read(bookingFlowProvider.notifier);
+          // C24: candidates mirror _loadPackage (sorted options first) so
+          // repair and seeding agree on which option is "first".
+          final candidates = package.options.isNotEmpty
+              ? package.options.map((t) => t.pax).toList()
+              : (package.paxOptions ?? const <int>[]);
+          // C24: a same-package refresh (loading→data, invalidate) must
+          // never reset a valid higher pax — only repair a pax the
+          // freshly loaded package no longer offers, honoring ?pax= there.
+          if (flow.selectedPackage?.id == package.id) {
+            final currentPax = flow.selectedPax;
+            if (currentPax == null ||
+                (candidates.isNotEmpty &&
+                    !candidates.contains(currentPax))) {
+              if (candidates.isNotEmpty) {
+                final preselected = widget.initialPax;
+                final chosen =
+                    (preselected != null &&
+                        candidates.contains(preselected))
+                    ? preselected
+                    : candidates.first;
+                flowNotifier.setSelectedPax(chosen);
+              }
+            }
+            _syncNotifierDefaults();
+            return;
+          }
+          final prevPax = flow.selectedPax;
           flowNotifier.setSelectedPackage(package);
           _syncNotifierDefaults();
-          // Selections live in the notifier; only repair a pax value that
-          // the freshly loaded package no longer offers.
-          if (package.paxOptions != null && package.paxOptions!.isNotEmpty) {
-            final currentPax = ref.read(bookingFlowProvider).selectedPax;
-            if (currentPax == null ||
-                !package.paxOptions!.contains(currentPax)) {
-              flowNotifier.setSelectedPax(package.paxOptions!.first);
+          // Selections live in the notifier; seed the pax from the
+          // still-valid previous choice or the carried ?pax=, else first.
+          if (candidates.isNotEmpty) {
+            if (prevPax != null && candidates.contains(prevPax)) {
+              flowNotifier.setSelectedPax(prevPax);
+            } else {
+              final preselected = widget.initialPax;
+              final chosen =
+                  (preselected != null && candidates.contains(preselected))
+                  ? preselected
+                  : candidates.first;
+              flowNotifier.setSelectedPax(chosen);
             }
           }
         });
