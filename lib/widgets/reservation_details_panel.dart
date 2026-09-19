@@ -7,7 +7,7 @@ import 'card_surfaces.dart';
 /// Handles Package variation overview, the locked Pax summary (P6: the
 /// headcount step is chosen on the packages grid, never re-picked here),
 /// and Time slot selection. Payment Method is picked once at the payment
-/// step (C18 pay-once); the summary panel displays the current method.
+/// step (C18 pay-once); this panel carries no picker.
 /// Included-info lives in the booking summary's InclusionsList (C7).
 // C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
 // customer-facing copy uses Booking / Pax Choice.
