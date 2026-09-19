@@ -1,12 +1,19 @@
+import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import '../config/theme.dart';
 
 import 'responsive_app_shell.dart';
 
+/// C23: mobile tab bar. Drive it from the [StatefulNavigationShell] when
+/// hosted in [ResponsiveAppShell] so tab switches keep per-tab stacks
+/// (no stack reset); otherwise falls back to plain `go` (tests, standalone).
 class BottomNavBar extends StatelessWidget {
-  const BottomNavBar({super.key});
+  final StatefulNavigationShell? navigationShell;
+
+  const BottomNavBar({super.key, this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
@@ -20,23 +27,38 @@ class BottomNavBar extends StatelessWidget {
         ? AppTheme.night.withValues(alpha: 0.88)
         : AppTheme.secondary.withValues(alpha: 0.85);
 
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          decoration: BoxDecoration(color: navBg),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.white.withValues(alpha: 0.5),
-            selectedFontSize: 10,
-            unselectedFontSize: 10,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _getCurrentIndex(context),
-            onTap: (index) {
-              final router = GoRouter.maybeOf(context);
+    return SafeArea(
+      top: false,
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(color: navBg),
+            child: BottomNavigationBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.white.withValues(alpha: 0.5),
+              selectedFontSize: 10,
+              unselectedFontSize: 10,
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+              type: BottomNavigationBarType.fixed,
+              currentIndex:
+                  navigationShell?.currentIndex ?? _getCurrentIndex(context),
+              onTap: (index) {
+                // C23 native feel: light haptic tick on every tab select.
+                _selectionTick();
+                final shell = navigationShell;
+                if (shell != null) {
+                  // Re-tapping the active tab pops to its root; switching
+                  // branches keeps each tab's own stack (no stack reset).
+                  shell.goBranch(
+                    index,
+                    initialLocation: index == shell.currentIndex,
+                  );
+                  return;
+                }
+                final router = GoRouter.maybeOf(context);
               if (router != null) {
                 switch (index) {
                   case 0:
@@ -117,11 +139,17 @@ class BottomNavBar extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 
-  int _getCurrentIndex(BuildContext context) {
-    try {
+  /// Fire-and-forget haptic tick. The catch keeps widget tests (no platform
+  /// plugin) and restricted devices quiet; production still vibrates.
+  void _selectionTick() {
+    unawaited(HapticFeedback.selectionClick().catchError((Object _) {}));
+  }
+
+  int _getCurrentIndex(BuildContext context) {    try {
       final router = GoRouter.maybeOf(context);
       if (router == null) return 0;
       String location = '';
