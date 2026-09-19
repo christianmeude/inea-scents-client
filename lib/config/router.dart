@@ -46,23 +46,6 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: '/package-details/:id',
-            builder: (context, state) {
-              final packageId = int.parse(state.pathParameters['id']!);
-              final initialPax = int.tryParse(
-                state.queryParameters['pax'] ?? '',
-              );
-              final initialDate = tryParseDateParam(
-                state.queryParameters['date'],
-              );
-              return PackageDetailScreen(
-                packageId: packageId,
-                initialPax: initialPax,
-                initialDate: initialDate,
-              );
-            },
-          ),
-          GoRoute(
             path: '/booking/:id',
             builder: (context, state) {
               final packageId = int.parse(state.pathParameters['id']!);

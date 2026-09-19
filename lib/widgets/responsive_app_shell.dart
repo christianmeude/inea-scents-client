@@ -154,7 +154,6 @@ class ResponsiveAppShell extends StatelessWidget {
           } catch (_) {}
         }
         final hideBottomNav =
-            location.contains('package-details') ||
             location.contains('booking/') ||
             location.contains('login') ||
             location.contains('register') ||

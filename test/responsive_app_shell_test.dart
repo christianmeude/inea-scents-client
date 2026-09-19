@@ -324,11 +324,6 @@ void main() {
                       const Text('Packages Screen Page'),
                 ),
                 GoRoute(
-                  path: '/package-details/:id',
-                  builder: (context, state) =>
-                      Text('Package Detail ${state.pathParameters['id']}'),
-                ),
-                GoRoute(
                   path: '/booking/:id',
                   builder: (context, state) =>
                       Text('Booking Flow ${state.pathParameters['id']}'),
@@ -421,13 +416,7 @@ void main() {
           rethrow;
         }
 
-        // 8. Test subroute /package-details/42 highlights HOME
-        router.go('/package-details/42');
-        await tester.pumpAndSettle();
-        expect(find.text('Package Detail 42'), findsOneWidget);
-        expect(find.byIcon(Icons.home), findsOneWidget);
-
-        // 9. Test subroute /booking/99 retains BOOKINGS section highlight
+        // 8. Test subroute /booking/99 retains BOOKINGS section highlight
         router.go('/booking/99');
         await tester.pumpAndSettle();
         expect(find.text('Booking Flow 99'), findsOneWidget);
@@ -458,10 +447,6 @@ void main() {
                 builder: (context, state) => const Text('Packages Page'),
               ),
               GoRoute(
-                path: '/package-details/:id',
-                builder: (context, state) => const Text('Package Detail Page'),
-              ),
-              GoRoute(
                 path: '/booking/:id',
                 builder: (context, state) => const Text('Booking Page'),
               ),
@@ -477,11 +462,6 @@ void main() {
 
       // On /packages, BottomNavBar is visible
       expect(find.byType(BottomNavBar), findsOneWidget);
-
-      // On /package-details/1, BottomNavBar is hidden
-      router.go('/package-details/1');
-      await tester.pumpAndSettle();
-      expect(find.byType(BottomNavBar), findsNothing);
 
       // On /booking/1, BottomNavBar is hidden
       router.go('/booking/1');

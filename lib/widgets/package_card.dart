@@ -43,7 +43,7 @@ class _PackageCardState extends State<PackageCard> {
           'date=${formatDateParam(widget.initialDate!)}',
       ];
       context.push(
-        '/package-details/$id${query.isEmpty ? '' : '?${query.join('&')}'}',
+        '/booking/$id${query.isEmpty ? '' : '?${query.join('&')}'}',
       );
     }
   }

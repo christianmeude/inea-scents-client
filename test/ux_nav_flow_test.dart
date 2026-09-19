@@ -64,7 +64,7 @@ void main() {
             ),
           ),
           GoRoute(
-            path: '/package-details/:id',
+            path: '/booking/:id',
             builder: (context, state) {
               final query = state.queryParameters.entries
                   .map((e) => '${e.key}=${e.value}')
@@ -85,7 +85,7 @@ void main() {
       await tester.tap(find.byType(PackageCard));
       await tester.pumpAndSettle();
 
-      expect(pushed, '/package-details/7?pax=70&date=2030-01-15');
+      expect(pushed, '/booking/7?pax=70&date=2030-01-15');
     });
   });
 
