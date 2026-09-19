@@ -102,12 +102,19 @@ class _SplashScreenState extends State<SplashScreen>
                             left: 30,
                             child: Text(
                               'INEA',
-                              style: TextStyle(
+                              style: GoogleFonts.josefinSans(
                                 fontSize: 68,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 2,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 6,
                                 height: 1,
                                 color: Colors.white,
+                                shadows: const [
+                                  Shadow(
+                                    color: Color(0xB3653A4C),
+                                    blurRadius: 12,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -117,10 +124,17 @@ class _SplashScreenState extends State<SplashScreen>
                             child: Text(
                               'Scents',
                               style: GoogleFonts.greatVibes(
-                                fontSize: 58,
+                                fontSize: 66,
                                 fontWeight: FontWeight.w400,
                                 height: 1,
                                 color: Colors.white,
+                                shadows: const [
+                                  Shadow(
+                                    color: Color(0xB3653A4C),
+                                    blurRadius: 12,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
