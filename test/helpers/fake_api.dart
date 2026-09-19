@@ -20,6 +20,9 @@ class FakeApiBackend {
   /// Number of GET /api/bookings calls made so far.
   int bookingsEndpointCallCount = 0;
 
+  /// Number of POST /api/bookings calls made so far.
+  int createBookingCallCount = 0;
+
   /// When non-null, the created booking carries this checkout URL.
   String? checkoutUrl = 'https://example.com/checkout/IN-2026-000123';
 
@@ -88,6 +91,7 @@ class FakeHttpClientAdapter implements HttpClientAdapter {
     }
 
     if (method == 'POST' && path == '/api/bookings') {
+      backend.createBookingCallCount++;
       if (backend.failCreateBooking) {
         return _status(500, '{"detail":"payment provider unavailable"}');
       }

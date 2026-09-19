@@ -13,6 +13,14 @@ import '../src/utils/checkout_window.dart';
 import '../utils/peso.dart';
 import '../widgets/index.dart';
 
+/// Day-precision past check (C13): [date] counts as past only when its
+/// calendar day is before today's. Today itself is always allowed.
+bool _isPastDay(DateTime date, DateTime now) {
+  final day = DateTime(date.year, date.month, date.day);
+  final today = DateTime(now.year, now.month, now.day);
+  return day.isBefore(today);
+}
+
 /// Reservation and Booking Screen for INEA Scents.
 ///
 /// Features:
@@ -97,6 +105,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       notifier.ensureFreshForPackage(widget.packageId);
       // Notifier-owned defaults (provider writes are forbidden in initState).
       // A carried `?date=` wins over the default when not in the past.
+      // C13: an already-chosen date always survives re-entry — this branch
+      // only runs when the flow has no date yet, never overwriting one.
       final flow = ref.read(bookingFlowProvider);
       if (flow.selectedDate == null) {
         final now = DateTime.now();
@@ -153,6 +163,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     if (_submitting) return;
     _submitting = true;
     try {
+      // C13: submit-time past-date guard (day precision — today is allowed).
+      // The calendar only offers free days, but a chosen date can age past
+      // midnight while the flow sits open. Reject here so a stale date never
+      // reaches POST; the provider stays untouched.
+      final selectedDay = ref.read(bookingFlowProvider).selectedDate;
+      if (selectedDay != null && _isPastDay(selectedDay, DateTime.now())) {
+        if (mounted) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'The selected date has passed. Please choose a new date.',
+                ),
+              ),
+            );
+        }
+        return;
+      }
       final notifier = ref.read(bookingFlowProvider.notifier);
       // Web popup rule: window.open only survives inside the tap gesture.
       // The booking POST resolves seconds later, so hold a branded
