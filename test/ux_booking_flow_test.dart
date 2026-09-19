@@ -52,7 +52,7 @@ void main() {
   });
 
   group('ux_booking packages screen', () {
-    testWidgets('one tiered package renders four PAX cards with prices', (
+    testWidgets('one tiered package renders hero plus four Pax Choice rows', (
       WidgetTester tester,
     ) async {
       SharedPreferences.setMockInitialValues({'first_launch': false});
@@ -68,7 +68,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      for (final label in ['50 PAX', '70 PAX', '100 PAX', '150 PAX']) {
+      expect(find.text('Unified Celebration Bar'), findsOneWidget);
+      expect(find.text('Choose your Pax Choice'), findsOneWidget);
+      for (final label in [
+        '50 Pax Choice',
+        '70 Pax Choice',
+        '100 Pax Choice',
+        '150 Pax Choice',
+      ]) {
         expect(find.text(label), findsOneWidget);
       }
       for (final price in [
@@ -79,9 +86,10 @@ void main() {
       ]) {
         expect(find.text(price), findsOneWidget);
       }
-      // Glossary terms only: no Guests, no Tier in the UI.
+      // Glossary terms only: no Guests, no Tier, no Package in the UI.
       expect(find.textContaining('Guest'), findsNothing);
       expect(find.textContaining('Tier'), findsNothing);
+      expect(find.textContaining('Package'), findsNothing);
     });
   });
 

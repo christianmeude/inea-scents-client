@@ -15,30 +15,9 @@ class PackagesScreen extends ConsumerStatefulWidget {
   ConsumerState<PackagesScreen> createState() => _PackagesScreenState();
 }
 
-/// One selectable card on the packages grid. Packages with options expand to
-/// one entry per headcount step ("50 PAX — ₱4,499"); packages without options
-/// render as a single entry.
-class _PackageEntry {
-  final Package package;
-  final PackageOption? option;
-
-  const _PackageEntry(this.package, [this.option]);
-}
-
-List<_PackageEntry> _packageEntries(List<Package> packages) {
-  final entries = <_PackageEntry>[];
-  for (final package in packages) {
-    final options = package.options;
-    if (options.isEmpty) {
-      entries.add(_PackageEntry(package));
-    } else {
-      for (final option in options) {
-        entries.add(_PackageEntry(package, option));
-      }
-    }
-  }
-  return entries;
-}
+/// C17: one Offering renders one hero plus one row per Pax Choice.
+/// Packages without an option map fall back to a single row at the
+/// scalar price so the list never renders empty.
 
 class _PackagesScreenState extends ConsumerState<PackagesScreen> {
   @override
@@ -142,22 +121,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                   const SizedBox(height: 20),
 
                   // ==================================================
-                  // SECTION HEADER (P7: filter chips + item counter
-                  // removed — search narrows the grid directly)
-                  // ==================================================
-                  Text(
-                    'All Packages',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // ==================================================
-                  // PACKAGES
+                  // C17: single Offering hero + Pax Choice rows
                   // ==================================================
                   packagesAsync.when(
                     data: (packages) {
@@ -165,32 +129,41 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                         return _EmptyPackages();
                       }
 
-                      return LayoutBuilder(
-                        builder: (context, constraints) {
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
+                      final offering = packages.first;
+                      final opts = offering.options;
+                      final choices = opts.isEmpty
+                          ? [
+                              PackageOption(
+                                offering.paxOptions?.firstOrNull ?? 50,
+                                offering.priceForPax(null),
+                              ),
+                            ]
+                          : opts;
 
-                            // P6 (G2): 2 → 3 → 4 columns across
-                            // mobile / tablet / desktop.
-                            gridDelegate:
-                                ResponsiveAppShell.gridDelegateForWidth(
-                                  constraints.maxWidth,
-                                ),
-
-                            itemCount: _packageEntries(packages).length,
-
-                            itemBuilder: (context, index) {
-                              final entry = _packageEntries(packages)[index];
-
-                              return PackageCard(
-                                package: entry.package,
-                                optionPax: entry.option?.pax,
-                                initialDate: widget.initialDate,
-                              );
-                            },
-                          );
-                        },
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PackageOfferingHero(package: offering),
+                          const SizedBox(height: 20),
+                          Text(
+                            'Choose your Pax Choice',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          for (final choice in choices) ...[
+                            PaxChoiceRow(
+                              packageId: offering.id,
+                              pax: choice.pax,
+                              price: choice.price,
+                              initialDate: widget.initialDate,
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ],
                       );
                     },
 
