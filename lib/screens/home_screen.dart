@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 child: Stack(
                   alignment: Alignment.center,
-                  children: [Center(child: AppLogo())],
+                  children: [Center(child: SizedBox(width: 200, child: AppLogo()))],
                 ),
               ),
             Expanded(
