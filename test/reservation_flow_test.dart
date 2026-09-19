@@ -122,7 +122,7 @@ void main() {
 
         // Verify desktop header is present
 
-        expect(find.text('01 Details'), findsOneWidget);
+        expect(find.text('01 Date & Time'), findsOneWidget);
 
         // Layout coordinate verification:
         // Calendar above Details in the flow column; summary to the right.
@@ -1418,14 +1418,14 @@ void main() {
         await tester.pumpAndSettle();
 
         // Initial reservation header (P6: desktop is 2-column)
-        expect(find.text('01 Details'), findsOneWidget);
+        expect(find.text('01 Date & Time'), findsOneWidget);
 
         // Proceed to payment
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
         // Payment header updates
-        expect(find.text('04 Checkout'), findsOneWidget);
+        expect(find.text('03 Review & Pay'), findsOneWidget);
 
         expect(find.byIcon(Icons.lock_outline_rounded), findsWidgets);
       },

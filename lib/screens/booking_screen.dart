@@ -914,15 +914,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  _buildBreadcrumb('01 Details', true),
+                  _buildBreadcrumb('01 Date & Time', true),
                   _breadcrumbArrow(),
-                  _buildBreadcrumb('02 Pax Choice', _currentStep >= 1),
+                  _buildBreadcrumb('02 Details', _currentStep >= 3),
                   _breadcrumbArrow(),
-                  _buildBreadcrumb('03 Date & Time', _currentStep >= 2),
-                  _breadcrumbArrow(),
-                  _buildBreadcrumb('04 Checkout', _currentStep >= 3),
-                  _breadcrumbArrow(),
-                  _buildBreadcrumb('05 Confirmed', _currentStep >= 5),
+                  _buildBreadcrumb('03 Review & Pay', _currentStep >= 4),
                 ],
               ),
             ),
@@ -1300,13 +1296,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   Widget _buildTimeline() {
-    final steps = ['Pax Choice', 'Scents', 'Schedule', 'Details', 'Payment'];
+    // C19: 3-step wizard — Pax Choice and Scents are chosen before
+    // entering the flow (?pax= + scent shelf), so the timeline shows
+    // Schedule (2) → Details (3) → Payment (4).
+    final steps = ['Schedule', 'Details', 'Payment'];
+    final flowIndex = (_currentStep - 2).clamp(0, 2);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 25),
       child: Row(
         children: List.generate(steps.length, (index) {
-          final isPast = index < _currentStep;
-          final isCurrent = index == _currentStep;
+          final isPast = index < flowIndex;
+          final isCurrent = index == flowIndex;
           return Expanded(
             child: Column(
               children: [
@@ -1346,7 +1346,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       Expanded(
                         child: Container(
                           height: 3,
-                          color: index < _currentStep
+                          color: index < flowIndex
                               ? plum
                               : const Color(0xFF99868C),
                         ),

@@ -132,9 +132,7 @@ class BottomNavBar extends StatelessWidget {
           location = router.location;
         } catch (_) {}
       }
-      if (location.contains('package-details')) {
-        return 0;
-      } else if (location.contains('package')) {
+      if (location.contains('package')) {
         return 1;
       } else if (location.contains('booking')) {
         return 2;
