@@ -26,6 +26,8 @@ class DesktopPaymentPanel extends StatefulWidget {
   final ValueChanged<String>? onCustomerEmailChanged;
   final ValueChanged<String>? onCustomerPhoneChanged;
   final ValueChanged<String>? onVenueAddressChanged;
+  // C6: onBackToReservation identifier kept (booking_screen call sites);
+  // it navigates in-flow via _goToStep(2), never via the router.
   final VoidCallback? onBackToReservation;
 
   const DesktopPaymentPanel({

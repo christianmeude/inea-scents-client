@@ -14,6 +14,8 @@ import 'inclusions_list.dart';
 /// header one-liner {pax} PAX · {date} · {time}, Inclusions + Free via
 /// shared InclusionsList, no image/rating/Live chip/dot-leaders/payment
 /// chip/total-name duplication, `₱` only, wrap-don't-truncate.
+// C6: Order* class name kept (referenced across booking_screen and tests);
+// customer-facing copy already uses Booking ("Your Booking").
 class OrderSummaryPanel extends StatelessWidget {
   static const Color plum = Color(0xFF6A4053);
 

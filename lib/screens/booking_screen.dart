@@ -301,20 +301,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     ref.read(bookingFlowProvider.notifier).goToStep(step);
   }
 
-  /// P6: headcount is chosen on the packages grid and travels via `?pax=`,
-  /// so booking shows a read-only row. "Change" returns to package details
-  /// carrying the current pax and date; nothing to repair when absent.
-  void _goChangePax(Package package) {
-    final id = package.id;
-    if (id == null) return;
-    final query = <String>[];
-    if (_selectedPax != null) query.add('pax=$_selectedPax');
-    if (_selectedDate != null) {
-      query.add('date=${formatDateParam(_selectedDate!)}');
-    }
-    final suffix = query.isEmpty ? '' : '?${query.join('&')}';
-    context.go('/package-details/$id$suffix');
-  }
+  // C6: single in-flow edit path — pax "Change" stays on the schedule
+  // step via _goToStep(2), the same path as onBackToReservation below.
+  // The /package-details router jump is dropped (router.dart untouched).
 
   /// Freeform clock-time picker. Stores `H:i:s` directly (no slot labels);
   /// the provider passes it to the API, which accepts any valid time.
@@ -533,7 +522,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   key: const Key('reservation_details_panel'),
                                   package: package,
                                   selectedPax: _selectedPax,
-                                  onChangePax: () => _goChangePax(package),
+                                  // C6: in-flow pax edit (step 2); no router jump.
+                                  onChangePax: () => _goToStep(2),
                                   selectedTime: _selectedTime,
                                   onTimeSelected: (time) {
                                     ref
@@ -703,7 +693,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 key: const Key('tablet_details_panel'),
                                 package: package,
                                 selectedPax: _selectedPax,
-                                onChangePax: () => _goChangePax(package),
+                                // C6: in-flow pax edit (step 2); no router jump.
+                                onChangePax: () => _goToStep(2),
                                 selectedTime: _selectedTime,
                                 onTimeSelected: (time) {
                                   ref
@@ -908,7 +899,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 children: [
                   _buildBreadcrumb('01 Details', true),
                   _breadcrumbArrow(),
-                  _buildBreadcrumb('02 Package', _currentStep >= 1),
+                  _buildBreadcrumb('02 Pax Choice', _currentStep >= 1),
                   _breadcrumbArrow(),
                   _buildBreadcrumb('03 Date & Time', _currentStep >= 2),
                   _breadcrumbArrow(),
@@ -1292,7 +1283,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   Widget _buildTimeline() {
-    final steps = ['Package', 'Scents', 'Schedule', 'Details', 'Payment'];
+    final steps = ['Pax Choice', 'Scents', 'Schedule', 'Details', 'Payment'];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 25),
       child: Row(
@@ -1399,8 +1390,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          // P6: read-only — the headcount step was chosen on the
-          // packages grid (`?pax=`); Change routes back to details.
+          // C6: read-only — the headcount step was chosen on the
+          // packages grid (`?pax=`); Change stays in-flow on step 2.
           Builder(
             builder: (context) {
               final effectivePax =
@@ -1439,9 +1430,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    GestureDetector(
-                      key: const Key('pax_change_link'),
-                      onTap: () => _goChangePax(package),
+                      GestureDetector(
+                        key: const Key('pax_change_link'),
+                        // C6: in-flow pax edit (step 2); no router jump.
+                        onTap: () => _goToStep(2),
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: Text(
@@ -1529,7 +1521,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Order Details',
+            'Booking Details',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -1558,12 +1550,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       ),
                       const SizedBox(height: 15),
                       Text(
-                        'Package Variation: ${package.name}',
+                        'Pax Choice: ${package.name}',
                         style: TextStyle(fontSize: 13, color: _body),
                       ),
                       const SizedBox(height: 15),
                       Text(
-                        'Inclusion/s:',
+                        'Inclusions:',
                         style: TextStyle(fontSize: 13, color: _body),
                       ),
                       const SizedBox(height: 5),
@@ -1575,7 +1567,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       ),
                       const SizedBox(height: 15),
                       Text(
-                        'Free:',
+                        'Freebies:',
                         style: TextStyle(fontSize: 13, color: _body),
                       ),
                       const SizedBox(height: 5),

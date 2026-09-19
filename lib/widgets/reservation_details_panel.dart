@@ -9,6 +9,8 @@ import 'inclusions_list.dart';
 /// Handles Package variation overview, the locked Pax summary (P6: the
 /// headcount step is chosen on the packages grid, never re-picked here),
 /// Time slot selection, Inclusions preview, and Payment Method selection.
+// C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
+// customer-facing copy uses Booking / Pax Choice.
 class ReservationDetailsPanel extends StatelessWidget {
   static const Color plum = Color(0xFF6A4053);
   static const Color mutedPlum = Color(0xFF99868C);
@@ -17,8 +19,8 @@ class ReservationDetailsPanel extends StatelessWidget {
   final Package package;
   final int? selectedPax;
 
-  /// Returns to package details so the customer can pick another
-  /// headcount step. Null hides the Change action.
+  /// C6: requests the in-flow pax edit (booking step 2); the
+  /// package-details router jump is dropped. Null hides the Change action.
   final VoidCallback? onChangePax;
   final String? selectedTime;
   final ValueChanged<String> onTimeSelected;
@@ -94,7 +96,7 @@ class ReservationDetailsPanel extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          package.name ?? 'Luxury Experience Package',
+                          package.name ?? 'Luxury Experience Pax Choice',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,

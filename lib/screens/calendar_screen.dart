@@ -467,7 +467,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
-                      'Selected $dateStr — choose a package to book',
+                      'Selected $dateStr — choose a Pax Choice to book',
                     ),
                   ),
                 );

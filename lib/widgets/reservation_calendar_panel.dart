@@ -3,6 +3,8 @@ import 'inea_calendar.dart';
 
 /// Backward-compatible alias — delegates to shared [IneaCalendar].
 /// Keeps existing tests and desktop/tablet layouts working.
+// C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
+// customer-facing copy uses Booking.
 class ReservationCalendarPanel extends StatelessWidget {
   static const Color plum = IneaCalendar.plum;
   static const Color mutedPlum = IneaCalendar.mutedPlum;
