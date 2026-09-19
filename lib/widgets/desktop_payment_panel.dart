@@ -26,8 +26,10 @@ class DesktopPaymentPanel extends StatefulWidget {
   final ValueChanged<String>? onCustomerEmailChanged;
   final ValueChanged<String>? onCustomerPhoneChanged;
   final ValueChanged<String>? onVenueAddressChanged;
-  // C6: onBackToReservation identifier kept (booking_screen call sites);
-  // it navigates in-flow via _goToStep(2), never via the router.
+  // C6: onBackToReservation identifier kept for booking_screen call sites
+  // (in-flow via _goToStep(2), never via the router). C8: the redundant
+  // in-panel header + Edit Selection chip were distilled; navigation now
+  // lives solely in the booking header Back affordance.
   final VoidCallback? onBackToReservation;
 
   const DesktopPaymentPanel({
@@ -146,172 +148,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ========================================================
-              // 1. PAYMENT HEADER & NAVIGATION BANNER
-              // ========================================================
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                child: isNarrow
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: chipColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Icon(
-                                  Icons.lock_outline_rounded,
-                                  color: titleColor,
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Payment & Checkout Details',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                        color: titleColor,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      'Select payment method and enter details to complete your booking.',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: DesktopPaymentPanel.mutedPlum,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (widget.onBackToReservation != null) ...[
-                            const SizedBox(height: 10),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: OutlinedButton.icon(
-                                onPressed: widget.onBackToReservation,
-                                icon: Icon(
-                                  Icons.arrow_back_rounded,
-                                  size: 15,
-                                  color: titleColor,
-                                ),
-                                label: Text(
-                                  'Edit Selection',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: titleColor,
-                                  ),
-                                ),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  side: BorderSide(color: surfaceBorder),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(9999),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: chipColor,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.lock_outline_rounded,
-                              color: titleColor,
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Payment & Checkout Details',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: titleColor,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'Select payment method and enter details to complete your booking.',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: DesktopPaymentPanel.mutedPlum,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (widget.onBackToReservation != null) ...[
-                            const SizedBox(width: 8),
-                            OutlinedButton.icon(
-                              onPressed: widget.onBackToReservation,
-                              icon: Icon(
-                                Icons.arrow_back_rounded,
-                                size: 15,
-                                color: titleColor,
-                              ),
-                              label: Text(
-                                'Edit Selection',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: titleColor,
-                                ),
-                              ),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                                side: BorderSide(color: surfaceBorder),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(9999),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-              ),
-
-              const SizedBox(height: 14),
-
-              // ========================================================
-              // 2. PAYMENT METHOD SELECTION
+              // 1. PAYMENT METHOD SELECTION
               // ========================================================
               Container(
                 width: double.infinity,
@@ -451,7 +288,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               const SizedBox(height: 14),
 
               // ========================================================
-              // 3. PAYMENT METHOD INPUT FIELDS
+              // 2. PAYMENT METHOD INPUT FIELDS
               // ========================================================
               Container(
                 width: double.infinity,
@@ -575,7 +412,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               const SizedBox(height: 14),
 
               // ========================================================
-              // 4. BILLING & EVENT CONTACT INFORMATION
+              // 3. BILLING & EVENT CONTACT INFORMATION
               // ========================================================
               Container(
                 width: double.infinity,
@@ -753,7 +590,7 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
               const SizedBox(height: 14),
 
               // ========================================================
-              // 5. SECURITY & TRUST BADGES
+              // 4. SECURITY & TRUST BADGES
               // ========================================================
               Container(
                 width: double.infinity,

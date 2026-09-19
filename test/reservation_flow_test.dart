@@ -1305,7 +1305,8 @@ void main() {
           find.byKey(const Key('desktop_payment_panel_view')),
           findsOneWidget,
         );
-        expect(find.text('Payment & Checkout Details'), findsOneWidget);
+        // C8: header distilled — panel starts at payment method selection.
+        expect(find.text('Payment & Checkout Details'), findsNothing);
         expect(find.text('Select Payment Method'), findsOneWidget);
       },
     );
@@ -1434,7 +1435,7 @@ void main() {
     );
 
     testWidgets(
-      'Edit Selection button in DesktopPaymentPanel cross-fades back to 2-column reservation layout',
+      'C8: Edit Selection chip distilled; header Back still cross-fades back to 2-column reservation layout',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1450,10 +1451,10 @@ void main() {
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
-        // Find and tap 'Edit Selection' button inside payment panel
-        final editSelectionFinder = find.text('Edit Selection');
-        expect(editSelectionFinder, findsOneWidget);
-        await tester.tap(editSelectionFinder);
+        // C8: in-panel Edit Selection chip distilled; C6 Back affordance preserved.
+        expect(find.text('Edit Selection'), findsNothing);
+        expect(find.text('Payment & Checkout Details'), findsNothing);
+        await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
 
         // Returned to Calendar and Details panels
@@ -1778,7 +1779,8 @@ void main() {
         findsOneWidget,
       );
       expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
-      expect(find.text('Payment & Checkout Details'), findsOneWidget);
+      // C8: header distilled.
+      expect(find.text('Payment & Checkout Details'), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -2049,8 +2051,8 @@ void main() {
             findsOneWidget,
           );
 
-          // Edit Selection (Back to Reservation)
-          final editSel = find.text('Edit Selection');
+          // C8: chip distilled — header Back (C6 _goToStep(2)) returns.
+          final editSel = find.text('Back');
           await tester.ensureVisible(editSel);
           await tester.pumpAndSettle();
           await tester.tap(editSel);
@@ -2117,7 +2119,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Payment & Checkout Details'), findsOneWidget);
+        // C8: header distilled — panel starts at payment method selection.
+        expect(find.text('Payment & Checkout Details'), findsNothing);
         expect(find.text('Online Checkout'), findsOneWidget);
         expect(
           find.byKey(const Key('online_checkout_explainer')),
