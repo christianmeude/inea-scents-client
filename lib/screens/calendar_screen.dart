@@ -28,52 +28,15 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   Widget build(BuildContext context) {
     // P7: chrome resolves through the shared helper; brand accents
     // (selected day, markers) stay fixed in both modes.
-    final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
-    final chipColor = CardSurfaces.chipBg(context);
     final availabilityAsync = ref.watch(availabilityProvider);
 
     // P7: no explicit color — flat theme scaffold background.
     return Scaffold(
-      // ========================================================
-      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
-      // ========================================================
-      appBar: MediaQuery.of(context).size.width < 768
-          ? AppBar(
-              backgroundColor: Colors.transparent,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: true,
-
-              title: const _BrandName(),
-
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 14),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: chipColor,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: surfaceBorder),
-                    ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.refresh_rounded,
-                        size: 20,
-                        color: titleColor,
-                      ),
-                      onPressed: () {
-                        ref.read(availabilityProvider.notifier).refresh();
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : null,
+      // C22: distilled — mobile AppBar removed (brand title + refresh
+      // button). Pull-to-refresh stays the refresh path; desktop
+      // TopNavBar covers nav.
+      appBar: null,
 
       // ========================================================
       // BODY
@@ -443,8 +406,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   /// Legend + selected-date panel + continue action. Stacked on
   /// mobile, legend | selection side-by-side on web.
   Widget _buildAgendaColumn(String? selectedStatus, {bool isDesktop = false}) {
-    final surfaceBorder = CardSurfaces.cardBorder(context);
-    final chipColor = CardSurfaces.chipBg(context);
     final selection = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -528,71 +489,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     return '${months[date.month - 1]} '
         '${date.day}, '
         '${date.year}';
-  }
-}
-
-// ============================================================================
-// BRAND NAME
-// Matches Packages screen alignment
-// ============================================================================
-
-class _BrandName extends StatelessWidget {
-  const _BrandName();
-
-  @override
-  Widget build(BuildContext context) {
-    const brandColor = Color(0xFF6D3E55);
-
-    return SizedBox(
-      width: 130,
-      height: 58,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'INEA',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 5.2,
-              height: 0.85,
-              color: brandColor,
-              shadows: [
-                Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 3),
-
-          Text(
-            'Scents',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 22,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w300,
-              fontFamily: 'serif',
-              letterSpacing: 0.3,
-              height: 0.95,
-              color: brandColor,
-              shadows: [
-                Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 

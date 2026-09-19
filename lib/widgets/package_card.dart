@@ -172,7 +172,7 @@ class _PackageCardState extends State<PackageCard> {
                         ),
                       ),
                       child: Text(
-                        'View Package',
+                        'View Pax Choice',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,

@@ -247,7 +247,8 @@ class _TopNavItemState extends State<_TopNavItem> {
           onTap: widget.onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+            constraints: const BoxConstraints(minHeight: 48.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: bg,
               borderRadius: BorderRadius.circular(9999),
@@ -266,14 +267,14 @@ class _TopNavItemState extends State<_TopNavItem> {
                 Icon(
                   isSelected ? widget.activeIcon : widget.icon,
                   color: Colors.white,
-                  size: 14,
+                  size: 18,
                 ),
                 const SizedBox(width: 3),
                 Text(
                   widget.label,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 11,
+                    fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                     letterSpacing: 0.4,
                   ),

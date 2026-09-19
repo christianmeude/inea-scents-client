@@ -43,6 +43,8 @@ class MyBookingsScreen extends ConsumerWidget {
       // ============================================================
       // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
       // ============================================================
+      // C22: distilled — brand title removed; desktop TopNavBar covers
+      // nav. The functional book-another action stays (48px touch).
       appBar: isNarrow
           ? AppBar(
               backgroundColor: Colors.transparent,
@@ -50,25 +52,15 @@ class MyBookingsScreen extends ConsumerWidget {
               elevation: 0,
               centerTitle: true,
 
-              // ==========================================================
-              // BRAND
-              // Same alignment as PackagesScreen
-              // ==========================================================
-              title: const _BrandName(),
-
-              // Keep the left side empty so the brand remains centered.
-              leading: const SizedBox(),
-
-              // C12: book-another stays pinned on mobile; same 42px
-              // circle language as PackagesScreen/ProfileScreen so the
-              // brand stays centered. Hidden unless bookings data exists.
+              // C12: book-another stays pinned on mobile; hidden unless
+              // bookings data exists.
               actions: [
                 if (hasBookings)
                   Padding(
                     padding: const EdgeInsets.only(right: 16),
                     child: Container(
-                      width: 42,
-                      height: 42,
+                      width: 48,
+                      height: 48,
                       decoration: BoxDecoration(
                         color: CardSurfaces.chipBg(context),
                         shape: BoxShape.circle,
@@ -90,7 +82,7 @@ class MyBookingsScreen extends ConsumerWidget {
                     ),
                   )
                 else
-                  const SizedBox(width: 58),
+                  const SizedBox(width: 64),
               ],
             )
           : null,
@@ -262,77 +254,6 @@ class MyBookingsScreen extends ConsumerWidget {
 }
 
 // ============================================================================
-// INEA BRAND NAME
-// EXACT SAME ALIGNMENT AS PACKAGESSCREEN
-// ============================================================================
-
-class _BrandName extends StatelessWidget {
-  const _BrandName();
-
-  @override
-  Widget build(BuildContext context) {
-    const brandColor = Color(0xFF6D3E55);
-
-    return SizedBox(
-      width: 130,
-      height: 58,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // ==========================================================
-          // INEA
-          // ==========================================================
-          Text(
-            'INEA',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 5.2,
-              height: 0.85,
-              color: brandColor,
-              shadows: [
-                Shadow(
-                  color: CardSurfaces.chipBg(context),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 3),
-
-          // ==========================================================
-          // SCENTS
-          // ==========================================================
-          Text(
-            'Scents',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 22,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w300,
-              fontFamily: 'serif',
-              letterSpacing: 0.3,
-              height: 0.95,
-              color: brandColor,
-              shadows: [
-                Shadow(
-                  color: CardSurfaces.chipBg(context),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================================
 // BOOKING CARD
 // ============================================================================
 
@@ -447,7 +368,7 @@ class _BookingCard extends StatelessWidget {
             // PACKAGE NAME
             // ==========================================================
             Text(
-              booking.package?.name ?? 'Unknown Package',
+              booking.package?.name ?? 'Unknown Pax Choice',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -522,7 +443,7 @@ class _BookingCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Package Price',
+                    'Pax Choice Price',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,

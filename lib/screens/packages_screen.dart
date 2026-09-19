@@ -34,50 +34,9 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
     // P7: no explicit color — the theme scaffold color (light cream /
     // dark night) is the background.
     return Scaffold(
-      // ============================================================
-      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
-      // ============================================================
-      appBar: MediaQuery.of(context).size.width < 768
-          ? AppBar(
-              backgroundColor: Colors.transparent,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: true,
-
-              title: const _BrandName(),
-
-              leading: const SizedBox(),
-
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: CardSurfaces.chipBg(context),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.55),
-                        width: 1,
-                      ),
-                    ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      icon: Icon(
-                        Icons.tune_rounded,
-                        color: textColor,
-                        size: 20,
-                      ),
-                      onPressed: () {
-                        // Add filters later.
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            )
-          : null,
+      // C22: distilled — mobile AppBar removed (brand title + dead tune
+      // filter). Desktop TopNavBar covers nav; body carries the title.
+      appBar: null,
 
       // ============================================================
       // BODY (P7: flat theme background; decorative gradient removed)
@@ -228,9 +187,9 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     // stay in logs, never on screen.
                     error: (error, stack) {
                       return ErrorStateCard(
-                        title: 'Unable to load packages',
+                        title: 'Unable to load Offerings',
                         message:
-                            "We couldn't load the packages. "
+                            "We couldn't load the Offerings. "
                             'Check your connection and try again.',
                         onRetry: () => ref.invalidate(packagesProvider),
                       );
@@ -248,82 +207,6 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
       // ============================================================
       // BODY WRAPPER END
       // ============================================================
-    );
-  }
-}
-
-// ============================================================================
-// INEA BRAND NAME
-// ============================================================================
-
-class _BrandName extends StatelessWidget {
-  const _BrandName();
-
-  @override
-  Widget build(BuildContext context) {
-    const brandColor = Color(0xFF6D3E55);
-
-    return SizedBox(
-      width: 130,
-      height: 58,
-
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-
-        children: [
-          // ==========================================================
-          // INEA
-          // ==========================================================
-          Text(
-            'INEA',
-            textAlign: TextAlign.center,
-
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 5.2,
-              height: 0.85,
-              color: brandColor,
-
-              shadows: [
-                Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 3),
-
-          // ==========================================================
-          // SCENTS
-          // ==========================================================
-          Text(
-            'Scents',
-            textAlign: TextAlign.center,
-
-            style: TextStyle(
-              fontSize: 22,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w300,
-              fontFamily: 'serif',
-              letterSpacing: 0.3,
-              height: 0.95,
-              color: brandColor,
-
-              shadows: [
-                Shadow(
-                  color: Colors.white.withValues(alpha: 0.75),
-                  blurRadius: 1.5,
-                  offset: const Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -365,7 +248,7 @@ class _EmptyPackages extends StatelessWidget {
           const SizedBox(height: 14),
 
           SelectableText(
-            'No packages available',
+            'No Offerings available',
             textAlign: TextAlign.center,
             style: TextStyle(
               color: textColor,
