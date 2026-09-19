@@ -148,7 +148,8 @@ void main() {
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('Choose Event Time'), findsOneWidget);
-        expect(find.text('Payment Method'), findsOneWidget);
+        // C18 pay-once: schedule step carries no payment picker.
+        expect(find.text('Payment Method'), findsNothing);
 
         // Verify contents inside Right column (Sticky Order Summary) — P7 C distilled
         expect(find.text('Your Booking'), findsOneWidget);
@@ -360,10 +361,27 @@ void main() {
         // Retired method is gone from every picker (owner Q14-B).
         expect(find.text('Bank Transfer'), findsNothing);
 
-        // Select 'Cash' in the details panel (scoped: the summary
+        // C18 pay-once: schedule step carries no picker — pick once
+        // at the payment step instead.
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('reservation_details_panel')),
+            matching: find.text('Cash'),
+          ),
+          findsNothing,
+        );
+
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsOneWidget,
+        );
+
+        // Select 'Cash' in the payment panel (scoped: the summary
         // column renders the method label too).
         final cashFinder = find.descendant(
-          of: find.byKey(const Key('reservation_details_panel')),
+          of: find.byKey(const Key('desktop_payment_panel_view')),
           matching: find.text('Cash'),
         );
         await tester.ensureVisible(cashFinder);
@@ -672,22 +690,48 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // P6: pax is read-only (locked step + Change link); payment
-        // toggles remain interactive. Time keeps its default.
+        // P6: pax is read-only (locked step + Change link). C18 pay-once:
+        // the schedule step carries no payment picker.
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('20 PAX'), findsOneWidget);
 
         // Freeform time keeps its default through selection changes
         expect(find.text('2:00 PM'), findsWidgets);
 
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('reservation_details_panel')),
+            matching: find.text('Cash'),
+          ),
+          findsNothing,
+        );
+
+        // Pick Cash once at the payment step, then continue below.
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsOneWidget,
+        );
         final cashFinder = find.descendant(
-          of: find.byKey(const Key('reservation_details_panel')),
+          of: find.byKey(const Key('desktop_payment_panel_view')),
           matching: find.text('Cash'),
         );
         await tester.ensureVisible(cashFinder);
         await tester.pumpAndSettle();
         await tester.tap(cashFinder);
         await tester.pumpAndSettle();
+
+        // Back to the schedule step for the oscillation below.
+        final backToSchedule = find.text('Back');
+        await tester.ensureVisible(backToSchedule);
+        await tester.pumpAndSettle();
+        await tester.tap(backToSchedule);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('reservation_calendar_panel')),
+          findsOneWidget,
+        );
 
         expect(find.textContaining('PAX ·'), findsWidgets);
         expect(find.text('20 PAX'), findsWidgets);
@@ -813,8 +857,6 @@ void main() {
                       onChangePax: () {},
                       selectedTime: null,
                       onTimeSelected: (_) {},
-                      paymentMethod: null,
-                      onPaymentMethodSelected: (_) {},
                     ),
                   ),
                   Expanded(
@@ -2021,17 +2063,43 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // P6: pax is read-only; select Online on reservation step.
+        // P6: pax is read-only. C18 pay-once: no picker on the
+        // reservation step — pick Online once at the payment step.
         expect(find.text('20 PAX'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('reservation_details_panel')),
+            matching: find.text('Online'),
+          ),
+          findsNothing,
+        );
+
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsOneWidget,
+        );
 
         final onlineOption = find.descendant(
-          of: find.byKey(const Key('reservation_details_panel')),
+          of: find.byKey(const Key('desktop_payment_panel_view')),
           matching: find.text('Online'),
         );
         await tester.ensureVisible(onlineOption);
         await tester.pumpAndSettle();
         await tester.tap(onlineOption);
         await tester.pumpAndSettle();
+
+        // Back to the reservation step for the oscillation below.
+        final backToReservation = find.text('Back');
+        await tester.ensureVisible(backToReservation);
+        await tester.pumpAndSettle();
+        await tester.tap(backToReservation);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('reservation_calendar_panel')),
+          findsOneWidget,
+        );
 
         expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('20 PAX'), findsWidgets);
