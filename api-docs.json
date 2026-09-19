@@ -289,9 +289,8 @@
                                     "payment_method": {
                                         "type": "string",
                                         "enum": [
-                                            "credit_card",
-                                            "cash",
-                                            "bank_transfer"
+                                            "online",
+                                            "cash"
                                         ]
                                     },
                                     "scent_ids": {
