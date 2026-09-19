@@ -30,10 +30,7 @@ void main() {
     venueAddress: 'The Peninsula Manila',
   );
 
-  GoRouter buildRouter(
-    List<Override> overrides, {
-    String initial = '/bookings',
-  }) {
+  GoRouter buildRouter({String initial = '/bookings'}) {
     return GoRouter(
       initialLocation: initial,
       routes: [
@@ -78,9 +75,7 @@ void main() {
   testWidgets('empty state CTA goes to /packages with Pax-Choice copy', (
     WidgetTester tester,
   ) async {
-    final router = buildRouter([
-      bookingsProvider.overrideWith((ref) => Future.value(<Booking>[])),
-    ]);
+    final router = buildRouter();
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -112,9 +107,7 @@ void main() {
   testWidgets('non-empty mobile shows pinned book-another icon to /packages', (
     WidgetTester tester,
   ) async {
-    final router = buildRouter([
-      bookingsProvider.overrideWith((ref) => Future.value([sampleBooking()])),
-    ]);
+    final router = buildRouter();
     await pumpBookings(tester, router, [
       bookingsProvider.overrideWith((ref) => Future.value([sampleBooking()])),
     ]);
@@ -136,9 +129,7 @@ void main() {
   testWidgets('non-empty desktop shows trailing book-another button', (
     WidgetTester tester,
   ) async {
-    final router = buildRouter([
-      bookingsProvider.overrideWith((ref) => Future.value([sampleBooking()])),
-    ]);
+    final router = buildRouter();
     await pumpBookings(
       tester,
       router,
@@ -164,7 +155,7 @@ void main() {
     // Never-resolving-until-teardown future stays in the spinner (pump,
     // not pumpAndSettle — the spinner animation never settles). Completed
     // at the end so no timer is pending when the tree is disposed.
-    final loadingRouter = buildRouter(const []);
+    final loadingRouter = buildRouter();
     final loadingCompleter = Completer<List<Booking>>();
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;
@@ -200,7 +191,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     // Error: GET /api/bookings 500 renders the friendly card, no action.
     final errorBackend = FakeApiBackend()..failGetBookings = true;
-    final errorRouter = buildRouter(const []);
+    final errorRouter = buildRouter();
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
