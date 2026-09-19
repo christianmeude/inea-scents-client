@@ -141,8 +141,8 @@ void main() {
 
         // Verify contents inside the flow column (Calendar)
         expect(find.text('Select Date'), findsOneWidget);
-        expect(find.text('Available'), findsWidgets);
-        expect(find.text('Booked'), findsWidgets);
+        expect(find.text('Available'), findsNothing);
+        expect(find.text('Booked'), findsNothing);
 
         // Verify contents inside the flow column (Details, PAX read-only)
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
