@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/index.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/index.dart';
 
-class HomeScreen extends ConsumerWidget {
+/// C16: Home is a concierge stack, not a catalog. Check-date CTA first,
+/// then the C11 upcoming Booking, one Offering teaser (→ /packages),
+/// then trust copy. No catalog grid lives here.
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final packagesAsync = ref.watch(packagesProvider);
-    // P7: surfaces resolve through the shared helper (banner art stays).
-    final titleColor = CardSurfaces.title(context);
-
-    // P7: no explicit color — flat theme scaffold background.
+  Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
-            // ============================================================
-            // HEADER (Mobile only, Desktop uses TopNavBar in App Shell)
-            // ============================================================
             if (MediaQuery.of(context).size.width < 768)
-              Padding(
-                padding: const EdgeInsets.symmetric(
+              const Padding(
+                padding: EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 15,
                 ),
@@ -31,110 +25,37 @@ class HomeScreen extends ConsumerWidget {
                   children: [Center(child: AppLogo())],
                 ),
               ),
-
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1200),
-                    child: Column(
+                    child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // C1: concierge next step — date-first entry into
-                        // the booking flow (P4 order), above the fold.
-                        // ============================================================
-                        const Padding(
+                        // Date-first entry (C13 guard + Availability
+                        // gating live on the calendar route).
+                        Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20),
                           child: NextStepCard(),
                         ),
-
-                        const SizedBox(height: 24),
-
-                        // POPULAR PACKAGES TITLE
-                        // ============================================================
+                        SizedBox(height: 16),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            'Our Packages',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w500,
-                              color: titleColor,
-                            ),
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: UpcomingBookingSection(),
                         ),
-
-                        const SizedBox(height: 15),
-
-                        // ============================================================
-                        // PACKAGE GRID
-                        // ============================================================
+                        SizedBox(height: 16),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: packagesAsync.when(
-                            data: (packages) {
-                              if (packages.isEmpty) {
-                                return const Center(
-                                  child: Text("No packages available"),
-                                );
-                              }
-
-                              return LayoutBuilder(
-                                builder: (context, constraints) {
-                                  return GridView.builder(
-                                    shrinkWrap: true,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    gridDelegate:
-                                        ResponsiveAppShell.homeGridDelegateForWidth(
-                                          constraints.maxWidth,
-                                        ),
-                                    itemCount: packages.length,
-                                    itemBuilder: (context, index) {
-                                      return PackageCard(
-                                        package: packages[index],
-                                      );
-                                    },
-                                  );
-                                },
-                              );
-                            },
-                            // C1 (Q10): skeleton grid unifies Home loading
-                            // with Packages — no raw spinner divergence.
-                            loading: () => LayoutBuilder(
-                              builder: (context, constraints) {
-                                return GridView.builder(
-                                  shrinkWrap: true,
-                                  physics:
-                                      const NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      ResponsiveAppShell.homeGridDelegateForWidth(
-                                        constraints.maxWidth,
-                                      ),
-                                  itemCount: 4,
-                                  itemBuilder: (context, index) {
-                                    return const SkeletonPackageCard();
-                                  },
-                                );
-                              },
-                            ),
-                            // P6 (Q6/Q8): shared friendly card; raw
-                            // errors stay in logs, never on screen.
-                            error: (err, stack) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                              ),
-                              child: ErrorStateCard(
-                                title: 'Unable to load packages',
-                                message:
-                                    "We couldn't load the packages. Check your connection and try again.",
-                                onRetry: () => ref.invalidate(packagesProvider),
-                              ),
-                            ),
-                          ),
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: _OfferingTeaser(),
                         ),
-                        const SizedBox(height: 40),
+                        SizedBox(height: 16),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: _TrustCopy(),
+                        ),
+                        SizedBox(height: 40),
                       ],
                     ),
                   ),
@@ -143,6 +64,81 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Single static teaser into the Offerings list. No fetching here.
+class _OfferingTeaser extends StatelessWidget {
+  const _OfferingTeaser();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('home_offering_teaser'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: CardSurfaces.cardBg(context),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: CardSurfaces.cardBorder(context)),
+        boxShadow: [
+          BoxShadow(
+            color: CardSurfaces.plum.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Explore our Offerings',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+              color: CardSurfaces.title(context),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Check your date, then pick a Pax Choice for your event.',
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.4,
+              color: CardSurfaces.body(context),
+            ),
+          ),
+          const SizedBox(height: 14),
+          FilledButton(
+            key: const Key('home_view_offerings_cta'),
+            style: FilledButton.styleFrom(
+              backgroundColor: CardSurfaces.plum,
+            ),
+            onPressed: () => context.push('/packages'),
+            child: const Text('View Offerings'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrustCopy extends StatelessWidget {
+  const _TrustCopy();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      'One Booking per date · Admin-confirmed · Flexible Pax Choice',
+      key: const Key('home_trust_copy'),
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontSize: 12,
+        height: 1.5,
+        color: CardSurfaces.body(context),
       ),
     );
   }
