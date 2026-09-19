@@ -125,9 +125,23 @@ class ProfileScreen extends ConsumerWidget {
                 },
               ),
 
-              // C22: brand footer removed — AppLogo lives only on Home
-              // + auth screens. Spacer keeps the C9 no-scroll 360x800 fit.
-              const Expanded(child: SizedBox.shrink()),
+              // ==================================================
+              // BRAND FOOTER (C9: muted mark optically centered in
+              // the card-edge-to-screen-bottom zone; SizedBox
+              // bounds the AppLogo FittedBox so its layout box
+              // stays compact — Transform.scale kept the full-size
+              // box and pushed 360x800 into scroll/overflow).
+              Expanded(
+                child: Center(
+                  child: Opacity(
+                    opacity: 0.3,
+                    child: SizedBox(
+                      width: 120,
+                      child: const AppLogo(),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
