@@ -129,11 +129,19 @@ class ProfileScreen extends ConsumerWidget {
                     userEmail: userEmail,
                     firstLetter: firstLetter,
                   );
+                  // C11: nearest upcoming Booking with View detail link.
+                  const upcoming = UpcomingBookingSection();
                   if (constraints.maxWidth <=
                       ResponsiveAppShell.tabletBreakpoint) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [profile, const SizedBox(height: 16), settings],
+                      children: [
+                        profile,
+                        const SizedBox(height: 12),
+                        upcoming,
+                        const SizedBox(height: 12),
+                        settings,
+                      ],
                     );
                   }
 
@@ -144,7 +152,9 @@ class ProfileScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           profile,
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
+                          upcoming,
+                          const SizedBox(height: 12),
                           settings,
                         ],
                       ),

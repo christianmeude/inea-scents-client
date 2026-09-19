@@ -29,6 +29,13 @@ class FakeApiBackend {
   /// When true, POST /api/bookings answers with an HTTP 500.
   bool failCreateBooking = false;
 
+  /// When true, GET /api/bookings answers with an HTTP 500.
+  bool failBookings = false;
+
+  /// When non-null, GET /api/bookings returns exactly these rows instead
+  /// of the single canned booking. Lets tests stage upcoming/past/empty.
+  List<Map<String, Object?>>? bookingsOverride;
+
   /// A single date for the given month/year marked as booked, or null.
   DateTime? bookedDate;
 
@@ -104,6 +111,13 @@ class FakeHttpClientAdapter implements HttpClientAdapter {
 
     if (method == 'GET' && path == '/api/bookings') {
       backend.bookingsEndpointCallCount++;
+      if (backend.failBookings) {
+        return _status(500, '{"detail":"bookings unavailable"}');
+      }
+      final override = backend.bookingsOverride;
+      if (override != null) {
+        return _json(jsonEncode({'data': override}));
+      }
       final resolved =
           backend.bookingsEndpointCallCount > backend.pollAttemptsToResolve;
       return _json(

@@ -84,6 +84,16 @@ class AppRouter {
             builder: (context, state) => const MyBookingsScreen(),
           ),
           GoRoute(
+            path: '/bookings/:id',
+            builder: (context, state) {
+              final bookingId = int.tryParse(
+                state.pathParameters['id'] ?? '',
+              );
+              if (bookingId == null) return const MyBookingsScreen();
+              return BookingDetailScreen(bookingId: bookingId);
+            },
+          ),
+          GoRoute(
             path: '/calendar',
             builder: (context, state) => const CalendarScreen(),
           ),
