@@ -6,7 +6,8 @@ import 'card_surfaces.dart';
 /// Middle Column / Panel for INEA Scents reservation flow on desktop.
 /// Handles Package variation overview, the locked Pax summary (P6: the
 /// headcount step is chosen on the packages grid, never re-picked here),
-/// Time slot selection, and Payment Method selection.
+/// and Time slot selection. Payment Method is picked once at the payment
+/// step (C18 pay-once); this panel carries no picker.
 /// Included-info lives in the booking summary's InclusionsList (C7).
 // C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
 // customer-facing copy uses Booking / Pax Choice.
@@ -23,8 +24,6 @@ class ReservationDetailsPanel extends StatelessWidget {
   final VoidCallback? onChangePax;
   final String? selectedTime;
   final ValueChanged<String> onTimeSelected;
-  final String? paymentMethod;
-  final ValueChanged<String> onPaymentMethodSelected;
 
   const ReservationDetailsPanel({
     super.key,
@@ -33,15 +32,12 @@ class ReservationDetailsPanel extends StatelessWidget {
     required this.onChangePax,
     required this.selectedTime,
     required this.onTimeSelected,
-    required this.paymentMethod,
-    required this.onPaymentMethodSelected,
   });
 
   @override
   Widget build(BuildContext context) {
     // P7: all surfaces resolve through the shared helper so the dark
     // toggle recolors every card, chip, and label.
-    final surface = CardSurfaces.cardBg(context);
     final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
     final bodyColor = CardSurfaces.body(context);
@@ -55,13 +51,6 @@ class ReservationDetailsPanel extends StatelessWidget {
       if (options.isEmpty) return null;
       return formatPeso(package.priceForPax(pax));
     }
-
-    // Customer-facing methods only: Online (PayMongo) or Cash.
-    // Selected state is plum — red reads as error (grill critique #5).
-    final paymentMethods = [
-      {'id': 'online', 'label': 'Online', 'color': plum},
-      {'id': 'cash', 'label': 'Cash', 'color': const Color(0xFF16A34A)},
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,108 +325,6 @@ class ReservationDetailsPanel extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 14),
-
-        // ========================================================
-        // 4. CHOOSE PAYMENT METHOD
-        // ========================================================
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: chipColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.payment_rounded,
-                      color: titleColor,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: Text(
-                      'Payment Method',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: titleColor,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final cardW = (constraints.maxWidth - 6) / 2;
-                  return Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: paymentMethods.map((method) {
-                      final isSelected =
-                          (paymentMethod ?? 'online') == method['id'];
-                      return SizedBox(
-                        width: cardW,
-                        child: InkWell(
-                          onTap: () =>
-                              onPaymentMethodSelected(method['id'] as String),
-                          borderRadius: BorderRadius.circular(12),
-                          mouseCursor: SystemMouseCursors.click,
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              color: isSelected ? chipColor : surface,
-                              borderRadius: BorderRadius.circular(12),
-                              // P6 (Q4): constant border width — focus/selection
-                              // never shifts layout; color alone signals state.
-                              border: Border.all(
-                                color: isSelected ? titleColor : surfaceBorder,
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  method['label'] as String,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: method['color'] as Color,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Icon(
-                                  isSelected
-                                      ? Icons.check_circle_rounded
-                                      : Icons.circle_outlined,
-                                  size: 14,
-                                  color: isSelected ? plum : mutedPlum,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }

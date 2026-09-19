@@ -559,12 +559,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                         .read(bookingFlowProvider.notifier)
                                         .setSelectedTime(time);
                                   },
-                                  paymentMethod: _paymentMethod,
-                                  onPaymentMethodSelected: (method) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setPaymentMethod(method);
-                                  },
                                 ),
                               ),
                             ],
@@ -729,12 +723,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   ref
                                       .read(bookingFlowProvider.notifier)
                                       .setSelectedTime(time);
-                                },
-                                paymentMethod: _paymentMethod,
-                                onPaymentMethodSelected: (method) {
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setPaymentMethod(method);
                                 },
                               ),
                             ],
