@@ -195,11 +195,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 24), // gap-6
 
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _InputLabel(
-                              text: 'Password',
-                              color: inputLabelColor,
+                            // C23: Expanded keeps the pair inside 360px even
+                            // with wide fallback fonts (was 41px overflow).
+                            Expanded(
+                              child: _InputLabel(
+                                text: 'Password',
+                                color: inputLabelColor,
+                              ),
                             ),
                             _LinkButton(
                               text: 'Forgot password?',
@@ -309,27 +312,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6A4053),
+                              // C23: keep the plum fill while loading instead
+                              // of dropping to the grey disabled wash.
+                              disabledBackgroundColor: const Color(0xFF6A4053),
                               foregroundColor: Colors.white,
+                              disabledForegroundColor: Colors.white,
                               elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
                             ),
                             child: authState.isLoading
                                 ? const SizedBox(
-                                    height: 16,
-                                    width: 16,
+                                    height: 20,
+                                    width: 20,
                                     child: CircularProgressIndicator(
-                                      strokeWidth: 2,
+                                      strokeWidth: 2.5,
                                       color: Colors.white,
                                     ),
                                   )
-                                : Text(
-                                    'LOG IN',
-                                    style: GoogleFonts.figtree(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 1.2,
+                                : FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'LOG IN',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.figtree(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 1.2,
+                                      ),
                                     ),
                                   ),
                           ),
@@ -352,19 +366,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     : const Color(0xFF6A4053),
                                 width: 1.5,
                               ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
                             ),
-                            child: Text(
-                              'CREATE NEW ACCOUNT',
-                              style: GoogleFonts.figtree(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
-                                color: isDark
-                                    ? const Color(0xFFFDF4F5)
-                                    : const Color(0xFF6A4053),
+                            // C23: scale down instead of clipping glyphs at
+                            // narrow widths (360px).
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'CREATE NEW ACCOUNT',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.figtree(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                  color: isDark
+                                      ? const Color(0xFFFDF4F5)
+                                      : const Color(0xFF6A4053),
+                                ),
                               ),
                             ),
                           ),

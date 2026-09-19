@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../screens/index.dart';
@@ -26,63 +27,88 @@ class AppRouter {
         path: '/forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      ShellRoute(
-        builder: (context, state, child) => ResponsiveAppShell(
+      // C23: stateful tabs — each tab keeps its own stack, so switching
+      // tabs never resets the other tabs. Platform page transitions come
+      // from AppTheme.pageTransitionsTheme (Cupertino iOS / Zoom Android /
+      // cross-fade desktop); tab switches via goBranch are instant.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => ResponsiveAppShell(
           themeToggle: const ConnectedThemeToggleButton(inverted: true),
-          child: child,
+          navigationShell: navigationShell,
+          child: const SizedBox.shrink(),
         ),
-        routes: [
-          GoRoute(
-            path: '/home',
-            builder: (context, state) => const HomeScreen(),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/packages',
-            builder: (context, state) {
-              final initialDate = tryParseDateParam(
-                state.queryParameters['date'],
-              );
-              return PackagesScreen(initialDate: initialDate);
-            },
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/packages',
+                builder: (context, state) {
+                  final initialDate = tryParseDateParam(
+                    state.queryParameters['date'],
+                  );
+                  return PackagesScreen(initialDate: initialDate);
+                },
+              ),
+              GoRoute(
+                path: '/booking/:id',
+                builder: (context, state) {
+                  final packageId = int.parse(state.pathParameters['id']!);
+                  final initialPax = int.tryParse(
+                    state.queryParameters['pax'] ?? '',
+                  );
+                  final initialDate = tryParseDateParam(
+                    state.queryParameters['date'],
+                  );
+                  return BookingScreen(
+                    packageId: packageId,
+                    initialPax: initialPax,
+                    initialDate: initialDate,
+                  );
+                },
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/booking/:id',
-            builder: (context, state) {
-              final packageId = int.parse(state.pathParameters['id']!);
-              final initialPax = int.tryParse(
-                state.queryParameters['pax'] ?? '',
-              );
-              final initialDate = tryParseDateParam(
-                state.queryParameters['date'],
-              );
-              return BookingScreen(
-                packageId: packageId,
-                initialPax: initialPax,
-                initialDate: initialDate,
-              );
-            },
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/bookings',
+                builder: (context, state) => const MyBookingsScreen(),
+              ),
+              GoRoute(
+                path: '/bookings/:id',
+                builder: (context, state) {
+                  final bookingId = int.tryParse(
+                    state.pathParameters['id'] ?? '',
+                  );
+                  if (bookingId == null) return const MyBookingsScreen();
+                  return BookingDetailScreen(bookingId: bookingId);
+                },
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/bookings',
-            builder: (context, state) => const MyBookingsScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/calendar',
+                builder: (context, state) => const CalendarScreen(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/bookings/:id',
-            builder: (context, state) {
-              final bookingId = int.tryParse(
-                state.pathParameters['id'] ?? '',
-              );
-              if (bookingId == null) return const MyBookingsScreen();
-              return BookingDetailScreen(bookingId: bookingId);
-            },
-          ),
-          GoRoute(
-            path: '/calendar',
-            builder: (context, state) => const CalendarScreen(),
-          ),
-          GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfileScreen(),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
           ),
         ],
       ),

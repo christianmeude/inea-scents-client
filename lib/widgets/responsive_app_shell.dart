@@ -21,6 +21,11 @@ class ResponsiveAppShell extends StatelessWidget {
   final double breakpoint;
   final Color? backgroundColor;
 
+  /// C23: live tab shell when hosted in a `StatefulShellRoute`. The shell
+  /// renders the active branch and drives the tab bar without resetting
+  /// per-tab stacks. Null in tests / standalone use, where [child] renders.
+  final StatefulNavigationShell? navigationShell;
+
   /// Injectable so provider-less tests can render the shell; production
   /// passes the connected toggle.
   final Widget themeToggle;
@@ -31,6 +36,7 @@ class ResponsiveAppShell extends StatelessWidget {
     this.maxWidth = maxContentWidth,
     this.breakpoint = mobileBreakpoint,
     this.backgroundColor,
+    this.navigationShell,
     this.themeToggle = const ThemeToggleButton(isDark: false),
   });
 
@@ -132,7 +138,8 @@ class ResponsiveAppShell extends StatelessWidget {
           // P7: flat theme background — decorative ambient layers were
           // stripped app-wide per owner direction; the theme scaffold
           // color (light cream / dark night) carries both modes.
-          body: child,
+          // C23: the live navigation shell renders the active tab branch.
+          body: navigationShell ?? child,
           bottomNavigationBar: isDesktopView
               ? null
               : _buildMobileBottomNav(context),
@@ -164,6 +171,8 @@ class ResponsiveAppShell extends StatelessWidget {
         }
       }
     } catch (_) {}
+    final shell = navigationShell;
+    if (shell != null) return BottomNavBar(navigationShell: shell);
     return const BottomNavBar();
   }
 }

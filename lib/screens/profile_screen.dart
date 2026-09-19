@@ -348,6 +348,15 @@ class _SettingsColumn extends StatelessWidget {
 
               const _SettingDivider(),
 
+              // C23: the single in-app theme toggle. Wired to
+              // themeModeProvider via toggleTheme so the choice persists
+              // (inea-theme) and every screen follows it through
+              // MaterialApp.themeMode. No toggles live on other screens'
+              // settings surfaces.
+              const _ThemeToggleTile(),
+
+              const _SettingDivider(),
+
               _ProfileSettingTile(
                 icon: Icons.help_outline_rounded,
                 title: 'Help & Support',
@@ -367,6 +376,83 @@ class _SettingsColumn extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ============================================================================
+// THEME TOGGLE TILE (C23: Profile-only; persisted via toggleTheme)
+// ============================================================================
+
+class _ThemeToggleTile extends ConsumerWidget {
+  const _ThemeToggleTile();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const primaryColor = Color(0xFF74445C);
+    final textColor = isDark
+        ? const Color(0xFFFDF4F5)
+        : const Color(0xFF633E50);
+
+    final mode = ref.watch(themeModeProvider);
+    final darkEnabled =
+        mode == ThemeMode.dark ||
+        (mode == ThemeMode.system &&
+            Theme.of(context).brightness == Brightness.dark);
+
+    void flip(bool value) => toggleTheme(ref, value);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => flip(!darkEnabled),
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 8),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 48),
+            child: Row(
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Icon(
+                    darkEnabled
+                        ? Icons.light_mode_outlined
+                        : Icons.dark_mode_outlined,
+                    color: isDark
+                        ? const Color(0xFFFDF4F5)
+                        : primaryColor,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    'Dark theme',
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Switch.adaptive(
+                  value: darkEnabled,
+                  activeThumbColor: primaryColor,
+                  onChanged: flip,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
