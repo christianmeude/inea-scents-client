@@ -43,7 +43,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
       // ============================================================
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
+          // C25: platform-default physics (clamp Android / bounce iOS).
 
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
 

@@ -367,7 +367,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1000),
                 child: ListView(
-                  physics: const BouncingScrollPhysics(),
+                  // C25: platform-default physics (clamp Android / bounce iOS).
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
                   children: [
                     titleContent,
@@ -387,7 +387,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           }
 
           return ListView(
-            physics: const BouncingScrollPhysics(),
+            // C25: platform-default physics (clamp Android / bounce iOS).
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
             children: [
               titleContent,
