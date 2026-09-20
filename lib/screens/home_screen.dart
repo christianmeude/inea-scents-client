@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/index.dart';
 
-/// C16: Home is a concierge stack, not a catalog. Check-date CTA first,
-/// then the C11 upcoming Booking, one Offering teaser (→ /packages),
-/// then trust copy. No catalog grid lives here.
+/// C16/C26: Home is a concierge stack, not a catalog. Check-date CTA first,
+// then the C11 upcoming Booking, one Offering teaser (→ /packages).
+// No catalog grid lives here.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -36,6 +36,8 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         // Date-first entry (C13 guard + Availability
                         // gating live on the calendar route).
+                        // C26: 16px card rhythm, 20px edges.
+                        SizedBox(height: 16),
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 20),
                           child: NextStepCard(),
@@ -50,12 +52,7 @@ class HomeScreen extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 20),
                           child: _OfferingTeaser(),
                         ),
-                        SizedBox(height: 16),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: _TrustCopy(),
-                        ),
-                        SizedBox(height: 40),
+                        SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -121,24 +118,6 @@ class _OfferingTeaser extends StatelessWidget {
             child: const Text('View Offerings'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TrustCopy extends StatelessWidget {
-  const _TrustCopy();
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      'One Booking per date · Admin-confirmed · Flexible Pax Choice',
-      key: const Key('home_trust_copy'),
-      textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 12,
-        height: 1.5,
-        color: CardSurfaces.body(context),
       ),
     );
   }

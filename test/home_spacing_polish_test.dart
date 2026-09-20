@@ -1,0 +1,66 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:inea_scents_client/providers/index.dart';
+import 'package:inea_scents_client/screens/home_screen.dart';
+
+/// C26: Home spacing polish — One Booking subtitle gone, 16px card rhythm,
+/// 20px screen edge padding at 360/768/1200px.
+GoRouter _router() {
+  return GoRouter(
+    initialLocation: '/',
+    routes: [
+      GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
+    ],
+  );
+}
+
+Future<void> _pumpAt(WidgetTester tester, double width) async {
+  tester.view.physicalSize = Size(width, 800);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.reset);
+  final router = _router();
+  addTearDown(router.dispose);
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [bookingsProvider.overrideWith((ref) async => [])],
+      child: MaterialApp.router(routerConfig: router),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  group('c26 home spacing polish', () {
+    for (final width in [360.0, 768.0, 1200.0]) {
+      testWidgets('w${width.toInt()}: subtitle gone, 16px rhythm, 20px edges',
+          (WidgetTester tester) async {
+        await _pumpAt(tester, width);
+        expect(tester.takeException(), isNull);
+
+        // C26: subtitle gone.
+        expect(find.byKey(const Key('home_trust_copy')), findsNothing);
+        expect(find.textContaining('One Booking'), findsNothing);
+
+        // C26: 16px card rhythm (top + 2 inter-card gaps).
+        final gaps = tester
+            .widgetList<SizedBox>(find.byWidgetPredicate(
+              (w) => w is SizedBox && w.height == 16 && w.width == null,
+            ))
+            .length;
+        expect(gaps, 3);
+
+        // C26: 20px screen edge padding around every card.
+        final edges = tester
+            .widgetList<Padding>(find.byWidgetPredicate(
+              (w) =>
+                  w is Padding &&
+                  w.padding == const EdgeInsets.symmetric(horizontal: 20),
+            ))
+            .length;
+        expect(edges, 3);
+      });
+    }
+  });
+}
