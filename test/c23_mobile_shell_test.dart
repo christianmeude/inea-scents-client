@@ -158,9 +158,15 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       expect(prefs.getString('inea-theme'), 'dark');
 
-      // C9 still holds: no scrollable, muted footer logo intact.
+      // C9 still holds: no page scroll, muted footer logo intact.
+      // C29: scaffold form fields own horizontal editables — vertical only.
       expect(find.byType(SingleChildScrollView), findsNothing);
-      expect(find.byType(Scrollable), findsNothing);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is Scrollable && w.axis == Axis.vertical,
+        ),
+        findsNothing,
+      );
       expect(find.byType(AppLogo), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
