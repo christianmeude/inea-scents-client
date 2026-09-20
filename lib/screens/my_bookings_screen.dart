@@ -409,7 +409,6 @@ class _BookingCard extends StatelessWidget {
               ),
 
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Pax Choice Price',
@@ -420,14 +419,22 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ),
 
-                  Text(
-                    booking.package != null
-                        ? formatPeso(booking.package!.price ?? 0.0)
-                        : 'N/A',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: CardSurfaces.title(context),
+                  const SizedBox(width: 12),
+
+                  // C25: price takes remaining width and ellipsizes
+                  // instead of overflowing the row at 360px.
+                  Expanded(
+                    child: Text(
+                      booking.package != null
+                          ? formatPeso(booking.package!.price ?? 0.0)
+                          : 'N/A',
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: CardSurfaces.title(context),
+                      ),
                     ),
                   ),
                 ],
