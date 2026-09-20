@@ -101,11 +101,23 @@ class MyBookingsScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              SizedBox(width: isNarrow ? 12 : 16),
                               Flexible(
                                 child: OutlinedButton.icon(
                                   onPressed: () =>
                                       context.go('/packages'),
+                                  // C25: tighter touch target <768px so
+                                  // the row fits at 360px; desktop keeps
+                                  // theme defaults.
+                                  style: isNarrow
+                                      ? OutlinedButton.styleFrom(
+                                          padding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                                vertical: 12,
+                                              ),
+                                        )
+                                      : null,
                                   icon: const Icon(
                                     Icons.add_rounded,
                                     size: 18,
