@@ -104,7 +104,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('non-empty mobile shows pinned book-another icon to /packages', (
+  testWidgets('non-empty mobile shows header book-another, no AppBar plus', (
     WidgetTester tester,
   ) async {
     final router = buildRouter();
@@ -113,13 +113,17 @@ void main() {
     ]);
 
     expect(find.text('My Bookings'), findsOneWidget);
+    // C25: circle-plus AppBar action removed; header button is the
+    // single book-another affordance (compact label <768px).
+    expect(find.byType(AppBar), findsNothing);
     expect(
       find.byTooltip('Book another Pax Choice'),
-      findsOneWidget,
+      findsNothing,
     );
+    expect(find.text('Book another'), findsOneWidget);
     expect(find.text('Explore Packages'), findsNothing);
 
-    await tester.tap(find.byTooltip('Book another Pax Choice'));
+    await tester.tap(find.text('Book another'));
     await tester.pumpAndSettle();
     expect(router.location, '/packages');
     expect(find.text('Packages Screen Page'), findsOneWidget);

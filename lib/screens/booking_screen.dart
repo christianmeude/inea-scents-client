@@ -438,7 +438,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           key: const Key(
             'app_shell_scroll_view',
           ), // Keep this key so tests pass
-          physics: const BouncingScrollPhysics(),
+          // C25: platform-default physics (clamp Android / bounce iOS).
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),

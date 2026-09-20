@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
               ),
             Expanded(
               child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                // C25: platform-default physics (clamp Android / bounce iOS).
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1200),

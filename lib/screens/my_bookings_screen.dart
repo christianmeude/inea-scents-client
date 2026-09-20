@@ -31,61 +31,14 @@ class MyBookingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bookingsAsync = ref.watch(bookingsProvider);
     final isNarrow = MediaQuery.of(context).size.width < 768;
-    // C12: persistent book-another affordance is data-only — hidden on
-    // loading/error/empty (empty has its own CTA).
-    final hasBookings = bookingsAsync.maybeWhen(
-      data: (bookings) => bookings.isNotEmpty,
-      orElse: () => false,
-    );
+    // C12/C25: the header book-another button renders only in the data
+    // branch below (empty has its own CTA), so it stays data-only.
 
     // P7: no explicit color — flat theme scaffold background.
+    // C25: mobile AppBar removed — its only content was the circle-plus
+    // book-another action. The page-header button below is now the
+    // single book-another affordance on all widths.
     return Scaffold(
-      // ============================================================
-      // APP BAR (Mobile only, Desktop uses TopNavBar in App Shell)
-      // ============================================================
-      // C22: distilled — brand title removed; desktop TopNavBar covers
-      // nav. The functional book-another action stays (48px touch).
-      appBar: isNarrow
-          ? AppBar(
-              backgroundColor: Colors.transparent,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: true,
-
-              // C12: book-another stays pinned on mobile; hidden unless
-              // bookings data exists.
-              actions: [
-                if (hasBookings)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: CardSurfaces.chipBg(context),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.55),
-                          width: 1,
-                        ),
-                      ),
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        tooltip: 'Book another Pax Choice',
-                        icon: Icon(
-                          Icons.add_rounded,
-                          color: CardSurfaces.title(context),
-                          size: 22,
-                        ),
-                        onPressed: () => context.go('/packages'),
-                      ),
-                    ),
-                  )
-                else
-                  const SizedBox(width: 64),
-              ],
-            )
-          : null,
 
       // ============================================================
       // BODY (P7: flat theme background; decorative gradient removed)
@@ -101,7 +54,7 @@ class MyBookingsScreen extends ConsumerWidget {
               color: primaryColor,
               onRefresh: () => ref.refresh(bookingsProvider.future),
               child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+                // C25: platform-default physics (clamp Android / bounce iOS).
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 1200),
@@ -112,9 +65,10 @@ class MyBookingsScreen extends ConsumerWidget {
                         children: [
                           // ==================================================
                           // PAGE HEADER
-                          // C12: desktop/tablet has no AppBar, so the
-                          // trailing book-another action lives here.
-                          // Mobile keeps the AppBar icon only (no dup).
+                          // C25: the trailing book-another action lives
+                          // here on all widths (mobile AppBar removed
+                          // with its circle-plus). Compact label <768px
+                          // so the row fits at 360px.
                           // ==================================================
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,20 +101,23 @@ class MyBookingsScreen extends ConsumerWidget {
                                   ],
                                 ),
                               ),
-                              if (!isNarrow) ...[
-                                const SizedBox(width: 16),
-                                OutlinedButton.icon(
+                              const SizedBox(width: 16),
+                              Flexible(
+                                child: OutlinedButton.icon(
                                   onPressed: () =>
                                       context.go('/packages'),
                                   icon: const Icon(
                                     Icons.add_rounded,
                                     size: 18,
                                   ),
-                                  label: const Text(
-                                    'Book another Pax Choice',
+                                  label: Text(
+                                    isNarrow
+                                        ? 'Book another'
+                                        : 'Book another Pax Choice',
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                              ],
+                              ),
                             ],
                           ),
 
