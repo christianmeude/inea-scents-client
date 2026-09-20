@@ -108,9 +108,15 @@ void main() {
     WidgetTester tester,
   ) async {
     final router = buildRouter();
-    await pumpBookings(tester, router, [
-      bookingsProvider.overrideWith((ref) => Future.value([sampleBooking()])),
-    ]);
+    await pumpBookings(
+      tester,
+      router,
+      [
+        bookingsProvider.overrideWith((ref) => Future.value([sampleBooking()])),
+      ],
+      // C25 acceptance probes 360px: overflow/overshoot would throw.
+      size: const Size(360, 740),
+    );
 
     expect(find.text('My Bookings'), findsOneWidget);
     // C25: circle-plus AppBar action removed; header button is the
@@ -180,6 +186,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     expect(find.byTooltip('Book another Pax Choice'), findsNothing);
     expect(find.text('Book another Pax Choice'), findsNothing);
+    expect(find.text('Book another'), findsNothing);
     loadingCompleter.complete(<Booking>[]);
     await tester.pumpAndSettle();
     expect(find.text('No bookings yet'), findsOneWidget);
@@ -216,6 +223,7 @@ void main() {
     expect(find.text('Try Again'), findsOneWidget);
     expect(find.byTooltip('Book another Pax Choice'), findsNothing);
     expect(find.text('Book another Pax Choice'), findsNothing);
+    expect(find.text('Book another'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
