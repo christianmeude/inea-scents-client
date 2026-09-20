@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:inea_scents_client/api/models/booking.dart';
-import 'package:inea_scents_client/providers/index.dart';
 import 'package:inea_scents_client/screens/booking_detail_screen.dart';
 import 'package:inea_scents_client/screens/profile_screen.dart';
 import 'package:inea_scents_client/src/providers/core_providers.dart';
@@ -13,8 +11,9 @@ import 'package:inea_scents_client/widgets/upcoming_booking_section.dart';
 
 import 'helpers/fake_api.dart';
 
-/// C11: Profile Upcoming Booking section — selector rules plus the
-/// rendered empty/error/data states and the working View → detail path.
+/// C29: Upcoming Booking section removed from Profile only — selector rules
+/// still cover Home; Profile asserts no Upcoming section, scaffold form
+/// fields, disabled tiles with deferred notes, and kept /bookings/:id route.
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
@@ -112,8 +111,8 @@ void main() {
     );
   }
 
-  GoRouter router() => GoRouter(
-        initialLocation: '/profile',
+  GoRouter router({String initialLocation = '/profile'}) => GoRouter(
+        initialLocation: initialLocation,
         routes: [
           GoRoute(
             path: '/profile',
@@ -144,89 +143,50 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('renders nearest upcoming with working View to detail',
+  testWidgets('C29: profile has no Upcoming section, scaffold form shown',
       (tester) async {
     usePhoneViewport(tester);
-    final past = DateTime.now().subtract(const Duration(days: 18));
     final future = DateTime.now().add(const Duration(days: 16));
     final backend = FakeApiBackend()
       ..bookingsOverride = [
-        upcomingJson(id: 3, date: past.toIso8601String()),
         upcomingJson(id: 1, date: future.toIso8601String()),
       ];
 
     await tester.pumpWidget(appWith(router(), backend));
     await tester.pumpAndSettle();
 
-    expect(find.text('UPCOMING BOOKING'), findsOneWidget);
-    expect(find.text('Golden Hour'), findsOneWidget);
-    expect(find.text('View'), findsOneWidget);
+    // C29: Upcoming section removed from profile even with data.
+    expect(find.byType(UpcomingBookingSection), findsNothing);
+    expect(find.text('UPCOMING BOOKING'), findsNothing);
+    expect(find.text('No upcoming Booking yet'), findsNothing);
+    // C29: scaffold name/email/phone form visible (wiring in C14/C15).
+    expect(find.byKey(const Key('profile_name')), findsOneWidget);
+    expect(find.byKey(const Key('profile_email')), findsOneWidget);
+    expect(find.byKey(const Key('profile_phone')), findsOneWidget);
+    expect(find.text('Saving deferred — wiring in C14/C15.'), findsOneWidget);
+    // C29: tiles visible but disabled with deferred notes.
+    expect(find.text('Edit Profile'), findsOneWidget);
+    expect(find.text('Deferred — available in C14'), findsOneWidget);
+    expect(find.text('Change Password'), findsOneWidget);
+    expect(find.text('Deferred — available in C15'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
-    await tester.tap(find.text('View'));
+  testWidgets('C29: /bookings/:id route still resolves to detail',
+      (tester) async {
+    usePhoneViewport(tester);
+    final future = DateTime.now().add(const Duration(days: 16));
+    final backend = FakeApiBackend()
+      ..bookingsOverride = [
+        upcomingJson(id: 1, date: future.toIso8601String()),
+      ];
+
+    await tester.pumpWidget(
+        appWith(router(initialLocation: '/bookings/1'), backend));
     await tester.pumpAndSettle();
 
     expect(find.byType(BookingDetailScreen), findsOneWidget);
     expect(find.text('IN-2026-00001'), findsOneWidget);
-    expect(find.text('Golden Hour'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('empty state links to /packages', (tester) async {
-    usePhoneViewport(tester);
-    final backend = FakeApiBackend()..bookingsOverride = [];
-
-    await tester.pumpWidget(appWith(router(), backend));
-    await tester.pumpAndSettle();
-
-    expect(find.text('No upcoming Booking yet'), findsOneWidget);
-
-    await tester.tap(find.text('Explore'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('packages screen'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('loading state shows a compact skeleton', (tester) async {
-    usePhoneViewport(tester);
-    final backend = FakeApiBackend()..bookingsOverride = [];
-
-    await tester.pumpWidget(appWith(router(), backend));
-    await tester.pump();
-
-    expect(find.byType(Shimmer), findsWidgets);
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('error state offers retry', (tester) async {
-    usePhoneViewport(tester);
-
-    // Override the provider to fail synchronously: exercises the error
-    // UI without Dio backoff timers, and Retry re-runs the same error.
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          bookingsProvider.overrideWith((ref) => throw Exception('boom')),
-        ],
-        child: MaterialApp.router(routerConfig: router()),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text("We couldn't load your upcoming Booking."),
-      findsOneWidget,
-    );
-    expect(find.text('Retry'), findsOneWidget);
-
-    await tester.tap(find.text('Retry'));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text("We couldn't load your upcoming Booking."),
-      findsOneWidget,
-    );
     expect(tester.takeException(), isNull);
   });
 }

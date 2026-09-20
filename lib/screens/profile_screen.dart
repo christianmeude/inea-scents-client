@@ -91,8 +91,12 @@ class ProfileScreen extends ConsumerWidget {
                     userEmail: userEmail,
                     firstLetter: firstLetter,
                   );
-                  // C11: nearest upcoming Booking with View detail link.
-                  const upcoming = UpcomingBookingSection();
+                  // C29: Upcoming Booking section removed from profile only;
+                  // /bookings/:id route + detail screen intact (C11).
+                  final form = _ProfileFormCard(
+                    userName: userName,
+                    userEmail: userEmail,
+                  );
                   if (constraints.maxWidth <=
                       ResponsiveAppShell.tabletBreakpoint) {
                     return Column(
@@ -100,7 +104,7 @@ class ProfileScreen extends ConsumerWidget {
                       children: [
                         profile,
                         const SizedBox(height: 12),
-                        upcoming,
+                        form,
                         const SizedBox(height: 12),
                         settings,
                       ],
@@ -115,7 +119,7 @@ class ProfileScreen extends ConsumerWidget {
                         children: [
                           profile,
                           const SizedBox(height: 12),
-                          upcoming,
+                          form,
                           const SizedBox(height: 12),
                           settings,
                         ],
@@ -286,7 +290,79 @@ class _ProfileCard extends StatelessWidget {
 
               icon: Icon(Icons.edit_outlined, color: textColor, size: 18),
 
-              onPressed: () {},
+              // C29: edit deferred to C14 — tile + button disabled.
+              onPressed: null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// PROFILE FORM SCAFFOLD (C29: fields visible, wiring deferred to C14/C15)
+// ============================================================================
+
+class _ProfileFormCard extends StatelessWidget {
+  final String userName;
+  final String userEmail;
+
+  const _ProfileFormCard({required this.userName, required this.userEmail});
+
+  @override
+  Widget build(BuildContext context) {
+    final cardBg = CardSurfaces.cardBg(context);
+    final cardBorder = CardSurfaces.cardBorder(context);
+    // C29: compact dense fields so 360x800 still fits (C9, no scroll).
+    InputDecoration deco(String label) => InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(fontSize: 11),
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    );
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: cardBorder, width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // C29: no API calls — display-only scaffold for C14/C15.
+          TextFormField(
+            key: const Key('profile_name'),
+            initialValue: userName,
+            enabled: false,
+            style: const TextStyle(fontSize: 12),
+            decoration: deco('Name'),
+          ),
+          const SizedBox(height: 6),
+          TextFormField(
+            key: const Key('profile_email'),
+            initialValue: userEmail,
+            enabled: false,
+            style: const TextStyle(fontSize: 12),
+            decoration: deco('Email'),
+          ),
+          const SizedBox(height: 6),
+          TextFormField(
+            key: const Key('profile_phone'),
+            enabled: false,
+            style: const TextStyle(fontSize: 12),
+            decoration: deco('Phone'),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Saving deferred — wiring in C14/C15.',
+            style: TextStyle(
+              color: CardSurfaces.body(context),
+              fontSize: 11,
             ),
           ),
         ],
@@ -335,6 +411,9 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.person_outline_rounded,
                 title: 'Edit Profile',
+                // C29: deferred to C14 — visible but disabled.
+                enabled: false,
+                note: 'Deferred — available in C14',
                 onTap: () {},
               ),
 
@@ -343,6 +422,9 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.lock_outline_rounded,
                 title: 'Change Password',
+                // C29: deferred to C15 — visible but disabled.
+                enabled: false,
+                note: 'Deferred — available in C15',
                 onTap: () {},
               ),
 
@@ -467,6 +549,9 @@ class _ProfileSettingTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDestructive;
   final bool showArrow;
+  // C29: deferred tiles render disabled with a short note.
+  final bool enabled;
+  final String? note;
 
   const _ProfileSettingTile({
     required this.icon,
@@ -474,6 +559,8 @@ class _ProfileSettingTile extends StatelessWidget {
     required this.onTap,
     this.isDestructive = false,
     this.showArrow = true,
+    this.enabled = true,
+    this.note,
   });
 
   @override
@@ -498,8 +585,11 @@ class _ProfileSettingTile extends StatelessWidget {
       color: Colors.transparent,
 
       child: InkWell(
-        onTap: onTap,
-        mouseCursor: SystemMouseCursors.click,
+        // C29: disabled tiles are not tappable.
+        onTap: enabled ? onTap : null,
+        mouseCursor: enabled
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
         borderRadius: BorderRadius.circular(24),
 
         child: Padding(
@@ -549,6 +639,15 @@ class _ProfileSettingTile extends StatelessWidget {
 
                     const SizedBox(height: 3),
 
+                    // C29: deferred note under disabled tiles.
+                    if (note != null)
+                      Text(
+                        note!,
+                        style: TextStyle(
+                          color: secondaryTextColor,
+                          fontSize: 11,
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -556,7 +655,8 @@ class _ProfileSettingTile extends StatelessWidget {
               // ========================================================
               // ARROW
               // ========================================================
-              if (showArrow)
+              // C29: no arrow on disabled tiles.
+              if (showArrow && enabled)
                 Icon(
                   Icons.arrow_forward_ios_rounded,
                   size: 14,

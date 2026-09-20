@@ -43,7 +43,12 @@ void main() {
     expect(find.text('My Profile'), findsOneWidget);
     // No scrollable may remain on the profile page.
     expect(find.byType(SingleChildScrollView), findsNothing);
-    expect(find.byType(Scrollable), findsNothing);
+    // C29: the scaffold name/email/phone form fields each own a
+    // horizontal editable Scrollable — only vertical page scroll counts.
+    final pageScroll = find.byWidgetPredicate(
+      (w) => w is Scrollable && w.axis == Axis.vertical,
+    );
+    expect(pageScroll, findsNothing);
     // Muted footer mark still renders, centered in the bottom zone.
     expect(find.byType(AppLogo), findsOneWidget);
     expect(
