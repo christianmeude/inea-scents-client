@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/index.dart';
 
-/// C16: Home is a concierge stack, not a catalog. Check-date CTA first,
-/// then the C11 upcoming Booking, one Offering teaser (→ /packages),
-/// then trust copy. No catalog grid lives here.
+/// C16/C26: Home is a concierge stack, not a catalog. Check-date CTA first,
+// then the C11 upcoming Booking, one Offering teaser (→ /packages).
+// No catalog grid lives here.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
