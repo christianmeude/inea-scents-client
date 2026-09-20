@@ -7,7 +7,8 @@ import 'package:inea_scents_client/screens/home_screen.dart';
 import 'package:inea_scents_client/widgets/index.dart';
 
 /// C16 Home concierge stack: Check-date CTA + UpcomingBookingSection +
-/// one Offering teaser (→ /packages) + trust copy. No catalog grid.
+/// one Offering teaser (→ /packages). No catalog grid. C26: the One Booking
+/// trust subtitle is gone.
 GoRouter _homeRouter(void Function(String location) onPush) {
   return GoRouter(
     initialLocation: '/',
@@ -43,7 +44,7 @@ Widget _harness(GoRouter router) {
 
 void main() {
   group('c16 home concierge stack', () {
-    testWidgets('renders CTA + upcoming + teaser + trust, zero PackageCard', (
+    testWidgets('renders CTA + upcoming + teaser, zero PackageCard', (
       WidgetTester tester,
     ) async {
       final router = _homeRouter((_) {});
@@ -56,7 +57,9 @@ void main() {
       expect(find.byType(UpcomingBookingSection), findsOneWidget);
       expect(find.byKey(const Key('home_offering_teaser')), findsOneWidget);
       expect(find.text('Explore our Offerings'), findsOneWidget);
-      expect(find.byKey(const Key('home_trust_copy')), findsOneWidget);
+      // C26: One Booking subtitle gone.
+      expect(find.byKey(const Key('home_trust_copy')), findsNothing);
+      expect(find.textContaining('One Booking'), findsNothing);
       // No catalog grid remains on Home.
       expect(find.byType(PackageCard), findsNothing);
       expect(find.byType(GridView), findsNothing);
