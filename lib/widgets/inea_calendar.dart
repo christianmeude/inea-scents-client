@@ -19,10 +19,25 @@ class IneaCalendar extends ConsumerStatefulWidget {
   final DateTime? selectedDate;
   final ValueChanged<DateTime> onDateSelected;
 
+  /// Day-only dates the grid may select. When non-null, only these days
+  /// (and never past days) are enabled. When null, all future non-booked
+  /// days are enabled (booking-flow behavior).
+  final Set<DateTime>? enabledDays;
+
+  /// When false, renders the month grid only — no "Select Date" header
+  /// and no selection caption (the host screen owns that chrome). C28.
+  final bool showChrome;
+
+  /// Fired after month paging (selection is preserved). C28.
+  final ValueChanged<DateTime>? onPageChanged;
+
   const IneaCalendar({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
+    this.enabledDays,
+    this.showChrome = true,
+    this.onPageChanged,
   });
 
   @override
@@ -44,7 +59,21 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
   @override
   void initState() {
     super.initState();
-    _focusedDay = _clampDay(widget.selectedDate ?? DateTime.now());
+    // C28: date-first entry opens on the earliest selectable day's month
+    // so the grid and the allowlist agree on first paint.
+    DateTime initial = widget.selectedDate ?? DateTime.now();
+    final allow = widget.enabledDays;
+    if (widget.selectedDate == null && allow != null && allow.isNotEmpty) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final upcoming = allow
+          .map((d) => DateTime(d.year, d.month, d.day))
+          .where((d) => !d.isBefore(today))
+          .toList()
+        ..sort();
+      if (upcoming.isNotEmpty) initial = upcoming.first;
+    }
+    _focusedDay = _clampDay(initial);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(availabilityProvider.notifier)
@@ -99,6 +128,9 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
     return '${weekdays[date.weekday - 1]}, ${_formatFullDate(date)}';
   }
 
+  DateTime _dayOnly(DateTime date) =>
+      DateTime(date.year, date.month, date.day);
+
   Set<DateTime> _bookedDaysFor(DateTime focusedMonth) {
     final availability = ref.read(availabilityProvider).value;
     if (availability == null) return const {};
@@ -119,7 +151,6 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
   Widget build(BuildContext context) {
     // P7: chrome resolves through the shared helper; brand accents
     // (selected day, semantic dots) stay fixed in both modes.
-    final surface = CardSurfaces.cardBg(context);
     final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
     final bodyColor = CardSurfaces.body(context);
@@ -129,6 +160,252 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
         ? _bookedDaysFor(_focusedDay)
         : const <DateTime>{};
     final isLoading = availabilityAsync.isLoading;
+    // C28: allowlist normalized to day-only for cheap contains checks.
+    final allowDays = widget.enabledDays == null
+        ? null
+        : {for (final d in widget.enabledDays!) _dayOnly(d)};
+
+    bool isEnabled(DateTime day) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final cellDay = _dayOnly(day);
+      if (cellDay.isBefore(today)) return false;
+      if (allowDays != null) return allowDays.contains(cellDay);
+      return !bookedDays.contains(cellDay);
+    }
+
+    final dayText = TextStyle(
+      color: titleColor,
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+    );
+
+    final grid = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      decoration: BoxDecoration(
+        color: chipColor.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: surfaceBorder),
+      ),
+      child: TableCalendar(
+        firstDay: firstCalendarDay,
+        lastDay: lastCalendarDay,
+        focusedDay: _focusedDay,
+        currentDay: DateTime.now(),
+        // C28: row height keeps every day-cell tap target ≥44px.
+        rowHeight: 52,
+        daysOfWeekHeight: 22,
+        headerStyle: HeaderStyle(
+          formatButtonVisible: false,
+          titleCentered: true,
+          leftChevronIcon: Icon(
+            Icons.chevron_left_rounded,
+            color: titleColor,
+            size: 20,
+          ),
+          rightChevronIcon: Icon(
+            Icons.chevron_right_rounded,
+            color: titleColor,
+            size: 20,
+          ),
+          titleTextStyle: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: titleColor,
+          ),
+          headerPadding: const EdgeInsets.symmetric(vertical: 4),
+        ),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekdayStyle: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: bodyColor,
+          ),
+          weekendStyle: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: bodyColor,
+          ),
+        ),
+        calendarStyle: CalendarStyle(
+          outsideDaysVisible: false,
+          cellMargin: const EdgeInsets.all(2),
+          defaultTextStyle: TextStyle(
+            color: titleColor,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+          weekendTextStyle: TextStyle(
+            color: titleColor,
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+          todayDecoration: BoxDecoration(
+            color: IneaCalendar.plum.withValues(alpha: 0.12),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: IneaCalendar.plum.withValues(alpha: 0.4),
+            ),
+          ),
+          todayTextStyle: TextStyle(
+            color: titleColor,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+          selectedDecoration: const BoxDecoration(
+            color: IneaCalendar.plum,
+            shape: BoxShape.circle,
+          ),
+          selectedTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        selectedDayPredicate: (day) {
+          if (widget.selectedDate == null) return false;
+          return isSameDay(widget.selectedDate, day);
+        },
+        calendarBuilders: CalendarBuilders(
+          // C28: default cells keep a 44px-min height tap target.
+          defaultBuilder: (context, day, focusedDay) {
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Center(child: Text('${day.day}', style: dayText)),
+              ),
+            );
+          },
+          // C28: today ring is a fixed 44px target.
+          todayBuilder: (context, day, focusedDay) {
+            return Center(
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: IneaCalendar.plum.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: IneaCalendar.plum.withValues(alpha: 0.4),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${day.day}',
+                  style: dayText.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+            );
+          },
+          // C28: selection indicator is a fixed 44px target.
+          selectedBuilder: (context, day, focusedDay) {
+            return Center(
+              child: Container(
+                key: const Key('inea_selected_day'),
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: IneaCalendar.plum,
+                  shape: BoxShape.circle,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${day.day}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            );
+          },
+          disabledBuilder: (context, day, focusedDay) {
+            final now = DateTime.now();
+            final today = DateTime(now.year, now.month, now.day);
+            final cellDay = _dayOnly(day);
+            final isPast = cellDay.isBefore(today);
+            final isFull = bookedDays.contains(cellDay);
+
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '${day.day}',
+                          style: TextStyle(
+                            color: titleColor.withValues(alpha: 0.3),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        if (isFull && !isPast)
+                          Text(
+                            'Full',
+                            style: TextStyle(
+                              color: titleColor.withValues(alpha: 0.4),
+                              fontSize: 8,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        enabledDayPredicate: isEnabled,
+        onDaySelected: (selectedDay, focusedDay) {
+          setState(() {
+            _focusedDay = focusedDay;
+          });
+          widget.onDateSelected(selectedDay);
+        },
+        // C28: paging keeps the selection; only the month refetches.
+        onPageChanged: (focusedDay) {
+          setState(() {
+            _focusedDay = focusedDay;
+          });
+          ref
+              .read(availabilityProvider.notifier)
+              .setMonth(focusedDay.month, focusedDay.year);
+          widget.onPageChanged?.call(focusedDay);
+        },
+      ),
+    );
+
+    Widget? loadingRow;
+    if (isLoading) {
+      loadingRow = const Padding(
+        padding: EdgeInsets.only(top: 8),
+        child: Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: IneaCalendar.plum,
+            ),
+          ),
+        ),
+      );
+    }
+
+    // C28: bare mode — grid only, host screen owns title + agenda.
+    if (!widget.showChrome) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [grid, ?loadingRow],
+      );
+    }
 
     return Container(
       width: double.infinity,
@@ -166,163 +443,8 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
             ],
           ),
           const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-            decoration: BoxDecoration(
-              color: chipColor.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: surfaceBorder),
-            ),
-            child: TableCalendar(
-              firstDay: firstCalendarDay,
-              lastDay: lastCalendarDay,
-              focusedDay: _focusedDay,
-              currentDay: DateTime.now(),
-              headerStyle: HeaderStyle(
-                formatButtonVisible: false,
-                titleCentered: true,
-                leftChevronIcon: Icon(
-                  Icons.chevron_left_rounded,
-                  color: titleColor,
-                  size: 20,
-                ),
-                rightChevronIcon: Icon(
-                  Icons.chevron_right_rounded,
-                  color: titleColor,
-                  size: 20,
-                ),
-                titleTextStyle: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
-                headerPadding: const EdgeInsets.symmetric(vertical: 4),
-              ),
-              daysOfWeekStyle: DaysOfWeekStyle(
-                weekdayStyle: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: bodyColor,
-                ),
-                weekendStyle: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: bodyColor,
-                ),
-              ),
-              calendarStyle: CalendarStyle(
-                outsideDaysVisible: false,
-                cellMargin: const EdgeInsets.all(2),
-                defaultTextStyle: TextStyle(
-                  color: titleColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-                weekendTextStyle: TextStyle(
-                  color: titleColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                ),
-                todayDecoration: BoxDecoration(
-                  color: IneaCalendar.plum.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: IneaCalendar.plum.withValues(alpha: 0.4),
-                  ),
-                ),
-                todayTextStyle: TextStyle(
-                  color: titleColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
-                selectedDecoration: const BoxDecoration(
-                  color: IneaCalendar.plum,
-                  shape: BoxShape.circle,
-                ),
-                selectedTextStyle: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              selectedDayPredicate: (day) {
-                if (widget.selectedDate == null) return false;
-                return isSameDay(widget.selectedDate, day);
-              },
-              calendarBuilders: CalendarBuilders(
-                disabledBuilder: (context, day, focusedDay) {
-                  final now = DateTime.now();
-                  final today = DateTime(now.year, now.month, now.day);
-                  final cellDay = DateTime(day.year, day.month, day.day);
-                  final isPast = cellDay.isBefore(today);
-                  final isFull = bookedDays.contains(cellDay);
-
-                  return Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '${day.day}',
-                            style: TextStyle(
-                              color: titleColor.withValues(alpha: 0.3),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          if (isFull && !isPast)
-                            Text(
-                              'Full',
-                              style: TextStyle(
-                                color: titleColor.withValues(alpha: 0.4),
-                                fontSize: 8,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-              enabledDayPredicate: (day) {
-                final now = DateTime.now();
-                final today = DateTime(now.year, now.month, now.day);
-                final cellDay = DateTime(day.year, day.month, day.day);
-                if (cellDay.isBefore(today)) return false;
-                return !bookedDays.contains(cellDay);
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                setState(() {
-                  _focusedDay = focusedDay;
-                });
-                widget.onDateSelected(selectedDay);
-              },
-              onPageChanged: (focusedDay) {
-                setState(() {
-                  _focusedDay = focusedDay;
-                });
-                ref
-                    .read(availabilityProvider.notifier)
-                    .setMonth(focusedDay.month, focusedDay.year);
-              },
-            ),
-          ),
-          if (isLoading) ...[
-            const SizedBox(height: 8),
-            const Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: IneaCalendar.plum,
-                ),
-              ),
-            ),
-          ],
+          grid,
+          ?loadingRow,
           if (widget.selectedDate != null && !isLoading) ...[
             const SizedBox(height: 10),
             Text(
