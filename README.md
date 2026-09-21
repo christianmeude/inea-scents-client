@@ -51,7 +51,7 @@ flutter run
 ## 🔌 Connectivity
 
 **Backend API:**
-This mobile client connects to the `inea-scents` Laravel backend. By default, it may point to `https://inea-scents.onrender.com/api` or your local development server (`http://127.0.0.1:8000/api`).
+This mobile client connects to the `inea-scents-backend` Laravel backend. By default, it may point to `https://ineascents.onrender.com/api` or your local development server (`http://127.0.0.1:8000/api`).
 
 All endpoints are fully integrated in `lib/services/dio_client.dart`:
 - `POST /register`, `POST /login` (Auth)
