@@ -94,21 +94,12 @@ class ProfileScreen extends ConsumerWidget {
                   );
                   // C29: Upcoming Booking section removed from profile only;
                   // /bookings/:id route + detail screen intact (C11).
-                  final form = _ProfileFormCard(
-                    userName: userName,
-                    userEmail: userEmail,
-                  );
+                  // C37: inline form card removed (supersedes C29 scaffold).
                   if (constraints.maxWidth <=
                       ResponsiveAppShell.tabletBreakpoint) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        profile,
-                        const SizedBox(height: 12),
-                        form,
-                        const SizedBox(height: 12),
-                        settings,
-                      ],
+                      children: [profile, const SizedBox(height: 12), settings],
                     );
                   }
 
@@ -119,8 +110,6 @@ class ProfileScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           profile,
-                          const SizedBox(height: 12),
-                          form,
                           const SizedBox(height: 12),
                           settings,
                         ],
@@ -302,77 +291,6 @@ class _ProfileCard extends StatelessWidget {
 }
 
 // ============================================================================
-// PROFILE FORM SCAFFOLD (C29: fields visible, wiring deferred to C14/C15)
-// ============================================================================
-
-class _ProfileFormCard extends StatelessWidget {
-  final String userName;
-  final String userEmail;
-
-  const _ProfileFormCard({required this.userName, required this.userEmail});
-
-  @override
-  Widget build(BuildContext context) {
-    final cardBg = CardSurfaces.cardBg(context);
-    final cardBorder = CardSurfaces.cardBorder(context);
-    // C29: compact dense fields so 360x800 still fits (C9, no scroll).
-    InputDecoration deco(String label) => InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(fontSize: 11),
-      isDense: true,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-    );
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: cardBorder, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // C29: no API calls — display-only scaffold for C14/C15.
-          TextFormField(
-            key: const Key('profile_name'),
-            initialValue: userName,
-            enabled: false,
-            style: const TextStyle(fontSize: 12),
-            decoration: deco('Name'),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            key: const Key('profile_email'),
-            initialValue: userEmail,
-            enabled: false,
-            style: const TextStyle(fontSize: 12),
-            decoration: deco('Email'),
-          ),
-          const SizedBox(height: 6),
-          TextFormField(
-            key: const Key('profile_phone'),
-            enabled: false,
-            style: const TextStyle(fontSize: 12),
-            decoration: deco('Phone'),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Saving deferred — wiring in C14/C15.',
-            style: TextStyle(
-              color: CardSurfaces.body(context),
-              fontSize: 11,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================================
 // SETTINGS COLUMN (P7: header + card, shared by both compositions)
 // ============================================================================
 
@@ -437,14 +355,6 @@ class _SettingsColumn extends StatelessWidget {
               // MaterialApp.themeMode. No toggles live on other screens'
               // settings surfaces.
               const _ThemeToggleTile(),
-
-              const _SettingDivider(),
-
-              _ProfileSettingTile(
-                icon: Icons.help_outline_rounded,
-                title: 'Help & Support',
-                onTap: () {},
-              ),
 
               const _SettingDivider(),
 
