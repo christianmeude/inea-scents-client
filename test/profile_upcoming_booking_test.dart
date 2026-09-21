@@ -11,9 +11,10 @@ import 'package:inea_scents_client/widgets/upcoming_booking_section.dart';
 
 import 'helpers/fake_api.dart';
 
-/// C29: Upcoming Booking section removed from Profile only — selector rules
-/// still cover Home; Profile asserts no Upcoming section, scaffold form
-/// fields, disabled tiles with deferred notes, and kept /bookings/:id route.
+/// C37: Upcoming Booking section removed from Profile only — selector rules
+/// still cover Home; Profile asserts no Upcoming section, no inline form
+/// card, no Help tile, disabled tiles with deferred notes, and kept
+/// /bookings/:id route. Profile renders without overflow at 360x800.
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
@@ -143,7 +144,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('C29: profile has no Upcoming section, scaffold form shown',
+  testWidgets('C37: profile has no Upcoming section, form card, Help tile',
       (tester) async {
     usePhoneViewport(tester);
     final future = DateTime.now().add(const Duration(days: 16));
@@ -155,20 +156,23 @@ void main() {
     await tester.pumpWidget(appWith(router(), backend));
     await tester.pumpAndSettle();
 
-    // C29: Upcoming section removed from profile even with data.
+    // C37: Upcoming section removed from profile even with data.
     expect(find.byType(UpcomingBookingSection), findsNothing);
     expect(find.text('UPCOMING BOOKING'), findsNothing);
     expect(find.text('No upcoming Booking yet'), findsNothing);
-    // C29: scaffold name/email/phone form visible (wiring in C14/C15).
-    expect(find.byKey(const Key('profile_name')), findsOneWidget);
-    expect(find.byKey(const Key('profile_email')), findsOneWidget);
-    expect(find.byKey(const Key('profile_phone')), findsOneWidget);
-    expect(find.text('Saving deferred — wiring in C14/C15.'), findsOneWidget);
+    // C37: inline form card removed (supersedes C29 scaffold).
+    expect(find.byKey(const Key('profile_name')), findsNothing);
+    expect(find.byKey(const Key('profile_email')), findsNothing);
+    expect(find.byKey(const Key('profile_phone')), findsNothing);
+    expect(find.text('Saving deferred — wiring in C14/C15.'), findsNothing);
+    // C37: Help & Support tile removed (overflow fix).
+    expect(find.text('Help & Support'), findsNothing);
     // C29: tiles visible but disabled with deferred notes.
     expect(find.text('Edit Profile'), findsOneWidget);
     expect(find.text('Deferred — available in C14'), findsOneWidget);
     expect(find.text('Change Password'), findsOneWidget);
     expect(find.text('Deferred — available in C15'), findsOneWidget);
+    // C9/C37: no overflow at 360x800 — any overflow throws.
     expect(tester.takeException(), isNull);
   });
 
