@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../config/theme.dart';
 import '../providers/index.dart';
 import '../widgets/index.dart';
 
@@ -210,7 +211,7 @@ class _ProfileCard extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF95647E), Color(0xFF74445C)],
+                colors: [Color(0xFF95647E), AppTheme.primary],
               ),
 
               boxShadow: [
@@ -472,7 +473,7 @@ class _ThemeToggleTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    const primaryColor = Color(0xFF74445C);
+    const primaryColor = AppTheme.primary;
     final textColor = isDark
         ? const Color(0xFFFDF4F5)
         : const Color(0xFF633E50);
@@ -567,7 +568,7 @@ class _ProfileSettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     // P6 (Q1): dark-aware tile text.
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    const primaryColor = Color(0xFF74445C);
+    const primaryColor = AppTheme.primary;
     final textColor = isDark
         ? const Color(0xFFFDF4F5)
         : const Color(0xFF633E50);

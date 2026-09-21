@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../config/theme.dart';
+
 /// Shared friendly error card (P6 Q6/Q8): one look for every load failure —
 /// solid Elegant Concierge card, plain-language message, a single Try Again
 /// action. Raw error text is never rendered; it stays in logs only.
@@ -22,7 +24,7 @@ class ErrorStateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    const plum = Color(0xFF74445C);
+    const plum = AppTheme.primary;
     final titleColor =
         isDark ? const Color(0xFFFDF4F5) : const Color(0xFF633E50);
     final bodyColor =
