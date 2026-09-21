@@ -341,10 +341,9 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.lock_outline_rounded,
                 title: 'Change Password',
-                // C29: deferred to C15 — visible but disabled.
-                enabled: false,
-                note: 'Deferred — available in C15',
-                onTap: () {},
+                // C39: plain navigation to the scaffolded
+                // /profile/password route; C15 wires submit.
+                onTap: () => context.push('/profile/password'),
               ),
 
               const _SettingDivider(),

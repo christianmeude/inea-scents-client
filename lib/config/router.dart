@@ -108,6 +108,11 @@ class AppRouter {
                 path: '/profile',
                 builder: (context, state) => const ProfileScreen(),
               ),
+              // C39: scaffold only — form ships disabled, C15 wires submit.
+              GoRoute(
+                path: '/profile/password',
+                builder: (context, state) => const ChangePasswordScreen(),
+              ),
             ],
           ),
         ],
