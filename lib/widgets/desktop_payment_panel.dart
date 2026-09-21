@@ -233,9 +233,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                   children: [
                                     Icon(
                                       method['icon'] as IconData,
-                                      color: isSelected
-                                          ? methodColor
-                                          : DesktopPaymentPanel.mutedPlum,
+                                      // C33: title token both states (AAA 4.5+).
+                                      color: titleColor,
                                       size: 22,
                                     ),
                                     const SizedBox(height: 4),
@@ -244,9 +243,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
-                                        color: isSelected
-                                            ? methodColor
-                                            : titleColor,
+                                        // C33: title token (AAA 4.5+ UI).
+                                        color: titleColor,
                                       ),
                                       textAlign: TextAlign.center,
                                       maxLines: 1,
@@ -257,7 +255,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                       method['sublabel'] as String,
                                       style: TextStyle(
                                         fontSize: 9,
-                                        color: DesktopPaymentPanel.mutedPlum,
+                                        // C33: title token (AAA 7+ text).
+                                        color: titleColor,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -269,9 +268,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                           : Icons
                                                 .radio_button_unchecked_rounded,
                                       size: 14,
-                                      color: isSelected
-                                          ? methodColor
-                                          : const Color(0x4D99868C),
+                                      // C33: title token (AAA 4.5+ UI).
+                                      color: titleColor,
                                     ),
                                   ],
                                 ),
