@@ -5,9 +5,9 @@
 ## 🌍 The Ecosystem
 
 The Inea Scents platform consists of three separate repositories. This repository relies on the backend for API endpoints:
-1. **`inea_scents_client` (This Repo)**: Flutter cross-platform mobile/web application for customer bookings.
-2. **`inea-scents`**: Laravel backend, PostgreSQL database, and Admin Dashboard.
-3. **`inea-scents-landing`**: React/Vite customer-facing marketing website.
+1. **`ineascents-app` (This Repo)**: Flutter cross-platform mobile/web application for customer bookings.
+2. **`ineascents-backend`**: Laravel backend, PostgreSQL database, and Admin Dashboard.
+3. **`ineascents-landing`**: React/Vite customer-facing marketing website.
 
 ## ⚡ Quick Start
 
@@ -22,7 +22,7 @@ flutter pub run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-*Note: Ensure the `inea-scents` backend is running locally or configured to point to the production API, or the app will not be able to fetch data.*
+*Note: Ensure the `ineascents-backend` backend is running locally or configured to point to the production API, or the app will not be able to fetch data.*
 
 ## 📋 Prerequisites
 
@@ -51,7 +51,7 @@ flutter run
 ## 🔌 Connectivity
 
 **Backend API:**
-This mobile client connects to the `inea-scents-backend` Laravel backend. By default, it may point to `https://ineascents.onrender.com/api` or your local development server (`http://127.0.0.1:8000/api`).
+This mobile client connects to the `ineascents-backend` Laravel backend. By default, it may point to `https://ineascents.onrender.com/api` or your local development server (`http://127.0.0.1:8000/api`).
 
 All endpoints are fully integrated in `lib/services/dio_client.dart`:
 - `POST /register`, `POST /login` (Auth)
