@@ -73,7 +73,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Stack(
           children: [
             // ======================================================
-            // MESH GRADIENT BLOBS
+            // MESH GRADIENT BLOBS (C45: light alphas cut to 0x14 pale /
+            // 0x0D plum for AAA; mesh geometry + dark mode untouched)
             // ======================================================
             Positioned(
               top: -sh * 0.10,
@@ -83,7 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 600,
                 color: isDark
                     ? const Color(0x664A1C28)
-                    : const Color(0xFFDABDAC),
+                    : const Color(0x14DABDAC),
                 angle: 30 * (3.14159 / 180),
               ),
             ),
@@ -95,7 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 300,
                 color: isDark
                     ? const Color(0x664A1C28)
-                    : const Color(0xFFDABDAC),
+                    : const Color(0x14DABDAC),
                 angle: 15 * (3.14159 / 180),
               ),
             ),
@@ -107,7 +108,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 250,
                 color: isDark
                     ? const Color(0x806A4053)
-                    : const Color(0xFFC08D9E),
+                    : const Color(0x14C08D9E),
                 angle: 10 * (3.14159 / 180),
               ),
             ),
@@ -119,7 +120,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 400,
                 color: isDark
                     ? const Color(0x9936222C)
-                    : const Color(0xFF988088),
+                    : const Color(0x14988088),
               ),
             ),
             Positioned(
@@ -130,7 +131,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 600,
                 color: isDark
                     ? const Color(0xB33B1019)
-                    : const Color(0xFFC4A5A8),
+                    : const Color(0x14C4A5A8),
               ),
             ),
             Positioned(
@@ -141,7 +142,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 400,
                 color: isDark
                     ? const Color(0xB33B1019)
-                    : const Color(0xFFC4A5A8),
+                    : const Color(0x14C4A5A8),
               ),
             ),
             Positioned(
@@ -152,7 +153,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 500,
                 color: isDark
                     ? const Color(0x996A4053)
-                    : const Color(0xFF6E3C53),
+                    : const Color(0x0D6E3C53),
               ),
             ),
             Positioned(
@@ -163,7 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 250,
                 color: isDark
                     ? const Color(0x996A4053)
-                    : const Color(0xFF6E3C53),
+                    : const Color(0x0D6E3C53),
               ),
             ),
 
