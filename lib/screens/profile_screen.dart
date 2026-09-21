@@ -514,7 +514,7 @@ class _ProfileSettingTile extends StatelessWidget {
 
                 decoration: BoxDecoration(
                   color: isDestructive
-                      ? const Color(0xFF9A4F5D).withValues(alpha: 0.10)
+                      ? itemColor.withValues(alpha: 0.10)
                       : primaryColor.withValues(alpha: 0.10),
 
                   borderRadius: BorderRadius.circular(13),
@@ -537,9 +537,7 @@ class _ProfileSettingTile extends StatelessWidget {
                       title,
 
                       style: TextStyle(
-                        color: isDestructive
-                            ? const Color(0xFF9A4F5D)
-                            : textColor,
+                        color: isDestructive ? itemColor : textColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
