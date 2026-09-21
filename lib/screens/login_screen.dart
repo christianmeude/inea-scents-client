@@ -35,19 +35,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (next.isLoggedIn) {
         context.go('/home');
       } else if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            // P6 (Q8): friendly fallback; provider messages pass through.
-            content: Text(
+        // C30: persistent banner on wide (retry re-submits), SnackBar narrow.
+        showAppError(
+          context,
+          // P6 (Q8): friendly fallback; provider messages pass through.
+          message:
               next.errorMessage ??
-                  "That didn't work. Check your details and try again.",
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFF6A4053),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+              "That didn't work. Check your details and try again.",
+          onRetry: () => ref
+              .read(authProvider.notifier)
+              .login(
+                email: emailController.text.trim(),
+                password: passwordController.text,
+              ),
         );
       }
     });

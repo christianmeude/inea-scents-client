@@ -162,6 +162,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Future<void> _handleConfirmAndPay() async {
     if (_submitting) return;
     _submitting = true;
+    // C30: drop any stale error surface before a fresh attempt.
+    if (mounted) hideAppError(context);
     try {
       // C13: submit-time past-date guard (day precision — today is allowed).
       // The calendar only offers free days, but a chosen date can age past
@@ -170,15 +172,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       final selectedDate = _selectedDate;
       if (selectedDate != null && _isPastDay(selectedDate, DateTime.now())) {
         if (mounted) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'The selected date has passed. Please choose a new date.',
-                ),
-              ),
-            );
+          // C30: persistent banner on wide, SnackBar on narrow.
+          showAppError(
+            context,
+            message: 'The selected date has passed. Please choose a new date.',
+          );
         }
         return;
       }
@@ -199,9 +197,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _heldCheckoutTab = null;
         final state = ref.read(bookingFlowProvider);
         if (state.errorMessage != null && mounted) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+          // C30: submit failure retries the submit, dismiss clears.
+          showAppError(
+            context,
+            message: state.errorMessage!,
+            onRetry: () => _handleConfirmAndPay(),
+          );
         }
         return;
       }
@@ -235,8 +236,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// Opens [checkoutUrl] in a new browser tab (external application), so
   /// the app — and its payment polling — stays alive underneath.
   /// Returns true when the platform accepted the launch. Never throws:
-  /// a failure surfaces as a SnackBar with a copy-link action instead of
-  /// stranding the user on the processing screen.
+  /// a failure surfaces as a banner/SnackBar with a copy-link action
+  /// instead of stranding the user on the processing screen.
   Future<bool> _launchCheckoutUrl(String checkoutUrl) async {
     final uri = Uri.tryParse(checkoutUrl);
     if (uri == null || (!uri.isScheme('http') && !uri.isScheme('https'))) {
@@ -258,20 +259,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   void _showCheckoutLaunchFailure(String checkoutUrl) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(
-        SnackBar(
-          content: const Text(
-            'Checkout did not open automatically. Use the button below.',
-          ),
-          action: SnackBarAction(
-            label: 'Copy link',
-            onPressed: () =>
-                Clipboard.setData(ClipboardData(text: checkoutUrl)),
-          ),
-        ),
-      );
+    // C30: copy-link action preserved on both surfaces.
+    showAppError(
+      context,
+      message: 'Checkout did not open automatically. Use the button below.',
+      actionLabel: 'Copy link',
+      onAction: () => Clipboard.setData(ClipboardData(text: checkoutUrl)),
+    );
   }
 
   /// Re-opens the stored checkout link for the in-flight booking, if any.
@@ -279,13 +273,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final checkoutUrl = ref.read(bookingFlowProvider).booking?.checkoutUrl;
     if (checkoutUrl == null || checkoutUrl.isEmpty) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text('Checkout link is unavailable. Please rebook.'),
-          ),
-        );
+      // C30: persistent banner on wide, SnackBar on narrow.
+      showAppError(
+        context,
+        message: 'Checkout link is unavailable. Please rebook.',
+      );
       return;
     }
     await _launchCheckoutUrl(checkoutUrl);
@@ -642,10 +634,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         // Selections live in the notifier; the gate below is
                         // the single authority — nothing to mirror back.
                         if (!notifier.canProceedFromSchedule()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please select date and time'),
-                            ),
+                          // C30: persistent banner on wide, SnackBar narrow.
+                          showAppError(
+                            context,
+                            message: 'Please select date and time',
                           );
                           return;
                         }
@@ -804,10 +796,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         // Selections live in the notifier; the gate below is
                         // the single authority — nothing to mirror back.
                         if (!notifier.canProceedFromSchedule()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please select date and time'),
-                            ),
+                          // C30: persistent banner on wide, SnackBar narrow.
+                          showAppError(
+                            context,
+                            message: 'Please select date and time',
                           );
                           return;
                         }
@@ -856,10 +848,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                             _selectedPax != null &&
                             _selectedTime != null;
                         if (!notifier.canProceedFromSchedule() && !localOk) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please select date and time'),
-                            ),
+                          // C30: persistent banner on wide, SnackBar narrow.
+                          showAppError(
+                            context,
+                            message: 'Please select date and time',
                           );
                           return;
                         }
@@ -876,12 +868,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         notifier.nextStep();
                       } else if (_currentStep == 3) {
                         if (!notifier.canProceedFromDetails()) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Please fill name, email and venue',
-                              ),
-                            ),
+                          // C30: persistent banner on wide, SnackBar narrow.
+                          showAppError(
+                            context,
+                            message: 'Please fill name, email and venue',
                           );
                           return;
                         }

@@ -10,6 +10,9 @@ class ErrorStateCard extends StatelessWidget {
   final String retryLabel;
   final IconData icon;
 
+  /// C30: optional dismiss (close affordance, no visual change when null).
+  final VoidCallback? onDismiss;
+
   const ErrorStateCard({
     super.key,
     required this.title,
@@ -17,6 +20,7 @@ class ErrorStateCard extends StatelessWidget {
     required this.onRetry,
     this.retryLabel = 'Try Again',
     this.icon = Icons.cloud_off_rounded,
+    this.onDismiss,
   });
 
   @override
@@ -48,45 +52,63 @@ class ErrorStateCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF36222C)
-                  : const Color(0xFFF5E8EC),
-              shape: BoxShape.circle,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF36222C)
+                      : const Color(0xFFF5E8EC),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: isDark ? const Color(0xFFFDF4F5) : plum,
+                ),
+              ),
+              const SizedBox(height: 14),
+              SelectableText(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SelectableText(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: bodyColor, fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 18),
+              OutlinedButton(
+                onPressed: onRetry,
+                child: Text(retryLabel),
+              ),
+            ],
+          ),
+          // C30: dismiss affordance only when a handler is provided.
+          if (onDismiss != null)
+            Positioned(
+              top: 0,
+              right: 0,
+              child: IconButton(
+                key: const Key('error_card_dismiss'),
+                icon: const Icon(Icons.close_rounded, size: 20),
+                tooltip: 'Dismiss',
+                visualDensity: VisualDensity.compact,
+                color: bodyColor,
+                onPressed: onDismiss,
+              ),
             ),
-            child: Icon(
-              icon,
-              size: 32,
-              color: isDark ? const Color(0xFFFDF4F5) : plum,
-            ),
-          ),
-          const SizedBox(height: 14),
-          SelectableText(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: titleColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          SelectableText(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: bodyColor, fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: 18),
-          OutlinedButton(
-            onPressed: onRetry,
-            child: Text(retryLabel),
-          ),
         ],
       ),
     );

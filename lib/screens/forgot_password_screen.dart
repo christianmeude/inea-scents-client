@@ -29,6 +29,31 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  /// C30: reset-link POST; failures surface as a persistent banner on
+  /// wide (retry re-sends), SnackBar on narrow. Success stays a SnackBar.
+  Future<void> _sendResetLink() async {
+    final dioClient = ref.read(dioClientProvider);
+    try {
+      await dioClient.dio.post(
+        '/forgot-password',
+        data: {'email': emailController.text.trim()},
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset link sent!')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      showAppError(
+        context,
+        message:
+            "We couldn't send the reset link. "
+            'Check your connection and try again.',
+        onRetry: _sendResetLink,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
@@ -37,19 +62,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       if (next.isLoggedIn) {
         context.go('/home');
       } else if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            // P6 (Q8): friendly fallback; provider messages pass through.
-            content: Text(
+        // C30: persistent banner on wide, SnackBar on narrow.
+        showAppError(
+          context,
+          // P6 (Q8): friendly fallback; provider messages pass through.
+          message:
               next.errorMessage ??
-                  "That didn't work. Check your details and try again.",
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFF6A4053),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+              "That didn't work. Check your details and try again.",
         );
       }
     });
@@ -214,41 +233,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           child: ElevatedButton(
                             onPressed: authState.isLoading
                                 ? null
-                                : () async {
-                                    final dioClient = ref.read(
-                                      dioClientProvider,
-                                    );
-                                    try {
-                                      await dioClient.dio.post(
-                                        '/forgot-password',
-                                        data: {
-                                          'email': emailController.text.trim(),
-                                        },
-                                      );
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Password reset link sent!',
-                                          ),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      if (!context.mounted) return;
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            "We couldn't send the reset link. "
-                                            'Check your connection and try again.',
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
+                                : _sendResetLink,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6A4053),
                               foregroundColor: Colors.white,
