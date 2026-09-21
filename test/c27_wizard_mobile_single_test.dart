@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:inea_scents_client/config/theme.dart';
+import 'package:inea_scents_client/models/index.dart';
+import 'package:inea_scents_client/providers/index.dart';
+import 'package:inea_scents_client/screens/booking_screen.dart';
+import 'package:inea_scents_client/src/providers/core_providers.dart';
+import 'package:inea_scents_client/widgets/index.dart';
+
+import 'helpers/fake_api.dart';
+
+/// C27 wizard mobile pass: Details step single-column under 768px,
+/// desktop multi-column intact, one unified Schedule/Details/Payment
+/// timeline on mobile + web.
+Package _c27Package() => const Package(
+  id: 42,
+  name: 'Dior Women Luxury Experience',
+  price: 4500.0,
+  paxOptions: [20, 30, 50, 75, 100],
+);
+
+Widget _c27Harness(ProviderContainer container) {
+  return UncontrolledProviderScope(
+    container: container,
+    child: MaterialApp(
+      theme: AppTheme.lightTheme,
+      home: ResponsiveAppShell(child: BookingScreen(packageId: 42)),
+    ),
+  );
+}
+
+ProviderContainer _c27Container() {
+  return ProviderContainer(
+    overrides: [
+      packageDetailsProvider(42).overrideWith((ref) => _c27Package()),
+      apiClientProvider.overrideWithValue(
+        buildFakeRestClient(FakeApiBackend()),
+      ),
+    ],
+  );
+}
+
+Future<void> _pump(
+  WidgetTester tester,
+  ProviderContainer container,
+  Size size,
+) async {
+  tester.view.physicalSize = size;
+  tester.view.devicePixelRatio = 1.0;
+  await tester.pumpWidget(_c27Harness(container));
+  await tester.pumpAndSettle();
+}
+
+void main() {
+  group('c27 wizard mobile single-column + unified timeline', () {
+    testWidgets('Details step stacks one column at 390px', (
+      WidgetTester tester,
+    ) async {
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final container = _c27Container();
+      addTearDown(container.dispose);
+      await _pump(tester, container, const Size(390, 844));
+
+      container.read(bookingFlowProvider.notifier).goToStep(3);
+      await tester.pumpAndSettle();
+
+      final summary = find.byKey(const Key('mobile_details_summary_card'));
+      final card = find.byKey(const Key('mobile_details_package_card'));
+      expect(summary, findsOneWidget);
+      expect(card, findsOneWidget);
+
+      // Stacked vertically: package card starts at/below summary end.
+      final summaryBottom = tester.getBottomLeft(summary).dy;
+      final cardTop = tester.getTopLeft(card).dy;
+      expect(cardTop, greaterThanOrEqualTo(summaryBottom - 1.0));
+
+      // Full width: both span the same horizontal extent (no side-by-side).
+      final summaryRect = tester.getRect(summary);
+      final cardRect = tester.getRect(card);
+      expect(cardRect.left, moreOrLessEquals(summaryRect.left, epsilon: 2.0));
+      expect(cardRect.right, moreOrLessEquals(summaryRect.right, epsilon: 2.0));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('desktop reservation columns intact at 1280px', (
+      WidgetTester tester,
+    ) async {
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final container = _c27Container();
+      addTearDown(container.dispose);
+      await _pump(tester, container, const Size(1280, 800));
+
+      // Multi-column reservation view untouched: calendar left of details.
+      expect(
+        find.byKey(const Key('desktop_reservation_columns_view')),
+        findsOneWidget,
+      );
+      final calLeft = tester
+          .getTopLeft(find.byKey(const Key('reservation_calendar_panel')))
+          .dx;
+      final detLeft = tester
+          .getTopLeft(find.byKey(const Key('reservation_details_panel')))
+          .dx;
+      expect(calLeft, lessThan(detLeft));
+
+      // Unified timeline labels, exactly once each.
+      expect(find.text('Schedule'), findsOneWidget);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Payment'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('mobile timeline labels appear exactly once (no twin)', (
+      WidgetTester tester,
+    ) async {
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final container = _c27Container();
+      addTearDown(container.dispose);
+      await _pump(tester, container, const Size(390, 844));
+
+      for (final step in [2, 3, 4]) {
+        container.read(bookingFlowProvider.notifier).goToStep(step);
+        await tester.pumpAndSettle();
+        // Timeline labels identical on every step; step 3 also shows
+        // the in-step 'Details' section title (pre-existing content).
+        expect(find.text('Schedule'), findsOneWidget);
+        expect(find.text('Payment'), findsOneWidget);
+        expect(
+          find.text('Details'),
+          step == 3 ? findsNWidgets(2) : findsOneWidget,
+        );
+      }
+      expect(find.text('01 Date & Time'), findsNothing);
+      expect(find.text('03 Review & Pay'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+  });
+}

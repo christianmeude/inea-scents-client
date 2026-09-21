@@ -45,7 +45,7 @@ ProviderContainer _c19Container() {
 
 void main() {
   group('c19 wizard merge', () {
-    testWidgets('desktop breadcrumb shows 3 steps, no legacy crumbs', (
+    testWidgets('desktop header shows unified Schedule Details Payment', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(1200, 800);
@@ -58,9 +58,13 @@ void main() {
       await tester.pumpWidget(_c19Harness(container));
       await tester.pumpAndSettle();
 
-      expect(find.text('01 Date & Time'), findsOneWidget);
-      expect(find.text('02 Details'), findsOneWidget);
-      expect(find.text('03 Review & Pay'), findsOneWidget);
+      // C27: one timeline everywhere — desktop matches mobile labels.
+      expect(find.text('Schedule'), findsOneWidget);
+      expect(find.text('Details'), findsOneWidget);
+      expect(find.text('Payment'), findsOneWidget);
+      expect(find.text('01 Date & Time'), findsNothing);
+      expect(find.text('02 Details'), findsNothing);
+      expect(find.text('03 Review & Pay'), findsNothing);
       expect(find.text('01 Details'), findsNothing);
       expect(find.text('02 Pax Choice'), findsNothing);
       expect(find.text('04 Checkout'), findsNothing);
