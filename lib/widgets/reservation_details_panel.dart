@@ -21,6 +21,12 @@ class ReservationDetailsPanel extends StatelessWidget {
   final String? selectedTime;
   final ValueChanged<String> onTimeSelected;
 
+  /// C48: schedule-step grid shows time + pax only (COL B) — the §1
+  /// package summary card duplicates the summary rail's proper-noun line
+  /// and stays retired from the schedule step. Defaults true so existing
+  /// direct-panel usages (and their tests) render unchanged.
+  final bool showPackageSummary;
+
   const ReservationDetailsPanel({
     super.key,
     required this.package,
@@ -28,6 +34,7 @@ class ReservationDetailsPanel extends StatelessWidget {
     required this.onChangePax,
     required this.selectedTime,
     required this.onTimeSelected,
+    this.showPackageSummary = true,
   });
 
   @override
@@ -52,84 +59,88 @@ class ReservationDetailsPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ========================================================
-        // 1. PACKAGE SUMMARY CARD
+        // 1. PACKAGE SUMMARY CARD (C48: retired from the schedule
+        // step — hidden via [showPackageSummary]; the rail owns the
+        // proper-noun line there).
         // ========================================================
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: chipColor,
-                      borderRadius: BorderRadius.circular(10),
+        if (showPackageSummary) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: chipColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        Icons.card_giftcard_rounded,
+                        color: titleColor,
+                        size: 20,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.card_giftcard_rounded,
-                      color: titleColor,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          package.name ?? 'Luxury Experience Pax Choice',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: titleColor,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Starting at ${formatPeso(package.price ?? 4500.0)}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: bodyColor,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        // Package facts (grill critique #7): headcount range
-                        // + duration hint give the middle column weight.
-                        // Staff lives in the booking summary Inclusions;
-                        // no invented data.
-                        if (paxList.isNotEmpty)
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            paxList.length > 1
-                                ? '${paxList.first}–${paxList.last} PAX — 3–4 hrs'
-                                : '${paxList.first} PAX — 3–4 hrs',
+                            package.name ?? 'Luxury Experience Pax Choice',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: titleColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Starting at ${formatPeso(package.price ?? 4500.0)}',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              // C36: title token (was DE-plum, fails 7:1).
-                              color: titleColor,
-                              height: 1.35,
+                              fontWeight: FontWeight.w600,
+                              color: bodyColor,
                             ),
                           ),
-                      ],
+                          const SizedBox(height: 6),
+                          // Package facts (grill critique #7): headcount range
+                          // + duration hint give the middle column weight.
+                          // Staff lives in the booking summary Inclusions;
+                          // no invented data.
+                          if (paxList.isNotEmpty)
+                            Text(
+                              paxList.length > 1
+                                  ? '${paxList.first}–${paxList.last} PAX — 3–4 hrs'
+                                  : '${paxList.first} PAX — 3–4 hrs',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                // C36: title token (was DE-plum, fails 7:1).
+                                color: titleColor,
+                                height: 1.35,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              // Description lives on the package detail screen only
-              // (grill Q3-final): no server-copy price echo here.
-              // C7: included-info lives only in the booking summary
-              // (OrderSummaryPanel InclusionsList) — no duplicate accordion.
-            ],
+                  ],
+                ),
+                // Description lives on the package detail screen only
+                // (grill Q3-final): no server-copy price echo here.
+                // C7: included-info lives only in the booking summary
+                // (OrderSummaryPanel InclusionsList) — no duplicate accordion.
+              ],
+            ),
           ),
-        ),
 
-        const SizedBox(height: 14),
+          const SizedBox(height: 14),
+        ],
 
         // ========================================================
         // 2. YOUR PACKAGE (P6: read-only — the headcount step was
