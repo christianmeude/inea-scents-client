@@ -15,7 +15,7 @@ import 'package:inea_scents_client/widgets/error_state_card.dart';
 import 'helpers/fake_api.dart';
 
 /// C12: Bookings empty state routes to /packages (not /) with Pax-Choice
-/// copy, and a persistent data-only book-another action routes to /packages.
+/// copy. C43: data header shows title+count only (no book-another).
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
@@ -104,7 +104,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('non-empty mobile shows header book-another, no AppBar plus', (
+  testWidgets('non-empty mobile shows title+count only, no AppBar plus', (
     WidgetTester tester,
   ) async {
     final router = buildRouter();
@@ -119,24 +119,21 @@ void main() {
     );
 
     expect(find.text('My Bookings'), findsOneWidget);
-    // C25: circle-plus AppBar action removed; header button is the
-    // single book-another affordance (compact label <768px).
+    expect(find.text('1 booking'), findsOneWidget);
+    // C43: no book-another affordance in the header on any width.
     expect(find.byType(AppBar), findsNothing);
     expect(
       find.byTooltip('Book another Pax Choice'),
       findsNothing,
     );
-    expect(find.text('Book another'), findsOneWidget);
+    expect(find.text('Book another'), findsNothing);
+    expect(find.text('Book another Pax Choice'), findsNothing);
     expect(find.text('Explore Packages'), findsNothing);
-
-    await tester.tap(find.text('Book another'));
-    await tester.pumpAndSettle();
-    expect(router.location, '/packages');
-    expect(find.text('Packages Screen Page'), findsOneWidget);
+    expect(router.location, '/bookings');
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('non-empty desktop shows trailing book-another button', (
+  testWidgets('non-empty desktop shows title+count only, no book-another', (
     WidgetTester tester,
   ) async {
     final router = buildRouter();
@@ -151,11 +148,11 @@ void main() {
       size: const Size(1280, 800),
     );
 
-    expect(find.text('Book another Pax Choice'), findsOneWidget);
-    await tester.tap(find.text('Book another Pax Choice'));
-    await tester.pumpAndSettle();
-    expect(router.location, '/packages');
-    expect(find.text('Packages Screen Page'), findsOneWidget);
+    expect(find.text('My Bookings'), findsOneWidget);
+    expect(find.text('1 booking'), findsOneWidget);
+    expect(find.text('Book another Pax Choice'), findsNothing);
+    expect(find.text('Book another'), findsNothing);
+    expect(router.location, '/bookings');
     expect(tester.takeException(), isNull);
   });
 
