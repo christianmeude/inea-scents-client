@@ -31,14 +31,11 @@ class MyBookingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookingsAsync = ref.watch(bookingsProvider);
-    final isNarrow = MediaQuery.of(context).size.width < 768;
-    // C12/C25: the header book-another button renders only in the data
-    // branch below (empty has its own CTA), so it stays data-only.
+    // C43: header is title+count only (book-another removed);
+    // empty state keeps its own CTA to /packages.
 
     // P7: no explicit color — flat theme scaffold background.
-    // C25: mobile AppBar removed — its only content was the circle-plus
-    // book-another action. The page-header button below is now the
-    // single book-another affordance on all widths.
+    // C43: header shows title+count only (no book-another affordance).
     return Scaffold(
 
       // ============================================================
@@ -66,69 +63,29 @@ class MyBookingsScreen extends ConsumerWidget {
                         children: [
                           // ==================================================
                           // PAGE HEADER
-                          // C25: the trailing book-another action lives
-                          // here on all widths (mobile AppBar removed
-                          // with its circle-plus). Compact label <768px
-                          // so the row fits at 360px.
+                          // C43: title+count only (book-another removed).
                           // ==================================================
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'My Bookings',
-                                      style: TextStyle(
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.w600,
-                                        color: CardSurfaces.title(context),
-                                        letterSpacing: -0.3,
-                                      ),
-                                    ),
-
-                                    const SizedBox(height: 5),
-
-                                    Text(
-                                      '${bookings.length} '
-                                      '${bookings.length == 1 ? 'booking' : 'bookings'}',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: CardSurfaces.body(context),
-                                      ),
-                                    ),
-                                  ],
+                              Text(
+                                'My Bookings',
+                                style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w600,
+                                  color: CardSurfaces.title(context),
+                                  letterSpacing: -0.3,
                                 ),
                               ),
-                              SizedBox(width: isNarrow ? 12 : 16),
-                              Flexible(
-                                child: OutlinedButton.icon(
-                                  onPressed: () =>
-                                      context.go('/packages'),
-                                  // C25: tighter touch target <768px so
-                                  // the row fits at 360px; desktop keeps
-                                  // theme defaults.
-                                  style: isNarrow
-                                      ? OutlinedButton.styleFrom(
-                                          padding:
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                                vertical: 12,
-                                              ),
-                                        )
-                                      : null,
-                                  icon: const Icon(
-                                    Icons.add_rounded,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    isNarrow
-                                        ? 'Book another'
-                                        : 'Book another Pax Choice',
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+
+                              const SizedBox(height: 5),
+
+                              Text(
+                                '${bookings.length} '
+                                '${bookings.length == 1 ? 'booking' : 'bookings'}',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: CardSurfaces.body(context),
                                 ),
                               ),
                             ],
