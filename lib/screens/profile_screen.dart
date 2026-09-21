@@ -280,8 +280,8 @@ class _ProfileCard extends StatelessWidget {
 
               icon: Icon(Icons.edit_outlined, color: textColor, size: 18),
 
-              // C29: edit deferred to C14 — tile + button disabled.
-              onPressed: null,
+              // C38: plain navigation to the scaffolded edit form.
+              onPressed: () => context.push('/profile/edit'),
             ),
           ),
         ],
@@ -330,10 +330,8 @@ class _SettingsColumn extends StatelessWidget {
               _ProfileSettingTile(
                 icon: Icons.person_outline_rounded,
                 title: 'Edit Profile',
-                // C29: deferred to C14 — visible but disabled.
-                enabled: false,
-                note: 'Deferred — available in C14',
-                onTap: () {},
+                // C38: plain navigation to /profile/edit.
+                onTap: () => context.push('/profile/edit'),
               ),
 
               const _SettingDivider(),
