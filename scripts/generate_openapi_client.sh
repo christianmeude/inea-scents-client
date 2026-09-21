@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-OPENAPI_URL=${1:-https://inea-scents.onrender.com/docs?api-docs.json}
+OPENAPI_URL=${1:-https://ineascents.onrender.com/docs?api-docs.json}
 OUT_DIR=${2:-lib/api}
 GENERATOR=${3:-dart-dio}
 

@@ -1,5 +1,5 @@
 Param(
-    [string]$OpenApiUrl = 'https://inea-scents.onrender.com/docs?api-docs.json',
+    [string]$OpenApiUrl = 'https://ineascents.onrender.com/docs?api-docs.json',
     [string]$OutputDir = 'lib/api',
     [string]$Generator = 'dart-dio'
 )

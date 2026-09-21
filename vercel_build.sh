@@ -17,9 +17,9 @@ export PATH="$PATH:`pwd`/flutter/bin"
 # 12-Factor: API_URL passed per Vercel env (Vercel env dashboard).
 # Only prod exists in the cloud — Preview and Production both use the prod URL
 # (see backend docs/adr/0009-two-environments.md).
-# Production/Preview -> https://inea-scents.onrender.com (prod DB)
+# Production/Preview -> https://ineascents.onrender.com (prod DB)
 # Local `flutter run` passes --dart-define=API_URL=http://127.0.0.1:8000 manually.
-: "${API_URL:?API_URL dart-define is required. Set Vercel env API_URL=https://inea-scents.onrender.com for Production and Preview.}"
+: "${API_URL:?API_URL dart-define is required. Set Vercel env API_URL=https://ineascents.onrender.com for Production and Preview.}"
 
 # Enable web, install deps, and build with committed outputs.
 # Codegen (swagger_parser, build_runner) runs locally before pushing —
