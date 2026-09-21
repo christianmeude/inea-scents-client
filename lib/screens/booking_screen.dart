@@ -393,13 +393,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           if (flow.selectedPackage?.id == package.id) {
             final currentPax = flow.selectedPax;
             if (currentPax == null ||
-                (candidates.isNotEmpty &&
-                    !candidates.contains(currentPax))) {
+                (candidates.isNotEmpty && !candidates.contains(currentPax))) {
               if (candidates.isNotEmpty) {
                 final preselected = widget.initialPax;
                 final chosen =
-                    (preselected != null &&
-                        candidates.contains(preselected))
+                    (preselected != null && candidates.contains(preselected))
                     ? preselected
                     : candidates.first;
                 flowNotifier.setSelectedPax(chosen);
@@ -924,8 +922,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   // ==========================================================================
 
   Widget _buildDesktopHeader(Package package) {
-    final isPayment = _currentStep == 4;
-
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 6),
       child: Row(
@@ -959,44 +955,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           const SizedBox(width: 8),
           Container(height: 18, width: 1, color: _surfaceBorder),
           const SizedBox(width: 10),
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildBreadcrumb('01 Date & Time', true),
-                  _breadcrumbArrow(),
-                  _buildBreadcrumb('02 Details', _currentStep >= 3),
-                  _breadcrumbArrow(),
-                  _buildBreadcrumb('03 Review & Pay', _currentStep >= 4),
-                ],
-              ),
-            ),
-          ),
+          // C27: one timeline everywhere — Schedule/Details/Payment
+          // identical on mobile + web; divergent crumbs deleted.
+          Expanded(child: _buildTimeline()),
           const SizedBox(width: 10),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBreadcrumb(String text, bool active) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontSize: 13,
-        fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-        color: active ? _title : _title.withValues(alpha: 0.4),
-      ),
-    );
-  }
-
-  Widget _breadcrumbArrow() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: Icon(
-        Icons.arrow_right_alt_rounded,
-        size: 14,
-        color: _title.withValues(alpha: 0.3),
       ),
     );
   }
@@ -1454,10 +1417,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                      GestureDetector(
-                        key: const Key('pax_change_link'),
-                        // C6: in-flow pax edit (step 2); no router jump.
-                        onTap: () => _goToStep(2),
+                    GestureDetector(
+                      key: const Key('pax_change_link'),
+                      // C6: in-flow pax edit (step 2); no router jump.
+                      onTap: () => _goToStep(2),
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: Text(
@@ -1553,173 +1516,170 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             ),
           ),
           const SizedBox(height: 15),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // C27: single column under 768px; desktop row untouched.
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                flex: 3,
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: _surface,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: _surfaceBorder),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Details',
-                        style: TextStyle(fontSize: 14, color: _title),
+              Container(
+                key: const Key('mobile_details_summary_card'),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: _surface,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: _surfaceBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Details',
+                      style: TextStyle(fontSize: 14, color: _title),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Pax Choice: ${package.name}',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Inclusions:',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 5),
+                    ...(package.inclusions ?? []).map(
+                      (e) => Text(
+                        '• $e',
+                        style: TextStyle(fontSize: 12, color: _title),
                       ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Pax Choice: ${package.name}',
-                        style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Freebies:',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 5),
+                    ...(package.freebies ?? []).map(
+                      (e) => Text(
+                        '• $e',
+                        style: TextStyle(fontSize: 12, color: _title),
                       ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Inclusions:',
-                        style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Selected Date:',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      _selectedDate != null
+                          ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
+                          : 'Not selected',
+                      style: TextStyle(fontSize: 13, color: _title),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Selected Time:',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      TimeSlot.display(_selectedTime),
+                      style: TextStyle(fontSize: 13, color: _title),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Selected Pax:',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${_selectedPax ?? 50} PAX',
+                      style: TextStyle(fontSize: 13, color: _title),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Total Cost:',
+                      style: TextStyle(fontSize: 13, color: _body),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      formatPeso(package.priceForPax(_selectedPax)),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: _title,
                       ),
-                      const SizedBox(height: 5),
-                      ...(package.inclusions ?? []).map(
-                        (e) => Text(
-                          '• $e',
-                          style: TextStyle(fontSize: 12, color: _title),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Freebies:',
-                        style: TextStyle(fontSize: 13, color: _body),
-                      ),
-                      const SizedBox(height: 5),
-                      ...(package.freebies ?? []).map(
-                        (e) => Text(
-                          '• $e',
-                          style: TextStyle(fontSize: 12, color: _title),
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Selected Date:',
-                        style: TextStyle(fontSize: 13, color: _body),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        _selectedDate != null
-                            ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
-                            : 'Not selected',
-                        style: TextStyle(fontSize: 13, color: _title),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Selected Time:',
-                        style: TextStyle(fontSize: 13, color: _body),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        TimeSlot.display(_selectedTime),
-                        style: TextStyle(fontSize: 13, color: _title),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Selected Pax:',
-                        style: TextStyle(fontSize: 13, color: _body),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '${_selectedPax ?? 50} PAX',
-                        style: TextStyle(fontSize: 13, color: _title),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        'Total Cost:',
-                        style: TextStyle(fontSize: 13, color: _body),
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        formatPeso(package.priceForPax(_selectedPax)),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: _title,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 15),
-              Expanded(
-                flex: 2,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _surface,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: _surfaceBorder),
-                  ),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
-                        ),
-                        child: Container(
-                          height: 100,
-                          width: double.infinity,
-                          color: const Color(0xFFF3EBE1),
-                          child:
-                              (package.images != null &&
-                                  package.images!.isNotEmpty)
-                              ? Image.network(
-                                  package.images![0],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(
-                                        Icons.local_florist,
-                                        color: _title,
-                                        size: 32,
-                                      ),
-                                )
-                              : Icon(
-                                  Icons.local_florist,
-                                  color: _title,
-                                  size: 32,
-                                ),
-                        ),
+              const SizedBox(height: 15),
+              Container(
+                key: const Key('mobile_details_package_card'),
+                decoration: BoxDecoration(
+                  color: _surface,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: _surfaceBorder),
+                ),
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              package.name ?? '',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
+                      child: Container(
+                        height: 100,
+                        width: double.infinity,
+                        color: const Color(0xFFF3EBE1),
+                        child:
+                            (package.images != null &&
+                                package.images!.isNotEmpty)
+                            ? Image.network(
+                                package.images![0],
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(
+                                      Icons.local_florist,
+                                      color: _title,
+                                      size: 32,
+                                    ),
+                              )
+                            : Icon(
+                                Icons.local_florist,
                                 color: _title,
+                                size: 32,
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              package.description ?? '',
-                              maxLines: 3,
-                              style: TextStyle(fontSize: 10, color: _body),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              formatPeso(package.price ?? 4499.0),
-                              style: TextStyle(fontSize: 13, color: _title),
-                            ),
-                          ],
-                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            package.name ?? '',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: _title,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            package.description ?? '',
+                            maxLines: 3,
+                            style: TextStyle(fontSize: 10, color: _body),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            formatPeso(package.price ?? 4499.0),
+                            style: TextStyle(fontSize: 13, color: _title),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

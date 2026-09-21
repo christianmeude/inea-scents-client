@@ -120,9 +120,11 @@ void main() {
           findsOneWidget,
         );
 
-        // Verify desktop header is present
+        // Verify desktop header shows the unified timeline (C27)
 
-        expect(find.text('01 Date & Time'), findsOneWidget);
+        expect(find.text('Schedule'), findsOneWidget);
+        expect(find.text('Details'), findsOneWidget);
+        expect(find.text('Payment'), findsOneWidget);
 
         // Layout coordinate verification:
         // Calendar above Details in the flow column; summary to the right.
@@ -1405,7 +1407,7 @@ void main() {
     );
 
     testWidgets(
-      'Desktop payment header updates title to Payment & Checkout and badge to Secure In-Place Checkout',
+      'Desktop payment header keeps the unified timeline on payment step',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1417,15 +1419,19 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Initial reservation header (P6: desktop is 2-column)
-        expect(find.text('01 Date & Time'), findsOneWidget);
+        // Initial reservation header (C27: unified Schedule/Details/Payment)
+        expect(find.text('Schedule'), findsOneWidget);
+        expect(find.text('Details'), findsOneWidget);
+        expect(find.text('Payment'), findsOneWidget);
 
         // Proceed to payment
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
-        // Payment header updates
-        expect(find.text('03 Review & Pay'), findsOneWidget);
+        // Payment header keeps the same unified timeline
+        expect(find.text('Schedule'), findsOneWidget);
+        expect(find.text('Details'), findsOneWidget);
+        expect(find.text('Payment'), findsOneWidget);
 
         expect(find.byIcon(Icons.lock_outline_rounded), findsWidgets);
       },
