@@ -1916,7 +1916,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                               child: Text(
                                 m['label'] as String,
                                 style: TextStyle(
-                                  color: m['color'] as Color,
+                                  // C33: title token (AAA 4.5+ UI).
+                                  color: _title,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                 ),
