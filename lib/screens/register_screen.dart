@@ -34,21 +34,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
+        // C30: never carry a prior error banner onto /home.
+        hideAppError(context);
         context.go('/home');
       } else if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            // P6 (Q8): friendly fallback; provider messages pass through.
-            content: Text(
+        // C30: persistent banner on wide (retry re-submits), SnackBar narrow.
+        showAppError(
+          context,
+          // P6 (Q8): friendly fallback; provider messages pass through.
+          message:
               next.errorMessage ??
-                  "That didn't work. Check your details and try again.",
-            ),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFF6A4053),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
+              "That didn't work. Check your details and try again.",
+          onRetry: () => ref
+              .read(authProvider.notifier)
+              .register(
+                name: nameController.text.trim(),
+                email: emailController.text.trim(),
+                password: passwordController.text,
+              ),
         );
       }
     });

@@ -48,44 +48,48 @@ class ErrorStateCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Stack(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF36222C)
-                  : const Color(0xFFF5E8EC),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 32,
-              color: isDark ? const Color(0xFFFDF4F5) : plum,
-            ),
-          ),
-          const SizedBox(height: 14),
-          SelectableText(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: titleColor,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 6),
-          SelectableText(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: bodyColor, fontSize: 13, height: 1.4),
-          ),
-          const SizedBox(height: 18),
-          OutlinedButton(
-            onPressed: onRetry,
-            child: Text(retryLabel),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF36222C)
+                      : const Color(0xFFF5E8EC),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: isDark ? const Color(0xFFFDF4F5) : plum,
+                ),
+              ),
+              const SizedBox(height: 14),
+              SelectableText(
+                title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: titleColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 6),
+              SelectableText(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: bodyColor, fontSize: 13, height: 1.4),
+              ),
+              const SizedBox(height: 18),
+              OutlinedButton(
+                onPressed: onRetry,
+                child: Text(retryLabel),
+              ),
+            ],
           ),
         ],
       ),
