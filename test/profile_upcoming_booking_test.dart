@@ -144,7 +144,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
   }
 
-  testWidgets('C37: profile has no Upcoming section, form card, Help tile',
+  testWidgets('C38: profile Edit tile navigates, no inline form card',
       (tester) async {
     usePhoneViewport(tester);
     final future = DateTime.now().add(const Duration(days: 16));
@@ -167,9 +167,9 @@ void main() {
     expect(find.text('Saving deferred — wiring in C14/C15.'), findsNothing);
     // C37: Help & Support tile removed (overflow fix).
     expect(find.text('Help & Support'), findsNothing);
-    // C29: tiles visible but disabled with deferred notes.
+    // C38: Edit Profile tile navigates to /profile/edit (plain nav).
     expect(find.text('Edit Profile'), findsOneWidget);
-    expect(find.text('Deferred — available in C14'), findsOneWidget);
+    expect(find.text('Deferred — available in C14'), findsNothing);
     expect(find.text('Change Password'), findsOneWidget);
     expect(find.text('Deferred — available in C15'), findsOneWidget);
     // C9/C37: no overflow at 360x800 — any overflow throws.

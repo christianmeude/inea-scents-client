@@ -19,6 +19,11 @@ class AppRouter {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      // C38: scaffolded edit-profile form (submit disabled, C14 open).
+      GoRoute(
+        path: '/profile/edit',
+        builder: (context, state) => const EditProfileScreen(),
+      ),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),

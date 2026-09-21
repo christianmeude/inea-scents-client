@@ -8,4 +8,5 @@ export 'calendar_screen.dart';
 export 'my_bookings_screen.dart';
 export 'booking_detail_screen.dart';
 export 'profile_screen.dart';
+export 'edit_profile_screen.dart';
 export 'forgot_password_screen.dart';
