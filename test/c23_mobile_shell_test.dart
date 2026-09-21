@@ -73,7 +73,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('LOG IN loading shows a 20px white spinner on plum', (
+    testWidgets('LOG IN loading shows a 20px cream spinner on plum', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);

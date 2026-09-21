@@ -81,8 +81,8 @@ void main() {
     }
   });
 
-  group('c31 button labels at 360/768/1280', () {
-    for (final width in [360.0, 768.0, 1280.0]) {
+  group('c31 button labels at 360/768/1200', () {
+    for (final width in [360.0, 768.0, 1200.0]) {
       for (final theme in [AppTheme.lightTheme, AppTheme.darkTheme]) {
         final mode = theme.brightness == Brightness.dark ? 'dark' : 'light';
         testWidgets('Elevated+Filled CTA legible $mode @ ${width.toInt()}px', (

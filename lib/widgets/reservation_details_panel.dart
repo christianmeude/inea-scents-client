@@ -12,10 +12,6 @@ import 'card_surfaces.dart';
 // C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
 // customer-facing copy uses Booking / Pax Choice.
 class ReservationDetailsPanel extends StatelessWidget {
-  static const Color plum = Color(0xFF6A4053);
-  static const Color mutedPlum = Color(0xFF99868C);
-  static const Color cream = Color(0xFFFDF4F5);
-
   final Package package;
   final int? selectedPax;
 
