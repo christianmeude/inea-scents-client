@@ -15,5 +15,6 @@ export 'theme_toggle_button.dart';
 export 'error_state_card.dart';
 export 'upcoming_booking_section.dart';
 export 'card_surfaces.dart';
+export 'tab_header.dart';
 export 'inclusions_list.dart';
 export 'error_banner.dart';

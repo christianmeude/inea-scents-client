@@ -13,18 +13,6 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authProvider);
 
-    // ============================================================
-    // COLORS (P6 Q1/Q3: dark-aware; cards are solid, never glass)
-    // ============================================================
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final textColor = isDark
-        ? const Color(0xFFFDF4F5)
-        : const Color(0xFF633E50);
-    final secondaryTextColor = isDark
-        ? const Color(0xFFC4ACAC)
-        : const Color(0xFF765867);
-
     // Solid card surfaces matching the rest of the app (Q3).
     final userName = authState.user?.name ?? 'User';
     final userEmail = authState.user?.email ?? '';
@@ -54,23 +42,12 @@ class ProfileScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ==================================================
-              // PAGE TITLE
+              // PAGE TITLE (C42: unified header, trailing empty —
+              // C35: dark-aware via CardSurfaces, never per-screen hex)
               // ==================================================
-              Text(
-                'My Profile',
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
-                ),
-              ),
-
-              const SizedBox(height: 4),
-
-              Text(
-                'Manage your account and preferences.',
-                style: TextStyle(color: secondaryTextColor, fontSize: 13),
+              const TabHeader(
+                title: 'My Profile',
+                count: 'Manage your account and preferences.',
               ),
 
               const SizedBox(height: 12),

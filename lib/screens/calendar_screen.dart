@@ -91,7 +91,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     final surface = CardSurfaces.cardBg(context);
     final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
-    final bodyColor = CardSurfaces.body(context);
     final availability = availabilityState.data;
 
     // C28: date-entry grid is the shared IneaCalendar; only days the
@@ -121,35 +120,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         builder: (context, constraints) {
           final isDesktop = constraints.maxWidth >= ResponsiveAppShell.tabletBreakpoint;
 
-          final titleContent = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-// ====================================================
-          // PAGE TITLE
-          // ====================================================
-          Text(
-            'Availability',
-            style: TextStyle(
-              color: titleColor,
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.1,
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            'Choose a date for your scent experience.',
-            style: TextStyle(
-              color: bodyColor,
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-
-          const SizedBox(height: 22),
-            ],
+          // C42: unified header (title+count left, trailing empty).
+          const titleContent = TabHeader(
+            title: 'Availability',
+            count: 'Choose a date for your scent experience.',
           );
 
           final calendarCard = // ====================================================
@@ -193,10 +167,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           if (isDesktop) {
             return Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1000),
+                // C42: header aligns to the 1200 shell cap (was 1000).
+                constraints: const BoxConstraints(maxWidth: 1200),
                 child: ListView(
                   // C25: platform-default physics (clamp Android / bounce iOS).
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
                   children: [
                     titleContent,
                     const SizedBox(height: 22),
@@ -216,7 +191,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
           return ListView(
             // C25: platform-default physics (clamp Android / bounce iOS).
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
             children: [
               titleContent,
               const SizedBox(height: 22),

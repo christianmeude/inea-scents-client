@@ -4,9 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inea_scents_client/providers/index.dart';
 import 'package:inea_scents_client/screens/home_screen.dart';
+import 'package:inea_scents_client/widgets/index.dart';
 
 /// C26: Home spacing polish — One Booking subtitle gone, 16px card rhythm,
 /// 20px screen edge padding at 360/768/1200px.
+/// C42: mobile logo row retired (brand lives in TopNavBar); unified
+/// TabHeader (`Home` + count) tops the stack, trailing slot empty.
 GoRouter _router() {
   return GoRouter(
     initialLocation: '/',
@@ -34,7 +37,7 @@ Future<void> _pumpAt(WidgetTester tester, double width) async {
 void main() {
   group('c26 home spacing polish', () {
     for (final width in [360.0, 768.0, 1200.0]) {
-      testWidgets('w${width.toInt()}: subtitle gone, 16px rhythm, 20px edges',
+      testWidgets('w${width.toInt()}: header, no logo, 16px rhythm, 20px edges',
           (WidgetTester tester) async {
         await _pumpAt(tester, width);
         expect(tester.takeException(), isNull);
@@ -43,15 +46,20 @@ void main() {
         expect(find.byKey(const Key('home_trust_copy')), findsNothing);
         expect(find.textContaining('One Booking'), findsNothing);
 
-        // C26: 16px card rhythm (top + 2 inter-card gaps).
+        // C42: unified header on top, mobile logo row retired.
+        expect(find.byType(TabHeader), findsOneWidget);
+        expect(find.text('Home'), findsOneWidget);
+        expect(find.byType(AppLogo), findsNothing);
+
+        // C26: 16px card rhythm between the 3 cards.
         final gaps = tester
             .widgetList<SizedBox>(find.byWidgetPredicate(
               (w) => w is SizedBox && w.height == 16 && w.width == null,
             ))
             .length;
-        expect(gaps, 3);
+        expect(gaps, 2);
 
-        // C26: 20px screen edge padding around every card.
+        // C26: 20px screen edge padding around header + every card.
         final edges = tester
             .widgetList<Padding>(find.byWidgetPredicate(
               (w) =>
@@ -59,7 +67,7 @@ void main() {
                   w.padding == const EdgeInsets.symmetric(horizontal: 20),
             ))
             .length;
-        expect(edges, 3);
+        expect(edges, 4);
       });
     }
   });

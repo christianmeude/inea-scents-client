@@ -45,7 +45,25 @@ class MyBookingsScreen extends ConsumerWidget {
         child: bookingsAsync.when(
           data: (bookings) {
             if (bookings.isEmpty) {
-              return const _EmptyBookings();
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1200),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // C42: unified header over the empty state.
+                        const TabHeader(
+                          title: 'My Bookings',
+                          count: '0 bookings',
+                        ),
+                        const Expanded(child: _EmptyBookings()),
+                      ],
+                    ),
+                  ),
+                ),
+              );
             }
 
             return RefreshIndicator(
@@ -62,33 +80,13 @@ class MyBookingsScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // ==================================================
-                          // PAGE HEADER
-                          // C43: title+count only (book-another removed).
+                          // PAGE HEADER (C42: unified header, trailing
+                          // empty — C43 title+count adopted as-is)
                           // ==================================================
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'My Bookings',
-                                style: TextStyle(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w600,
-                                  color: CardSurfaces.title(context),
-                                  letterSpacing: -0.3,
-                                ),
-                              ),
-
-                              const SizedBox(height: 5),
-
-                              Text(
-                                '${bookings.length} '
+                          TabHeader(
+                            title: 'My Bookings',
+                            count: '${bookings.length} '
                                 '${bookings.length == 1 ? 'booking' : 'bookings'}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: CardSurfaces.body(context),
-                                ),
-                              ),
-                            ],
                           ),
 
                           const SizedBox(height: 20),
