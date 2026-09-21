@@ -42,7 +42,10 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
       // ============================================================
       body: SafeArea(
         child: SingleChildScrollView(
-          // C25: platform-default physics (clamp Android / bounce iOS).
+          // C40: clamp overscroll on mobile (<768px); SDK default
+          // (stretch Android / bounce iOS) displaced content past edge.
+          // Desktop/web physics untouched (null = platform default).
+          physics: MobileClampScroll.physicsOf(context),
 
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
 

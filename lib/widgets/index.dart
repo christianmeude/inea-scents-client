@@ -18,3 +18,4 @@ export 'card_surfaces.dart';
 export 'tab_header.dart';
 export 'inclusions_list.dart';
 export 'error_banner.dart';
+export 'mobile_clamp_scroll.dart';
