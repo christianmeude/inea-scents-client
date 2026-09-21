@@ -59,13 +59,14 @@ void main() {
   });
 
   group('c32 destructive tile contrast', () {
-    testWidgets('light: Logout title+icon 0xFF9A4F5D vs white >= 4.5 @ 360px',
+    testWidgets('light: Logout title+icon errorOnLight vs white >= 7 @ 360px',
         (WidgetTester tester) async {
       await _pumpProfile(tester, AppTheme.lightTheme);
 
       expect(find.text('Logout'), findsOneWidget);
       final title = tester.widget<Text>(find.text('Logout'));
-      const expected = Color(0xFF9A4F5D);
+      // C36: darker plum token (was 0xFF9A4F5D at 5.75; text bar is 7:1).
+      final expected = AppTheme.errorOnLight;
       expect(title.style?.color, equals(expected));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.logout_rounded));
@@ -74,7 +75,8 @@ void main() {
       final ctx = tester.element(find.byType(ProfileScreen));
       final surface = CardSurfaces.cardBg(ctx);
       expect(surface, equals(Colors.white));
-      expect(_ratio(expected, surface), greaterThanOrEqualTo(4.5));
+      // C36: destructive text meets the 7:1 text bar.
+      expect(_ratio(expected, surface), greaterThanOrEqualTo(7.0));
       expect(tester.takeException(), isNull);
     });
 

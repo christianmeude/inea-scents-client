@@ -108,10 +108,11 @@ class ReservationDetailsPanel extends StatelessWidget {
                             paxList.length > 1
                                 ? '${paxList.first}–${paxList.last} PAX — 3–4 hrs'
                                 : '${paxList.first} PAX — 3–4 hrs',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xDE6A4053),
+                              // C36: title token (was DE-plum, fails 7:1).
+                              color: titleColor,
                               height: 1.35,
                             ),
                           ),

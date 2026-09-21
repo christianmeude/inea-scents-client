@@ -1321,7 +1321,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   steps[index],
                   style: TextStyle(
                     fontSize: 10,
-                    color: isCurrent ? plum : const Color(0xFF99868C),
+                    // C36: title token both states (was plum/muted, fails 7:1).
+                    color: _title,
                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
@@ -1346,9 +1347,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Please Choose Available Schedule',
-            style: TextStyle(fontSize: 13, color: plum),
+            // C36: title token (was plum, fails 7:1 on tinted fills).
+            style: TextStyle(fontSize: 13, color: _title),
           ),
           const SizedBox(height: 15),
           IneaCalendar(
@@ -1433,14 +1435,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             },
           ),
           const SizedBox(height: 25),
-          const Text(
+          Text(
             'Choose Event Time',
-            style: TextStyle(fontSize: 13, color: plum),
+            // C36: title token (was plum).
+            style: TextStyle(fontSize: 13, color: _title),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'One booking lasts 3–4 hrs.',
-            style: TextStyle(fontSize: 12, color: Color(0x8A6A4053)),
+            // C36: title token (was translucent plum, fails 7:1).
+            style: TextStyle(fontSize: 12, color: _title),
           ),
           const SizedBox(height: 10),
           Container(
@@ -1624,7 +1628,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       child: Container(
                         height: 100,
                         width: double.infinity,
-                        color: const Color(0xFFF3EBE1),
+                        // C36: surfaceBorder fallback fill (was cream
+                        // 0xFFF3EBE1); title icon holds >=4.5 both modes.
+                        color: _surfaceBorder,
                         child:
                             (package.images != null &&
                                 package.images!.isNotEmpty)

@@ -88,7 +88,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         : const Color(0xFF765867);
     final errorColor = isDark
         ? const Color(0xFFF0A6B0)
-        : const Color(0xFF9A4F5D);
+        : AppTheme.errorOnLight; // C36: 9.83:1 vs white (was 5.75).
 
     final currentError = _touched['current'] == true
         ? ChangePasswordValidators.validateCurrent(
