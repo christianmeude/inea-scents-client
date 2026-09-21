@@ -200,7 +200,9 @@ class ReservationDetailsPanel extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
-                                    color: ReservationDetailsPanel.plum,
+                                    // C31: title token both modes (was
+                                    // plum-on-night in dark).
+                                    color: titleColor,
                                     decoration: TextDecoration.underline,
                                   ),
                                   maxLines: 1,

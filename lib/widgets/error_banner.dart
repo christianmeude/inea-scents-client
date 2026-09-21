@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../config/theme.dart';
 import 'card_surfaces.dart';
 import 'responsive_app_shell.dart';
 
@@ -85,17 +86,25 @@ void showAppError(
           // C30: explicit dismiss (SnackBar keeps auto-dismiss too).
           // Narrow keeps the pre-C30 branded look.
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF6A4053),
+          // C31: plum/cream token both modes.
+          backgroundColor: AppTheme.primaryButtonBackground,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           content: Row(
             children: [
-              Expanded(child: Text(message)),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    color: AppTheme.onPrimaryButton,
+                  ),
+                ),
+              ),
               IconButton(
                 key: const Key('app_error_dismiss'),
                 icon: const Icon(Icons.close_rounded, size: 20),
-                color: Colors.white,
+                color: AppTheme.onPrimaryButton,
                 tooltip: 'Dismiss',
                 visualDensity: VisualDensity.compact,
                 onPressed: messenger.clearSnackBars,
@@ -107,6 +116,8 @@ void showAppError(
               ? SnackBarAction(
                   key: Key(hasAction ? 'app_error_action' : 'app_error_retry'),
                   label: actionLabel ?? retryLabel,
+                  // C31: cream action label on the plum token.
+                  textColor: AppTheme.onPrimaryButton,
                   onPressed: () {
                     messenger.clearSnackBars();
                     (hasAction ? onAction : onRetry)?.call();

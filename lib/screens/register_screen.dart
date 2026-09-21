@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
+import '../config/theme.dart';
 import '../widgets/index.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -249,12 +250,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         );
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6A4053),
+                              // C31: plum/cream token both modes.
+                              backgroundColor:
+                                  AppTheme.primaryButtonBackground,
                               // C23: keep the plum fill while loading instead
                               // of dropping to the grey disabled wash.
-                              disabledBackgroundColor: const Color(0xFF6A4053),
-                              foregroundColor: Colors.white,
-                              disabledForegroundColor: Colors.white,
+                              disabledBackgroundColor:
+                                  AppTheme.primaryButtonBackground,
+                              foregroundColor: AppTheme.onPrimaryButton,
+                              disabledForegroundColor:
+                                  AppTheme.onPrimaryButton,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -269,7 +274,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     width: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
-                                      color: Colors.white,
+                                      // C31: cream spinner on plum token.
+                                      color: AppTheme.onPrimaryButton,
                                     ),
                                   )
                                 : FittedBox(
@@ -295,7 +301,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           child: OutlinedButton(
                             onPressed: () => context.go('/login'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF6A4053),
+                              // C31: plum token (label stays dark-aware below).
+                              foregroundColor:
+                                  AppTheme.primaryButtonBackground,
                               side: BorderSide(
                                 color: isDark
                                     ? const Color(
@@ -322,9 +330,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 1.2,
+                                  // C31: cream label in dark via token.
                                   color: isDark
-                                      ? const Color(0xFFFDF4F5)
-                                      : const Color(0xFF6A4053),
+                                      ? AppTheme.onPrimaryButton
+                                      : AppTheme.primaryButtonBackground,
                                 ),
                               ),
                             ),

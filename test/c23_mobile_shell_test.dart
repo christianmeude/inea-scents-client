@@ -51,7 +51,8 @@ void main() {
       expect(style.backgroundColor!.resolve({WidgetState.disabled}), plum);
       expect(
         style.foregroundColor!.resolve({WidgetState.disabled}),
-        Colors.white,
+        // C31: cream label token on plum (was white; same AA legibility).
+        AppTheme.onPrimaryButton,
       );
       // 44px touch target inside the 44–48px band.
       final sized = tester.widget<SizedBox>(

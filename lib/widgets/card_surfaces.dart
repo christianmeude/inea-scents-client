@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../config/theme.dart';
+
 /// Shared Elegant Concierge surfaces (P7): every card, chip, and title in
 /// the app resolves through here so the dark toggle never leaves a
 /// light-hardcoded surface behind. Light values preserve the established
 /// look exactly; dark values follow the canonical nights
 /// (`night #151012`, `surface #1C1618`, `border #36222C`).
 class CardSurfaces {
-  static const Color _plum = Color(0xFF6A4053);
+  // C31: plum/cream resolve through AppTheme (single source).
+  static const Color _plum = AppTheme.primaryButtonBackground;
   static const Color _mutedPlum = Color(0xFF99868C);
   static const Color _titleLight = Color(0xFF633E50);
   static const Color _bodyLight = Color(0xFF765867);
-  static const Color _cream = Color(0xFFFDF4F5);
+  static const Color _cream = AppTheme.onPrimaryButton;
 
   static const Color night = Color(0xFF151012);
   static const Color nightSurface = Color(0xFF1C1618);
@@ -49,4 +52,8 @@ class CardSurfaces {
   static Color get plum => _plum;
   static Color get mutedPlum => _mutedPlum;
   static Color get cream => _cream;
+
+  /// C31: primary-button token re-exports — AppTheme owns the values.
+  static Color get primaryButtonBackground => AppTheme.primaryButtonBackground;
+  static Color get onPrimaryButton => AppTheme.onPrimaryButton;
 }

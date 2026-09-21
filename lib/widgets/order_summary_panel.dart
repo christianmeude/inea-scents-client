@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/theme.dart';
 import '../models/index.dart';
 import '../config/offering.dart';
 import '../utils/peso.dart';
@@ -17,7 +18,8 @@ import 'inclusions_list.dart';
 // C6: Order* class name kept (referenced across booking_screen and tests);
 // customer-facing copy already uses Booking ("Your Booking").
 class OrderSummaryPanel extends StatelessWidget {
-  static const Color plum = Color(0xFF6A4053);
+  // C31: single-sourced via AppTheme (never per-screen hex).
+  static const Color plum = AppTheme.primaryButtonBackground;
 
   final Package package;
   final DateTime? selectedDate;
@@ -320,7 +322,8 @@ class OrderSummaryPanel extends StatelessWidget {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: Colors.white,
+                        // C31: cream spinner on the plum CTA token.
+                        color: AppTheme.onPrimaryButton,
                       ),
                     )
                   : Text(
