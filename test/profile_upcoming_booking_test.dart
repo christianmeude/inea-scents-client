@@ -167,11 +167,13 @@ void main() {
     expect(find.text('Saving deferred — wiring in C14/C15.'), findsNothing);
     // C37: Help & Support tile removed (overflow fix).
     expect(find.text('Help & Support'), findsNothing);
-    // C38: Edit Profile tile navigates to /profile/edit (plain nav).
+<    // C38: Edit Profile tile navigates to /profile/edit (plain nav).
+    // C39: Change Password is plain navigation to /profile/password
+    // (scaffold ships disabled submit, C15 wires it).
     expect(find.text('Edit Profile'), findsOneWidget);
     expect(find.text('Deferred — available in C14'), findsNothing);
     expect(find.text('Change Password'), findsOneWidget);
-    expect(find.text('Deferred — available in C15'), findsOneWidget);
+    expect(find.text('Deferred — available in C15'), findsNothing);
     // C9/C37: no overflow at 360x800 — any overflow throws.
     expect(tester.takeException(), isNull);
   });
