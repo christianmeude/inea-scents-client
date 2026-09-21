@@ -556,10 +556,11 @@ class _EmptyBookings extends StatelessWidget {
                 ],
               ),
 
-              child: const Icon(
+              child: Icon(
                 Icons.calendar_month_outlined,
                 size: 42,
-                color: Color(0xFF8B6B7C),
+                // C36: title token (was 0xFF8B6B7C, fails 4.5).
+                color: CardSurfaces.title(context),
               ),
             ),
 

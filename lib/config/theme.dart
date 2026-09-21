@@ -54,6 +54,10 @@ class AppTheme {
   static const Color unavailable = Color(0xFFFCA5A5);
   static const Color link = Color(0xFF06B6D4);
 
+  // C36 single-source AAA error text for light surfaces: deep red-plum
+  // holds 9.83:1 vs white (text bar 7:1). Dark mode keeps 0xFFF0A6B0.
+  static const Color errorOnLight = Color(0xFF7A2531);
+
   // Global PageTransitionsTheme with Desktop Cross-Fade
   static const PageTransitionsTheme pageTransitionsTheme = PageTransitionsTheme(
     builders: {

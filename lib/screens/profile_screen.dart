@@ -486,7 +486,8 @@ class _ProfileSettingTile extends StatelessWidget {
     final itemColor = isDestructive
         ? isDark
               ? const Color(0xFFF0A6B0)
-              : const Color(0xFF9A4F5D)
+              // C36: 9.83:1 vs white (was 0xFF9A4F5D at 5.75).
+              : AppTheme.errorOnLight
         : (isDark ? const Color(0xFFFDF4F5) : primaryColor);
 
     return Material(

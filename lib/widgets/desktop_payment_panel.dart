@@ -344,12 +344,13 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                             ).withValues(alpha: 0.25),
                           ),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
                             Icon(
                               Icons.lock_outline_rounded,
                               size: 18,
-                              color: Color(0xFF6A4053),
+                              // C36: title token (AAA 7+ text both modes).
+                              color: titleColor,
                             ),
                             SizedBox(width: 10),
                             Expanded(
@@ -359,7 +360,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                 'no card details are entered here.',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFF6A4053),
+                                  // C36: title token (was plum 2.10 dark).
+                                  color: titleColor,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -383,10 +385,11 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.info_outline_rounded,
                               size: 18,
-                              color: Color(0xFF16A34A),
+                              // C36: title token (was green, fails dark).
+                              color: titleColor,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -394,7 +397,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                                 'You will pay in cash on the event day. Our team will confirm your booking shortly.',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFF16A34A),
+                                  // C36: title token (was green, fails dark).
+                                  color: titleColor,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -613,7 +617,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Icon(
                           Icons.shield_rounded,
                           size: 16,
-                          color: Color(0xFF16A34A),
+                          // C36: title token (was green, fails dark).
+                          color: titleColor,
                         ),
                         SizedBox(width: 6),
                         Flexible(
@@ -634,7 +639,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Icon(
                           Icons.verified_user_rounded,
                           size: 16,
-                          color: Color(0xFF16A34A),
+                          // C36: title token (was green, fails dark).
+                          color: titleColor,
                         ),
                         SizedBox(width: 6),
                         Flexible(
@@ -655,7 +661,8 @@ class _DesktopPaymentPanelState extends State<DesktopPaymentPanel> {
                         Icon(
                           Icons.lock_rounded,
                           size: 16,
-                          color: Color(0xFF16A34A),
+                          // C36: title token (was green, fails dark).
+                          color: titleColor,
                         ),
                         SizedBox(width: 6),
                         Flexible(

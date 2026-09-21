@@ -37,10 +37,10 @@ class BottomNavBar extends StatelessWidget {
             child: BottomNavigationBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              selectedItemColor: Colors.white,
-              // C34 AAA: per-mode unselected keeps >=4.5:1 non-text
-              // contrast vs the bar surface (light bar ~#A8969C fails
-              // white 2.8:1 and plum 3.0:1; night passes 6.7:1).
+              selectedItemColor: isDark ? Colors.white : AppTheme.night,
+              // C36 AAA: light selected resolves to night (6.73:1 vs the
+              // light bar); dark keeps white. C34: unselected keeps
+              // per-mode >=4.5:1 non-text contrast vs the bar surface.
               unselectedItemColor: isDark
                   ? Colors.white.withValues(alpha: 0.85)
                   : AppTheme.night,
