@@ -88,17 +88,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> scrollToAndTap(WidgetTester tester, Finder finder) async {
-    await tester.scrollUntilVisible(
-      finder,
-      100,
-      scrollable: find
-          .descendant(
-            of: find.byKey(const Key('app_shell_scroll_view')),
-            matching: find.byType(Scrollable),
-          )
-          .first,
-    );
+  /// C48: conversion lives in the sticky bottom bar outside the page
+  /// scroll — bar buttons tap directly, never via scrollUntilVisible.
+  Future<void> tapBar(WidgetTester tester, Finder finder) async {
     await tester.tap(finder);
     await tester.pumpAndSettle();
   }
@@ -121,9 +113,9 @@ void main() {
 
   /// Drives the mobile flow to the Step 4 payment screen.
   Future<void> driveToPayment(WidgetTester tester) async {
-    await scrollToAndTap(tester, find.text('Next'));
+    await tapBar(tester, find.text('Proceed'));
     await fillMobileContacts(tester);
-    await scrollToAndTap(tester, find.text('Proceed to Payment'));
+    await tapBar(tester, find.text('Proceed to Payment'));
     expect(find.text('Price Details'), findsOneWidget);
     expect(find.textContaining('Confirm & Pay'), findsOneWidget);
   }

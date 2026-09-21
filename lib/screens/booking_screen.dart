@@ -91,6 +91,30 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// tap, so a fast double-tap could otherwise POST two bookings.
   bool _submitting = false;
 
+  /// C48: collapsed-schedule disclosure (mobile step 2). The full
+  /// summary renders only on demand; the collapsed card carries no CTA.
+  bool _scheduleSummaryExpanded = false;
+
+  /// Short date matching the summary rail one-liner (`Sep 18, 2026`).
+  static String _shortDate(DateTime? date) {
+    if (date == null) return 'Not selected';
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
   int get _currentStep => ref.read(bookingFlowProvider).currentStep;
 
   @override
@@ -423,8 +447,22 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
     final packageAsync = ref.watch(packageDetailsProvider(widget.packageId));
 
+    // C48: mobile sticky bar lives outside the page scroll as the
+    // Scaffold's bottomNavigationBar. MediaQuery <768px matches the
+    // LayoutBuilder mobile branch (the 1200 cap never binds below 768).
+    final isMobileWidth =
+        MediaQuery.of(context).size.width <
+        ResponsiveAppShell.mobileBreakpoint;
+    final barPackage = packageAsync.maybeWhen(
+      data: (package) => package,
+      orElse: () => null,
+    );
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      bottomNavigationBar: (isMobileWidth && barPackage != null)
+          ? _buildMobileBottomBar(barPackage)
+          : null,
       body: SafeArea(
         child: SingleChildScrollView(
           key: const Key(
@@ -595,6 +633,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   key: const Key('reservation_details_panel'),
                                   package: package,
                                   selectedPax: _selectedPax,
+                                  // C48: schedule grid COL B carries time +
+                                  // pax only; the §1 package card stays
+                                  // retired (the rail owns that line).
+                                  showPackageSummary: false,
                                   // C6: in-flow pax edit (step 2); no router jump.
                                   onChangePax: () => _goToStep(2),
                                   selectedTime: _selectedTime,
@@ -760,6 +802,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 key: const Key('tablet_details_panel'),
                                 package: package,
                                 selectedPax: _selectedPax,
+                                // C48: §1 package card retired from the
+                                // schedule step (rail owns that line).
+                                showPackageSummary: false,
                                 // C6: in-flow pax edit (step 2); no router jump.
                                 onChangePax: () => _goToStep(2),
                                 selectedTime: _selectedTime,
@@ -822,11 +867,240 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   // ==========================================================================
+  // C48 MOBILE SCHEDULE: collapsed summary + sticky bottom bar
+  // ==========================================================================
+
+  /// Collapsed schedule summary (mobile step 2 only): the verbatim
+  /// `{pax} PAX · {date} · {time}` one-liner + `Total ₱` row. The full
+  /// summary renders only via the disclosure below — never inline, and
+  /// never with a second CTA (the bar owns conversion).
+  Widget _buildMobileScheduleCollapsedSummary(
+    Package package,
+    List<int> paxEntries,
+  ) {
+    final effectivePax =
+        _selectedPax ?? (paxEntries.isNotEmpty ? paxEntries.first : 50);
+    final oneLiner =
+        '$effectivePax PAX · ${_shortDate(_selectedDate)} · ${TimeSlot.display(_selectedTime)}';
+    final total = formatPeso(package.priceForPax(_selectedPax));
+    final venue = (ref.read(bookingFlowProvider).venueAddress ?? '').trim();
+    final inclusions = package.inclusions ?? const <String>[];
+    final freebies = package.freebies ?? const <String>[];
+
+    return Container(
+      key: const Key('mobile_schedule_collapsed_summary'),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: _surface,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: _surfaceBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            oneLiner,
+            key: const Key('mobile_schedule_collapsed_oneliner'),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: _title,
+              height: 1.3,
+            ),
+            softWrap: true,
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: _title,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  total,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: _title,
+                  ),
+                  softWrap: true,
+                  textAlign: TextAlign.end,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          GestureDetector(
+            key: const Key('mobile_schedule_collapsed_toggle'),
+            onTap: () => setState(
+              () => _scheduleSummaryExpanded = !_scheduleSummaryExpanded,
+            ),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  _scheduleSummaryExpanded ? 'Hide details' : 'View details',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: _title,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_scheduleSummaryExpanded) ...[
+            Text(
+              venue.isEmpty ? 'Venue — Not yet provided' : 'Venue · $venue',
+              style: TextStyle(fontSize: 12, color: _body, height: 1.3),
+              softWrap: true,
+            ),
+            if (inclusions.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('Inclusions:', style: TextStyle(fontSize: 12, color: _body)),
+              const SizedBox(height: 4),
+              for (final e in inclusions)
+                Text(
+                  '• $e',
+                  style: TextStyle(fontSize: 12, color: _title, height: 1.35),
+                  softWrap: true,
+                ),
+            ],
+            if (freebies.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('Freebies:', style: TextStyle(fontSize: 12, color: _body)),
+              const SizedBox(height: 4),
+              for (final e in freebies)
+                Text(
+                  '• $e',
+                  style: TextStyle(fontSize: 12, color: _title, height: 1.35),
+                  softWrap: true,
+                ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Sticky mobile conversion bar. Lives OUTSIDE the page scroll as the
+  /// Scaffold's [bottomNavigationBar] so the C40 clamp never fights
+  /// stickiness. Labels: `Proceed` (step 2), `Proceed to Payment`
+  /// (step 3), `Confirm & Pay ₱` (step 4). Null off-flow (checkout).
+  Widget? _buildMobileBottomBar(Package package) {
+    if (_currentStep != 2 && _currentStep != 3 && _currentStep != 4) {
+      return null;
+    }
+    final isLoading = ref.watch(bookingFlowProvider).isLoading;
+    final total = formatPeso(package.priceForPax(_selectedPax));
+    final label = _currentStep == 4
+        ? 'Confirm & Pay $total'
+        : _currentStep == 3
+        ? 'Proceed to Payment'
+        : 'Proceed';
+
+    return SafeArea(
+      top: false,
+      child: Container(
+        key: const Key('mobile_booking_bottom_bar'),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+        decoration: BoxDecoration(
+          color: _surface,
+          border: Border(top: BorderSide(color: _surfaceBorder)),
+        ),
+        child: Row(
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total', style: TextStyle(fontSize: 11, color: _body)),
+                const SizedBox(height: 2),
+                Text(
+                  total,
+                  key: const Key('mobile_bottom_bar_total'),
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: _title,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  key: const Key('mobile_bottom_bar_cta'),
+                  onPressed: isLoading ? null : () => _handleMobileBarTap(),
+                  // P7: theme ElevatedButton drives both modes.
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9999),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.5),
+                        )
+                      : Text(label, style: const TextStyle(fontSize: 16)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Mobile bar tap: same per-step gates as the retired in-column CTA —
+  /// [canProceedFromSchedule]/[canProceedFromDetails] stay the single
+  /// authorities, failures surface via C30 [showAppError], the
+  /// `14:00:00` prefill and `_submitting` guard unchanged.
+  void _handleMobileBarTap() {
+    final notifier = ref.read(bookingFlowProvider.notifier);
+    if (_currentStep == 4) {
+      _handleConfirmAndPay();
+    } else if (_currentStep == 2) {
+      if (!notifier.canProceedFromSchedule()) {
+        // C30: persistent banner on wide, SnackBar on narrow.
+        showAppError(context, message: 'Please select date and time');
+        return;
+      }
+      notifier.nextStep();
+    } else if (_currentStep == 3) {
+      if (!notifier.canProceedFromDetails()) {
+        // C30: persistent banner on wide, SnackBar on narrow.
+        showAppError(context, message: 'Please fill name, email and venue');
+        return;
+      }
+      notifier.nextStep();
+    } else {
+      notifier.nextStep();
+    }
+  }
+
+  // ==========================================================================
   // MOBILE 1-COLUMN LAYOUT (<768px)
   // ==========================================================================
 
   Widget _buildMobileLayout(Package package) {
-    final submitting = ref.watch(bookingFlowProvider).isLoading;
+    // C48: the sticky bottom bar (Scaffold.bottomNavigationBar) owns
+    // conversion — one CTA, never two on screen. The in-column button
+    // is retired; this column carries content only.
     return Column(
       children: [
         _buildHeader(showBack: true),
@@ -834,79 +1108,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         Padding(
           padding: const EdgeInsets.all(20),
           child: _buildCurrentStep(package),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(20),
-          child: SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: submitting
-                  ? null
-                  : () {
-                      final notifier = ref.read(bookingFlowProvider.notifier);
-                      if (_currentStep == 4) {
-                        _handleConfirmAndPay();
-                      } else if (_currentStep == 2) {
-                        final localOk =
-                            _selectedDate != null &&
-                            _selectedPax != null &&
-                            _selectedTime != null;
-                        if (!notifier.canProceedFromSchedule() && !localOk) {
-                          // C30: persistent banner on wide, SnackBar narrow.
-                          showAppError(
-                            context,
-                            message: 'Please select date and time',
-                          );
-                          return;
-                        }
-                        // Ensure provider has local values before advancing
-                        if (_selectedDate != null) {
-                          notifier.setSelectedDate(_selectedDate!);
-                        }
-                        if (_selectedPax != null) {
-                          notifier.setSelectedPax(_selectedPax!);
-                        }
-                        if (_selectedTime != null) {
-                          notifier.setSelectedTime(_selectedTime!);
-                        }
-                        notifier.nextStep();
-                      } else if (_currentStep == 3) {
-                        if (!notifier.canProceedFromDetails()) {
-                          // C30: persistent banner on wide, SnackBar narrow.
-                          showAppError(
-                            context,
-                            message: 'Please fill name, email and venue',
-                          );
-                          return;
-                        }
-                        notifier.nextStep();
-                      } else {
-                        notifier.nextStep();
-                      }
-                    },
-              // P7: theme ElevatedButton drives both modes.
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(9999),
-                ),
-              ),
-              child: submitting
-                  ? const SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.5),
-                    )
-                  : Text(
-                      _currentStep == 4
-                          ? 'Confirm & Pay'
-                          : _currentStep == 3
-                          ? 'Proceed to Payment'
-                          : 'Next',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-            ),
-          ),
         ),
       ],
     );
@@ -1364,8 +1565,73 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             },
           ),
           const SizedBox(height: 25),
+          Text(
+            'Choose Event Time',
+            // C36: title token (was plum).
+            style: TextStyle(fontSize: 13, color: _title),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'One booking lasts 3–4 hrs.',
+            // C36: title token (was translucent plum, fails 7:1).
+            style: TextStyle(fontSize: 12, color: _title),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: _surface,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: _surfaceBorder),
+            ),
+            child: InkWell(
+              key: const Key('event_time_picker_button'),
+              onTap: () => _pickEventTime(),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF4F5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: _surfaceBorder),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.schedule_rounded, size: 18, color: plum),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _selectedTime == null
+                            ? 'Select time'
+                            : TimeSlot.display(_selectedTime),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: _selectedTime == null
+                              ? FontWeight.normal
+                              : FontWeight.w700,
+                          color: _title,
+                        ),
+                      ),
+                    ),
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 18,
+                      color: plum,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 25),
           // Proper-noun header (grill Q3a): the flow step already says
           // what this is; the product name carries the weight.
+          // C48: survives only as the mobile stack section label (the
+          // §1 package card stays retired from the schedule step).
           Text(
             package.name ?? 'Perfume Bar',
             style: TextStyle(
@@ -1437,69 +1703,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               );
             },
           ),
-          const SizedBox(height: 25),
-          Text(
-            'Choose Event Time',
-            // C36: title token (was plum).
-            style: TextStyle(fontSize: 13, color: _title),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'One booking lasts 3–4 hrs.',
-            // C36: title token (was translucent plum, fails 7:1).
-            style: TextStyle(fontSize: 12, color: _title),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: _surface,
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: _surfaceBorder),
-            ),
-            child: InkWell(
-              key: const Key('event_time_picker_button'),
-              onTap: () => _pickEventTime(),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDF4F5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _surfaceBorder),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.schedule_rounded, size: 18, color: plum),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        _selectedTime == null
-                            ? 'Select time'
-                            : TimeSlot.display(_selectedTime),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: _selectedTime == null
-                              ? FontWeight.normal
-                              : FontWeight.w700,
-                          color: _title,
-                        ),
-                      ),
-                    ),
-                    const Icon(
-                      Icons.access_time_rounded,
-                      size: 18,
-                      color: plum,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          const SizedBox(height: 16),
+          _buildMobileScheduleCollapsedSummary(package, paxEntries),
         ],
       );
     } else if (_currentStep == 3) {

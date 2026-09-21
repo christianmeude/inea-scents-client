@@ -261,7 +261,9 @@ void main() {
         // On mobile: Timeline and mobile scroll view are rendered
         expect(find.byKey(const Key('app_shell_scroll_view')), findsOneWidget);
         expect(find.text('Schedule'), findsWidgets);
-        expect(find.text('Next'), findsOneWidget);
+        // C48: conversion lives in the sticky bottom bar (h50 pill),
+        // outside the scroll — the in-column CTA is retired.
+        expect(find.text('Proceed'), findsOneWidget);
 
         // Desktop/tablet 3-column & 2-column keys are not rendered
         expect(
@@ -908,18 +910,8 @@ void main() {
         expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
         expect(find.text('30 PAX'), findsNothing);
 
-        // Tap Next to go to Step 3 (Details)
-        await tester.scrollUntilVisible(
-          find.text('Next'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('app_shell_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        await tester.tap(find.text('Next'));
+        // Tap Proceed (sticky bottom bar, outside the scroll) for Step 3.
+        await tester.tap(find.text('Proceed'));
         await tester.pumpAndSettle();
 
         // Step 3: Details
@@ -929,17 +921,7 @@ void main() {
         // Fill mobile contact & venue information required for submission
         await fillMobileContacts(tester);
 
-        // Tap Proceed to Payment to go to Step 4
-        await tester.scrollUntilVisible(
-          find.text('Proceed to Payment'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('app_shell_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
+        // Tap Proceed to Payment (sticky bottom bar) to go to Step 4
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
@@ -1001,18 +983,8 @@ void main() {
         expect(pickerFinder, findsOneWidget);
         expect(find.text('2:00 PM'), findsWidgets);
 
-        // Advance to Step 3 (Details)
-        await tester.scrollUntilVisible(
-          find.text('Next'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('app_shell_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        await tester.tap(find.text('Next'));
+        // Advance to Step 3 (Details) via the sticky bottom bar.
+        await tester.tap(find.text('Proceed'));
         await tester.pumpAndSettle();
 
         // Verify selected time and pax are displayed in Details
@@ -1664,22 +1636,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Step 2: Schedule & Pax
+        // Step 2: Schedule & Pax (C48: sticky bottom bar owns conversion)
 
-        expect(find.text('Next'), findsOneWidget);
+        expect(find.text('Proceed'), findsOneWidget);
 
-        // Advance to Step 3: Details
-        await tester.scrollUntilVisible(
-          find.text('Next'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('app_shell_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
-        await tester.tap(find.text('Next'));
+        // Advance to Step 3: Details via the sticky bottom bar.
+        await tester.tap(find.text('Proceed'));
         await tester.pumpAndSettle();
 
         expect(find.text('Proceed to Payment'), findsOneWidget);
@@ -1687,17 +1649,7 @@ void main() {
         // Fill mobile contact & venue information required for submission
         await fillMobileContacts(tester);
 
-        // Advance to Step 4: Mobile Payment
-        await tester.scrollUntilVisible(
-          find.text('Proceed to Payment'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('app_shell_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
+        // Advance to Step 4: Mobile Payment via the sticky bottom bar.
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
         expect(find.text('Price Details'), findsOneWidget);
@@ -1717,17 +1669,7 @@ void main() {
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
 
-        // Advance back to mobile payment and complete
-        await tester.scrollUntilVisible(
-          find.text('Proceed to Payment'),
-          100,
-          scrollable: find
-              .descendant(
-                of: find.byKey(const Key('app_shell_scroll_view')),
-                matching: find.byType(Scrollable),
-              )
-              .first,
-        );
+        // Advance back to mobile payment and complete (sticky bar).
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
         await tester.tap(find.textContaining('Confirm & Pay'));
