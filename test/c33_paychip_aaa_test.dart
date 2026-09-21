@@ -109,14 +109,20 @@ void main() {
         testWidgets('chip text resolves to title token ($method $mode)', (
           WidgetTester tester,
         ) async {
+          tester.view.physicalSize = const Size(1280, 1600);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
           await tester.pumpWidget(
             MaterialApp(
               theme: theme,
               home: Scaffold(
-                body: DesktopPaymentPanel(
-                  package: pkg,
-                  paymentMethod: method,
-                  onPaymentMethodSelected: (_) {},
+                body: SingleChildScrollView(
+                  child: DesktopPaymentPanel(
+                    package: pkg,
+                    paymentMethod: method,
+                    onPaymentMethodSelected: (_) {},
+                  ),
                 ),
               ),
             ),
