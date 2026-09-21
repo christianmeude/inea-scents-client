@@ -111,8 +111,10 @@ class _OfferingTeaser extends StatelessWidget {
           const SizedBox(height: 14),
           FilledButton(
             key: const Key('home_view_offerings_cta'),
+            // C31: plum/cream token both modes (was dark-on-dark).
             style: FilledButton.styleFrom(
               backgroundColor: CardSurfaces.plum,
+              foregroundColor: CardSurfaces.onPrimaryButton,
             ),
             onPressed: () => context.push('/packages'),
             child: const Text('View Offerings'),

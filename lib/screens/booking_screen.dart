@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/index.dart';
 import '../providers/index.dart';
+import '../config/theme.dart';
 import '../src/utils/checkout_window.dart';
 import '../utils/peso.dart';
 import '../widgets/index.dart';
@@ -54,7 +55,8 @@ class BookingScreen extends ConsumerStatefulWidget {
 
 class _BookingScreenState extends ConsumerState<BookingScreen> {
   bool _isInitialized = false;
-  static const Color plum = Color(0xFF6A4053);
+  // C31: single-sourced via AppTheme (never per-screen hex).
+  static const Color plum = AppTheme.primaryButtonBackground;
 
   // P7: dark-aware surfaces through the shared helper.
   Color get _surface => CardSurfaces.cardBg(context);
@@ -1176,9 +1178,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               onPressed: onPressed,
               icon: Icon(buttonIcon, size: 18),
               label: Text(buttonLabel),
+              // C31: theme ElevatedButton supplies the plum/cream
+              // token in both modes (no per-screen colors).
               style: ElevatedButton.styleFrom(
-                backgroundColor: plum,
-                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(9999),
                 ),
@@ -1194,8 +1196,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 onPressed: secondaryOnPressed,
                 icon: Icon(secondaryIcon ?? Icons.refresh_rounded, size: 18),
                 label: Text(secondaryLabel),
+                // C31: theme TextButton supplies the legible
+                // label token per mode (plum-on-night removed).
                 style: TextButton.styleFrom(
-                  foregroundColor: plum,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(9999),
                   ),

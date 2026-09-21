@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../config/theme.dart';
+
 /// C1 concierge recomposition: the Home next-step card. Date-first entry
 /// into the booking flow (P4 order) — routes to the availability calendar,
 /// where C4/C5 keep day states legible.
@@ -84,7 +86,11 @@ class NextStepCard extends StatelessWidget {
           const SizedBox(width: 12),
           FilledButton(
             key: const Key('home_check_date_cta'),
-            style: FilledButton.styleFrom(backgroundColor: plum),
+            // C31: plum/cream token both modes (was dark-on-dark).
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.primaryButtonBackground,
+              foregroundColor: AppTheme.onPrimaryButton,
+            ),
             onPressed: () => context.push('/calendar'),
             child: const Text('Check date'),
           ),

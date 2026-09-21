@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
+import '../config/theme.dart';
 import '../widgets/index.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -256,22 +257,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     rememberMe = value ?? false;
                                   });
                                 },
-                                activeColor: const Color(0xFF6A4053),
-                                checkColor: Colors.white,
+                                activeColor:
+                                    AppTheme.primaryButtonBackground, // C31
+                                checkColor: AppTheme.onPrimaryButton, // C31
                                 fillColor: WidgetStateProperty.resolveWith((
                                   states,
                                 ) {
                                   if (states.contains(WidgetState.selected)) {
-                                    return const Color(0xFF6A4053);
+                                    return AppTheme
+                                        .primaryButtonBackground; // C31
                                   }
                                   return isDark
                                       ? const Color(0xFF151012)
                                       : Colors.white;
                                 }),
                                 side: BorderSide(
-                                  color: const Color(
-                                    0xFF6A4053,
-                                  ).withValues(alpha: 0.3),
+                                  color: AppTheme.primaryButtonBackground // C31
+                                      .withValues(alpha: 0.3),
                                   width: 1.0,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -313,12 +315,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         );
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6A4053),
+                              // C31: plum/cream token both modes.
+                              backgroundColor:
+                                  AppTheme.primaryButtonBackground,
                               // C23: keep the plum fill while loading instead
                               // of dropping to the grey disabled wash.
-                              disabledBackgroundColor: const Color(0xFF6A4053),
-                              foregroundColor: Colors.white,
-                              disabledForegroundColor: Colors.white,
+                              disabledBackgroundColor:
+                                  AppTheme.primaryButtonBackground,
+                              foregroundColor: AppTheme.onPrimaryButton,
+                              disabledForegroundColor:
+                                  AppTheme.onPrimaryButton,
                               elevation: 0,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
@@ -333,7 +339,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     width: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2.5,
-                                      color: Colors.white,
+                                      // C31: cream spinner on plum token.
+                                      color: AppTheme.onPrimaryButton,
                                     ),
                                   )
                                 : FittedBox(
@@ -359,7 +366,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: () => context.go('/register'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF6A4053),
+                              foregroundColor:
+                                  AppTheme.primaryButtonBackground, // C31 token
                               side: BorderSide(
                                 color: isDark
                                     ? const Color(
@@ -386,9 +394,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   letterSpacing: 1.2,
+                                  // C31: cream label in dark via token.
                                   color: isDark
-                                      ? const Color(0xFFFDF4F5)
-                                      : const Color(0xFF6A4053),
+                                      ? AppTheme.onPrimaryButton
+                                      : AppTheme.primaryButtonBackground,
                                 ),
                               ),
                             ),

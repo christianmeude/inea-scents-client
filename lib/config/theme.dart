@@ -35,6 +35,14 @@ class AppTheme {
   static const Color neutralSurface = Color(0xFFFFFFFF); // Surface White
   static const Color neutralText = Color(0xFF6A4053); // Same as primary
 
+  // C31 single-source primary-button token: plum fill + cream text in
+  // BOTH modes. All plum CTA fills/labels resolve through here —
+  // never per-screen hex.
+  static const Color primaryButtonBackground = primary;
+  static const Color onPrimaryButton = Color(0xFFFDF4F5); // cream
+  static const Color primaryButtonHover = Color(0xFF5A3646);
+  static const Color primaryButtonFocusRing = Color(0xFFDABDAC);
+
   // Background Gradients (for ambient backgrounds)
   static const Color backgroundTop = Color(0xFFF8E9DF);
   static const Color backgroundMiddle = Color(0xFFD8B0BA);
@@ -91,11 +99,13 @@ class AppTheme {
               return primary.withValues(alpha: 0.5);
             }
             if (states.contains(WidgetState.hovered)) {
-              return const Color(0xFF5A3646); // Subtle darker plum on hover
+              return primaryButtonHover; // C31 token
             }
-            return primary;
+            return primaryButtonBackground; // C31 token
           }),
-          foregroundColor: WidgetStateProperty.all(Colors.white),
+          foregroundColor: WidgetStateProperty.all(
+            onPrimaryButton,
+          ), // C31 token
           mouseCursor: WidgetStateProperty.resolveWith<MouseCursor>((states) {
             if (states.contains(WidgetState.disabled)) {
               return SystemMouseCursors.basic;
@@ -104,19 +114,22 @@ class AppTheme {
           }),
           overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
             if (states.contains(WidgetState.pressed)) {
-              return Colors.white.withValues(alpha: 0.15);
+              return onPrimaryButton.withValues(alpha: 0.15);
             }
             if (states.contains(WidgetState.hovered)) {
-              return Colors.white.withValues(alpha: 0.08);
+              return onPrimaryButton.withValues(alpha: 0.08);
             }
             if (states.contains(WidgetState.focused)) {
-              return Colors.white.withValues(alpha: 0.15);
+              return onPrimaryButton.withValues(alpha: 0.15);
             }
             return null;
           }),
           side: WidgetStateProperty.resolveWith<BorderSide?>((states) {
             if (states.contains(WidgetState.focused)) {
-              return const BorderSide(color: Color(0xFFDABDAC), width: 2.5);
+              return const BorderSide(
+                color: primaryButtonFocusRing,
+                width: 2.5,
+              ); // C31 token
             }
             return BorderSide.none;
           }),
@@ -130,6 +143,37 @@ class AppTheme {
             if (states.contains(WidgetState.hovered)) return 2.0;
             return 0.0;
           }),
+        ),
+      ),
+      // C31: FilledButton defaults to the same plum/cream token so
+      // plum-CTAs never fall back to scheme onPrimary (dark-on-dark).
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return primaryButtonBackground.withValues(alpha: 0.5);
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return primaryButtonHover;
+            }
+            return primaryButtonBackground;
+          }),
+          foregroundColor: WidgetStateProperty.all(onPrimaryButton),
+          overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return onPrimaryButton.withValues(alpha: 0.15);
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return onPrimaryButton.withValues(alpha: 0.08);
+            }
+            return null;
+          }),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(9999)),
+          ),
+          padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -308,16 +352,17 @@ class AppTheme {
       pageTransitionsTheme: pageTransitionsTheme,
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
+          // C31: plum fill + cream text in BOTH modes (was cream/dark).
           backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
             if (states.contains(WidgetState.disabled)) {
-              return darkPrimary.withValues(alpha: 0.5);
+              return primaryButtonBackground.withValues(alpha: 0.5);
             }
             if (states.contains(WidgetState.hovered)) {
-              return const Color(0xFFEDE2E4);
+              return primaryButtonHover;
             }
-            return darkPrimary;
+            return primaryButtonBackground;
           }),
-          foregroundColor: WidgetStateProperty.all(darkBg),
+          foregroundColor: WidgetStateProperty.all(onPrimaryButton),
           mouseCursor: WidgetStateProperty.resolveWith<MouseCursor>((states) {
             if (states.contains(WidgetState.disabled)) {
               return SystemMouseCursors.basic;
@@ -326,19 +371,22 @@ class AppTheme {
           }),
           overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
             if (states.contains(WidgetState.pressed)) {
-              return darkBg.withValues(alpha: 0.15);
+              return onPrimaryButton.withValues(alpha: 0.15);
             }
             if (states.contains(WidgetState.hovered)) {
-              return darkBg.withValues(alpha: 0.08);
+              return onPrimaryButton.withValues(alpha: 0.08);
             }
             if (states.contains(WidgetState.focused)) {
-              return darkBg.withValues(alpha: 0.15);
+              return onPrimaryButton.withValues(alpha: 0.15);
             }
             return null;
           }),
           side: WidgetStateProperty.resolveWith<BorderSide?>((states) {
             if (states.contains(WidgetState.focused)) {
-              return const BorderSide(color: Color(0xFF6A4053), width: 2.5);
+              return const BorderSide(
+                color: primaryButtonFocusRing,
+                width: 2.5,
+              );
             }
             return BorderSide.none;
           }),
@@ -352,6 +400,37 @@ class AppTheme {
             if (states.contains(WidgetState.hovered)) return 2.0;
             return 0.0;
           }),
+        ),
+      ),
+      // C31: FilledButton defaults to the same plum/cream token so
+      // plum-CTAs never fall back to scheme onPrimary (dark-on-dark).
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return primaryButtonBackground.withValues(alpha: 0.5);
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return primaryButtonHover;
+            }
+            return primaryButtonBackground;
+          }),
+          foregroundColor: WidgetStateProperty.all(onPrimaryButton),
+          overlayColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return onPrimaryButton.withValues(alpha: 0.15);
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return onPrimaryButton.withValues(alpha: 0.08);
+            }
+            return null;
+          }),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(9999)),
+          ),
+          padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/index.dart';
+import '../config/theme.dart';
 import '../src/providers/core_providers.dart';
 import '../widgets/index.dart';
 
@@ -239,8 +240,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 ? null
                                 : _sendResetLink,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6A4053),
-                              foregroundColor: Colors.white,
+                              // C31: plum/cream token both modes.
+                              backgroundColor:
+                                  AppTheme.primaryButtonBackground,
+                              foregroundColor: AppTheme.onPrimaryButton,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
@@ -252,7 +255,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                     width: 16,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors.white,
+                                      // C31: cream spinner on plum token.
+                                      color: AppTheme.onPrimaryButton,
                                     ),
                                   )
                                 : Text(
@@ -273,7 +277,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                           child: OutlinedButton(
                             onPressed: () => context.go('/login'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF6A4053),
+                              // C31: plum token (label stays dark-aware below).
+                              foregroundColor:
+                                  AppTheme.primaryButtonBackground,
                               side: BorderSide(
                                 color: isDark
                                     ? const Color(
@@ -292,9 +298,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.2,
+                                // C31: cream label in dark via token.
                                 color: isDark
-                                    ? const Color(0xFFFDF4F5)
-                                    : const Color(0xFF6A4053),
+                                    ? AppTheme.onPrimaryButton
+                                    : AppTheme.primaryButtonBackground,
                               ),
                             ),
                           ),

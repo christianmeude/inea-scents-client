@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../providers/index.dart';
+import '../config/theme.dart';
 import 'card_surfaces.dart';
 
 /// Shared calendar module for booking flows.
@@ -11,7 +12,8 @@ import 'card_surfaces.dart';
 /// month navigation, and polished header/badge live. Used on desktop,
 /// tablet, and mobile to guarantee uniform parity (ADR 0004).
 class IneaCalendar extends ConsumerStatefulWidget {
-  static const Color plum = Color(0xFF6A4053);
+  // C31: single-sourced via AppTheme (never per-screen hex).
+  static const Color plum = AppTheme.primaryButtonBackground;
   static const Color mutedPlum = Color(0xFF99868C);
   static const Color availableGreen = Color(0xFF6F927A);
   static const Color bookedAmber = Color(0xFFC28A52);
@@ -253,11 +255,12 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
             fontWeight: FontWeight.w700,
           ),
           selectedDecoration: const BoxDecoration(
-            color: IneaCalendar.plum,
+            // C31: plum/cream token both modes.
+            color: AppTheme.primaryButtonBackground,
             shape: BoxShape.circle,
           ),
           selectedTextStyle: const TextStyle(
-            color: Colors.white,
+            color: AppTheme.onPrimaryButton,
             fontSize: 11,
             fontWeight: FontWeight.w700,
           ),
@@ -312,7 +315,8 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                 child: Text(
                   '${day.day}',
                   style: const TextStyle(
-                    color: Colors.white,
+                    // C31: cream label on the plum token.
+                    color: AppTheme.onPrimaryButton,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),

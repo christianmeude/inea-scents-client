@@ -51,7 +51,8 @@ void main() {
       expect(style.backgroundColor!.resolve({WidgetState.disabled}), plum);
       expect(
         style.foregroundColor!.resolve({WidgetState.disabled}),
-        Colors.white,
+        // C31: cream label token on plum (was white; same AA legibility).
+        AppTheme.onPrimaryButton,
       );
       // 44px touch target inside the 44–48px band.
       final sized = tester.widget<SizedBox>(
@@ -72,7 +73,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('LOG IN loading shows a 20px white spinner on plum', (
+    testWidgets('LOG IN loading shows a 20px cream spinner on plum', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
