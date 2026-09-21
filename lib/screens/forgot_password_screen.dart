@@ -39,6 +39,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         data: {'email': emailController.text.trim()},
       );
       if (!mounted) return;
+      // C30: clear any error banner before the success confirmation.
+      hideAppError(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Password reset link sent!')),
       );
@@ -60,6 +62,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
+        // C30: never carry a prior error banner onto /home.
+        hideAppError(context);
         context.go('/home');
       } else if (next.errorMessage != null) {
         // C30: persistent banner on wide, SnackBar on narrow.

@@ -34,6 +34,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
+        // C30: never carry a prior error banner onto /home.
+        hideAppError(context);
         context.go('/home');
       } else if (next.errorMessage != null) {
         // C30: persistent banner on wide (retry re-submits), SnackBar narrow.

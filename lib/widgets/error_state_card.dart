@@ -10,9 +10,6 @@ class ErrorStateCard extends StatelessWidget {
   final String retryLabel;
   final IconData icon;
 
-  /// C30: optional dismiss (close affordance, no visual change when null).
-  final VoidCallback? onDismiss;
-
   const ErrorStateCard({
     super.key,
     required this.title,
@@ -20,7 +17,6 @@ class ErrorStateCard extends StatelessWidget {
     required this.onRetry,
     this.retryLabel = 'Try Again',
     this.icon = Icons.cloud_off_rounded,
-    this.onDismiss,
   });
 
   @override
@@ -95,20 +91,6 @@ class ErrorStateCard extends StatelessWidget {
               ),
             ],
           ),
-          // C30: dismiss affordance only when a handler is provided.
-          if (onDismiss != null)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                key: const Key('error_card_dismiss'),
-                icon: const Icon(Icons.close_rounded, size: 20),
-                tooltip: 'Dismiss',
-                visualDensity: VisualDensity.compact,
-                color: bodyColor,
-                onPressed: onDismiss,
-              ),
-            ),
         ],
       ),
     );

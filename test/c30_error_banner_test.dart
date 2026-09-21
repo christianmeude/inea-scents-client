@@ -183,35 +183,8 @@ void main() {
     });
   });
 
-  group('C30 error card dismiss', () {
-    testWidgets('dismiss fires when provided, hidden otherwise', (
-      WidgetTester tester,
-    ) async {
-      var dismissed = false;
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: AppTheme.lightTheme,
-          home: Scaffold(
-            body: ErrorStateCard(
-              title: 'Unable to load bookings',
-              message: "We couldn't load your bookings. Try again.",
-              onRetry: () {},
-              onDismiss: () => dismissed = true,
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(const Key('error_card_dismiss')));
-      await tester.pumpAndSettle();
-      expect(dismissed, isTrue);
-
-      // Retry affordance untouched.
-      expect(find.text('Try Again'), findsOneWidget);
-    });
-
-    testWidgets('no dismiss affordance without a handler', (
+  group('C30 error card retry-only', () {
+    testWidgets('card carries retry, no dismiss affordance', (
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
@@ -228,7 +201,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // C30: dismiss lives on the banner/SnackBar path; the full-page
+      // card is retry-only (dismissing it would blank the screen).
       expect(find.byKey(const Key('error_card_dismiss')), findsNothing);
+      expect(find.text('Try Again'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

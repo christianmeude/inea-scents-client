@@ -83,12 +83,19 @@ void showAppError(
       ..showSnackBar(
         SnackBar(
           // C30: explicit dismiss (SnackBar keeps auto-dismiss too).
+          // Narrow keeps the pre-C30 branded look.
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: const Color(0xFF6A4053),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           content: Row(
             children: [
               Expanded(child: Text(message)),
               IconButton(
                 key: const Key('app_error_dismiss'),
                 icon: const Icon(Icons.close_rounded, size: 20),
+                color: Colors.white,
                 tooltip: 'Dismiss',
                 visualDensity: VisualDensity.compact,
                 onPressed: messenger.clearSnackBars,
