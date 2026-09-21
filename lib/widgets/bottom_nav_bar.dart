@@ -38,7 +38,12 @@ class BottomNavBar extends StatelessWidget {
               backgroundColor: Colors.transparent,
               elevation: 0,
               selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.white.withValues(alpha: 0.5),
+              // C34 AAA: per-mode unselected keeps >=4.5:1 non-text
+              // contrast vs the bar surface (light bar ~#A8969C fails
+              // white 2.8:1 and plum 3.0:1; night passes 6.7:1).
+              unselectedItemColor: isDark
+                  ? Colors.white.withValues(alpha: 0.85)
+                  : AppTheme.night,
               selectedFontSize: 10,
               unselectedFontSize: 10,
               selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
