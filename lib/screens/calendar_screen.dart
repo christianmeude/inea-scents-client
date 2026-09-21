@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../config/theme.dart';
 import '../providers/index.dart';
 import '../widgets/index.dart';
 
@@ -19,7 +20,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   // INEA COLORS
   // ============================================================
 
-  static const Color primary = Color(0xFF74445C);
+  static const Color primary = AppTheme.primary;
 
   // C4: no dot indicators — day cells render without markers.
 

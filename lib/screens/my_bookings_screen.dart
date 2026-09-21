@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../config/theme.dart';
 import '../providers/index.dart';
 import '../models/index.dart';
 import '../utils/peso.dart';
@@ -19,7 +20,7 @@ class MyBookingsScreen extends ConsumerWidget {
   static const Color backgroundMiddle = Color(0xFFD8B0BA);
   static const Color backgroundBottom = Color(0xFFB78C9C);
 
-  static const Color primaryColor = Color(0xFF74445C);
+  static const Color primaryColor = AppTheme.primary;
   static const Color primaryLight = Color(0xFF95647E);
 
   static const Color textColor = Color(0xFF633E50);

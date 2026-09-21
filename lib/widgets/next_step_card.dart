@@ -12,7 +12,7 @@ class NextStepCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    const plum = Color(0xFF74445C);
+    const plum = AppTheme.primary;
 
     return Container(
       key: const Key('home_next_step_card'),
