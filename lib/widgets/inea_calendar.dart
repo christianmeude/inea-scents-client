@@ -325,39 +325,20 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
             );
           },
           disabledBuilder: (context, day, focusedDay) {
-            final now = DateTime.now();
-            final today = DateTime(now.year, now.month, now.day);
-            final cellDay = _dayOnly(day);
-            final isPast = cellDay.isBefore(today);
-            final isFull = bookedDays.contains(cellDay);
-
+            // C46: no `Full` label — booked/past days stay legible via
+            // body-color + strike (≥4.5 vs grid surface both modes).
             return Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 44),
                 child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${day.day}',
-                          style: TextStyle(
-                            color: titleColor.withValues(alpha: 0.3),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        if (isFull && !isPast)
-                          Text(
-                            'Full',
-                            style: TextStyle(
-                              color: titleColor.withValues(alpha: 0.4),
-                              fontSize: 8,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                      ],
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(
+                      color: bodyColor,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      decoration: TextDecoration.lineThrough,
+                      decorationColor: bodyColor,
                     ),
                   ),
                 ),
