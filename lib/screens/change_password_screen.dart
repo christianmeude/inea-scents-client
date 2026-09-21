@@ -123,6 +123,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
+            // C40: clamp overscroll on mobile (<768px); SDK default
+            // (stretch Android / bounce iOS) displaced content past edge.
+            physics: MobileClampScroll.physicsOf(context),
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),

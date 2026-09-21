@@ -97,6 +97,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       appBar: AppBar(title: const Text('Edit Profile')),
       body: SafeArea(
         child: SingleChildScrollView(
+          // C40: clamp overscroll on mobile (<768px); SDK default
+          // (stretch Android / bounce iOS) displaced content past edge.
+          physics: MobileClampScroll.physicsOf(context),
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           child: Center(
             child: ConstrainedBox(

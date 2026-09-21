@@ -105,6 +105,10 @@ class _DetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final status = booking.status ?? 'pending';
     return SingleChildScrollView(
+      // C40: clamp overscroll on mobile (<768px); SDK default
+      // (stretch Android / bounce iOS) displaced content past edge.
+      // Desktop/web physics untouched (null = platform default).
+      physics: MobileClampScroll.physicsOf(context),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),

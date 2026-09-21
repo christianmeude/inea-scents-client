@@ -170,7 +170,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 // C42: header aligns to the 1200 shell cap (was 1000).
                 constraints: const BoxConstraints(maxWidth: 1200),
                 child: ListView(
-                  // C25: platform-default physics (clamp Android / bounce iOS).
+                  // C40: desktop surface — platform default untouched.
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
                   children: [
                     titleContent,
@@ -190,7 +190,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           }
 
           return ListView(
-            // C25: platform-default physics (clamp Android / bounce iOS).
+            // C40: clamp overscroll on mobile (<768px); SDK default
+            // (stretch Android / bounce iOS) displaced content past edge.
+            // Desktop/web physics untouched (null = platform default).
+            physics: MobileClampScroll.physicsForWidth(constraints.maxWidth),
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
             children: [
               titleContent,

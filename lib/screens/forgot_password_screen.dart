@@ -196,6 +196,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             SafeArea(
               child: Center(
                 child: SingleChildScrollView(
+                  // C40: clamp overscroll on mobile (<768px); SDK default
+                  // (stretch Android / bounce iOS) displaced content past edge.
+                  physics: MobileClampScroll.physicsOf(context),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 48,

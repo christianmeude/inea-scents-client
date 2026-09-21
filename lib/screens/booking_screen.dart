@@ -430,7 +430,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           key: const Key(
             'app_shell_scroll_view',
           ), // Keep this key so tests pass
-          // C25: platform-default physics (clamp Android / bounce iOS).
+          // C40: clamp overscroll on mobile (<768px); SDK default
+          // (stretch Android / bounce iOS) displaced content past edge.
+          // Desktop/web physics untouched (null = platform default).
+          physics: MobileClampScroll.physicsOf(context),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),
