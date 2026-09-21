@@ -12,54 +12,44 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            if (MediaQuery.of(context).size.width < 768)
-              const Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [Center(child: SizedBox(width: 200, child: AppLogo()))],
-                ),
-              ),
-            Expanded(
-              child: SingleChildScrollView(
-                // C25: platform-default physics (clamp Android / bounce iOS).
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1200),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Date-first entry (C13 guard + Availability
-                        // gating live on the calendar route).
-                        // C26: 16px card rhythm, 20px edges.
-                        SizedBox(height: 16),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: NextStepCard(),
-                        ),
-                        SizedBox(height: 16),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: UpcomingBookingSection(),
-                        ),
-                        SizedBox(height: 16),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: _OfferingTeaser(),
-                        ),
-                        SizedBox(height: 20),
-                      ],
+        child: SingleChildScrollView(
+          // C25: platform-default physics (clamp Android / bounce iOS).
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // C42: unified header (mobile logo row retired — brand
+                  // lives in TopNavBar on tablet/desktop).
+                  SizedBox(height: 18),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: TabHeader(
+                      title: 'Home',
+                      count: 'Plan your scent experience.',
                     ),
                   ),
-                ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: NextStepCard(),
+                  ),
+                  SizedBox(height: 16),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: UpcomingBookingSection(),
+                  ),
+                  SizedBox(height: 16),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: _OfferingTeaser(),
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

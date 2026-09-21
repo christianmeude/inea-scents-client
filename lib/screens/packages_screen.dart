@@ -29,7 +29,6 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
     // ============================================================
 
     final textColor = CardSurfaces.title(context);
-    final secondaryTextColor = CardSurfaces.body(context);
 
     // P7: no explicit color — the theme scaffold color (light cream /
     // dark night) is the background.
@@ -45,7 +44,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
         child: SingleChildScrollView(
           // C25: platform-default physics (clamp Android / bounce iOS).
 
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
 
           child: Center(
             child: ConstrainedBox(
@@ -54,27 +53,11 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ==================================================
-                  // PAGE TITLE
+                  // PAGE TITLE (C42: unified header, trailing empty)
                   // ==================================================
-                  Text(
-                    'Our Collections',
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-
-                  const SizedBox(height: 5),
-
-                  Text(
-                    'Discover your perfect scent.',
-                    style: TextStyle(
-                      color: secondaryTextColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                    ),
+                  const TabHeader(
+                    title: 'Our Collections',
+                    count: 'Discover your perfect scent.',
                   ),
 
                   const SizedBox(height: 20),
