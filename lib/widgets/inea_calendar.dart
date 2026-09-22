@@ -179,7 +179,9 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
     final dayText = TextStyle(
       color: titleColor,
       fontSize: 11,
-      fontWeight: FontWeight.w500,
+      // C54: available days stand out via contrast — opaque title, bolder
+      // weight against the muted unavailable treatment below.
+      fontWeight: FontWeight.w600,
     );
 
     final grid = Container(
@@ -325,8 +327,9 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
             );
           },
           disabledBuilder: (context, day, focusedDay) {
-            // C46: no `Full` label — booked/past days stay legible via
-            // body-color + strike (≥4.5 vs grid surface both modes).
+            // C54: unavailable days are muted without strikethrough —
+            // translucent body color, light weight, bare day number.
+            // Disabled via enabledDayPredicate, so never tappable.
             return Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 44),
@@ -334,11 +337,10 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
                   child: Text(
                     '${day.day}',
                     style: TextStyle(
-                      color: bodyColor,
+                      color: bodyColor.withValues(alpha: 0.5),
                       fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      decoration: TextDecoration.lineThrough,
-                      decorationColor: bodyColor,
+                      fontWeight: FontWeight.w400,
+                      decoration: TextDecoration.none,
                     ),
                   ),
                 ),
