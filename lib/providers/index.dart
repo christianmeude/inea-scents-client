@@ -560,7 +560,10 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
   }
 
   /// Polls `GET /api/bookings` until the created booking is confirmed or
-  /// cancelled/expired. Re-arms every [interval] and gives up after [maxDuration].
+  /// cancelled/expired. Re-arms every [interval] until [maxDuration], then
+  /// runs one final reconcile: the checkout flips only on a resolved Status,
+  /// never on a bare timeout, so a late PayMongo success can still flip the
+  /// Booking off pending via `checkStatusImmediate`.
   Future<void> startPolling({
     Duration interval = const Duration(seconds: 3),
     Duration maxDuration = const Duration(minutes: 15),
@@ -606,7 +609,10 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
       }
       if (stopwatch.elapsed >= maxDuration) {
         _pollTimer?.cancel();
-        state = state.copyWith(checkoutStatus: BookingCheckoutStatus.cancelled);
+        // Final reconcile, not a verdict: a still-pending Booking keeps
+        // waiting (the timer is spent, `checkStatusImmediate` stays
+        // available), so only a resolved Status flips the checkout.
+        await checkStatusImmediate();
         return;
       }
       _pollTimer = Timer(interval, poll);
