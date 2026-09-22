@@ -106,23 +106,39 @@ void main() {
       // Booked/disabled cells never carry the `Full` caption.
       expect(find.text('Full', findRichText: true), findsNothing);
 
-      // The booked day number is still rendered (disabled but legible).
-      final disabledCells = find.byWidgetPredicate(
+      // C54: no strikethrough anywhere — unavailable days are muted.
+      final struck = find.byWidgetPredicate(
         (w) =>
             w is Text &&
-            w.data == '10' &&
-            w.style?.decoration == TextDecoration.lineThrough,
+            (w.style?.decoration == TextDecoration.lineThrough ||
+                w.style?.decoration?.contains(TextDecoration.lineThrough) ==
+                    true),
+      );
+      expect(struck, findsNothing);
+
+      // The booked day number is still rendered (disabled but muted).
+      final disabledCells = find.byWidgetPredicate(
+        (w) => w is Text && w.data == '10',
       );
       expect(disabledCells, findsOneWidget);
 
-      // Disabled day text resolves to body color at >=4.5 vs the grid.
+      // Disabled day text is muted body (translucent, light weight) while
+      // the enabled day next to it stands out opaque + bolder.
       final disabled = tester.widget<Text>(disabledCells);
       final ctx = tester.element(disabledCells);
-      expect(disabled.style?.color, equals(CardSurfaces.body(ctx)));
       expect(
-        _ratio(disabled.style!.color!, _gridSurface(mode == 'dark')),
-        greaterThanOrEqualTo(4.5),
+        disabled.style?.color,
+        equals(CardSurfaces.body(ctx).withValues(alpha: 0.5)),
       );
+      expect(disabled.style?.color?.a, lessThan(1.0));
+      final enabledCells = find.byWidgetPredicate(
+        // Day 11 is the selection (cream on plum); day 12 is a plain
+        // enabled day rendered by the available defaultBuilder.
+        (w) => w is Text && w.data == '12',
+      );
+      expect(enabledCells, findsOneWidget);
+      final enabled = tester.widget<Text>(enabledCells);
+      expect(enabled.style?.color, equals(CardSurfaces.title(ctx)));
       expect(tester.takeException(), isNull);
     });
   }
