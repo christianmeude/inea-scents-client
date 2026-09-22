@@ -7,6 +7,27 @@ import '../config/theme.dart';
 
 import 'responsive_app_shell.dart';
 
+/// C53: shared tab index so the top nav, bottom nav, and reroutes agree on
+/// which tab a location belongs to. The single booking route (`/booking/:id`,
+/// singular) lives in the Packages branch; only the plural `/bookings…`
+/// list/detail routes belong to Bookings. Returns -1 when unknown (callers
+/// map that to "nothing selected" or Home).
+int navIndexForLocation(String location) {
+  final path = location.split('?').first;
+  if (path.contains('package') || path.contains('/booking/')) {
+    return 1;
+  } else if (path.contains('booking')) {
+    return 2;
+  } else if (path.contains('calendar')) {
+    return 3;
+  } else if (path.contains('profile')) {
+    return 4;
+  } else if (path == '/' || path.contains('home')) {
+    return 0;
+  }
+  return -1;
+}
+
 /// C23: mobile tab bar. Drive it from the [StatefulNavigationShell] when
 /// hosted in [ResponsiveAppShell] so tab switches keep per-tab stacks
 /// (no stack reset); otherwise falls back to plain `go` (tests, standalone).
@@ -165,18 +186,8 @@ class BottomNavBar extends StatelessWidget {
           location = router.location;
         } catch (_) {}
       }
-      if (location.contains('package')) {
-        return 1;
-      } else if (location.contains('booking')) {
-        return 2;
-      } else if (location.contains('calendar')) {
-        return 3;
-      } else if (location.contains('profile')) {
-        return 4;
-      } else if (location == '/' || location.contains('home')) {
-        return 0;
-      }
-      return 0;
+      final index = navIndexForLocation(location);
+      return index < 0 ? 0 : index;
     } catch (_) {
       return 0;
     }

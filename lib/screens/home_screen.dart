@@ -33,6 +33,8 @@ class HomeScreen extends StatelessWidget {
                       count: 'Plan your scent experience.',
                     ),
                   ),
+                  // C53 (Q9): persistent resume chip (zero-size idle).
+                  BookingResumeChip(),
                   SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
@@ -109,7 +111,7 @@ class _OfferingTeaser extends StatelessWidget {
               backgroundColor: CardSurfaces.plum,
               foregroundColor: CardSurfaces.onPrimaryButton,
             ),
-            onPressed: () => context.push('/packages'),
+            onPressed: () => context.go('/packages'),
             child: const Text('View Offerings'),
           ),
         ],

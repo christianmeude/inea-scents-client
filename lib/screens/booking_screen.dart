@@ -178,10 +178,21 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   void _prefillFromUser() {
+    // C53: Profile is the prefill source of truth. Fill-only, every time:
+    // an empty field takes the profile value, but anything already in the
+    // flow (an inline edit, a restored draft) always wins — and nothing
+    // here ever writes back to the profile.
     final user = ref.read(authProvider).user;
     if (user == null) return;
-    _customerNameController.text = user.name ?? '';
-    _customerEmailController.text = user.email ?? '';
+    final flow = ref.read(bookingFlowProvider);
+    if (_customerNameController.text.isEmpty &&
+        (flow.customerName ?? '').isEmpty) {
+      _customerNameController.text = user.name ?? '';
+    }
+    if (_customerEmailController.text.isEmpty &&
+        (flow.customerEmail ?? '').isEmpty) {
+      _customerEmailController.text = user.email ?? '';
+    }
     ref.read(bookingFlowProvider.notifier).prefillFromUser(user);
   }
 
@@ -391,6 +402,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Widget build(BuildContext context) {
     if (!_isInitialized) return const SizedBox.shrink();
     ref.watch(bookingFlowProvider);
+    // C53: the profile can arrive after this route (late login/session
+    // restore) — prefill then too, so the one booking route prefills
+    // details every time. Fill-only; inline edits always win.
+    ref.listen<AuthState>(authProvider, (prev, next) {
+      if (!mounted) return;
+      if (prev?.user == next.user) return;
+      if (next.user != null) _prefillFromUser();
+    });
     ref.listen<AsyncValue<Package>>(packageDetailsProvider(widget.packageId), (
       prev,
       next,
@@ -475,7 +494,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),
-              child: packageAsync.when(
+              // C53 (Q9): persistent resume chip above the flow — renders
+              // in data/loading/error alike (zero-size when idle).
+              child: Column(
+                children: [
+                  BookingResumeChip(
+                    currentPackageId: widget.packageId,
+                  ),
+                  packageAsync.when(
                 data: (package) {
                   if (_currentStep == 5) {
                     return _buildCheckoutScreen();
@@ -516,6 +542,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   ),
                 ),
               ), // when
+                ],
+              ),
             ), // ConstrainedBox
           ), // Center
         ), // SingleChildScrollView
