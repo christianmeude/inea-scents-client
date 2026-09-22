@@ -231,7 +231,7 @@ class _DetailBody extends StatelessWidget {
                         Text(
                           booking.package != null
                               ? formatPeso(
-                                  booking.package!.price ?? 0.0,
+                                  booking.package!.priceForPax(booking.pax),
                                 )
                               : 'N/A',
                           style: TextStyle(
