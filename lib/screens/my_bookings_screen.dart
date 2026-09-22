@@ -385,7 +385,9 @@ class _BookingCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       booking.package != null
-                          ? formatPeso(booking.package!.price ?? 0.0)
+                          ? formatPeso(
+                              booking.package!.priceForPax(booking.pax),
+                            )
                           : 'N/A',
                       textAlign: TextAlign.end,
                       overflow: TextOverflow.ellipsis,
