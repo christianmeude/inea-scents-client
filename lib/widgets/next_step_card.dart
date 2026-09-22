@@ -91,7 +91,7 @@ class NextStepCard extends StatelessWidget {
               backgroundColor: AppTheme.primaryButtonBackground,
               foregroundColor: AppTheme.onPrimaryButton,
             ),
-            onPressed: () => context.push('/calendar'),
+            onPressed: () => context.go('/calendar'),
             child: const Text('Check date'),
           ),
         ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../config/theme.dart';
+import 'bottom_nav_bar.dart';
 import 'theme_toggle_button.dart';
 
 class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
@@ -167,18 +168,9 @@ class TopNavBar extends StatelessWidget implements PreferredSizeWidget {
           location = router.location;
         } catch (_) {}
       }
-      if (location.contains('package')) {
-        return 1;
-      } else if (location.contains('booking')) {
-        return 2;
-      } else if (location.contains('calendar')) {
-        return 3;
-      } else if (location.contains('profile')) {
-        return 4;
-      } else if (location == '/' || location.contains('home')) {
-        return 0;
-      }
-      return -1;
+      // C53: shared matcher — the single `/booking/:id` route reads as
+      // Packages (its branch), only plural `/bookings…` reads as Bookings.
+      return navIndexForLocation(location);
     } catch (_) {
       return 0;
     }

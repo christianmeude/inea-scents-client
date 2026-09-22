@@ -52,6 +52,10 @@ class ProfileScreen extends ConsumerWidget {
 
               const SizedBox(height: 12),
 
+              // C53 (Q9): persistent resume chip (zero-size idle — the C9
+              // no-scroll fit is untouched when there is no draft).
+              const BookingResumeChip(),
+
               // ==================================================
               // PROFILE + SETTINGS (P7 impeccable adapt: stacked
               // on mobile, side-by-side on web)

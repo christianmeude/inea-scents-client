@@ -416,11 +416,13 @@ void main() {
           rethrow;
         }
 
-        // 8. Test subroute /booking/99 retains BOOKINGS section highlight
+        // 8. C53: subroute /booking/99 belongs to the Packages branch
+        // (single booking route), so PACKAGES keeps the highlight — the
+        // plural /bookings list is the only BOOKINGS route.
         router.go('/booking/99');
         await tester.pumpAndSettle();
         expect(find.text('Booking Flow 99'), findsOneWidget);
-        expect(find.byIcon(Icons.calendar_today), findsOneWidget);
+        expect(find.byIcon(Icons.card_giftcard), findsOneWidget);
 
         // 10. Unknown /wishlist route is gone (wishlist retired, owner Q15).
         expect(find.text('Wishlist Screen Page'), findsNothing);

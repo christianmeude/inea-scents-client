@@ -65,6 +65,16 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
 
                   const SizedBox(height: 20),
 
+                  // C53 (Q9): persistent resume chip (zero-size idle).
+                  const BookingResumeChip(),
+
+                  // C53: the calendar reroute retains the draft date — say
+                  // so, and forward it with every Pax Choice row below.
+                  if (widget.initialDate != null) ...[
+                    _CarriedDateBanner(date: widget.initialDate!),
+                    const SizedBox(height: 12),
+                  ],
+
                   // ==================================================
                   // C17: single Offering hero + Pax Choice rows
                   // ==================================================
@@ -193,6 +203,52 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
       // ============================================================
       // BODY WRAPPER END
       // ============================================================
+    );
+  }
+}
+
+// ============================================================================
+// C53 CARRIED DATE BANNER
+// ============================================================================
+
+/// Confirms the `?date=` the calendar reroute retained. Informational only —
+/// every Pax Choice row below forwards it to the single booking route.
+class _CarriedDateBanner extends StatelessWidget {
+  final DateTime date;
+
+  const _CarriedDateBanner({required this.date});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('packages_carried_date'),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: CardSurfaces.chipBg(context),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: CardSurfaces.cardBorder(context)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.event_available_outlined,
+            size: 18,
+            color: CardSurfaces.title(context),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Showing for ${formatDateParam(date)} — carried from the calendar.',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: CardSurfaces.title(context),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -174,6 +174,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
                   children: [
                     titleContent,
+                    // C53 (Q9): persistent resume chip (zero-size idle).
+                    const BookingResumeChip(),
                     const SizedBox(height: 22),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,6 +199,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
             children: [
               titleContent,
+              // C53 (Q9): persistent resume chip (zero-size idle).
+              const BookingResumeChip(),
               const SizedBox(height: 22),
               calendarCard,
               const SizedBox(height: 20),
@@ -252,15 +256,11 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                 final d = _selectedDay!;
                 final dateStr =
                     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+                // C53: the draft date lives in the flow AND the query, so
+                // the reroute retains it. `go` (not `push`) switches to the
+                // Packages branch, keeping the tab selection in sync.
                 ref.read(bookingFlowProvider.notifier).setSelectedDate(d);
-                context.push('/packages?date=$dateStr');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Selected $dateStr — choose a Pax Choice to book',
-                    ),
-                  ),
-                );
+                context.go('/packages?date=$dateStr');
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 18),
               label: Text('Continue with ${_formatDate(_selectedDay!)}'),
