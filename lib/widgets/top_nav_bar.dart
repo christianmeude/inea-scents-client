@@ -337,6 +337,9 @@ class _BrandLogoState extends State<_BrandLogo> {
                       fontWeight: FontWeight.w700,
                       letterSpacing: 2.0,
                       color: Colors.white,
+                    ).copyWith(
+                      // C57: offline-safe fallback stack (single-source).
+                      fontFamilyFallback: AppTheme.brandFontFallback,
                     ),
                   ),
                   const SizedBox(width: 3),

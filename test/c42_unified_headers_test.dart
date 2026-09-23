@@ -199,7 +199,7 @@ void main() {
       expect(title.style?.fontWeight, FontWeight.w600);
       expect(title.style?.letterSpacing, -0.3);
       expect(title.style?.fontFamilyFallback, TabHeader.titleFallback);
-      expect(title.style?.fontFamilyFallback, contains('Georgia'));
+      expect(title.style?.fontFamilyFallback, contains('Josefin Sans'));
       expect(title.maxLines, 1);
       expect(title.overflow, TextOverflow.ellipsis);
       expect(
