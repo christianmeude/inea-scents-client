@@ -86,13 +86,15 @@ class ProfileScreen extends ConsumerWidget {
 
                   return Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 600),
-                      child: Column(
+                      // C56: match the 1200 shell cap like every other
+                      // tab screen (was 600, narrower than the shell).
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          profile,
-                          const SizedBox(height: 12),
-                          settings,
+                          Expanded(child: profile),
+                          const SizedBox(width: 16),
+                          Expanded(child: settings),
                         ],
                       ),
                     ),
@@ -110,8 +112,11 @@ class ProfileScreen extends ConsumerWidget {
                 child: Center(
                   child: Opacity(
                     opacity: 0.3,
+                    // C56: enlarged footer mark (was 120) so the brand
+                    // reads at desktop widths; still bounded so the
+                    // 360x800 no-scroll fit holds.
                     child: SizedBox(
-                      width: 120,
+                      width: 180,
                       child: const AppLogo(),
                     ),
                   ),
@@ -360,11 +365,11 @@ class _ThemeToggleTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // C56: brand-aligned via CardSurfaces/AppTheme tokens (was per-screen
+    // hex); matches _ProfileSettingTile icon chip + text in both modes.
     const primaryColor = AppTheme.primary;
-    final textColor = isDark
-        ? const Color(0xFFFDF4F5)
-        : const Color(0xFF633E50);
+    final textColor = CardSurfaces.title(context);
+    final iconColor = CardSurfaces.onBrand(context);
 
     final mode = ref.watch(themeModeProvider);
     final darkEnabled =
@@ -397,9 +402,7 @@ class _ThemeToggleTile extends ConsumerWidget {
                     darkEnabled
                         ? Icons.light_mode_outlined
                         : Icons.dark_mode_outlined,
-                    color: isDark
-                        ? const Color(0xFFFDF4F5)
-                        : primaryColor,
+                    color: iconColor,
                     size: 20,
                   ),
                 ),
@@ -416,7 +419,10 @@ class _ThemeToggleTile extends ConsumerWidget {
                 ),
                 Switch.adaptive(
                   value: darkEnabled,
+                  // C56: brand plum track (was default green-grey).
                   activeThumbColor: primaryColor,
+                  activeTrackColor: primaryColor.withValues(alpha: 0.35),
+                  inactiveThumbColor: CardSurfaces.mutedPlum,
                   onChanged: flip,
                 ),
               ],
