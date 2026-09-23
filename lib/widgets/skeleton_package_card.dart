@@ -3,7 +3,6 @@ import 'package:shimmer/shimmer.dart';
 
 class SkeletonPackageCard extends StatelessWidget {
   const SkeletonPackageCard({super.key});
-
   @override
   Widget build(BuildContext context) {
     // P6 (Q1): dark-aware shimmer so loading states never flash white.
@@ -92,6 +91,138 @@ class SkeletonPackageCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// C58: packages loading skeleton — mirrors the Offering hero + Pax
+/// Choice rows so loading never teases the retired card grid.
+class SkeletonPackagesLoading extends StatelessWidget {
+  const SkeletonPackagesLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final base = isDark
+        ? const Color(0xFF36222C)
+        : const Color(0xFF99868C);
+    final highlight = isDark
+        ? const Color(0xFF5A4450)
+        : const Color(0xFFE8DEE2);
+
+    Widget bar({
+      required double height,
+      required double width,
+      double radius = 6,
+    }) {
+      return Shimmer.fromColors(
+        baseColor: base,
+        highlightColor: highlight,
+        child: Container(
+          height: height,
+          width: width,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(radius),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      key: const Key('skeleton_packages_loading'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Hero mirror: 200px banner (mobile) with thumb + text block.
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final wide = constraints.maxWidth >= 768;
+            final bannerHeight = wide ? 240.0 : 200.0;
+            final imageWidth = wide ? 340.0 : 132.0;
+            return Container(
+              key: const Key('skeleton_offering_hero'),
+              width: double.infinity,
+              height: bannerHeight,
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1C1618) : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: base,
+                    highlightColor: highlight,
+                    child: Container(
+                      width: imageWidth,
+                      height: bannerHeight,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          bar(height: 18, width: double.infinity, radius: 6),
+                          const SizedBox(height: 8),
+                          bar(height: 14, width: 140, radius: 6),
+                          const SizedBox(height: 8),
+                          bar(height: 12, width: double.infinity, radius: 6),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 20),
+        bar(height: 18, width: 200, radius: 6),
+        const SizedBox(height: 12),
+        for (int i = 0; i < 3; i++) ...[
+          Container(
+            key: Key('skeleton_pax_row_$i'),
+            width: double.infinity,
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1618) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      bar(height: 15, width: 140, radius: 6),
+                      const SizedBox(height: 6),
+                      bar(height: 13, width: 90, radius: 6),
+                    ],
+                  ),
+                ),
+                Shimmer.fromColors(
+                  baseColor: base,
+                  highlightColor: highlight,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (i < 2) const SizedBox(height: 10),
+        ],
+      ],
     );
   }
 }

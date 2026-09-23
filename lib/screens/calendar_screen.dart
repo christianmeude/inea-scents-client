@@ -26,9 +26,6 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // P7: chrome resolves through the shared helper; brand accents
-    // (selected day, markers) stay fixed in both modes.
-    final titleColor = CardSurfaces.title(context);
     final availabilityAsync = ref.watch(availabilityProvider);
 
     // P7: no explicit color — flat theme scaffold background.
@@ -47,11 +44,17 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           skipLoadingOnReload: true,
 
           loading: () {
-            return Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: titleColor,
-              ),
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+              children: const [
+                TabHeader(
+                  title: 'Availability',
+                  count: 'Choose a date for your scent experience.',
+                ),
+                BookingResumeChip(),
+                SizedBox(height: 22),
+                SkeletonCalendar(),
+              ],
             );
           },
 
