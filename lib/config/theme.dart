@@ -58,6 +58,16 @@ class AppTheme {
   // holds 9.83:1 vs white (text bar 7:1). Dark mode keeps 0xFFF0A6B0.
   static const Color errorOnLight = Color(0xFF7A2531);
 
+  // C57 single-source header/brand fallback stack: Josefin Sans first,
+  // system sans after — holds with font-fetch disabled (offline-safe).
+  static const List<String> brandFontFallback = [
+    'Josefin Sans',
+    'Figtree',
+    'Segoe UI',
+    'Roboto',
+    'sans-serif',
+  ];
+
   // Global PageTransitionsTheme with Desktop Cross-Fade
   static const PageTransitionsTheme pageTransitionsTheme = PageTransitionsTheme(
     builders: {

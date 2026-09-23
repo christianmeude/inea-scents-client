@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../config/theme.dart';
 import 'card_surfaces.dart';
 
 /// C42: one shared two-slot tab header (C41 spec §1–§3, pairing B).
@@ -17,13 +18,9 @@ class TabHeader extends StatelessWidget {
   static const double countSize = 13;
   static const double titleLetterSpacing = -0.3;
 
-  /// Pairing B fallbacks (C41 §5): hold with font-fetch disabled.
-  static const List<String> titleFallback = [
-    'Cormorant Garamond',
-    'Georgia',
-    'Times New Roman',
-    'serif',
-  ];
+  /// C57: header title renders Josefin Sans (was Cormorant Garamond);
+  /// fallback stack is the single-source [AppTheme.brandFontFallback].
+  static const List<String> titleFallback = AppTheme.brandFontFallback;
   static const List<String> bodyFallback = [
     'Figtree',
     '-apple-system',
@@ -55,11 +52,11 @@ class TabHeader extends StatelessWidget {
     // C41 §5 B: explicit fallback stacks hold with font-fetch disabled.
     // (copyWith AFTER the GoogleFonts call — the package overwrites
     // fontFamilyFallback internally.)
-    final titleStyle = GoogleFonts.cormorantGaramond(
+    final titleStyle = GoogleFonts.josefinSans(
       fontSize: titleSizeFor(MediaQuery.sizeOf(context).width),
       fontWeight: FontWeight.w600,
       letterSpacing: titleLetterSpacing,
-      // Georgia's smaller x-height never wraps where Cormorant fits.
+      // Josefin's taller caps never wrap where the old serif fit.
       height: 1.15,
       color: CardSurfaces.title(context),
     ).copyWith(fontFamilyFallback: titleFallback);

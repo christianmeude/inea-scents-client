@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../config/theme.dart';
+
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key});
 
@@ -30,6 +32,9 @@ class AppLogo extends StatelessWidget {
     // by half the offset to keep the logo perfectly centered.
     final visualCenterOffset = isDesktop ? 38.0 : 31.5;
 
+    // C57: brand header renders Josefin Sans with the single-source
+    // offline-safe fallback stack (copyWith AFTER — the package
+    // overwrites fontFamilyFallback internally).
     final ineaStroke = GoogleFonts.josefinSans(
       fontSize: ineaSize,
       fontWeight: FontWeight.w700,
@@ -39,14 +44,14 @@ class AppLogo extends StatelessWidget {
         ..strokeWidth = 3
         ..strokeJoin = StrokeJoin.round
         ..color = strokeColor,
-    );
+    ).copyWith(fontFamilyFallback: AppTheme.brandFontFallback);
 
     final ineaFill = GoogleFonts.josefinSans(
       fontSize: ineaSize,
       fontWeight: FontWeight.w700,
       letterSpacing: ineaSpacing,
       color: brandPrimary,
-    );
+    ).copyWith(fontFamilyFallback: AppTheme.brandFontFallback);
 
     final scentsStroke = GoogleFonts.greatVibes(
       fontSize: scentsSize,
