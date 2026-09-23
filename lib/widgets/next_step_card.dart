@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../config/theme.dart';
+import 'home_hero_glow.dart';
 
 /// C1 concierge recomposition: the Home next-step card. Date-first entry
 /// into the booking flow (P4 order) — routes to the availability calendar,
@@ -22,9 +23,7 @@ class NextStepCard extends StatelessWidget {
         color: isDark ? const Color(0xFF1C1618) : Colors.white,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isDark
-              ? const Color(0xFF36222C)
-              : const Color(0x4D99868C),
+          color: isDark ? const Color(0xFF36222C) : const Color(0x4D99868C),
           width: 1.0,
         ),
         boxShadow: [
@@ -35,64 +34,75 @@ class NextStepCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF36222C)
-                  : const Color(0xFFF5E8EC),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.calendar_month_rounded,
-              size: 28,
-              color: isDark ? const Color(0xFFFDF4F5) : plum,
-            ),
+          // C69: ambient plum/cream wash behind the hero content —
+          // Positioned.fill sizes it exactly to the Row (no layout
+          // change, no overflow); the card's own padding insets it
+          // from the rounded edge.
+          const Positioned.fill(
+            child: HomeHeroGlow(key: Key('home_hero_glow')),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Your next step',
-                  style: TextStyle(
-                    color: isDark
-                        ? const Color(0xFFFDF4F5)
-                        : const Color(0xFF633E50),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF36222C)
+                      : const Color(0xFFF5E8EC),
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Check availability for your date, then choose a Pax Choice.',
-                  style: TextStyle(
-                    color: isDark
-                        ? const Color(0xFFC4ACAC)
-                        : const Color(0xFF765867),
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
+                child: Icon(
+                  Icons.calendar_month_rounded,
+                  size: 28,
+                  color: isDark ? const Color(0xFFFDF4F5) : plum,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          FilledButton(
-            key: const Key('home_check_date_cta'),
-            // C31: plum/cream token both modes (was dark-on-dark).
-            style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.primaryButtonBackground,
-              foregroundColor: AppTheme.onPrimaryButton,
-            ),
-            onPressed: () => context.go('/calendar'),
-            child: const Text('Check date'),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Your next step',
+                      style: TextStyle(
+                        color: isDark
+                            ? const Color(0xFFFDF4F5)
+                            : const Color(0xFF633E50),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Check availability for your date, then choose a Pax Choice.',
+                      style: TextStyle(
+                        color: isDark
+                            ? const Color(0xFFC4ACAC)
+                            : const Color(0xFF765867),
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              FilledButton(
+                key: const Key('home_check_date_cta'),
+                // C31: plum/cream token both modes (was dark-on-dark).
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppTheme.primaryButtonBackground,
+                  foregroundColor: AppTheme.onPrimaryButton,
+                ),
+                onPressed: () => context.go('/calendar'),
+                child: const Text('Check date'),
+              ),
+            ],
           ),
         ],
       ),
