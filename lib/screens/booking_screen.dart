@@ -1169,22 +1169,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             Expanded(
               child: SizedBox(
                 height: 50,
-                child: ElevatedButton(
-                  key: const Key('mobile_bottom_bar_cta'),
-                  onPressed: isLoading ? null : () => _handleMobileBarTap(),
-                  // P7: theme ElevatedButton drives both modes.
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(9999),
+                // C68: press-scale on the conversion CTA (no restyle).
+                child: PressScale(
+                  child: ElevatedButton(
+                    key: const Key('mobile_bottom_bar_cta'),
+                    onPressed: isLoading ? null : () => _handleMobileBarTap(),
+                    // P7: theme ElevatedButton drives both modes.
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(9999),
+                      ),
                     ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
+                          )
+                        : Text(label, style: const TextStyle(fontSize: 16)),
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5),
-                        )
-                      : Text(label, style: const TextStyle(fontSize: 16)),
                 ),
               ),
             ),
