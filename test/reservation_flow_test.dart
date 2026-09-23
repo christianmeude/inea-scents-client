@@ -2259,6 +2259,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Payment Successful'), findsOneWidget);
+      // C51: in product the overlay is a pill on the booking route, so the
+      // success screen's own Done stays tappable. This harness has no
+      // router, so minimize explicitly before exercising Done.
+      container.read(paymentOverlayMinimizedProvider.notifier).state = true;
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Done'));
       await tester.pumpAndSettle();
 

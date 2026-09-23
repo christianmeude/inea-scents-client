@@ -185,14 +185,26 @@ class MyBookingsScreen extends ConsumerWidget {
 // BOOKING CARD
 // ============================================================================
 
-class _BookingCard extends StatelessWidget {
+class _BookingCard extends ConsumerWidget {
   final Booking booking;
 
   const _BookingCard({required this.booking});
 
   @override
-  Widget build(BuildContext context) {
-    final status = booking.status.toString();
+  Widget build(BuildContext context, WidgetRef ref) {
+    // C51: live flow subscription — the in-flight Booking's fresh Status
+    // (flipped by poll/recheck) renders here with no list refresh. Any
+    // other row keeps its cached copy.
+    final flowBooking = ref.watch(
+      bookingFlowProvider.select((s) => s.booking),
+    );
+    final live =
+        (flowBooking != null &&
+            flowBooking.id != null &&
+            flowBooking.id == booking.id)
+        ? flowBooking
+        : booking;
+    final status = live.status.toString();
     final statusColor = _getStatusColor(status);
 
     return Container(
@@ -262,7 +274,7 @@ class _BookingCard extends StatelessWidget {
                       const SizedBox(height: 4),
 
                       Text(
-                        booking.bookingReference ?? 'N/A',
+                        live.bookingReference ?? 'N/A',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -296,7 +308,7 @@ class _BookingCard extends StatelessWidget {
             // PACKAGE NAME
             // ==========================================================
             Text(
-              booking.package?.name ?? 'Unknown Pax Choice',
+              live.package?.name ?? 'Unknown Pax Choice',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -324,7 +336,7 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.calendar_today_outlined,
               label: 'Event Date',
-              value: booking.eventDate?.toString().split(' ')[0] ?? 'N/A',
+              value: live.eventDate?.toString().split(' ')[0] ?? 'N/A',
             ),
 
             const SizedBox(height: 11),
@@ -335,7 +347,7 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.location_on_outlined,
               label: 'Venue',
-              value: booking.venueAddress ?? 'N/A',
+              value: live.venueAddress ?? 'N/A',
             ),
 
             const SizedBox(height: 11),
@@ -346,11 +358,11 @@ class _BookingCard extends StatelessWidget {
             _BookingDetailRow(
               icon: Icons.people_outline,
               label: 'PAX',
-              value: booking.pax == null
+              value: live.pax == null
                   ? 'N/A'
-                  : booking.pax == 1
+                  : live.pax == 1
                   ? '1 PAX'
-                  : '${booking.pax} PAX',
+                  : '${live.pax} PAX',
             ),
 
             const SizedBox(height: 18),
@@ -384,9 +396,9 @@ class _BookingCard extends StatelessWidget {
                   // instead of overflowing the row at 360px.
                   Expanded(
                     child: Text(
-                      booking.package != null
+                      live.package != null
                           ? formatPeso(
-                              booking.package!.priceForPax(booking.pax),
+                              live.package!.priceForPax(live.pax),
                             )
                           : 'N/A',
                       textAlign: TextAlign.end,
