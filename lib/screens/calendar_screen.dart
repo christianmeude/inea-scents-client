@@ -40,45 +40,61 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
       // ========================================================
       // P7: flat theme background; decorative gradient removed.
       body: SafeArea(
-        child: availabilityAsync.when(
-          skipLoadingOnReload: true,
+        child: Builder(
+          builder: (context) {
+            // C66: initial load only — reloads keep stale content
+            // (no skeleton flash) until fresh data lands.
+            final isInitialLoading =
+                availabilityAsync.isLoading && !availabilityAsync.hasValue;
+            final content = availabilityAsync.when(
+              skipLoadingOnReload: true,
 
-          loading: () {
-            return ListView(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
-              children: const [
-                TabHeader(
-                  title: 'Availability',
-                  count: 'Choose a date for your scent experience.',
-                ),
-                // C60: Q9 retired.
-                SizedBox(height: 22),
-                SkeletonCalendar(),
-              ],
+              loading: () {
+                return const SizedBox.shrink();
+              },
+
+              // P6 (Q6/Q8): shared friendly card; raw errors stay
+              // in logs, never on screen.
+              error: (error, _) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: ErrorStateCard(
+                      title: 'Unable to load availability',
+                      message:
+                          "We couldn't load the calendar. "
+                          'Check your connection and try again.',
+                      onRetry: () {
+                        ref.read(availabilityProvider.notifier).refresh();
+                      },
+                    ),
+                  ),
+                );
+              },
+
+              data: (availabilityState) {
+                return _buildCalendar(availabilityState);
+              },
             );
-          },
-
-          // P6 (Q6/Q8): shared friendly card; raw errors stay
-          // in logs, never on screen.
-          error: (error, _) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ErrorStateCard(
-                  title: 'Unable to load availability',
-                  message:
-                      "We couldn't load the calendar. "
-                      'Check your connection and try again.',
-                  onRetry: () {
-                    ref.read(availabilityProvider.notifier).refresh();
-                  },
-                ),
+            // C66: skeleton→content crossfade (fade, no pop-in).
+            // Header stays mounted in both branches so only the
+            // shimmer/content swaps.
+            return SkeletonCrossfade(
+              isLoading: isInitialLoading,
+              skeleton: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                children: const [
+                  TabHeader(
+                    title: 'Availability',
+                    count: 'Choose a date for your scent experience.',
+                  ),
+                  // C60: Q9 retired.
+                  SizedBox(height: 22),
+                  SkeletonCalendar(),
+                ],
               ),
+              child: content,
             );
-          },
-
-          data: (availabilityState) {
-            return _buildCalendar(availabilityState);
           },
         ),
       ),
@@ -121,7 +137,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final isDesktop = constraints.maxWidth >= ResponsiveAppShell.tabletBreakpoint;
+          final isDesktop =
+              constraints.maxWidth >= ResponsiveAppShell.tabletBreakpoint;
 
           // C42: unified header (title+count left, trailing empty).
           const titleContent = TabHeader(
@@ -130,42 +147,42 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           );
 
           final calendarCard = // ====================================================
-          // CALENDAR CARD
-          // ====================================================
-          Container(
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(24),
+              // CALENDAR CARD
+              // ====================================================
+              Container(
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: BorderRadius.circular(24),
 
-              border: Border.all(color: surfaceBorder, width: 1),
+                  border: Border.all(color: surfaceBorder, width: 1),
 
-              boxShadow: [
-                BoxShadow(
-                  color: primary.withValues(alpha: 0.10),
-                  blurRadius: 22,
-                  offset: const Offset(0, 10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: primary.withValues(alpha: 0.10),
+                      blurRadius: 22,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
-              ],
-            ),
 
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
 
-              // C28: date-entry grid is the shared IneaCalendar
-              // (bare mode — this card owns the chrome). Paging
-              // keeps the selection; only the month refetches.
-              child: IneaCalendar(
-                showChrome: false,
-                selectedDate: _selectedDay,
-                enabledDays: enabledDays,
-                onDateSelected: (selectedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                  });
-                },
-              ),
-            ),
-          );
+                  // C28: date-entry grid is the shared IneaCalendar
+                  // (bare mode — this card owns the chrome). Paging
+                  // keeps the selection; only the month refetches.
+                  child: IneaCalendar(
+                    showChrome: false,
+                    selectedDate: _selectedDay,
+                    enabledDays: enabledDays,
+                    onDateSelected: (selectedDay) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                      });
+                    },
+                  ),
+                ),
+              );
 
           if (isDesktop) {
             return Center(
@@ -184,7 +201,13 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       children: [
                         Expanded(flex: 7, child: calendarCard),
                         const SizedBox(width: 24),
-                        Expanded(flex: 4, child: _buildAgendaColumn(selectedStatus, isDesktop: true)),
+                        Expanded(
+                          flex: 4,
+                          child: _buildAgendaColumn(
+                            selectedStatus,
+                            isDesktop: true,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -237,8 +260,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            selectedStatus == null ||
-                    _isAvailable(selectedStatus)
+            selectedStatus == null || _isAvailable(selectedStatus)
                 ? 'Available for your event'
                 : 'Unavailable — pick another date',
             style: TextStyle(
