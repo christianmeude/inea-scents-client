@@ -1046,6 +1046,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// Scaffold's [bottomNavigationBar] so the C40 clamp never fights
   /// stickiness. Labels: `Proceed` (step 2), `Proceed to Payment`
   /// (step 3), `Confirm & Pay ₱` (step 4). Null off-flow (checkout).
+  /// C63: the SafeArea (top:false) keeps the bar above the bottom
+  /// system inset; the step column's 28px bottom padding (see
+  /// _buildMobileLayout) keeps content clear of the bar.
   Widget? _buildMobileBottomBar(Package package) {
     if (_currentStep != 2 && _currentStep != 3 && _currentStep != 4) {
       return null;
@@ -1150,12 +1153,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     // C48: the sticky bottom bar (Scaffold.bottomNavigationBar) owns
     // conversion — one CTA, never two on screen. The in-column button
     // is retired; this column carries content only.
+    // C63: extra bottom scroll padding (28 > bar-adjacent 20) so the
+    // last item scrolls fully above the sticky bar — content is never
+    // hidden behind it at 360px width.
     return Column(
       children: [
         _buildHeader(showBack: true),
         _buildTimeline(),
         Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           child: _buildCurrentStep(package),
         ),
       ],
