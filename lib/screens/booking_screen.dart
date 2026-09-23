@@ -1456,6 +1456,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     );
   }
 
+  /// C70: only the success moment (green check) draws in; every other
+  /// checkout status keeps its static icon.
+  static bool _isSuccessCheck(IconData iconData, Color iconColor) {
+    return iconData == Icons.check_rounded &&
+        iconColor.toARGB32() == SuccessCheck.successGreen.toARGB32();
+  }
+
   Widget _buildCheckoutCard({
     required IconData iconData,
     required Color iconColor,
@@ -1491,7 +1498,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(color: iconColor, shape: BoxShape.circle),
-            child: Icon(iconData, color: _surface, size: 40),
+            // C70: success moment draws the check in (≤350ms stroke);
+            // other statuses keep their static icon. Same 40px box either
+            // way, so no layout shift.
+            child: _isSuccessCheck(iconData, iconColor)
+                ? const SuccessCheck()
+                : Icon(iconData, color: _surface, size: 40),
           ),
           const SizedBox(height: 20),
           Text(
