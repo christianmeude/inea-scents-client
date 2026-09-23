@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
 import 'inline_errors.dart';
+import 'micro_interactions.dart';
 
 /// C52: app-wide error display is toast-only on every width. The wide
 /// (>=768px) nav-level [MaterialBanner] is gone — validation errors
@@ -42,10 +43,15 @@ void showAppError(
         duration: Duration(seconds: (hasRetry || hasAction) ? 8 : 4),
         // C52: plain wrapping text — no Row/IconButton squeeze, so a
         // long message never overflows at 360px even with an action.
-        content: Text(
-          message,
-          style: const TextStyle(color: AppTheme.onPrimaryButton),
-          softWrap: true,
+        // C68: slide-in entry on the toast content (transform-only, no
+        // layout shift; instant when reduced-motion is on). Tokens stay
+        // C31 plum/cream — no restyle.
+        content: ToastEntry(
+          child: Text(
+            message,
+            style: const TextStyle(color: AppTheme.onPrimaryButton),
+            softWrap: true,
+          ),
         ),
         // C52: one action slot — extra action wins, else retry, and
         // retry only for transient failures. Validation copy never

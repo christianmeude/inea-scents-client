@@ -489,7 +489,9 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    // C68: chip appear on mount (fade + scale, layout-stable).
+    return ChipAppear(
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
 
       decoration: BoxDecoration(
@@ -521,6 +523,7 @@ class _StatusBadge extends StatelessWidget {
             ),
           ),
         ],
+      ),
       ),
     );
   }
