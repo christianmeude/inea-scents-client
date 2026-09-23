@@ -317,17 +317,6 @@ class _BookingCard extends ConsumerWidget {
               ),
             ),
 
-            const SizedBox(height: 5),
-
-            Text(
-              'INEA Scents Perfume Experience',
-              style: TextStyle(
-                fontSize: 11,
-                color: CardSurfaces.body(context),
-                letterSpacing: 0.2,
-              ),
-            ),
-
             const SizedBox(height: 18),
 
             // ==========================================================
@@ -504,17 +493,18 @@ class _StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
 
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        // C55: bolder fill + border so the semantic chip reads at 9px.
+        color: color.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.22), width: 1),
+        border: Border.all(color: color.withValues(alpha: 0.40), width: 1),
       ),
 
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 6,
-            height: 6,
+            width: 7,
+            height: 7,
 
             decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
@@ -524,9 +514,9 @@ class _StatusBadge extends StatelessWidget {
           Text(
             status.toUpperCase(),
             style: TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
               color: color,
             ),
           ),
@@ -640,18 +630,23 @@ class _EmptyBookings extends StatelessWidget {
 // STATUS COLOR
 // ============================================================================
 
+// C55: status chips resolve through AppTheme semantic tokens
+// (success/pending/errorOnLight/secondary) — never bespoke hex.
 Color _getStatusColor(String status) {
   switch (status.toLowerCase()) {
     case 'confirmed':
-      return const Color(0xFF648B70);
+    case 'paid':
+      return AppTheme.success;
 
     case 'pending':
-      return const Color(0xFFC28A52);
+      return AppTheme.pending;
 
     case 'cancelled':
-      return const Color(0xFF9A607B);
+    case 'canceled':
+    case 'expired':
+      return AppTheme.errorOnLight;
 
     default:
-      return const Color(0xFF8B7B84);
+      return AppTheme.secondary;
   }
 }
