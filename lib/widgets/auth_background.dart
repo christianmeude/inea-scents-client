@@ -101,7 +101,7 @@ class AuthBackground extends StatelessWidget {
       ),
       _BlobSpec(
         w: 500, h: 400,
-        topFrac: 0.20, rightFrac: 0.20, narrowRightFrac: 0.02,
+        topFrac: 0.20, rightFrac: 0.20, narrowRightFrac: 0.25,
         light: lightBlobs[3], dark: darkBlobs[3],
       ),
       _BlobSpec(

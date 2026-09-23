@@ -229,6 +229,51 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('every narrow override moves inward vs its base frac',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      Future<List<Positioned>> offsetsFor(bool isDark) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: AuthBackground(isDark: isDark, child: const SizedBox()),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        return tester
+            .widgetList<Positioned>(find.byType(Positioned))
+            .where((p) => (p.left == null) != (p.right == null))
+            .toList();
+      }
+
+      // Narrow light (overrides active) vs dark (frozen base geometry):
+      // same 360px width, so any delta is purely the narrow override.
+      final narrow = await offsetsFor(false);
+      final base = await offsetsFor(true);
+      expect(narrow, hasLength(8));
+      expect(base, hasLength(8));
+      // Indices with a narrow override (must move strictly inward);
+      // the rest share the base frac (must be equal).
+      const overridden = {0, 2, 4, 5, 7};
+      for (var i = 0; i < 8; i++) {
+        final n = narrow[i].left ?? narrow[i].right!;
+        final b = base[i].left ?? base[i].right!;
+        if (overridden.contains(i)) {
+          expect(n, greaterThan(b + 1.0),
+              reason: 'blob $i narrow $n must sit inward of base $b');
+        } else {
+          expect(n, closeTo(b, 1.0),
+              reason: 'blob $i has no override, must equal base $b');
+        }
+      }
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('dark layout at 360px equals pre-C59 desktop geometry',
         (WidgetTester tester) async {
       tester.view.physicalSize = const Size(360, 800);
