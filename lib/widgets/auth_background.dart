@@ -69,8 +69,10 @@ class AuthBackground extends StatelessWidget {
     final sh = size.height;
     // C59: reposition off-screen-anchored blobs inward on mobile so the
     // mesh stays composed behind the column instead of past the edge.
-    final narrow = sw < 640;
-    final s = blobScaleForWidth(sw);
+    // Dark geometry is frozen at the pre-C59 desktop mesh (full scale,
+    // base anchors); scale/narrow overrides are light-mode only.
+    final narrow = !isDark && sw < 640;
+    final s = isDark ? 1.0 : blobScaleForWidth(sw);
     final specs = <_BlobSpec>[
       _BlobSpec(
         w: 300, h: 600, angleDeg: 30,
@@ -94,7 +96,7 @@ class AuthBackground extends StatelessWidget {
       ),
       _BlobSpec(
         w: 800, h: 600,
-        topFrac: -0.15, rightFrac: 0.05, narrowRightFrac: -0.15,
+        topFrac: -0.15, rightFrac: 0.05, narrowRightFrac: 0.15,
         light: lightBlobs[3], dark: darkBlobs[3],
       ),
       _BlobSpec(
@@ -109,7 +111,7 @@ class AuthBackground extends StatelessWidget {
       ),
       _BlobSpec(
         w: 600, h: 250,
-        topFrac: 0.75, rightFrac: 0.05, narrowRightFrac: -0.10,
+        topFrac: 0.75, rightFrac: 0.05, narrowRightFrac: 0.12,
         light: lightBlobs[4], dark: darkBlobs[4],
       ),
     ];

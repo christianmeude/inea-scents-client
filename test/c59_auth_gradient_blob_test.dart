@@ -182,4 +182,116 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   });
+
+  group('c59 narrow inward bounds + dark geometry freeze', () {
+    testWidgets('light narrow anchors stay within [0,1]-ish bounds (no outward spill)',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AuthBackground(isDark: false, child: SizedBox()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      const sw = 360.0;
+      final blobs = tester
+          .widgetList<Positioned>(find.byType(Positioned))
+          .where((p) => (p.left == null) != (p.right == null))
+          .toList();
+      expect(blobs, hasLength(8));
+      for (final p in blobs) {
+        if (p.left != null) {
+          // [0,1]-ish: allow the pre-existing slight off-screen anchor
+          // (-0.05) but never an outward spill like -0.15/-0.10.
+          expect(p.left!, greaterThanOrEqualTo(-0.05 * sw - 1.0),
+              reason: 'left $p spills outward past the viewport edge');
+          expect(p.left!, lessThanOrEqualTo(sw));
+        }
+        if (p.right != null) {
+          expect(p.right!, greaterThanOrEqualTo(-0.05 * sw - 1.0),
+              reason: 'right $p spills outward past the viewport edge');
+          expect(p.right!, lessThanOrEqualTo(sw));
+        }
+      }
+      // The two C59 narrowRight overrides must be genuinely inward
+      // (non-negative, never past the right edge).
+      final rights =
+          blobs.where((p) => p.right != null).map((p) => p.right!).toList();
+      expect(rights.where((r) => r < 0).length, lessThanOrEqualTo(1),
+          reason: 'only the untouched -0.05 anchor may sit off-screen');
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('dark layout at 360px equals pre-C59 desktop geometry',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(360, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: AuthBackground(isDark: true, child: SizedBox()),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      const sw = 360.0;
+      const sh = 800.0;
+      // Pre-C59 desktop geometry: base fracs at full scale.
+      const expectedTops = [-0.10, 0.10, 0.30, 0.65, -0.15, 0.20, 0.50, 0.75];
+      const expectedLefts = [-0.05, 0.05, -0.10, -0.05];
+      const expectedRights = [0.05, 0.20, -0.05, 0.05];
+      const expectedSizes = [
+        Size(300, 600),
+        Size(600, 300),
+        Size(800, 250),
+        Size(500, 400),
+        Size(800, 600),
+        Size(500, 400),
+        Size(300, 500),
+        Size(600, 250),
+      ];
+
+      final blobs = tester
+          .widgetList<Positioned>(find.byType(Positioned))
+          .where((p) => (p.left == null) != (p.right == null))
+          .toList();
+      expect(blobs, hasLength(8));
+      for (var i = 0; i < 8; i++) {
+        expect(blobs[i].top, closeTo(sh * expectedTops[i], 1.0));
+        if (i < 4) {
+          expect(blobs[i].left, closeTo(sw * expectedLefts[i], 1.0));
+        } else {
+          expect(blobs[i].right,
+              closeTo(sw * expectedRights[i - 4], 1.0));
+        }
+      }
+
+      final blobFinder = find.byWidgetPredicate(
+        (w) =>
+            w is AnimatedContainer &&
+            w.decoration is BoxDecoration &&
+            (w.decoration as BoxDecoration).borderRadius != null,
+      );
+      expect(blobFinder, findsNWidgets(8));
+      for (var i = 0; i < 8; i++) {
+        // Full scale in dark mode: no blobScaleForWidth shrink at 360px
+        // (360/768 would be ~0.5 if applied).
+        final size = tester.getSize(blobFinder.at(i));
+        expect(size.width, closeTo(expectedSizes[i].width, 1.0));
+        expect(size.height, closeTo(expectedSizes[i].height, 1.0));
+      }
+      expect(tester.takeException(), isNull);
+    });
+  });
 }
