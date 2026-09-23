@@ -138,6 +138,56 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// summary renders only on demand; the collapsed card carries no CTA.
   bool _scheduleSummaryExpanded = false;
 
+  /// C65: last rendered wizard stage — drives the direction-aware
+  /// stage transition (forward slides from the right, back from left).
+  int _lastSeenStep = 2;
+
+  /// C65: reduced-motion gate — [MediaQuery.disableAnimations] forces
+  /// every stage/timeline animation to settle instantly.
+  bool _isReducedMotion(BuildContext context) =>
+      MediaQuery.disableAnimationsOf(context);
+
+  /// C65: shared stage transition — slide + fade on step change,
+  /// direction-aware (cheap `_lastSeenStep` compare), ≤250ms ease-out,
+  /// Flutter built-ins only. Instant child swap when reduced motion.
+  Widget _stageSwitcher({
+    required int step,
+    required Widget child,
+  }) {
+    final reduce = _isReducedMotion(context);
+    final forward = step >= _lastSeenStep;
+    _lastSeenStep = step;
+    final begin = forward
+        ? const Offset(0.12, 0)
+        : const Offset(-0.12, 0);
+    return AnimatedSwitcher(
+      duration: reduce
+          ? Duration.zero
+          : const Duration(milliseconds: 250),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeOut,
+      layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+        return Stack(
+          alignment: Alignment.topLeft,
+          children: <Widget>[...previousChildren, ?currentChild],
+        );
+      },
+      transitionBuilder: (child, animation) {
+        if (reduce) return child;
+        return SlideTransition(
+          position: Tween<Offset>(begin: begin, end: Offset.zero).animate(
+            animation,
+          ),
+          child: FadeTransition(opacity: animation, child: child),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey('booking_stage_$step'),
+        child: child,
+      ),
+    );
+  }
+
   /// Short date matching the summary rail one-liner (`Sep 18, 2026`).
   static String _shortDate(DateTime? date) {
     if (date == null) return 'Not selected';
@@ -640,8 +690,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ------------------------------------------------------
-              // FLOW COLUMN (LEFT): IN-PLACE CROSS-FADE
+              // FLOW COLUMN (LEFT): IN-PLACE SLIDE + FADE (C65)
               // ------------------------------------------------------
               Expanded(
                 flex: 2,
@@ -651,24 +700,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _formErrorSlot(),
-                      AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    switchInCurve: Curves.easeInOut,
-                    switchOutCurve: Curves.easeInOut,
-                    layoutBuilder:
-                        (Widget? currentChild, List<Widget> previousChildren) {
-                          return Stack(
-                            alignment: Alignment.topLeft,
-                            children: <Widget>[
-                              ...previousChildren,
-                              ?currentChild,
-                            ],
-                          );
-                        },
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: isPayment
+                      _stageSwitcher(
+                        step: _currentStep,
+                        child: isPayment
                         ? DesktopPaymentPanel(
                             key: const ValueKey('desktop_payment_panel_view'),
                             package: package,
@@ -753,7 +787,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                               ),
                             ],
                           ),
-                    ),
+                      ),
                     ],
                   ),
                 ),
@@ -822,7 +856,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Left Column: Calendar & Customization / Payment
-              // (Cross-Faded)
+              // (Slide + faded, C65)
               Expanded(
                 flex: 1,
                 child: Padding(
@@ -831,24 +865,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _formErrorSlot(),
-                      AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    switchInCurve: Curves.easeInOut,
-                    switchOutCurve: Curves.easeInOut,
-                    layoutBuilder:
-                        (Widget? currentChild, List<Widget> previousChildren) {
-                          return Stack(
-                            alignment: Alignment.topLeft,
-                            children: <Widget>[
-                              ...previousChildren,
-                              ?currentChild,
-                            ],
-                          );
-                        },
-                    transitionBuilder: (child, animation) {
-                      return FadeTransition(opacity: animation, child: child);
-                    },
-                    child: isPayment
+                      _stageSwitcher(
+                        step: _currentStep,
+                        child: isPayment
                         ? DesktopPaymentPanel(
                             key: const ValueKey('tablet_payment_panel_view'),
                             package: package,
@@ -923,7 +942,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                               ),
                             ],
                           ),
-                    ),
+                      ),
                     ],
                   ),
                 ),
@@ -1221,7 +1240,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_formErrorSlot(), _buildCurrentStep(package)],
+            children: [
+              _formErrorSlot(),
+              // C65: mobile stage body slides + fades on step change.
+              _stageSwitcher(
+                step: _currentStep,
+                child: _buildCurrentStep(package),
+              ),
+            ],
           ),
         ),
       ],
@@ -1585,14 +1611,23 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     // C19: 3-step wizard — Pax Choice and Scents are chosen before
     // entering the flow (?pax= + scent shelf), so the timeline shows
     // Schedule (2) → Details (3) → Payment (4).
+    // C65: dots + connectors animate via AnimatedContainer (200ms
+    // ease-out); reduced motion settles instantly (zero duration).
     final steps = ['Schedule', 'Details', 'Payment'];
     final flowIndex = (_currentStep - 2).clamp(0, 2);
+    final reduce = _isReducedMotion(context);
+    final animDuration = reduce
+        ? Duration.zero
+        : const Duration(milliseconds: 200);
+    final doneColor = plum;
+    const todoColor = Color(0xFF99868C);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 25),
       child: Row(
         children: List.generate(steps.length, (index) {
           final isPast = index < flowIndex;
           final isCurrent = index == flowIndex;
+          final active = isPast || isCurrent;
           return Expanded(
             child: Column(
               children: [
@@ -1602,26 +1637,28 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       const Expanded(child: SizedBox())
                     else
                       Expanded(
-                        child: Container(
+                        child: AnimatedContainer(
+                          key: Key('timeline_connector_before_$index'),
+                          duration: animDuration,
+                          curve: Curves.easeOut,
                           height: 3,
-                          color: isPast || isCurrent
-                              ? plum
-                              : const Color(0xFF99868C),
+                          color: isPast || isCurrent ? doneColor : todoColor,
                         ),
                       ),
                     Semantics(
                       selected: isCurrent,
                       label: steps[index],
-                      child: Container(
+                      child: AnimatedContainer(
+                        key: Key('timeline_dot_$index'),
+                        duration: animDuration,
+                        curve: Curves.easeOut,
                         width: 22,
                         height: 22,
                         decoration: BoxDecoration(
-                          color: isPast || isCurrent
-                              ? plum
-                              : const Color(0xFF99868C),
+                          color: active ? doneColor : todoColor,
                           shape: BoxShape.circle,
                         ),
-                        child: isPast || isCurrent
+                        child: active
                             ? Icon(Icons.check, size: 12, color: _surface)
                             : null,
                       ),
@@ -1630,11 +1667,12 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       const Expanded(child: SizedBox())
                     else
                       Expanded(
-                        child: Container(
+                        child: AnimatedContainer(
+                          key: Key('timeline_connector_after_$index'),
+                          duration: animDuration,
+                          curve: Curves.easeOut,
                           height: 3,
-                          color: index < flowIndex
-                              ? plum
-                              : const Color(0xFF99868C),
+                          color: index < flowIndex ? doneColor : todoColor,
                         ),
                       ),
                   ],
