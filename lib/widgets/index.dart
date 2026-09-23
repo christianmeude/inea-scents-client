@@ -24,3 +24,4 @@ export 'inline_errors.dart';
 export 'mobile_clamp_scroll.dart';
 export 'auth_background.dart';
 export 'processing_payment_overlay.dart';
+export 'micro_interactions.dart';
