@@ -158,22 +158,7 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
                     // LOADING
                     // ==================================================
                     loading: () {
-                      return LayoutBuilder(
-                        builder: (context, constraints) {
-                          return GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                ResponsiveAppShell.gridDelegateForWidth(
-                                  constraints.maxWidth,
-                                ),
-                            itemCount: 4,
-                            itemBuilder: (context, index) {
-                              return const SkeletonPackageCard();
-                            },
-                          );
-                        },
-                      );
+                      return const SkeletonPackagesLoading();
                     },
 
                     // ==================================================
