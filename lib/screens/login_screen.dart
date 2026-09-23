@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -56,118 +55,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF151012) : const Color(0xFFFDF4F5);
     final inputLabelColor = isDark
         ? const Color(0xFFFDF4F5)
         : const Color(0xFF6A4053);
 
-    final sw = MediaQuery.of(context).size.width;
-    final sh = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor:
-          Colors.transparent, // Let AnimatedContainer handle background
-      body: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        color: bgColor,
+          Colors.transparent, // Let AuthBackground handle background
+      body: AuthBackground(
+        isDark: isDark,
         child: Stack(
           children: [
-            // ======================================================
-            // MESH GRADIENT BLOBS (C45: light alphas cut to 0x14 pale /
-            // 0x0D plum for AAA; mesh geometry + dark mode untouched)
-            // ======================================================
-            Positioned(
-              top: -sh * 0.10,
-              left: -sw * 0.05,
-              child: _BlurBlob(
-                width: 300,
-                height: 600,
-                color: isDark
-                    ? const Color(0x664A1C28)
-                    : const Color(0x14DABDAC),
-                angle: 30 * (3.14159 / 180),
-              ),
-            ),
-            Positioned(
-              top: sh * 0.10,
-              left: sw * 0.05,
-              child: _BlurBlob(
-                width: 600,
-                height: 300,
-                color: isDark
-                    ? const Color(0x664A1C28)
-                    : const Color(0x14DABDAC),
-                angle: 15 * (3.14159 / 180),
-              ),
-            ),
-            Positioned(
-              top: sh * 0.30,
-              left: -sw * 0.10,
-              child: _BlurBlob(
-                width: 800,
-                height: 250,
-                color: isDark
-                    ? const Color(0x806A4053)
-                    : const Color(0x14C08D9E),
-                angle: 10 * (3.14159 / 180),
-              ),
-            ),
-            Positioned(
-              top: sh * 0.65,
-              left: -sw * 0.05,
-              child: _BlurBlob(
-                width: 500,
-                height: 400,
-                color: isDark
-                    ? const Color(0x9936222C)
-                    : const Color(0x14988088),
-              ),
-            ),
-            Positioned(
-              top: -sh * 0.15,
-              right: sw * 0.05,
-              child: _BlurBlob(
-                width: 800,
-                height: 600,
-                color: isDark
-                    ? const Color(0xB33B1019)
-                    : const Color(0x14C4A5A8),
-              ),
-            ),
-            Positioned(
-              top: sh * 0.20,
-              right: sw * 0.20,
-              child: _BlurBlob(
-                width: 500,
-                height: 400,
-                color: isDark
-                    ? const Color(0xB33B1019)
-                    : const Color(0x14C4A5A8),
-              ),
-            ),
-            Positioned(
-              top: sh * 0.50,
-              right: -sw * 0.05,
-              child: _BlurBlob(
-                width: 300,
-                height: 500,
-                color: isDark
-                    ? const Color(0x996A4053)
-                    : const Color(0x0D6E3C53),
-              ),
-            ),
-            Positioned(
-              top: sh * 0.75,
-              right: sw * 0.05,
-              child: _BlurBlob(
-                width: 600,
-                height: 250,
-                color: isDark
-                    ? const Color(0x996A4053)
-                    : const Color(0x0D6E3C53),
-              ),
-            ),
-
             // ======================================================
             // MAIN CONTENT
             // ======================================================
@@ -655,38 +553,5 @@ class _LinkButtonState extends State<_LinkButton> {
 }
 
 // ============================================================================
-// BLURRED BACKGROUND BLOB
+// BLURRED BACKGROUND BLOB lives in widgets/auth_background.dart (C59 shared).
 // ============================================================================
-
-class _BlurBlob extends StatelessWidget {
-  final double width;
-  final double height;
-  final Color color;
-  final double angle;
-
-  const _BlurBlob({
-    required this.width,
-    required this.height,
-    required this.color,
-    this.angle = 0,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: angle,
-      child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.all(Radius.elliptical(width, height)),
-          ),
-        ),
-      ),
-    );
-  }
-}
