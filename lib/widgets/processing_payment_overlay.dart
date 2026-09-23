@@ -104,7 +104,7 @@ class _PillSpring extends StatelessWidget {
     if (reducedMotion) return child;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 450),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutBack,
       builder: (context, value, inner) {
         final scale = 0.85 + 0.15 * value;
