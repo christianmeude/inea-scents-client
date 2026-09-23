@@ -35,10 +35,10 @@ flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 
 # 3. Run against local backend (web)
-flutter run -d chrome --dart-define=API_URL=http://127.0.0.1:8000
+flutter run -d chrome --dart-define=API_URL=http://127.0.0.1:8080
 
 # Run against local backend (Android emulator)
-flutter run --dart-define=API_URL=http://10.0.2.2:8000
+flutter run --dart-define=API_URL=http://10.0.2.2:8080
 
 # Run against production backend
 flutter run -d chrome --dart-define=API_URL=https://ineascents.onrender.com
@@ -112,7 +112,7 @@ flutter build web --dart-define=API_URL=https://ineascents.onrender.com
 
 | Variable | Required | Example | Notes |
 | --- | --- | --- | --- |
-| `API_URL` | Yes (release); debug falls back per platform | `https://ineascents.onrender.com` | Build-time only via `--dart-define`. Debug fallback: web `http://127.0.0.1:8000`, Android `http://10.0.2.2:8000`. Release without it throws. |
+| `API_URL` | Yes (release); debug falls back per platform | `https://ineascents.onrender.com` | Build-time only via `--dart-define`. Debug fallback: web `http://127.0.0.1:8080`, Android `http://10.0.2.2:8080`. Release without it throws. |
 
 Do not edit `lib/config/environment.dart` to switch backends — pass the flag at build time.
 
@@ -125,7 +125,7 @@ Do not edit `lib/config/environment.dart` to switch backends — pass the flag a
 ## Troubleshooting
 
 - **Release crash `API_URL dart-define is required`?** Rebuild with `--dart-define=API_URL=https://ineascents.onrender.com`.
-- **Can't connect to API (local)?** Backend must be running; Android emulator uses `http://10.0.2.2:8000`, not `127.0.0.1`. Web uses `http://127.0.0.1:8000`.
+- **Can't connect to API (local)?** Backend must be running; Android emulator uses `http://10.0.2.2:8080`, not `127.0.0.1`. Web uses `http://127.0.0.1:8080`.
 - **Checkout tab blocked?** The held tab only works when opened inside the tap — use the on-screen recovery button (re-navigates to `checkoutUrl`).
 - **Codegen stale?** `flutter clean && flutter pub get && dart run build_runner build --delete-conflicting-outputs` (`flutter pub run build_runner` is deprecated — use `dart run`).
 - **Booking stuck pending?** Call `checkStatusImmediate` (retry) — only a resolved Status (`confirmed`/`paid`, `cancelled`/`expired`) flips the Checkout.

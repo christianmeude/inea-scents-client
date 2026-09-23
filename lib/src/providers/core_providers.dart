@@ -10,14 +10,14 @@ import '../../api/rest_client.dart';
 /// `flutter run` must pass its backend explicitly.
 ///
 /// Examples:
-///  - local web:   flutter run -d chrome --dart-define=API_URL=http://127.0.0.1:8000
-///  - local android emulator: --dart-define=API_URL=http://10.0.2.2:8000
+///  - local web:   flutter run -d chrome --dart-define=API_URL=http://127.0.0.1:8080
+///  - local android emulator: --dart-define=API_URL=http://10.0.2.2:8080
 ///  - prod web:    --dart-define=API_URL=https://ineascents.onrender.com
 
 String _getLocalFallbackForPlatform() {
-  if (kIsWeb) return 'http://127.0.0.1:8000';
-  if (Platform.isAndroid) return 'http://10.0.2.2:8000';
-  return 'http://127.0.0.1:8000';
+  if (kIsWeb) return 'http://127.0.0.1:8080';
+  if (Platform.isAndroid) return 'http://10.0.2.2:8080';
+  return 'http://127.0.0.1:8080';
 }
 
 String _resolveBaseUrl() {
