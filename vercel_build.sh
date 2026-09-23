@@ -18,7 +18,7 @@ export PATH="$PATH:`pwd`/flutter/bin"
 # Only prod exists in the cloud — Preview and Production both use the prod URL
 # (see backend docs/adr/0009-two-environments.md).
 # Production/Preview -> https://ineascents.onrender.com (prod DB)
-# Local `flutter run` passes --dart-define=API_URL=http://127.0.0.1:8000 manually.
+# Local `flutter run` passes --dart-define=API_URL=http://127.0.0.1:8080 manually.
 : "${API_URL:?API_URL dart-define is required. Set Vercel env API_URL=https://ineascents.onrender.com for Production and Preview.}"
 
 # Enable web, install deps, and build with committed outputs.
