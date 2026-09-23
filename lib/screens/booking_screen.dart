@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show FontFeature;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -2048,6 +2049,44 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     color: _title,
                   ),
                 ),
+                const SizedBox(height: 12),
+                // C64: scannable price rows — package/Pax line, then total.
+                // No fee model exists; no fee row is rendered (no invented
+                // math). Labels left, amounts right-aligned tabular, wrap
+                // never truncates amounts.
+                Row(
+                  key: const Key('price_details_pax_row'),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${_selectedPax ?? 50} PAX · tier price',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _title,
+                          height: 1.35,
+                        ),
+                        softWrap: true,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Flexible(
+                      child: Text(
+                        formatPeso(package.priceForPax(_selectedPax)),
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _title,
+                          height: 1.35,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                        softWrap: true,
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 15),
                 Text(
                   'Inclusions:',
@@ -2065,55 +2104,79 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                   ),
                 ].map((item) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
-                          flex: 4,
+                        Expanded(
                           child: Text(
                             '• ${item['label']}',
-                            style: TextStyle(fontSize: 12, color: _title),
-                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _title,
+                              height: 1.35,
+                            ),
+                            softWrap: true,
                           ),
                         ),
-                        Expanded(
-                          flex: 2,
-                          child: LayoutBuilder(
-                            builder: (context, constraints) {
-                              final count = (constraints.maxWidth / 8)
-                                  .floor()
-                                  .clamp(1, 20);
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                ),
-                                child: Text(
-                                  '- ' * count,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.clip,
-                                  style: const TextStyle(
-                                    color: Color(0xFF99868C),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
+                        const SizedBox(width: 12),
                         Text(
                           item['val']!,
-                          style: TextStyle(fontSize: 12, color: _title),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _body,
+                            height: 1.35,
+                            fontFeatures: const [
+                              FontFeature.tabularFigures(),
+                            ],
+                          ),
+                          softWrap: true,
+                          textAlign: TextAlign.end,
                         ),
                       ],
                     ),
                   );
                 }),
-                const SizedBox(height: 20),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    'Total: ${formatPeso(package.priceForPax(_selectedPax))}',
-                    style: TextStyle(fontSize: 13, color: _body),
-                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Divider(color: _surfaceBorder, thickness: 1),
+                ),
+                Row(
+                  key: const Key('price_details_total_row'),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Total',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: _title,
+                          height: 1.35,
+                        ),
+                        softWrap: true,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Flexible(
+                      key: const Key('price_details_total_amount'),
+                      child: Text(
+                        formatPeso(package.priceForPax(_selectedPax)),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: _title,
+                          height: 1.35,
+                          fontFeatures: const [
+                            FontFeature.tabularFigures(),
+                          ],
+                        ),
+                        softWrap: true,
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
