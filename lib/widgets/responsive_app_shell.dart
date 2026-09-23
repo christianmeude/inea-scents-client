@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'bottom_nav_bar.dart';
+import 'processing_payment_overlay.dart';
 import 'theme_toggle_button.dart';
 import 'top_nav_bar.dart';
 
@@ -139,7 +140,12 @@ class ResponsiveAppShell extends StatelessWidget {
           // stripped app-wide per owner direction; the theme scaffold
           // color (light cream / dark night) carries both modes.
           // C23: the live navigation shell renders the active tab branch.
-          body: navigationShell ?? child,
+          // C51: the minimizable payment modal stacks above every tab so
+          // processing survives navigation (provider-level, never
+          // route-local).
+          body: ProcessingPaymentOverlayHost(
+            child: navigationShell ?? child,
+          ),
           bottomNavigationBar: isDesktopView
               ? null
               : _buildMobileBottomNav(context),
