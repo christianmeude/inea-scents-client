@@ -394,9 +394,25 @@ class _IneaCalendarState extends ConsumerState<IneaCalendar> {
       );
     }
 
+    // C61: schedule-step card container + elevation (C54 muted spec
+    // intact — muted/disabled days stay body@50% w400 no-strike; available
+    // holds title w600 ≥7:1 AAA on this card surface in both modes).
     return Container(
+      key: const Key('schedule_calendar_card'),
       width: double.infinity,
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: CardSurfaces.cardBg(context),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: surfaceBorder),
+        boxShadow: [
+          BoxShadow(
+            color: IneaCalendar.plum.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
