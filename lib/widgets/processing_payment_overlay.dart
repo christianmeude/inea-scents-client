@@ -67,8 +67,61 @@ class ProcessingPaymentOverlay extends ConsumerWidget {
     final minimized =
         ref.watch(paymentOverlayMinimizedProvider) ||
         _onBookingCheckoutRoute(context);
-    if (minimized) return _ProcessingPill(status: status);
-    return _ProcessingModal(status: status);
+    // C67: spring entrance on minimize↔expand. Entrance-only (no
+    // cross-fade) so the outgoing child unmounts immediately; the
+    // incoming child scales + slides in from the bottom-right anchor.
+    final reducedMotion = MediaQuery.disableAnimationsOf(context);
+    if (minimized) {
+      return _PillSpring(
+        key: const ValueKey('pill-spring'),
+        reducedMotion: reducedMotion,
+        child: _ProcessingPill(status: status),
+      );
+    }
+    return _PillSpring(
+      key: const ValueKey('modal-spring'),
+      reducedMotion: reducedMotion,
+      child: _ProcessingModal(status: status),
+    );
+  }
+}
+
+/// C67: spring entrance for the payment pill minimize↔expand transition.
+///
+/// Scale + slide anchored bottom-right on [Curves.easeOutBack] (spring
+/// overshoot), Flutter built-ins only. Entrance-only: the outgoing child
+/// unmounts immediately so result auto-expand timing is unchanged. When
+/// reduced-motion is on the child renders instantly with no animation
+/// widgets.
+class _PillSpring extends StatelessWidget {
+  final Widget child;
+  final bool reducedMotion;
+
+  const _PillSpring({super.key, required this.child, required this.reducedMotion});
+
+  @override
+  Widget build(BuildContext context) {
+    if (reducedMotion) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutBack,
+      builder: (context, value, inner) {
+        final scale = 0.85 + 0.15 * value;
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset((1 - value) * 48, (1 - value) * 48),
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.bottomRight,
+              child: inner,
+            ),
+          ),
+        );
+      },
+      child: child,
+    );
   }
 }
 
