@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../config/theme.dart';
-import 'card_surfaces.dart';
-import 'responsive_app_shell.dart';
+import 'inline_errors.dart';
 
-/// C30: app-wide error display. Wide (>=768px) surfaces errors as a
-/// persistent inline [MaterialBanner] (never auto-dismisses); narrow
-/// keeps the [SnackBar]. Both carry retry (when [onRetry] is given) +
-/// dismiss. Friendly copy passes through untouched; raw errors stay
+/// C52: app-wide error display is toast-only on every width. The wide
+/// (>=768px) nav-level [MaterialBanner] is gone — validation errors
+/// render inline at the field/card level ([InlineFieldError],
+/// [FormErrorSummary]) and only transient failures surface here, with
+/// Retry. Friendly copy passes through untouched; raw errors stay
 /// in logs, never on screen.
+///
+/// [transient] gates the Retry affordance. When omitted, the
+/// [isTransientErrorMessage] heuristic over [message] decides — so a
+/// caller that passes `onRetry` for a validation message gets no
+/// Retry button. Pass `transient: true` explicitly to force it.
 void showAppError(
   BuildContext context, {
   required String message,
@@ -16,120 +21,52 @@ void showAppError(
   String retryLabel = 'Retry',
   String? actionLabel,
   VoidCallback? onAction,
+  bool? transient,
 }) {
+  final isTransient = transient ?? isTransientErrorMessage(message);
   final messenger = ScaffoldMessenger.of(context);
-  if (ResponsiveAppShell.isWideScreen(context)) {
-    messenger
-      ..clearSnackBars()
-      ..clearMaterialBanners()
-      ..showMaterialBanner(
-        MaterialBanner(
-          backgroundColor: CardSurfaces.cardBg(context),
-          surfaceTintColor: Colors.transparent,
-          padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-          leading: Icon(
-            Icons.error_outline_rounded,
-            color: CardSurfaces.onBrand(context),
-          ),
-          content: Text(
-            message,
-            style: TextStyle(
-              color: CardSurfaces.body(context),
-              fontSize: 13,
-              height: 1.4,
-            ),
-          ),
-          actions: [
-            if (onRetry != null)
-              TextButton(
-                key: const Key('app_error_retry'),
-                onPressed: () {
-                  messenger.clearMaterialBanners();
-                  onRetry();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: CardSurfaces.title(context),
-                ),
-                child: Text(retryLabel),
-              ),
-            if (onAction != null && actionLabel != null)
-              TextButton(
-                key: const Key('app_error_action'),
-                onPressed: () {
-                  messenger.clearMaterialBanners();
-                  onAction();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: CardSurfaces.title(context),
-                ),
-                child: Text(actionLabel),
-              ),
-            TextButton(
-              key: const Key('app_error_dismiss'),
-              onPressed: messenger.clearMaterialBanners,
-              style: TextButton.styleFrom(
-                foregroundColor: CardSurfaces.title(context),
-              ),
-              child: const Text('Dismiss'),
-            ),
-          ],
+  final hasRetry = onRetry != null && isTransient;
+  final hasAction = onAction != null && actionLabel != null;
+  messenger
+    ..clearMaterialBanners()
+    ..clearSnackBars()
+    ..showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        // C31: plum/cream token both modes.
+        backgroundColor: AppTheme.primaryButtonBackground,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
-      );
-  } else {
-    final hasRetry = onRetry != null;
-    final hasAction = onAction != null && actionLabel != null;
-    messenger
-      ..clearMaterialBanners()
-      ..clearSnackBars()
-      ..showSnackBar(
-        SnackBar(
-          // C30: explicit dismiss (SnackBar keeps auto-dismiss too).
-          // Narrow keeps the pre-C30 branded look.
-          behavior: SnackBarBehavior.floating,
-          // C31: plum/cream token both modes.
-          backgroundColor: AppTheme.primaryButtonBackground,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          content: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  message,
-                  style: const TextStyle(
-                    color: AppTheme.onPrimaryButton,
-                  ),
-                ),
-              ),
-              IconButton(
-                key: const Key('app_error_dismiss'),
-                icon: const Icon(Icons.close_rounded, size: 20),
-                color: AppTheme.onPrimaryButton,
-                tooltip: 'Dismiss',
-                visualDensity: VisualDensity.compact,
-                onPressed: messenger.clearSnackBars,
-              ),
-            ],
-          ),
-          // C30: one action slot — extra action wins, else retry.
-          action: hasAction || hasRetry
-              ? SnackBarAction(
-                  key: Key(hasAction ? 'app_error_action' : 'app_error_retry'),
-                  label: actionLabel ?? retryLabel,
-                  // C31: cream action label on the plum token.
-                  textColor: AppTheme.onPrimaryButton,
-                  onPressed: () {
-                    messenger.clearSnackBars();
-                    (hasAction ? onAction : onRetry)?.call();
-                  },
-                )
-              : null,
+        // Retry keeps the toast up longer so it stays tappable.
+        duration: Duration(seconds: (hasRetry || hasAction) ? 8 : 4),
+        // C52: plain wrapping text — no Row/IconButton squeeze, so a
+        // long message never overflows at 360px even with an action.
+        content: Text(
+          message,
+          style: const TextStyle(color: AppTheme.onPrimaryButton),
+          softWrap: true,
         ),
-      );
-  }
+        // C52: one action slot — extra action wins, else retry, and
+        // retry only for transient failures. Validation copy never
+        // gets a Retry button here (it renders in-card instead).
+        action: hasAction || hasRetry
+            ? SnackBarAction(
+                key: Key(hasAction ? 'app_error_action' : 'app_error_retry'),
+                label: actionLabel ?? retryLabel,
+                // C31: cream action label on the plum token.
+                textColor: AppTheme.onPrimaryButton,
+                onPressed: () {
+                  messenger.clearSnackBars();
+                  (hasAction ? onAction : onRetry)?.call();
+                },
+              )
+            : null,
+      ),
+    );
 }
 
-/// C30: clears any visible app error surface (banner or SnackBar).
+/// C52: clears any visible app error toast (plus legacy banners).
 void hideAppError(BuildContext context) {
   final messenger = ScaffoldMessenger.of(context);
   messenger

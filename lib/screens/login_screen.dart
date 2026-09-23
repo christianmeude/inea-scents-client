@@ -33,24 +33,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
-        // C30: never carry a prior error banner onto /home.
+        // C52: never carry a prior error surface onto /home.
         hideAppError(context);
         context.go('/home');
       } else if (next.errorMessage != null) {
-        // C30: persistent banner on wide (retry re-submits), SnackBar narrow.
-        showAppError(
-          context,
-          // P6 (Q8): friendly fallback; provider messages pass through.
-          message:
-              next.errorMessage ??
-              "That didn't work. Check your details and try again.",
-          onRetry: () => ref
-              .read(authProvider.notifier)
-              .login(
-                email: emailController.text.trim(),
-                password: passwordController.text,
-              ),
-        );
+        // C52: form-level failure renders in-card (see build); only a
+        // transient failure additionally surfaces a toast with Retry.
+        final message =
+            next.errorMessage ??
+            "That didn't work. Check your details and try again.";
+        if (isTransientErrorMessage(message)) {
+          showAppError(
+            context,
+            // P6 (Q8): friendly fallback; provider messages pass through.
+            message: message,
+            transient: true,
+            onRetry: () => ref
+                .read(authProvider.notifier)
+                .login(
+                  email: emailController.text.trim(),
+                  password: passwordController.text,
+                ),
+          );
+        }
       }
     });
 
@@ -87,6 +92,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(
                           height: 44,
                         ), // Adjusted to account for the visual overhang of the logo
+
+                        // C52: form-level failure renders in-card; Retry
+                        // only for transient failures (toast covers those).
+                        if (authState.errorMessage != null) ...[
+                          FormErrorSummary(
+                            message: authState.errorMessage!,
+                            onRetry: isTransientErrorMessage(
+                              authState.errorMessage!,
+                            )
+                                ? () => ref
+                                      .read(authProvider.notifier)
+                                      .login(
+                                        email: emailController.text.trim(),
+                                        password: passwordController.text,
+                                      )
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
 
                         _InputLabel(text: 'Email', color: inputLabelColor),
                         const SizedBox(height: 4),

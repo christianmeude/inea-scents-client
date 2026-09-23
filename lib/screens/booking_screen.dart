@@ -92,6 +92,48 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// tap, so a fast double-tap could otherwise POST two bookings.
   bool _submitting = false;
 
+  /// C52: form-level failure for the booking flow. Validation gates
+  /// (date/time, details, stale date) render here inline via
+  /// [FormErrorSummary] — never as a nav banner or toast. Only a
+  /// transient submit failure additionally surfaces a toast with Retry
+  /// (see [_handleConfirmAndPay]); [_formRetry] is non-null exactly
+  /// in that case.
+  String? _formError;
+  VoidCallback? _formRetry;
+
+  void _setFormError(String message, {VoidCallback? retry}) {
+    if (!mounted) return;
+    setState(() {
+      _formError = message;
+      _formRetry = retry;
+    });
+  }
+
+  void _clearFormError() {
+    if (_formError == null && _formRetry == null) return;
+    if (!mounted) return;
+    setState(() {
+      _formError = null;
+      _formRetry = null;
+    });
+  }
+
+  /// C52: in-card slot for [_formError]; shrink-wrapped when clear.
+  /// Rendered at the top of every flow layout (desktop/tablet/mobile)
+  /// plus the checkout screen, so gate failures always read in place.
+  Widget _formErrorSlot() {
+    final error = _formError;
+    if (error == null || error.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: FormErrorSummary(
+        key: const Key('booking_form_error'),
+        message: error,
+        onRetry: _formRetry,
+      ),
+    );
+  }
+
   /// C48: collapsed-schedule disclosure (mobile step 2). The full
   /// summary renders only on demand; the collapsed card carries no CTA.
   bool _scheduleSummaryExpanded = false;
@@ -226,7 +268,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Future<void> _handleConfirmAndPay() async {
     if (_submitting) return;
     _submitting = true;
-    // C30: drop any stale error surface before a fresh attempt.
+    // C52: drop any stale error surface before a fresh attempt.
+    _clearFormError();
     if (mounted) hideAppError(context);
     try {
       // C13: submit-time past-date guard (day precision — today is allowed).
@@ -236,10 +279,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       final selectedDate = _selectedDate;
       if (selectedDate != null && _isPastDay(selectedDate, DateTime.now())) {
         if (mounted) {
-          // C30: persistent banner on wide, SnackBar on narrow.
-          showAppError(
-            context,
-            message: 'The selected date has passed. Please choose a new date.',
+          // C52: validation gate renders inline, never as banner/toast.
+          _setFormError(
+            'The selected date has passed. Please choose a new date.',
           );
         }
         return;
@@ -261,12 +303,22 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _heldCheckoutTab = null;
         final state = ref.read(bookingFlowProvider);
         if (state.errorMessage != null && mounted) {
-          // C30: submit failure retries the submit, dismiss clears.
-          showAppError(
-            context,
-            message: state.errorMessage!,
-            onRetry: () => _handleConfirmAndPay(),
+          // C52: submit failure always renders in-card; only a
+          // transient failure additionally toasts with Retry.
+          final msg = state.errorMessage!;
+          final transient = isTransientErrorMessage(msg);
+          _setFormError(
+            msg,
+            retry: transient ? () => _handleConfirmAndPay() : null,
           );
+          if (transient) {
+            showAppError(
+              context,
+              message: msg,
+              transient: true,
+              onRetry: () => _handleConfirmAndPay(),
+            );
+          }
         }
         return;
       }
@@ -300,7 +352,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// Opens [checkoutUrl] in a new browser tab (external application), so
   /// the app — and its payment polling — stays alive underneath.
   /// Returns true when the platform accepted the launch. Never throws:
-  /// a failure surfaces as a banner/SnackBar with a copy-link action
+  /// a failure surfaces as a toast with a copy-link action
   /// instead of stranding the user on the processing screen.
   Future<bool> _launchCheckoutUrl(String checkoutUrl) async {
     final uri = Uri.tryParse(checkoutUrl);
@@ -323,7 +375,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   void _showCheckoutLaunchFailure(String checkoutUrl) {
     if (!mounted) return;
-    // C30: copy-link action preserved on both surfaces.
+    // C52: copy-link action preserved on the toast (no banner anywhere).
     showAppError(
       context,
       message: 'Checkout did not open automatically. Use the button below.',
@@ -337,11 +389,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final checkoutUrl = ref.read(bookingFlowProvider).booking?.checkoutUrl;
     if (checkoutUrl == null || checkoutUrl.isEmpty) {
       if (!mounted) return;
-      // C30: persistent banner on wide, SnackBar on narrow.
-      showAppError(
-        context,
-        message: 'Checkout link is unavailable. Please rebook.',
-      );
+      // C52: form-level failure renders inline on the checkout screen.
+      _setFormError('Checkout link is unavailable. Please rebook.');
       return;
     }
     await _launchCheckoutUrl(checkoutUrl);
@@ -399,6 +448,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   void _goToStep(int step) {
+    _clearFormError();
     ref.read(bookingFlowProvider.notifier).goToStep(step);
   }
 
@@ -597,7 +647,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
-                  child: AnimatedSwitcher(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _formErrorSlot(),
+                      AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     switchInCurve: Curves.easeInOut,
                     switchOutCurve: Curves.easeInOut,
@@ -699,6 +753,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                               ),
                             ],
                           ),
+                    ),
+                    ],
                   ),
                 ),
               ),
@@ -731,11 +787,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         // Selections live in the notifier; the gate below is
                         // the single authority — nothing to mirror back.
                         if (!notifier.canProceedFromSchedule()) {
-                          // C30: persistent banner on wide, SnackBar narrow.
-                          showAppError(
-                            context,
-                            message: 'Please select date and time',
-                          );
+                          // C52: validation gate renders inline, never toast.
+                          _setFormError('Please select date and time');
                           return;
                         }
                         _goToStep(4);
@@ -774,7 +827,11 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 8, 0),
-                  child: AnimatedSwitcher(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _formErrorSlot(),
+                      AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     switchInCurve: Curves.easeInOut,
                     switchOutCurve: Curves.easeInOut,
@@ -866,6 +923,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                               ),
                             ],
                           ),
+                    ),
+                    ],
                   ),
                 ),
               ),
@@ -896,11 +955,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         // Selections live in the notifier; the gate below is
                         // the single authority — nothing to mirror back.
                         if (!notifier.canProceedFromSchedule()) {
-                          // C30: persistent banner on wide, SnackBar narrow.
-                          showAppError(
-                            context,
-                            message: 'Please select date and time',
-                          );
+                          // C52: validation gate renders inline, never toast.
+                          _setFormError('Please select date and time');
                           return;
                         }
                         _goToStep(4);
@@ -1121,7 +1177,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   /// Mobile bar tap: same per-step gates as the retired in-column CTA —
   /// [canProceedFromSchedule]/[canProceedFromDetails] stay the single
-  /// authorities, failures surface via C30 [showAppError], the
+  /// authorities, failures render inline via C52 [_formError], the
   /// `14:00:00` prefill and `_submitting` guard unchanged.
   void _handleMobileBarTap() {
     final notifier = ref.read(bookingFlowProvider.notifier);
@@ -1129,15 +1185,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       _handleConfirmAndPay();
     } else if (_currentStep == 2) {
       if (!notifier.canProceedFromSchedule()) {
-        // C30: persistent banner on wide, SnackBar on narrow.
-        showAppError(context, message: 'Please select date and time');
+        // C52: validation gate renders inline, never toast.
+        _setFormError('Please select date and time');
         return;
       }
       notifier.nextStep();
     } else if (_currentStep == 3) {
       if (!notifier.canProceedFromDetails()) {
-        // C30: persistent banner on wide, SnackBar on narrow.
-        showAppError(context, message: 'Please fill name, email and venue');
+        // C52: validation gate renders inline, never toast.
+        _setFormError('Please fill name, email and venue');
         return;
       }
       notifier.nextStep();
@@ -1163,7 +1219,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         _buildTimeline(),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 28),
-          child: _buildCurrentStep(package),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [_formErrorSlot(), _buildCurrentStep(package)],
+          ),
         ),
       ],
     );
@@ -1356,6 +1415,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       children: [
         if (MediaQuery.of(context).size.width < 768)
           _buildHeader(showBack: false),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
+          child: _formErrorSlot(),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 32),
           child: Center(child: content),
