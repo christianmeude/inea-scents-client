@@ -65,8 +65,8 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
 
                   const SizedBox(height: 20),
 
-                  // C53 (Q9): persistent resume chip (zero-size idle).
-                  const BookingResumeChip(),
+                  // C60: Q9 retired — reopening a draft routes to the flow
+                  // itself at its stored stage.
 
                   // C53: the calendar reroute retains the draft date — say
                   // so, and forward it with every Pax Choice row below.

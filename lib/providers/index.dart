@@ -380,7 +380,25 @@ class BookingFlowNotifier extends StateNotifier<BookingFlowState> {
   }
 
   void goToStep(int step) {
-    state = state.copyWith(currentStep: step);
+    state = state.copyWith(currentStep: step.clamp(2, 5));
+  }
+
+  /// C60: an in-progress auto-draft — a chosen package, date, or Pax Choice
+  /// on a non-terminal checkout. Reopening the flow resumes [resumeStage].
+  bool get hasDraft =>
+      (state.selectedPackage != null ||
+          state.selectedDate != null ||
+          state.selectedPax != null) &&
+      state.checkoutStatus == BookingCheckoutStatus.idle &&
+      state.booking == null;
+
+  /// C60: the exact wizard stage a reopened draft resumes at — the stored
+  /// step, clamped to the wizard (2 Schedule, 3 Details, 4 Payment); an
+  /// in-flight checkout (5) stays put; no draft defaults to stage 1 (2).
+  int get resumeStage {
+    if (state.currentStep == 5) return 5;
+    if (!hasDraft) return 2;
+    return state.currentStep.clamp(2, 4);
   }
 
   bool canProceedFromSchedule() {

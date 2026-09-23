@@ -33,8 +33,8 @@ class HomeScreen extends StatelessWidget {
                       count: 'Plan your scent experience.',
                     ),
                   ),
-                  // C53 (Q9): persistent resume chip (zero-size idle).
-                  BookingResumeChip(),
+                  // C60: Q9 retired — the flow itself resumes the draft
+                  // at its stored stage.
                   SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),

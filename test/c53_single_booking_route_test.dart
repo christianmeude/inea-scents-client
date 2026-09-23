@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inea_scents_client/config/theme.dart';
 import 'package:inea_scents_client/models/index.dart';
@@ -27,7 +26,8 @@ import 'helpers/fake_api.dart';
 /// - Calendar date pick reroutes to Packages; Home CTAs land on the right
 ///   tab; top-nav selection follows reroutes (`/booking/:id` reads as
 ///   Packages, `/bookings` as Bookings).
-/// - Q9: persistent in-progress resume chip on all 5 screens.
+/// - C60: Q9 retired — no resume affordance anywhere; a reopened draft
+///   resumes in-flow at its stored stage with date + Pax + details intact.
 Package _pkg() => const Package(
   id: 42,
   name: 'Unified Celebration Bar',
@@ -226,7 +226,7 @@ void main() {
     });
   });
 
-  group('C53 Q9 resume chip on all 5 screens', () {
+  group('C60 Q9 retired + exact-stage resume', () {
     Future<void> pumpWithDraft(
       WidgetTester tester,
       Widget screen, {
@@ -289,7 +289,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip shows on Home with draft', (
+    testWidgets('no resume affordance on Home with draft', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
@@ -297,11 +297,11 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await pumpWithDraft(tester, const HomeScreen());
-      expect(find.byKey(const Key('booking_resume_chip')), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip shows on Packages with draft', (
+    testWidgets('no resume affordance on Packages with draft', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
@@ -313,11 +313,11 @@ void main() {
         const PackagesScreen(),
         withPackages: true,
       );
-      expect(find.byKey(const Key('booking_resume_chip')), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip shows on Calendar with draft', (
+    testWidgets('no resume affordance on Calendar with draft', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
@@ -325,26 +325,26 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await pumpWithDraft(tester, const CalendarScreen());
-      // Calendar without availability override shows the error card; the
-      // persistent chip still renders above it.
-      expect(find.byKey(const Key('booking_resume_chip')), findsOneWidget);
+      // Calendar without availability override shows the error card; no
+      // resume affordance renders above it either.
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip shows on Booking with a different drafted booking', (
+    testWidgets('no resume affordance on Booking with a different draft', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
-      // Draft belongs to package 42; viewing package 7 keeps the chip.
+      // Draft belongs to package 42; viewing package 7 shows no affordance.
       await pumpWithDraft(tester, const BookingScreen(packageId: 7));
-      expect(find.byKey(const Key('booking_resume_chip')), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip hides when already viewing the drafted booking', (
+    testWidgets('no resume affordance on the drafted booking itself', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
@@ -357,7 +357,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip shows on Profile with draft', (
+    testWidgets('no resume affordance on Profile with draft', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
@@ -365,69 +365,151 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       await pumpWithDraft(tester, const ProfileScreen());
-      expect(find.byKey(const Key('booking_resume_chip')), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('chip tap resumes the single booking route', (
-      WidgetTester tester,
-    ) async {
+    test('resumeStage defaults to stage 1 (Schedule) without a draft', () {
+      final backend = FakeApiBackend();
+      final container = _container(backend);
+      addTearDown(container.dispose);
+      final notifier = container.read(bookingFlowProvider.notifier);
+      expect(notifier.hasDraft, isFalse);
+      expect(notifier.resumeStage, 2);
+    });
+
+    test('resumeStage tracks the stored draft stage (Schedule/Details/Payment)', () {
+      final backend = FakeApiBackend();
+      final container = _container(backend);
+      addTearDown(container.dispose);
+      final notifier = container.read(bookingFlowProvider.notifier);
+      notifier
+        ..setSelectedPackage(_pkg())
+        ..setSelectedDate(_futureDay(30))
+        ..setSelectedPax(70);
+      expect(notifier.hasDraft, isTrue);
+      for (final stage in [2, 3, 4]) {
+        notifier.goToStep(stage);
+        expect(notifier.resumeStage, stage);
+      }
+    });
+
+    test('resumeStage keeps an in-flight checkout at step 5', () {
+      final backend = FakeApiBackend();
+      final container = _container(backend);
+      addTearDown(container.dispose);
+      final notifier = container.read(bookingFlowProvider.notifier);
+      notifier.goToStep(5);
+      expect(notifier.resumeStage, 5);
+    });
+
+    test('goToStep clamps out-of-range stages into the wizard', () {
+      final backend = FakeApiBackend();
+      final container = _container(backend);
+      addTearDown(container.dispose);
+      final notifier = container.read(bookingFlowProvider.notifier);
+      notifier.goToStep(99);
+      expect(container.read(bookingFlowProvider).currentStep, 5);
+      notifier.goToStep(-1);
+      expect(container.read(bookingFlowProvider).currentStep, 2);
+    });
+
+    Future<ProviderContainer> pumpBookingAtStage(
+      WidgetTester tester, {
+      required int stage,
+      bool withDraft = true,
+    }) async {
       tester.view.physicalSize = const Size(360, 800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       SharedPreferences.setMockInitialValues({'first_launch': false});
       final backend = FakeApiBackend();
-      backend.bookingsOverride = [];
-      final draftDate = _futureDay(30);
-      final router = GoRouter(
-        initialLocation: '/home',
-        routes: [
-          GoRoute(
-            path: '/home',
-            builder: (context, state) => const HomeScreen(),
-          ),
-          GoRoute(
-            path: '/packages',
-            builder: (context, state) => const PackagesScreen(),
-          ),
-          GoRoute(
-            path: '/booking/:id',
-            builder: (context, state) => BookingScreen(
-              packageId: int.parse(state.pathParameters['id']!),
-            ),
-          ),
-        ],
-      );
+      final container = _container(backend);
+      addTearDown(container.dispose);
+      if (withDraft) {
+        container.read(bookingFlowProvider.notifier)
+          ..setSelectedPackage(_pkg())
+          ..setSelectedDate(_futureDay(30))
+          ..setSelectedTime('14:00:00')
+          ..setSelectedPax(70)
+          ..setCustomerName('Draft Name')
+          ..setCustomerEmail('draft@example.com')
+          ..setVenueAddress('Draft Hall')
+          ..goToStep(stage);
+      }
       await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            apiClientProvider.overrideWithValue(
-              buildFakeRestClient(backend),
-            ),
-            _authAs('Maria Clara', 'maria@example.com', backend),
-            bookingFlowProvider.overrideWith(
-              (ref) =>
-                  BookingFlowNotifier(ref, ref.watch(apiClientProvider))
-                    ..setSelectedPackage(_pkg())
-                    ..setSelectedDate(draftDate)
-                    ..setSelectedPax(70),
-            ),
-          ],
-          child: MaterialApp.router(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
             theme: AppTheme.lightTheme,
-            routerConfig: router,
+            home: const ResponsiveAppShell(
+              child: BookingScreen(packageId: 42),
+            ),
           ),
         ),
       );
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('booking_resume_chip')), findsOneWidget);
+      return container;
+    }
 
-      await tester.tap(find.byKey(const Key('booking_resume_chip')));
-      await tester.pumpAndSettle();
-      final resumed = Uri.parse(router.location);
-      expect(resumed.path, '/booking/42');
-      expect(resumed.queryParameters['pax'], '70');
+    testWidgets('empty draft reopens at stage 1 (Schedule)', (
+      WidgetTester tester,
+    ) async {
+      final container = await pumpBookingAtStage(
+        tester,
+        stage: 2,
+        withDraft: false,
+      );
+      expect(container.read(bookingFlowProvider).currentStep, 2);
+      expect(find.byKey(const Key('mobile_inea_calendar')), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Schedule draft reopens at stage 1 with date + Pax intact', (
+      WidgetTester tester,
+    ) async {
+      final draftDate = _futureDay(30);
+      final container = await pumpBookingAtStage(tester, stage: 2);
+      final flow = container.read(bookingFlowProvider);
+      expect(flow.currentStep, 2);
+      expect(flow.selectedDate, draftDate);
+      expect(flow.selectedPax, 70);
+      expect(find.byKey(const Key('mobile_inea_calendar')), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Details draft reopens at stage 2 with details intact', (
+      WidgetTester tester,
+    ) async {
+      final draftDate = _futureDay(30);
+      final container = await pumpBookingAtStage(tester, stage: 3);
+      final flow = container.read(bookingFlowProvider);
+      expect(flow.currentStep, 3);
+      expect(flow.selectedDate, draftDate);
+      expect(flow.selectedPax, 70);
+      expect(flow.customerName, 'Draft Name');
+      final nameField = tester.widget<TextField>(
+        find.byKey(const ValueKey('mobile_customer_name')),
+      );
+      expect(nameField.controller?.text, 'Draft Name');
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Payment draft reopens at stage 3 with date + Pax intact', (
+      WidgetTester tester,
+    ) async {
+      final draftDate = _futureDay(30);
+      final container = await pumpBookingAtStage(tester, stage: 4);
+      final flow = container.read(bookingFlowProvider);
+      expect(flow.currentStep, 4);
+      expect(flow.selectedDate, draftDate);
+      expect(flow.selectedPax, 70);
+      expect(find.text('Price Details'), findsOneWidget);
+      expect(find.byKey(const Key('booking_resume_chip')), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });

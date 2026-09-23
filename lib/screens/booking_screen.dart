@@ -155,6 +155,13 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       if (flow.paymentMethod == null) {
         notifier.setPaymentMethod('online');
       }
+      // C60: exact-stage resume — a same-package draft reopens at its
+      // stored stage with date + Pax + details intact; an empty flow
+      // normalizes to stage 1 (Schedule). No-op in every live path.
+      final target = notifier.resumeStage;
+      if (target != ref.read(bookingFlowProvider).currentStep) {
+        notifier.goToStep(target);
+      }
     });
     _loadPackage();
     setState(() {
@@ -178,13 +185,32 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   void _prefillFromUser() {
+    // C60: exact-stage resume — a reopened draft reseeds the fields from
+    // the flow first, so date + Pax + details render intact. Fill-only:
+    // anything already typed always wins.
+    final flow = ref.read(bookingFlowProvider);
+    if (_customerNameController.text.isEmpty &&
+        (flow.customerName ?? '').isNotEmpty) {
+      _customerNameController.text = flow.customerName!;
+    }
+    if (_customerEmailController.text.isEmpty &&
+        (flow.customerEmail ?? '').isNotEmpty) {
+      _customerEmailController.text = flow.customerEmail!;
+    }
+    if (_customerPhoneController.text.isEmpty &&
+        (flow.customerPhone ?? '').isNotEmpty) {
+      _customerPhoneController.text = flow.customerPhone!;
+    }
+    if (_venueAddressController.text.isEmpty &&
+        (flow.venueAddress ?? '').isNotEmpty) {
+      _venueAddressController.text = flow.venueAddress!;
+    }
     // C53: Profile is the prefill source of truth. Fill-only, every time:
     // an empty field takes the profile value, but anything already in the
     // flow (an inline edit, a restored draft) always wins — and nothing
     // here ever writes back to the profile.
     final user = ref.read(authProvider).user;
     if (user == null) return;
-    final flow = ref.read(bookingFlowProvider);
     if (_customerNameController.text.isEmpty &&
         (flow.customerName ?? '').isEmpty) {
       _customerNameController.text = user.name ?? '';
@@ -494,13 +520,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),
-              // C53 (Q9): persistent resume chip above the flow — renders
-              // in data/loading/error alike (zero-size when idle).
               child: Column(
                 children: [
-                  BookingResumeChip(
-                    currentPackageId: widget.packageId,
-                  ),
                   packageAsync.when(
                 data: (package) {
                   if (_currentStep == 5) {
