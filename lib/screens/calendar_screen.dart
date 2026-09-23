@@ -51,7 +51,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   title: 'Availability',
                   count: 'Choose a date for your scent experience.',
                 ),
-                BookingResumeChip(),
+                // C60: Q9 retired.
                 SizedBox(height: 22),
                 SkeletonCalendar(),
               ],
@@ -177,8 +177,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
                   children: [
                     titleContent,
-                    // C53 (Q9): persistent resume chip (zero-size idle).
-                    const BookingResumeChip(),
+                    // C60: Q9 retired.
                     const SizedBox(height: 22),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,8 +201,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
             children: [
               titleContent,
-              // C53 (Q9): persistent resume chip (zero-size idle).
-              const BookingResumeChip(),
+              // C60: Q9 retired.
               const SizedBox(height: 22),
               calendarCard,
               const SizedBox(height: 20),

@@ -1,5 +1,4 @@
 export 'package_card.dart';
-export 'booking_resume_chip.dart';
 export 'bottom_nav_bar.dart';
 export 'top_nav_bar.dart';
 export 'responsive_app_shell.dart';
