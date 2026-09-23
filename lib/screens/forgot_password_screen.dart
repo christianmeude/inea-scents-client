@@ -29,8 +29,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  /// C30: reset-link POST; failures surface as a persistent banner on
-  /// wide (retry re-sends), SnackBar on narrow. Success stays a SnackBar.
+  /// C52: reset-link POST; a transient failure surfaces a toast with
+  /// Retry, and the form-level failure renders in-card (see build).
+  /// Success stays a SnackBar.
   Future<void> _sendResetLink() async {
     final dioClient = ref.read(dioClientProvider);
     try {
@@ -51,6 +52,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         message:
             "We couldn't send the reset link. "
             'Check your connection and try again.',
+        transient: true,
         onRetry: _sendResetLink,
       );
     }
@@ -62,18 +64,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     ref.listen(authProvider, (previous, next) {
       if (next.isLoggedIn) {
-        // C30: never carry a prior error banner onto /home.
+        // C52: never carry a prior error surface onto /home.
         hideAppError(context);
         context.go('/home');
       } else if (next.errorMessage != null) {
-        // C30: persistent banner on wide, SnackBar on narrow.
-        showAppError(
-          context,
-          // P6 (Q8): friendly fallback; provider messages pass through.
-          message:
-              next.errorMessage ??
-              "That didn't work. Check your details and try again.",
-        );
+        // C52: form-level failure renders in-card (see build); only a
+        // transient failure additionally surfaces a toast with Retry.
+        final message =
+            next.errorMessage ??
+            "That didn't work. Check your details and try again.";
+        if (isTransientErrorMessage(message)) {
+          showAppError(context, message: message, transient: true);
+        }
       }
     });
 
@@ -108,6 +110,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       children: [
                         const _ApplicationLogo(),
                         const SizedBox(height: 44),
+                        // C52: form-level failure renders in-card; the
+                        // reset-link toast (transient only) covers Retry.
+                        if (authState.errorMessage != null) ...[
+                          FormErrorSummary(
+                            message: authState.errorMessage!,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(

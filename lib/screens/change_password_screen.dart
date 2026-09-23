@@ -86,9 +86,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final secondaryTextColor = isDark
         ? const Color(0xFFC4ACAC)
         : const Color(0xFF765867);
-    final errorColor = isDark
-        ? const Color(0xFFF0A6B0)
-        : AppTheme.errorOnLight; // C36: 9.83:1 vs white (was 5.75).
 
     final currentError = _touched['current'] == true
         ? ChangePasswordValidators.validateCurrent(
@@ -196,10 +193,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             ),
                           ),
                         ),
-                        _InlineError(
+                        InlineFieldError(
                           key: const Key('change_password_current_error'),
                           message: currentError,
-                          color: errorColor,
                         ),
                         const SizedBox(height: 16),
                         _FieldLabel(text: 'New password', color: textColor),
@@ -228,10 +224,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             ),
                           ),
                         ),
-                        _InlineError(
+                        InlineFieldError(
                           key: const Key('change_password_new_error'),
                           message: newError,
-                          color: errorColor,
                         ),
                         const SizedBox(height: 16),
                         _FieldLabel(
@@ -260,10 +255,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             ),
                           ),
                         ),
-                        _InlineError(
+                        InlineFieldError(
                           key: const Key('change_password_confirm_error'),
                           message: confirmError,
-                          color: errorColor,
                         ),
                         const SizedBox(height: 16),
                         _FieldLabel(text: '6-digit code', color: textColor),
@@ -277,10 +271,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           hintText: '123456',
                           onChanged: (_) => _touch('code'),
                         ),
-                        _InlineError(
+                        InlineFieldError(
                           key: const Key('change_password_code_error'),
                           message: codeError,
-                          color: errorColor,
                         ),
                         const SizedBox(height: 24),
                         // C39: scaffold only — submit stays disabled until
@@ -341,22 +334,6 @@ class _FieldLabel extends StatelessWidget {
           fontSize: 14,
         ),
       ),
-    );
-  }
-}
-
-class _InlineError extends StatelessWidget {
-  final String? message;
-  final Color color;
-
-  const _InlineError({super.key, required this.message, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    if (message == null) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: 6, left: 20),
-      child: Text(message!, style: TextStyle(color: color, fontSize: 12)),
     );
   }
 }
