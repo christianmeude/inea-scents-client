@@ -37,7 +37,7 @@ class ProfileScreen extends ConsumerWidget {
         // card-edge-to-screen-bottom space instead of scrolling.
         // C81: Center > ConstrainedBox cap mirrors home/bookings; the
         // header padding lives INSIDE the cap. C71 single-column stack
-        // kept; no 600 card constraint (that's C82).
+        // kept; C82 caps the cards at 600 centered (pre-C56 proof).
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(
@@ -66,19 +66,31 @@ class ProfileScreen extends ConsumerWidget {
 
                   // ==================================================
                   // PROFILE + SETTINGS (C71: stacked single column
-                  // on all breakpoints)
+                  // on all breakpoints; C82: cards capped at 600
+                  // centered, header stays at the 1200 container)
                   // ==================================================
-                  _ProfileCard(
-                    userName: userName,
-                    userEmail: userEmail,
-                    firstLetter: firstLetter,
-                  ),
-                  const SizedBox(height: 12),
-                  _SettingsColumn(
-                    onLogout: () {
-                      ref.read(authProvider.notifier).logout();
-                      context.go('/login');
-                    },
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: ResponsiveAppShell.maxCardWidth,
+                      ),
+                      child: Column(
+                        children: [
+                          _ProfileCard(
+                            userName: userName,
+                            userEmail: userEmail,
+                            firstLetter: firstLetter,
+                          ),
+                          const SizedBox(height: 12),
+                          _SettingsColumn(
+                            onLogout: () {
+                              ref.read(authProvider.notifier).logout();
+                              context.go('/login');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
 
                   // ==================================================
