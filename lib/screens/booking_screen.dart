@@ -678,6 +678,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   Widget _buildDesktopThreeColumnLayout(Package package) {
     final isPayment = _currentStep == 4;
+    final isDetails = _currentStep == 3;
 
     return Column(
       children: [
@@ -702,90 +703,105 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       _stageSwitcher(
                         step: _currentStep,
                         child: isPayment
-                        ? DesktopPaymentPanel(
-                            key: const ValueKey('desktop_payment_panel_view'),
-                            package: package,
-                            selectedDate: _selectedDate,
-                            selectedTime: _selectedTime,
-                            selectedPax: _selectedPax,
-                            paymentMethod: _paymentMethod,
-                            customerName: _customerNameController.text,
-                            customerEmail: _customerEmailController.text,
-                            customerPhone: _customerPhoneController.text,
-                            venueAddress: _venueAddressController.text,
-                            onCustomerNameChanged: (v) {
-                              _customerNameController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setCustomerName(v);
-                            },
-                            onCustomerEmailChanged: (v) {
-                              _customerEmailController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setCustomerEmail(v);
-                            },
-                            onCustomerPhoneChanged: (v) {
-                              _customerPhoneController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setCustomerPhone(v);
-                            },
-                            onVenueAddressChanged: (v) {
-                              _venueAddressController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setVenueAddress(v);
-                            },
-                            onPaymentMethodSelected: (method) {
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setPaymentMethod(method);
-                            },
-                            onBackToReservation: () {
-                              _goToStep(2);
-                            },
-                          )
-                        : Row(
-                            key: const ValueKey(
-                              'desktop_reservation_columns_view',
-                            ),
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // FLOW: CALENDAR and DETAILS side-by-side
-                              Expanded(
-                                child: ReservationCalendarPanel(
-                                  key: const Key('reservation_calendar_panel'),
-                                  selectedDate: _selectedDate,
-                                  onDateSelected: (date) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setSelectedDate(date);
-                                  },
+                            ? DesktopPaymentPanel(
+                                key: const ValueKey(
+                                  'desktop_payment_panel_view',
                                 ),
-                              ),
-                              const SizedBox(width: 24),
-                              Expanded(
-                                child: ReservationDetailsPanel(
-                                  key: const Key('reservation_details_panel'),
-                                  package: package,
-                                  selectedPax: _selectedPax,
-                                  // C48: schedule grid COL B carries time +
-                                  // pax only; the §1 package card stays
-                                  // retired (the rail owns that line).
-                                  showPackageSummary: false,
-                                  // C6: in-flow pax edit (step 2); no router jump.
-                                  onChangePax: () => _goToStep(2),
-                                  selectedTime: _selectedTime,
-                                  onTimeSelected: (time) {
-                                    ref
-                                        .read(bookingFlowProvider.notifier)
-                                        .setSelectedTime(time);
-                                  },
+                                package: package,
+                                selectedDate: _selectedDate,
+                                selectedTime: _selectedTime,
+                                selectedPax: _selectedPax,
+                                paymentMethod: _paymentMethod,
+                                customerName: _customerNameController.text,
+                                customerEmail: _customerEmailController.text,
+                                customerPhone: _customerPhoneController.text,
+                                venueAddress: _venueAddressController.text,
+                                onCustomerNameChanged: (v) {
+                                  _customerNameController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setCustomerName(v);
+                                },
+                                onCustomerEmailChanged: (v) {
+                                  _customerEmailController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setCustomerEmail(v);
+                                },
+                                onCustomerPhoneChanged: (v) {
+                                  _customerPhoneController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setCustomerPhone(v);
+                                },
+                                onVenueAddressChanged: (v) {
+                                  _venueAddressController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setVenueAddress(v);
+                                },
+                                onPaymentMethodSelected: (method) {
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setPaymentMethod(method);
+                                },
+                                onBackToReservation: () {
+                                  _goToStep(2);
+                                },
+                              )
+                            // C74: web/tablet follows Schedule(2) →
+                            // Details(3) → Payment(4), no direct jump. The
+                            // step-3 branch renders the Details form in the
+                            // left column (same fields as mobile step 3).
+                            : isDetails
+                            ? _buildWebDetailsForm(
+                                viewKey: 'desktop_details_form_view',
+                                keyPrefix: 'desktop',
+                              )
+                            : Row(
+                                key: const ValueKey(
+                                  'desktop_reservation_columns_view',
                                 ),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // FLOW: CALENDAR and DETAILS side-by-side
+                                  Expanded(
+                                    child: ReservationCalendarPanel(
+                                      key: const Key(
+                                        'reservation_calendar_panel',
+                                      ),
+                                      selectedDate: _selectedDate,
+                                      onDateSelected: (date) {
+                                        ref
+                                            .read(bookingFlowProvider.notifier)
+                                            .setSelectedDate(date);
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 24),
+                                  Expanded(
+                                    child: ReservationDetailsPanel(
+                                      key: const Key(
+                                        'reservation_details_panel',
+                                      ),
+                                      package: package,
+                                      selectedPax: _selectedPax,
+                                      // C48: schedule grid COL B carries time +
+                                      // pax only; the §1 package card stays
+                                      // retired (the rail owns that line).
+                                      showPackageSummary: false,
+                                      // C6: in-flow pax edit (step 2); no router jump.
+                                      onChangePax: () => _goToStep(2),
+                                      selectedTime: _selectedTime,
+                                      onTimeSelected: (time) {
+                                        ref
+                                            .read(bookingFlowProvider.notifier)
+                                            .setSelectedTime(time);
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                       ),
                     ],
                   ),
@@ -816,15 +832,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       final notifier = ref.read(bookingFlowProvider.notifier);
                       if (_currentStep == 4) {
                         _handleConfirmAndPay();
+                      } else if (_currentStep == 3) {
+                        // C74: Details → Payment gate (same authority as
+                        // mobile `_handleMobileBarTap`).
+                        if (!notifier.canProceedFromDetails()) {
+                          // C52: validation gate renders inline, never toast.
+                          _setFormError('Please fill name, email and venue');
+                          return;
+                        }
+                        _goToStep(4);
                       } else {
                         // Selections live in the notifier; the gate below is
                         // the single authority — nothing to mirror back.
+                        // C74: Schedule → Details (never Payment directly).
                         if (!notifier.canProceedFromSchedule()) {
                           // C52: validation gate renders inline, never toast.
                           _setFormError('Please select date and time');
                           return;
                         }
-                        _goToStep(4);
+                        _goToStep(3);
                       }
                     },
                   ),
@@ -843,6 +869,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
 
   Widget _buildTabletTwoColumnLayout(Package package) {
     final isPayment = _currentStep == 4;
+    final isDetails = _currentStep == 3;
 
     return Column(
       children: [
@@ -867,80 +894,90 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       _stageSwitcher(
                         step: _currentStep,
                         child: isPayment
-                        ? DesktopPaymentPanel(
-                            key: const ValueKey('tablet_payment_panel_view'),
-                            package: package,
-                            selectedDate: _selectedDate,
-                            selectedTime: _selectedTime,
-                            selectedPax: _selectedPax,
-                            paymentMethod: _paymentMethod,
-                            customerName: _customerNameController.text,
-                            customerEmail: _customerEmailController.text,
-                            customerPhone: _customerPhoneController.text,
-                            venueAddress: _venueAddressController.text,
-                            onCustomerNameChanged: (v) {
-                              _customerNameController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setCustomerName(v);
-                            },
-                            onCustomerEmailChanged: (v) {
-                              _customerEmailController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setCustomerEmail(v);
-                            },
-                            onCustomerPhoneChanged: (v) {
-                              _customerPhoneController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setCustomerPhone(v);
-                            },
-                            onVenueAddressChanged: (v) {
-                              _venueAddressController.text = v;
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setVenueAddress(v);
-                            },
-                            onPaymentMethodSelected: (method) {
-                              ref
-                                  .read(bookingFlowProvider.notifier)
-                                  .setPaymentMethod(method);
-                            },
-                            onBackToReservation: () {
-                              _goToStep(2);
-                            },
-                          )
-                        : Column(
-                            children: [
-                              ReservationCalendarPanel(
-                                key: const Key('tablet_calendar_panel'),
-                                selectedDate: _selectedDate,
-                                onDateSelected: (date) {
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setSelectedDate(date);
-                                },
-                              ),
-                              const SizedBox(height: 14),
-                              ReservationDetailsPanel(
-                                key: const Key('tablet_details_panel'),
+                            ? DesktopPaymentPanel(
+                                key: const ValueKey(
+                                  'tablet_payment_panel_view',
+                                ),
                                 package: package,
-                                selectedPax: _selectedPax,
-                                // C48: §1 package card retired from the
-                                // schedule step (rail owns that line).
-                                showPackageSummary: false,
-                                // C6: in-flow pax edit (step 2); no router jump.
-                                onChangePax: () => _goToStep(2),
+                                selectedDate: _selectedDate,
                                 selectedTime: _selectedTime,
-                                onTimeSelected: (time) {
+                                selectedPax: _selectedPax,
+                                paymentMethod: _paymentMethod,
+                                customerName: _customerNameController.text,
+                                customerEmail: _customerEmailController.text,
+                                customerPhone: _customerPhoneController.text,
+                                venueAddress: _venueAddressController.text,
+                                onCustomerNameChanged: (v) {
+                                  _customerNameController.text = v;
                                   ref
                                       .read(bookingFlowProvider.notifier)
-                                      .setSelectedTime(time);
+                                      .setCustomerName(v);
                                 },
+                                onCustomerEmailChanged: (v) {
+                                  _customerEmailController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setCustomerEmail(v);
+                                },
+                                onCustomerPhoneChanged: (v) {
+                                  _customerPhoneController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setCustomerPhone(v);
+                                },
+                                onVenueAddressChanged: (v) {
+                                  _venueAddressController.text = v;
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setVenueAddress(v);
+                                },
+                                onPaymentMethodSelected: (method) {
+                                  ref
+                                      .read(bookingFlowProvider.notifier)
+                                      .setPaymentMethod(method);
+                                },
+                                onBackToReservation: () {
+                                  _goToStep(2);
+                                },
+                              )
+                            // C74: same 3-stage flow as desktop — the step-3
+                            // branch renders the Details form in the left
+                            // column (same fields as mobile step 3).
+                            : isDetails
+                            ? _buildWebDetailsForm(
+                                viewKey: 'tablet_details_form_view',
+                                keyPrefix: 'tablet',
+                              )
+                            : Column(
+                                children: [
+                                  ReservationCalendarPanel(
+                                    key: const Key('tablet_calendar_panel'),
+                                    selectedDate: _selectedDate,
+                                    onDateSelected: (date) {
+                                      ref
+                                          .read(bookingFlowProvider.notifier)
+                                          .setSelectedDate(date);
+                                    },
+                                  ),
+                                  const SizedBox(height: 14),
+                                  ReservationDetailsPanel(
+                                    key: const Key('tablet_details_panel'),
+                                    package: package,
+                                    selectedPax: _selectedPax,
+                                    // C48: §1 package card retired from the
+                                    // schedule step (rail owns that line).
+                                    showPackageSummary: false,
+                                    // C6: in-flow pax edit (step 2); no router jump.
+                                    onChangePax: () => _goToStep(2),
+                                    selectedTime: _selectedTime,
+                                    onTimeSelected: (time) {
+                                      ref
+                                          .read(bookingFlowProvider.notifier)
+                                          .setSelectedTime(time);
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                       ),
                     ],
                   ),
@@ -969,15 +1006,25 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                       final notifier = ref.read(bookingFlowProvider.notifier);
                       if (_currentStep == 4) {
                         _handleConfirmAndPay();
+                      } else if (_currentStep == 3) {
+                        // C74: Details → Payment gate (same authority as
+                        // mobile `_handleMobileBarTap`).
+                        if (!notifier.canProceedFromDetails()) {
+                          // C52: validation gate renders inline, never toast.
+                          _setFormError('Please fill name, email and venue');
+                          return;
+                        }
+                        _goToStep(4);
                       } else {
                         // Selections live in the notifier; the gate below is
                         // the single authority — nothing to mirror back.
+                        // C74: Schedule → Details (never Payment directly).
                         if (!notifier.canProceedFromSchedule()) {
                           // C52: validation gate renders inline, never toast.
                           _setFormError('Please select date and time');
                           return;
                         }
-                        _goToStep(4);
+                        _goToStep(3);
                       }
                     },
                   ),
@@ -987,6 +1034,85 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  // ==========================================================================
+  // C74 WEB DETAILS: step-3 form for desktop/tablet left columns
+  // ==========================================================================
+
+  /// C74: Details form rendered in the desktop/tablet left column at
+  /// step 3. Reuses [_buildMobileContactField] — the same fields widget
+  /// mobile step 3 uses — against the shared screen controllers, so the
+  /// provider + payment-panel prefill stay in sync. [keyPrefix] namespaces
+  /// the field keys per breakpoint (`desktop`/`tablet`).
+  Widget _buildWebDetailsForm({
+    required String viewKey,
+    required String keyPrefix,
+  }) {
+    final notifier = ref.read(bookingFlowProvider.notifier);
+    return Container(
+      key: ValueKey(viewKey),
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _surface,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: _surfaceBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Your Contact Details',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: _title,
+            ),
+          ),
+          const SizedBox(height: 15),
+          _buildMobileContactField(
+            controller: _customerNameController,
+            keyName: '${keyPrefix}_customer_name',
+            label: 'Full Name',
+            hint: 'Customer Name',
+            icon: Icons.person_outline_rounded,
+            textInputType: TextInputType.name,
+            onChanged: (v) => notifier.setCustomerName(v),
+          ),
+          const SizedBox(height: 12),
+          _buildMobileContactField(
+            controller: _customerEmailController,
+            keyName: '${keyPrefix}_customer_email',
+            label: 'Email Address',
+            hint: 'name@example.com',
+            icon: Icons.email_outlined,
+            textInputType: TextInputType.emailAddress,
+            onChanged: (v) => notifier.setCustomerEmail(v),
+          ),
+          const SizedBox(height: 12),
+          _buildMobileContactField(
+            controller: _customerPhoneController,
+            keyName: '${keyPrefix}_customer_phone',
+            label: 'Contact Phone',
+            hint: '+63 9XX XXX XXXX',
+            icon: Icons.phone_outlined,
+            textInputType: TextInputType.phone,
+            onChanged: (v) => notifier.setCustomerPhone(v),
+          ),
+          const SizedBox(height: 12),
+          _buildMobileContactField(
+            controller: _venueAddressController,
+            keyName: '${keyPrefix}_venue_address',
+            label: 'Event Venue / Address',
+            hint: 'e.g. Grand Ballroom, Makati',
+            icon: Icons.location_on_outlined,
+            textInputType: TextInputType.streetAddress,
+            onChanged: (v) => notifier.setVenueAddress(v),
+          ),
+        ],
+      ),
     );
   }
 

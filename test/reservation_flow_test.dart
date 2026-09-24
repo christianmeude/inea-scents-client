@@ -90,6 +90,51 @@ void main() {
     }
   }
 
+  /// Fills the C74 web Details form (desktop/tablet step 3) fields.
+  Future<void> fillWebDetailsContacts(
+    WidgetTester tester,
+    String prefix,
+  ) async {
+    final fields = {
+      '${prefix}_customer_name': 'Maria Clara',
+      '${prefix}_customer_email': 'maria@example.com',
+      '${prefix}_customer_phone': '+639171234567',
+      '${prefix}_venue_address': 'The Peninsula Manila',
+    };
+    for (final entry in fields.entries) {
+      final finder = find.byKey(Key(entry.key));
+      await tester.ensureVisible(finder);
+      await tester.enterText(finder, entry.value);
+      await tester.pump();
+    }
+  }
+
+  /// C74: drives a desktop/tablet flow from Schedule (2) through
+  /// Details (3) to Payment (4). Schedule-proceed must land on 3
+  /// (never 4): asserts the details view, fills it, then proceeds
+  /// to the payment panel.
+  Future<void> driveWebToPayment(
+    WidgetTester tester, {
+    required String detailsViewKey,
+    required String prefix,
+    required String paymentViewKey,
+  }) async {
+    final first = find.text('Proceed to Payment');
+    await tester.ensureVisible(first);
+    await tester.pumpAndSettle();
+    await tester.tap(first);
+    await tester.pumpAndSettle();
+    expect(find.byKey(Key(detailsViewKey)), findsOneWidget);
+    expect(find.byKey(Key(paymentViewKey)), findsNothing);
+    await fillWebDetailsContacts(tester, prefix);
+    final second = find.text('Proceed to Payment');
+    await tester.ensureVisible(second);
+    await tester.pumpAndSettle();
+    await tester.tap(second);
+    await tester.pumpAndSettle();
+    expect(find.byKey(Key(paymentViewKey)), findsOneWidget);
+  }
+
   group('Issue #44: 3-Column Reservation Flow Layout Tests', () {
     testWidgets(
       // P6: desktop is a 2-column flow (calendar → details stacked) +
@@ -375,11 +420,12 @@ void main() {
           findsNothing,
         );
 
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: Schedule → Details → Payment (no direct jump).
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
 
         // Select 'Cash' in the payment panel (scoped: the summary
@@ -413,16 +459,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        // C74: Schedule → Details → Payment (no direct jump).
         // Tap 'Proceed to Payment' in sticky Order Summary panel
-        final proceedButtonFinder = find.text('Proceed to Payment');
-        expect(proceedButtonFinder, findsOneWidget);
-        await tester.tap(proceedButtonFinder);
-        await tester.pumpAndSettle();
-
-        // Verify Desktop Payment panel appears
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
 
         // Fill contact & venue information required for submission
@@ -710,12 +753,13 @@ void main() {
           findsNothing,
         );
 
-        // Pick Cash once at the payment step, then continue below.
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: Pick Cash once at the payment step (via Details),
+        // then continue below.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
         final cashFinder = find.descendant(
           of: find.byKey(const Key('desktop_payment_panel_view')),
@@ -1191,14 +1235,19 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Proceed to Payment then Confirm & Pay to trigger success view
+        // C74: Proceed (Schedule → Details), fill, Proceed to Payment
+        // (Details → Payment), then Confirm & Pay to trigger success view
         // (P7: single page scroll).
         final proceedBtn = find.text('Proceed to Payment');
         await tester.ensureVisible(proceedBtn);
         await tester.pumpAndSettle();
         expect(proceedBtn, findsOneWidget);
-        await tester.tap(proceedBtn);
-        await tester.pumpAndSettle();
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'tablet_details_form_view',
+          prefix: 'tablet',
+          paymentViewKey: 'tablet_payment_panel_view',
+        );
 
         final confirmBtn = find.textContaining('Confirm & Pay');
         await tester.ensureVisible(confirmBtn);
@@ -1296,7 +1345,7 @@ void main() {
         );
         expect(find.text('Proceed to Payment'), findsOneWidget);
 
-        // Tap Proceed to Payment
+        // C74: Tap Proceed — Schedule → Details (never Payment).
         await tester.tap(find.text('Proceed to Payment'));
 
         // Advance halfway through the 300ms cross-fade transition
@@ -1308,7 +1357,7 @@ void main() {
         // Complete transition
         await tester.pumpAndSettle();
 
-        // Columns 1 & 2 (Calendar & Details) are replaced by DesktopPaymentPanel
+        // Schedule columns are replaced by the Details form, not Payment.
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsNothing,
@@ -1318,12 +1367,157 @@ void main() {
           findsNothing,
         );
         expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsNothing,
+        );
+
+        // Fill Details, then Proceed to Payment → payment panel.
+        await fillWebDetailsContacts(tester, 'desktop');
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pump(const Duration(milliseconds: 150));
+        expect(find.byType(FadeTransition), findsWidgets);
+        await tester.pumpAndSettle();
+
+        // Columns 1 & 2 (Calendar & Details) are replaced by DesktopPaymentPanel
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsNothing,
+        );
+        expect(
           find.byKey(const Key('desktop_payment_panel_view')),
           findsOneWidget,
         );
         // C8: header distilled — panel starts at payment method selection.
         expect(find.text('Payment & Checkout Details'), findsNothing);
         expect(find.text('Select Payment Method'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'C74: desktop schedule-proceed lands on Details (3), never Payment (4)',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1200, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          createBookingScreenWidget(screenSize: const Size(1200, 800)),
+        );
+        await tester.pumpAndSettle();
+
+        // Schedule-proceed lands on Details (3), not Payment (4).
+        final scheduleProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(scheduleProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(scheduleProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsNothing,
+        );
+
+        // Ungated Details-proceed is blocked inline (no jump to 4).
+        final gatedProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(gatedProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(gatedProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsNothing,
+        );
+        expect(find.byKey(const Key('booking_form_error')), findsOneWidget);
+
+        // Gated Details-proceed reaches Payment (4).
+        await fillWebDetailsContacts(tester, 'desktop');
+        final detailsProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(detailsProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(detailsProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets(
+      'C74: tablet schedule-proceed lands on Details (3), never Payment (4)',
+      (WidgetTester tester) async {
+        tester.view.physicalSize = const Size(900, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        await tester.pumpWidget(
+          createBookingScreenWidget(screenSize: const Size(900, 800)),
+        );
+        await tester.pumpAndSettle();
+
+        // Schedule-proceed lands on Details (3), not Payment (4).
+        final scheduleProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(scheduleProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(scheduleProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('tablet_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('tablet_payment_panel_view')),
+          findsNothing,
+        );
+
+        // Ungated Details-proceed is blocked inline (no jump to 4).
+        final gatedProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(gatedProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(gatedProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('tablet_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('tablet_payment_panel_view')),
+          findsNothing,
+        );
+        expect(find.byKey(const Key('booking_form_error')), findsOneWidget);
+
+        // Gated Details-proceed reaches Payment (4).
+        await fillWebDetailsContacts(tester, 'tablet');
+        final detailsProceed = find.text('Proceed to Payment');
+        await tester.ensureVisible(detailsProceed);
+        await tester.pumpAndSettle();
+        await tester.tap(detailsProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('tablet_details_form_view')),
+          findsNothing,
+        );
+        expect(
+          find.byKey(const Key('tablet_payment_panel_view')),
+          findsOneWidget,
+        );
       },
     );
 
@@ -1348,7 +1542,7 @@ void main() {
         expect(find.text('Inclusions'), findsOneWidget);
         expect(find.text('₱4,500.00'), findsOneWidget);
 
-        // Trigger payment transition
+        // C74: Trigger details transition (Schedule → Details).
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pump(const Duration(milliseconds: 150));
 
@@ -1369,6 +1563,19 @@ void main() {
         expect(summaryAfterPos.dy, equals(summaryBeforePos.dy));
         expect(
           find.byKey(const Key('order_summary_side_panel')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+
+        // Fill Details, then trigger payment transition (Details → Payment).
+        await fillWebDetailsContacts(tester, 'desktop');
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
           findsOneWidget,
         );
 
@@ -1396,9 +1603,25 @@ void main() {
         expect(find.text('Details'), findsOneWidget);
         expect(find.text('Payment'), findsOneWidget);
 
-        // Proceed to payment
+        // C74: Proceed through Details to Payment — header keeps
+        // the same unified timeline on every stage.
         await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        expect(find.text('Schedule'), findsOneWidget);
+        expect(find.text('Details'), findsOneWidget);
+        expect(find.text('Payment'), findsOneWidget);
+
+        await fillWebDetailsContacts(tester, 'desktop');
+        await tester.tap(find.text('Proceed to Payment'));
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsOneWidget,
+        );
 
         // Payment header keeps the same unified timeline
         expect(find.text('Schedule'), findsOneWidget);
@@ -1422,12 +1645,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Go to payment step
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: Go to payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
 
         // Tap Header Back button
@@ -1467,9 +1690,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Go to payment step
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
+        // C74: Go to payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
+        );
 
         // C8: in-panel Edit Selection chip distilled; C6 Back affordance preserved.
         expect(find.text('Edit Selection'), findsNothing);
@@ -1506,9 +1733,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Proceed to Payment
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
+        // C74: Proceed to Payment via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
+        );
 
         // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (no payment chip)
         expect(find.text('Online Checkout'), findsOneWidget);
@@ -1547,9 +1778,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Proceed to Payment
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
+        // C74: Proceed to Payment via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
+        );
 
         // Online is the default: explainer on, no card capture anywhere
         await tester.tap(find.text('Online'));
@@ -1598,12 +1833,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Step 1: Proceed to Payment
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: Step 1: Schedule → Details → Payment (no direct jump).
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
 
         // Step 2: Confirm & Pay in persistent Order Summary
@@ -1702,7 +1937,8 @@ void main() {
         );
         expect(find.text('Proceed to Payment'), findsOneWidget);
 
-        // Tap Proceed to Payment in tablet Order Summary (P7: page scroll).
+        // C74: Tap Proceed in tablet Order Summary (P7: page scroll) —
+        // Schedule → Details first (never Payment).
         final proceedBtn = find.text('Proceed to Payment');
         await tester.ensureVisible(proceedBtn);
         await tester.pumpAndSettle();
@@ -1710,6 +1946,21 @@ void main() {
         await tester.pump(const Duration(milliseconds: 150));
 
         expect(find.byType(FadeTransition), findsWidgets);
+        await tester.pumpAndSettle();
+
+        // Left column is now the Details form on tablet
+        expect(
+          find.byKey(const Key('tablet_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('tablet_payment_panel_view')),
+          findsNothing,
+        );
+
+        // Fill Details, then Proceed to Payment → payment panel.
+        await fillWebDetailsContacts(tester, 'tablet');
+        await tester.tap(find.text('Proceed to Payment'));
         await tester.pumpAndSettle();
 
         // Left column is now DesktopPaymentPanel on tablet
@@ -1761,12 +2012,12 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Proceed to Payment'));
-      await tester.pumpAndSettle();
-
-      expect(
-        find.byKey(const Key('desktop_payment_panel_view')),
-        findsOneWidget,
+      // C74: reach the payment step via Details.
+      await driveWebToPayment(
+        tester,
+        detailsViewKey: 'desktop_details_form_view',
+        prefix: 'desktop',
+        paymentViewKey: 'desktop_payment_panel_view',
       );
       expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
       // C8: header distilled.
@@ -1812,12 +2063,12 @@ void main() {
         await tester.ensureVisible(proceedBtn);
         await tester.pumpAndSettle();
         expect(proceedBtn, findsOneWidget);
-        await tester.tap(proceedBtn);
-        await tester.pumpAndSettle();
-
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: reach the payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
         expect(
           find.byKey(const Key('order_summary_side_panel')),
@@ -1840,12 +2091,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Proceed to payment on Desktop
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: Proceed to payment on Desktop via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
 
         // Resize to Tablet (900px) -> Still in Payment step
@@ -1891,8 +2142,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
+        // C74: reach the payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
+        );
 
         // Online method: explainer present, card capture absent
         await tester.tap(find.text('Online'));
@@ -1929,8 +2185,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
+        // C74: reach the payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
+        );
 
         final nameField = find.byKey(const Key('payment_customer_name'));
         final TextField nameWidget = tester.widget(nameField);
@@ -1983,12 +2244,12 @@ void main() {
         final proceedBtn = find.text('Proceed to Payment');
         await tester.ensureVisible(proceedBtn);
         await tester.pumpAndSettle();
-        await tester.tap(proceedBtn);
-        await tester.pumpAndSettle();
-
-        expect(
-          find.byKey(const Key('tablet_payment_panel_view')),
-          findsOneWidget,
+        // C74: reach the payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'tablet_details_form_view',
+          prefix: 'tablet',
+          paymentViewKey: 'tablet_payment_panel_view',
         );
         expect(
           find.byKey(const Key('tablet_order_summary_panel')),
@@ -2022,11 +2283,12 @@ void main() {
           findsNothing,
         );
 
-        await tester.tap(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsOneWidget,
+        // C74: reach the payment step via Details.
+        await driveWebToPayment(
+          tester,
+          detailsViewKey: 'desktop_details_form_view',
+          prefix: 'desktop',
+          paymentViewKey: 'desktop_payment_panel_view',
         );
 
         final onlineOption = find.descendant(
@@ -2052,13 +2314,28 @@ void main() {
         expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('20 PAX'), findsWidgets);
 
-        // Rapidly toggle forward and backward 3 times
+        // Rapidly toggle forward and backward 3 times (C74: each
+        // forward leg is Schedule → Details → Payment; Details stay
+        // filled from the first pass, so both gates pass).
         for (int i = 0; i < 3; i++) {
-          // Proceed to Payment
+          // Proceed to Details
           final proceed = find.text('Proceed to Payment');
           await tester.ensureVisible(proceed);
           await tester.pumpAndSettle();
           await tester.tap(proceed);
+          await tester.pump(const Duration(milliseconds: 100));
+          expect(find.byType(FadeTransition), findsWidgets);
+          await tester.pumpAndSettle();
+          expect(
+            find.byKey(const Key('desktop_details_form_view')),
+            findsOneWidget,
+          );
+
+          // Proceed to Payment
+          final proceedAgain = find.text('Proceed to Payment');
+          await tester.ensureVisible(proceedAgain);
+          await tester.pumpAndSettle();
+          await tester.tap(proceedAgain);
           await tester.pump(const Duration(milliseconds: 100));
           expect(find.byType(FadeTransition), findsWidgets);
           await tester.pumpAndSettle();
@@ -2085,11 +2362,21 @@ void main() {
         expect(find.text('Your Booking'), findsOneWidget);
         expect(find.text('20 PAX'), findsWidgets);
 
-        // Final proceed to payment and confirm
+        // Final proceed to payment and confirm (C74: via Details —
+        // still filled, so both gates pass).
         final finalProceed = find.text('Proceed to Payment');
         await tester.ensureVisible(finalProceed);
         await tester.pumpAndSettle();
         await tester.tap(finalProceed);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        final finalProceedAgain = find.text('Proceed to Payment');
+        await tester.ensureVisible(finalProceedAgain);
+        await tester.pumpAndSettle();
+        await tester.tap(finalProceedAgain);
         await tester.pumpAndSettle();
         await fillPaymentContacts(tester);
         final finalConfirm = find.textContaining('Confirm & Pay');
