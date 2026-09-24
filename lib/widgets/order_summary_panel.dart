@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import '../config/theme.dart';
 import '../models/index.dart';
-import '../config/offering.dart';
 import '../utils/peso.dart';
 import 'card_surfaces.dart';
-import 'inclusions_list.dart';
 
-/// Distilled booking side-panel (P7 C + grill rounds 1-3, 2026-09-15):
+/// Distilled booking side-panel (C75, 2026-09-24):
 /// `Your Booking` heading (Booking avoids `order` per CONTEXT.md),
-/// proper-noun package line, PAX-tier context line (tiers are a lookup —
-/// no fictional base+increment math), full weekday date + venue rows,
-/// `₱`-canonical total, amount-in-CTA. The `{pax} PAX · {date} · {time}`
-/// one-liner is kept verbatim (test-pinned).
-/// header one-liner {pax} PAX · {date} · {time}, Inclusions + Free via
-/// shared InclusionsList, no image/rating/Live chip/dot-leaders/payment
-/// chip/total-name duplication, `₱` only, wrap-don't-truncate.
+/// exactly five label-value rows (Package, Pax, Date, Time Slot, Total)
+/// separated by dividers, a single inclusions count caption, then the CTA.
+/// Removed: PAX-tier context line (tiers are a lookup — no `from` math),
+/// the `{pax} PAX · {date} · {time}` one-liner, the `· 3–4 hrs` duration
+/// suffix (time only), the venue row (venue lives in Details/schedule
+/// steps), and the full InclusionsList (a count line preserves the signal
+/// without breaking scannability). `₱`-canonical total, amount-in-CTA.
+/// [isSticky] caps the panel at viewport height with an internal scroll so
+/// the web/tablet rail stays usable while the page scrolls.
 // C6: Order* class name kept (referenced across booking_screen and tests);
 // customer-facing copy already uses Booking ("Your Booking").
 class OrderSummaryPanel extends StatelessWidget {
@@ -31,7 +31,8 @@ class OrderSummaryPanel extends StatelessWidget {
   final bool isLoading;
   final bool isSticky;
 
-  /// Venue as entered at checkout; null/empty renders `Not yet provided`.
+  /// Retained for call-site compatibility; the venue now lives in the
+  /// Details/schedule steps, so the summary no longer renders it.
   final String? venueAddress;
 
   const OrderSummaryPanel({
@@ -47,25 +48,6 @@ class OrderSummaryPanel extends StatelessWidget {
     this.isSticky = true,
     this.venueAddress,
   });
-
-  String _formatDate(DateTime? date) {
-    if (date == null) return 'Not selected';
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
-  }
 
   /// Explicit contract date: `Saturday, September 26, 2026`.
   String _formatFullDate(DateTime date) {
@@ -95,45 +77,86 @@ class OrderSummaryPanel extends StatelessWidget {
     return '${weekdays[date.weekday - 1]}, ${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
+  /// Single label-value row: label left, value right-aligned, wrap kept.
+  Widget _summaryRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    Key? valueKey,
+    bool strongValue = false,
+  }) {
+    final titleColor = CardSurfaces.title(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: CardSurfaces.body(context),
+                height: 1.35,
+              ),
+              softWrap: true,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 2,
+            child: Text(
+              value,
+              key: valueKey,
+              textAlign: TextAlign.end,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: strongValue ? FontWeight.w700 : FontWeight.w600,
+                color: titleColor,
+                height: 1.35,
+              ),
+              softWrap: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _rowDivider(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Divider(
+        color: CardSurfaces.cardBorder(context),
+        thickness: 1,
+        height: 1,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final surface = CardSurfaces.cardBg(context);
     final surfaceBorder = CardSurfaces.cardBorder(context);
     final titleColor = CardSurfaces.title(context);
     final effectivePrice = package.priceForPax(selectedPax);
-    final inclusions = package.inclusions ?? const <String>[];
-    final freebies = package.freebies ?? const <String>[];
 
-    // Fallback sample data when package carries null lists (mirrors
-    // previous placeholder inclusions): keeps visual parity without
-    // touching API contract.
-    final displayInclusions = inclusions.isNotEmpty
-        ? inclusions
-        : Offering.inclusions;
-    final displayFreebies = freebies.isNotEmpty ? freebies : Offering.freebies;
-
-    final oneLiner =
-        '${selectedPax ?? 50} PAX · ${_formatDate(selectedDate)} · ${TimeSlot.display(selectedTime)}';
-
-    // Tier context: truthful one-liner about the lookup model — the total
-    // is the server-side tier for the chosen PAX, `from` is the floor.
-    final tierOptions = package.options;
-    final tierFloor = tierOptions.isEmpty
-        ? (package.price ?? 4500.0)
-        : tierOptions.map((t) => t.price).reduce((a, b) => a < b ? a : b);
-    final tierLine = 'Priced by PAX tier · from ${formatPeso(tierFloor)}';
-
-    final venue = (venueAddress ?? '').trim();
-    final venueLine = venue.isEmpty
-        ? 'Venue — Not yet provided'
-        : 'Venue · $venue';
+    // Live package data only — no fallback fiction. The full list lives in
+    // the Details step; the rail keeps a single count caption.
+    final inclusionCount =
+        (package.inclusions ?? const <String>[]).length +
+        (package.freebies ?? const <String>[]).length;
+    final inclusionsCaption = inclusionCount == 0
+        ? 'No inclusions listed'
+        : '$inclusionCount inclusion${inclusionCount == 1 ? '' : 's'}';
 
     // Amount-in-CTA (grill Q5): only the default submit text carries it.
     final ctaText = actionButtonText == 'Confirm & Pay'
         ? 'Confirm & Pay ${formatPeso(effectivePrice)}'
         : actionButtonText;
 
-    return Container(
+    final card = Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: surface,
@@ -185,20 +208,42 @@ class OrderSummaryPanel extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          // Proper-noun package line + tier context (grill Q3a/Q4).
-          Text(
-            package.name ?? 'Perfume Bar',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: titleColor,
-              height: 1.3,
-            ),
-            softWrap: true,
+          // Five label-value rows with dividers — no paragraphs.
+          _summaryRow(
+            context,
+            label: 'Package',
+            value: package.name ?? 'Perfume Bar',
+            valueKey: const Key('summary_value_package'),
           ),
-          const SizedBox(height: 2),
+          _rowDivider(context),
+          _summaryRow(
+            context,
+            label: 'Pax',
+            value: '${selectedPax ?? 50} PAX',
+            valueKey: const Key('summary_value_pax'),
+          ),
+          _rowDivider(context),
+          _summaryRow(
+            context,
+            label: 'Date',
+            value: selectedDate != null
+                ? _formatFullDate(selectedDate!)
+                : 'Not selected',
+            valueKey: const Key('summary_value_date'),
+          ),
+          _rowDivider(context),
+          _summaryRow(
+            context,
+            label: 'Time Slot',
+            value: TimeSlot.display(selectedTime),
+            valueKey: const Key('summary_value_time'),
+          ),
+          _rowDivider(context),
+
+          // Collapsed inclusions signal (full list lives in Details).
           Text(
-            tierLine,
+            inclusionsCaption,
+            key: const Key('order_summary_inclusions_count'),
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w500,
@@ -206,67 +251,6 @@ class OrderSummaryPanel extends StatelessWidget {
               height: 1.3,
             ),
             softWrap: true,
-          ),
-
-          const SizedBox(height: 10),
-
-          // Header one-liner {pax} PAX · {date} · {time} — wrap, don't truncate.
-          Text(
-            oneLiner,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: titleColor,
-              height: 1.3,
-            ),
-            softWrap: true,
-          ),
-
-          // Explicit contract rows (grill critique #3).
-          if (selectedDate != null) ...[
-            const SizedBox(height: 2),
-            Text(
-              _formatFullDate(selectedDate!),
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: titleColor,
-                height: 1.3,
-              ),
-              softWrap: true,
-            ),
-          ],
-          if (selectedTime != null) ...[
-            const SizedBox(height: 2),
-            Text(
-              '${TimeSlot.display(selectedTime)} · 3–4 hrs',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: CardSurfaces.body(context),
-                height: 1.3,
-              ),
-              softWrap: true,
-            ),
-          ],
-          const SizedBox(height: 2),
-          Text(
-            venueLine,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: CardSurfaces.body(context),
-              height: 1.3,
-            ),
-            softWrap: true,
-          ),
-
-          const SizedBox(height: 14),
-
-          // Inclusions + Free via shared helper.
-          InclusionsList(
-            inclusions: displayInclusions,
-            freebies: displayFreebies,
           ),
 
           Padding(
@@ -337,6 +321,20 @@ class OrderSummaryPanel extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+
+    // C75 sticky rail: cap at viewport height with an internal scroll so
+    // the summary stays usable while the page scrolls. Non-sticky callers
+    // (none in the flow; covered by widget tests) get the bare card.
+    if (!isSticky) return card;
+    final viewportHeight = MediaQuery.of(context).size.height;
+    final cap = (viewportHeight - 140).clamp(240.0, 720.0);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: cap),
+      child: SingleChildScrollView(
+        physics: const ClampingScrollPhysics(),
+        child: card,
       ),
     );
   }

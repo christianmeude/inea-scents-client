@@ -810,14 +810,18 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
 
               // ------------------------------------------------------
-              // SUMMARY (RIGHT): PINNED AT TOP, SCROLLS WITH THE PAGE
+              // SUMMARY (RIGHT): STICKY RAIL — top-pinned; the panel caps
+              // itself at viewport height with an internal scroll (isSticky)
+              // so it stays usable while the page scrolls.
               // ------------------------------------------------------
               Expanded(
                 flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-                  child: OrderSummaryPanel(
-                    key: const Key('order_summary_side_panel'),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: OrderSummaryPanel(
+                      key: const Key('order_summary_side_panel'),
                     package: package,
                     selectedDate: _selectedDate,
                     selectedTime: _selectedTime,
@@ -854,6 +858,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         _goToStep(3);
                       }
                     },
+                    ),
                   ),
                 ),
               ),
@@ -985,13 +990,17 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                 ),
               ),
 
-              // Right Column: Order Summary (pinned at top)
+              // Right Column: Order Summary (sticky rail — top-pinned; the
+              // panel caps itself at viewport height with an internal
+              // scroll via isSticky).
               Expanded(
                 flex: 1,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-                  child: OrderSummaryPanel(
-                    key: const Key('tablet_order_summary_panel'),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: OrderSummaryPanel(
+                      key: const Key('tablet_order_summary_panel'),
                     package: package,
                     selectedDate: _selectedDate,
                     selectedTime: _selectedTime,
@@ -1028,6 +1037,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         _goToStep(3);
                       }
                     },
+                    ),
                   ),
                 ),
               ),
@@ -1134,9 +1144,15 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     final oneLiner =
         '$effectivePax PAX · ${_shortDate(_selectedDate)} · ${TimeSlot.display(_selectedTime)}';
     final total = formatPeso(package.priceForPax(_selectedPax));
-    final venue = (ref.read(bookingFlowProvider).venueAddress ?? '').trim();
-    final inclusions = package.inclusions ?? const <String>[];
-    final freebies = package.freebies ?? const <String>[];
+    // C75: row cuts apply here too — no venue row (venue lives in the
+    // Details step), no full lists; a single count caption preserves the
+    // signal without breaking scannability.
+    final inclusionsCount =
+        (package.inclusions ?? const <String>[]).length +
+        (package.freebies ?? const <String>[]).length;
+    final inclusionsCaption = inclusionsCount == 0
+        ? 'No inclusions listed'
+        : '$inclusionsCount inclusion${inclusionsCount == 1 ? '' : 's'}';
 
     return Container(
       key: const Key('mobile_schedule_collapsed_summary'),
@@ -1212,32 +1228,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
           ),
           if (_scheduleSummaryExpanded) ...[
             Text(
-              venue.isEmpty ? 'Venue — Not yet provided' : 'Venue · $venue',
+              inclusionsCaption,
               style: TextStyle(fontSize: 12, color: _body, height: 1.3),
               softWrap: true,
             ),
-            if (inclusions.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text('Inclusions:', style: TextStyle(fontSize: 12, color: _body)),
-              const SizedBox(height: 4),
-              for (final e in inclusions)
-                Text(
-                  '• $e',
-                  style: TextStyle(fontSize: 12, color: _title, height: 1.35),
-                  softWrap: true,
-                ),
-            ],
-            if (freebies.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text('Freebies:', style: TextStyle(fontSize: 12, color: _body)),
-              const SizedBox(height: 4),
-              for (final e in freebies)
-                Text(
-                  '• $e',
-                  style: TextStyle(fontSize: 12, color: _title, height: 1.35),
-                  softWrap: true,
-                ),
-            ],
           ],
         ],
       ),
