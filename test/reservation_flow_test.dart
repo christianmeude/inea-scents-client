@@ -198,19 +198,21 @@ void main() {
         // C18 pay-once: schedule step carries no payment picker.
         expect(find.text('Payment Method'), findsNothing);
 
-        // Verify contents inside Right column (Sticky Order Summary) — P7 C distilled
+        // Verify contents inside Right column (Sticky Order Summary) — C75 distilled
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.textContaining('PAX ·'), findsWidgets);
-        expect(find.text('Inclusions'), findsOneWidget);
+        expect(find.textContaining('PAX'), findsWidgets);
+        expect(find.text('7 inclusions'), findsOneWidget);
         expect(find.text('Proceed to Payment'), findsOneWidget);
         expect(find.text('₱4,500.00'), findsOneWidget);
       },
     );
 
     testWidgets(
-      // P7: one page scroll carries flow + summary together; the summary
-      // stays pinned at the top of its column and reachable throughout.
-      'R1: Page scroll carries flow and summary together on desktop',
+      // C75: sticky rail — the summary caps at viewport height with an
+      // internal scroll, so a drag starting on the rail is absorbed
+      // internally and the rail holds position; the CTA stays reachable
+      // through the page scroll.
+      'R1: Sticky summary rail holds position while the page scrolls on desktop',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 500);
         tester.view.devicePixelRatio = 1.0;
@@ -231,21 +233,21 @@ void main() {
           find.byKey(const Key('order_summary_side_panel')),
         );
 
-        // Drag from the summary side so the vertical page scroll receives
-        // the gesture (center of the page scroll sits over the horizontal
-        // calendar PageView, which would steal a pure-vertical drag's hit).
+        // Drag from the summary side: the rail's capped internal scroll
+        // absorbs the gesture (center of the page scroll sits over the
+        // horizontal calendar PageView, which would steal a pure-vertical
+        // drag's hit).
         final summaryCenter = tester.getCenter(
           find.byKey(const Key('order_summary_side_panel')),
         );
         await tester.dragFrom(summaryCenter, const Offset(0, -300));
         await tester.pumpAndSettle();
 
-        // Summary travels with the page (pinned top, not independently
-        // scrollable).
+        // Sticky rail holds position instead of traveling with the page.
         final scrolledSummaryPos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
-        expect(scrolledSummaryPos.dy, lessThan(initialSummaryPos.dy));
+        expect(scrolledSummaryPos.dy, equals(initialSummaryPos.dy));
         expect(scrolledSummaryPos.dx, equals(initialSummaryPos.dx));
 
         // CTA stays reachable through the page scroll.
@@ -342,7 +344,13 @@ void main() {
         // first-option fallback: no `?pax=` was passed, so 20 wins).
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-        expect(find.text('20 PAX'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('pax_readonly_row')),
+            matching: find.text('20 PAX'),
+          ),
+          findsOneWidget,
+        );
         expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
 
         // No in-flow pax selectors remain (the summary echo of the
@@ -440,9 +448,9 @@ void main() {
         await tester.tap(cashFinder);
         await tester.pumpAndSettle();
 
-        // Verify Order Summary still renders distilled one-liner (payment chip removed per C)
+        // Verify Order Summary still renders the distilled Pax row (payment chip removed per C)
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.textContaining('PAX ·'), findsOneWidget);
+        expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
       },
     );
 
@@ -568,9 +576,9 @@ void main() {
           await tester.tap(day15Finder.first);
           await tester.pumpAndSettle();
 
-          // Verify Order Summary one-liner updated (P7 C distilled, no separate Date label)
+          // Verify Order Summary Pax row updated (C75 distilled, label-value rows)
           expect(find.text('Your Booking'), findsOneWidget);
-          expect(find.textContaining('PAX ·'), findsWidgets);
+          expect(find.byKey(const Key('summary_value_pax')), findsWidgets);
         }
       },
     );
@@ -740,7 +748,13 @@ void main() {
         // P6: pax is read-only (locked step + Change link). C18 pay-once:
         // the schedule step carries no payment picker.
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-        expect(find.text('20 PAX'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('pax_readonly_row')),
+            matching: find.text('20 PAX'),
+          ),
+          findsOneWidget,
+        );
 
         // Freeform time keeps its default through selection changes
         expect(find.text('2:00 PM'), findsWidgets);
@@ -792,7 +806,7 @@ void main() {
           findsOneWidget,
         );
 
-        expect(find.textContaining('PAX ·'), findsWidgets);
+        expect(find.byKey(const Key('summary_value_pax')), findsWidgets);
         expect(find.text('20 PAX'), findsWidgets);
 
         // Oscillate across desktop/tablet boundary multiple times (P7 C: payment chip removed, verify distilled summary persists)
@@ -804,7 +818,7 @@ void main() {
             findsOneWidget,
           );
           expect(find.text('Your Booking'), findsOneWidget);
-          expect(find.textContaining('PAX ·'), findsOneWidget);
+          expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
 
           tester.view.physicalSize = const Size(1025, 800); // Desktop
           await tester.pumpAndSettle();
@@ -813,7 +827,7 @@ void main() {
             findsOneWidget,
           );
           expect(find.text('Your Booking'), findsOneWidget);
-          expect(find.textContaining('PAX ·'), findsOneWidget);
+          expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
         }
 
         // Oscillate across tablet/mobile boundary multiple times
@@ -832,7 +846,7 @@ void main() {
             findsOneWidget,
           );
           expect(find.text('Your Booking'), findsOneWidget);
-          expect(find.textContaining('PAX ·'), findsOneWidget);
+          expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
         }
       },
     );
@@ -935,9 +949,9 @@ void main() {
         );
         await tester.pump();
 
-        // Verify null fallbacks — P7 C distilled (no image/name, `₱` only, Inclusions fallback)
+        // Verify null fallbacks — C75 distilled (five label-value rows, count caption, `₱` only)
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.text('Inclusions'), findsOneWidget);
+        expect(find.text('No inclusions listed'), findsOneWidget);
         expect(find.text('₱4,500.00'), findsOneWidget);
         expect(find.textContaining('Not selected'), findsOneWidget);
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -1110,7 +1124,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('Jun 15, 2034'), findsOneWidget);
+        expect(find.byKey(const Key('summary_value_date')), findsOneWidget);
+        expect(find.text('Thursday, June 15, 2034'), findsWidgets);
       },
     );
 
@@ -1151,7 +1166,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.text('Inclusions'), findsOneWidget);
+        expect(find.text('4 inclusions'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );
@@ -1321,7 +1336,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('Mar 10, 2018'), findsOneWidget);
+        expect(find.byKey(const Key('summary_value_date')), findsOneWidget);
+        expect(find.text('Saturday, March 10, 2018'), findsWidgets);
         expect(tester.takeException(), isNull);
       },
     );
@@ -1550,7 +1566,7 @@ void main() {
           find.byKey(const Key('order_summary_side_panel')),
         );
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.text('Inclusions'), findsOneWidget);
+        expect(find.text('7 inclusions'), findsOneWidget);
         expect(find.text('₱4,500.00'), findsOneWidget);
 
         // C74: Trigger details transition (Schedule → Details).
@@ -1771,10 +1787,10 @@ void main() {
           paymentViewKey: 'desktop_payment_panel_view',
         );
 
-        // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (no payment chip)
+        // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (label-value rows, no payment chip)
         expect(find.text('Online Checkout'), findsOneWidget);
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.textContaining('PAX ·'), findsOneWidget);
+        expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
         expect(
           find.byKey(const Key('online_checkout_explainer')),
           findsOneWidget,
@@ -1791,7 +1807,7 @@ void main() {
 
         expect(find.text('Offline Payment Instructions'), findsOneWidget);
         expect(find.text('Your Booking'), findsOneWidget);
-        expect(find.textContaining('PAX ·'), findsOneWidget);
+        expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
       },
     );
 
@@ -2304,7 +2320,13 @@ void main() {
 
         // P6: pax is read-only. C18 pay-once: no picker on the
         // reservation step — pick Online once at the payment step.
-        expect(find.text('20 PAX'), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const Key('pax_readonly_row')),
+            matching: find.text('20 PAX'),
+          ),
+          findsOneWidget,
+        );
         expect(
           find.descendant(
             of: find.byKey(const Key('reservation_details_panel')),
