@@ -65,9 +65,36 @@ void main() {
       expect(container.read(bookingFlowProvider).selectedPax, 100);
       expect(find.textContaining('100 PAX'), findsWidgets);
 
-      // Checkout (payment step) keeps the higher pax.
+      // C74: Checkout (payment step) keeps the higher pax — reached
+      // via Details (Schedule → Details → Payment, no direct jump).
       await tester.tap(find.text('Proceed to Payment'));
       await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('desktop_details_form_view')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('desktop_payment_panel_view')),
+        findsNothing,
+      );
+      const detailsFields = {
+        'desktop_customer_name': 'Maria Clara',
+        'desktop_customer_email': 'maria@example.com',
+        'desktop_customer_phone': '+639171234567',
+        'desktop_venue_address': 'The Peninsula Manila',
+      };
+      for (final entry in detailsFields.entries) {
+        final finder = find.byKey(Key(entry.key));
+        await tester.ensureVisible(finder);
+        await tester.enterText(finder, entry.value);
+        await tester.pump();
+      }
+      await tester.tap(find.text('Proceed to Payment'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('desktop_payment_panel_view')),
+        findsOneWidget,
+      );
       expect(container.read(bookingFlowProvider).selectedPax, 100);
       expect(find.textContaining('100 PAX'), findsWidgets);
     },
