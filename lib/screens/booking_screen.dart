@@ -1219,7 +1219,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   /// Shows the selected date/time/venue/contact when provided, neutral
   /// prompts otherwise. Editing stays in step 3 — no TextFields here.
   Widget _buildScheduleEventSummary() {
-    final flow = ref.read(bookingFlowProvider);
+    final flow = ref.watch(bookingFlowProvider);
     final venue = (flow.venueAddress ?? '').trim();
     final contact = (flow.customerName ?? '').trim();
     return Container(
