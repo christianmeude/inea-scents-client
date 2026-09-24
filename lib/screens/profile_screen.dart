@@ -55,48 +55,20 @@ class ProfileScreen extends ConsumerWidget {
               // C60: Q9 retired.
 
               // ==================================================
-              // PROFILE + SETTINGS (P7 impeccable adapt: stacked
-              // on mobile, side-by-side on web)
+              // PROFILE + SETTINGS (C71: stacked single column
+              // on all breakpoints)
               // ==================================================
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final settings = _SettingsColumn(
-                    onLogout: () {
-                      ref.read(authProvider.notifier).logout();
-                      context.go('/login');
-                    },
-                  );
-                  final profile = _ProfileCard(
-                    userName: userName,
-                    userEmail: userEmail,
-                    firstLetter: firstLetter,
-                  );
-                  // C29: Upcoming Booking section removed from profile only;
-                  // /bookings/:id route + detail screen intact (C11).
-                  // C37: inline form card removed (supersedes C29 scaffold).
-                  if (constraints.maxWidth <=
-                      ResponsiveAppShell.tabletBreakpoint) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [profile, const SizedBox(height: 12), settings],
-                    );
-                  }
-
-                  return Center(
-                    child: ConstrainedBox(
-                      // C56: match the 1200 shell cap like every other
-                      // tab screen (was 600, narrower than the shell).
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: profile),
-                          const SizedBox(width: 16),
-                          Expanded(child: settings),
-                        ],
-                      ),
-                    ),
-                  );
+              // C71: single column on all breakpoints.
+              _ProfileCard(
+                userName: userName,
+                userEmail: userEmail,
+                firstLetter: firstLetter,
+              ),
+              const SizedBox(height: 12),
+              _SettingsColumn(
+                onLogout: () {
+                  ref.read(authProvider.notifier).logout();
+                  context.go('/login');
                 },
               ),
 
