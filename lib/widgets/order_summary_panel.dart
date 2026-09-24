@@ -21,6 +21,12 @@ class OrderSummaryPanel extends StatelessWidget {
   // C31: single-sourced via AppTheme (never per-screen hex).
   static const Color plum = AppTheme.primaryButtonBackground;
 
+  // Sticky-rail viewport cap (C75 sweep): reserve for header/footer chrome,
+  // clamped so the rail stays usable on short and tall viewports.
+  static const double _railViewportReserve = 140.0;
+  static const double _railMinHeight = 240.0;
+  static const double _railMaxHeight = 720.0;
+
   final Package package;
   final DateTime? selectedDate;
   final String? selectedTime;
@@ -30,10 +36,6 @@ class OrderSummaryPanel extends StatelessWidget {
   final String actionButtonText;
   final bool isLoading;
   final bool isSticky;
-
-  /// Retained for call-site compatibility; the venue now lives in the
-  /// Details/schedule steps, so the summary no longer renders it.
-  final String? venueAddress;
 
   const OrderSummaryPanel({
     super.key,
@@ -46,7 +48,6 @@ class OrderSummaryPanel extends StatelessWidget {
     this.actionButtonText = 'Confirm & Pay',
     this.isLoading = false,
     this.isSticky = true,
-    this.venueAddress,
   });
 
   /// Explicit contract date: `Saturday, September 26, 2026`.
@@ -329,7 +330,8 @@ class OrderSummaryPanel extends StatelessWidget {
     // (none in the flow; covered by widget tests) get the bare card.
     if (!isSticky) return card;
     final viewportHeight = MediaQuery.of(context).size.height;
-    final cap = (viewportHeight - 140).clamp(240.0, 720.0);
+    final cap = (viewportHeight - _railViewportReserve)
+        .clamp(_railMinHeight, _railMaxHeight);
     return ConstrainedBox(
       constraints: BoxConstraints(maxHeight: cap),
       child: SingleChildScrollView(

@@ -827,7 +827,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     selectedTime: _selectedTime,
                     selectedPax: _selectedPax,
                     paymentMethod: _paymentMethod,
-                    venueAddress: ref.watch(bookingFlowProvider).venueAddress,
                     actionButtonText: isPayment
                         ? 'Confirm & Pay'
                         : 'Proceed to Payment',
@@ -1006,7 +1005,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     selectedTime: _selectedTime,
                     selectedPax: _selectedPax,
                     paymentMethod: _paymentMethod,
-                    venueAddress: ref.watch(bookingFlowProvider).venueAddress,
                     actionButtonText: isPayment
                         ? 'Confirm & Pay'
                         : 'Proceed to Payment',
