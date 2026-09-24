@@ -502,7 +502,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   // C6: single in-flow edit path — pax "Change" stays on the schedule
-  // step via _goToStep(2), the same path as onBackToReservation below.
+  // step via _goToStep(2). Backward nav is stepwise (mobile parity):
+  // header Back uses previousStep() (4→3→2), never a direct jump.
   // The /package-details router jump is dropped (router.dart untouched).
 
   /// Freeform clock-time picker. Stores `H:i:s` directly (no slot labels);
@@ -746,7 +747,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                       .setPaymentMethod(method);
                                 },
                                 onBackToReservation: () {
-                                  _goToStep(2);
+                                  _goToStep(3);
                                 },
                               )
                             // C74: web/tablet follows Schedule(2) →
@@ -937,7 +938,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                       .setPaymentMethod(method);
                                 },
                                 onBackToReservation: () {
-                                  _goToStep(2);
+                                  _goToStep(3);
                                 },
                               )
                             // C74: same 3-stage flow as desktop — the step-3
@@ -1393,8 +1394,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         children: [
           TextButton.icon(
             onPressed: () {
+              // Stepwise backward nav (mobile parity): header Back is
+              // previousStep() — 4→3→2 — never a direct jump to Schedule.
               if (_currentStep > 2) {
-                _goToStep(2);
+                ref.read(bookingFlowProvider.notifier).previousStep();
               } else if (context.canPop()) {
                 context.pop();
               } else {

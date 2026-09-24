@@ -27,9 +27,10 @@ class DesktopPaymentPanel extends StatefulWidget {
   final ValueChanged<String>? onCustomerPhoneChanged;
   final ValueChanged<String>? onVenueAddressChanged;
   // C6: onBackToReservation identifier kept for booking_screen call sites
-  // (in-flow via _goToStep(2), never via the router). C8: the redundant
-  // in-panel header + Edit Selection chip were distilled; navigation now
-  // lives solely in the booking header Back affordance.
+  // (in-flow via _goToStep(3) — stepwise back to Details, never via the
+  // router). C8: the redundant in-panel header + Edit Selection chip were
+  // distilled; navigation now lives solely in the booking header Back
+  // affordance (previousStep(), mobile parity).
   final VoidCallback? onBackToReservation;
 
   const DesktopPaymentPanel({

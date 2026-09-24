@@ -770,7 +770,18 @@ void main() {
         await tester.tap(cashFinder);
         await tester.pumpAndSettle();
 
-        // Back to the schedule step for the oscillation below.
+        // Stepwise back to Schedule (4→3 Details, then 3→2; mobile
+        // parity) for the oscillation below.
+        final backToDetailsFirst = find.text('Back');
+        await tester.ensureVisible(backToDetailsFirst);
+        await tester.pumpAndSettle();
+        await tester.tap(backToDetailsFirst);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+
         final backToSchedule = find.text('Back');
         await tester.ensureVisible(backToSchedule);
         await tester.pumpAndSettle();
@@ -1633,7 +1644,7 @@ void main() {
     );
 
     testWidgets(
-      'Header Back button cross-fades back from DesktopPaymentPanel to 2-column reservation layout',
+      'Header Back button steps back from DesktopPaymentPanel to Details, then to 2-column reservation layout',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1653,14 +1664,26 @@ void main() {
           paymentViewKey: 'desktop_payment_panel_view',
         );
 
-        // Tap Header Back button
+        // Tap Header Back button (stepwise: 4→3, mobile parity)
         await tester.tap(find.text('Back'));
         await tester.pump(const Duration(milliseconds: 150));
         expect(find.byType(FadeTransition), findsWidgets);
 
         await tester.pumpAndSettle();
 
-        // Returned to 2-column reservation layout (P6)
+        // Back on the Details form (step 3), not the schedule layout.
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsNothing,
+        );
+
+        // Back again: 3→2 returns to the 2-column reservation layout (P6)
+        await tester.tap(find.text('Back'));
+        await tester.pumpAndSettle();
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
@@ -1669,16 +1692,12 @@ void main() {
           find.byKey(const Key('reservation_details_panel')),
           findsOneWidget,
         );
-        expect(
-          find.byKey(const Key('desktop_payment_panel_view')),
-          findsNothing,
-        );
         expect(find.text('Proceed to Payment'), findsOneWidget);
       },
     );
 
     testWidgets(
-      'C8: Edit Selection chip distilled; header Back still cross-fades back to 2-column reservation layout',
+      'C8: Edit Selection chip distilled; header Back steps back to Details, then to 2-column reservation layout',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1701,10 +1720,21 @@ void main() {
         // C8: in-panel Edit Selection chip distilled; C6 Back affordance preserved.
         expect(find.text('Edit Selection'), findsNothing);
         expect(find.text('Payment & Checkout Details'), findsNothing);
+        // Stepwise back (mobile parity): 4→3 lands on the Details form.
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('desktop_payment_panel_view')),
+          findsNothing,
+        );
 
-        // Returned to Calendar and Details panels
+        // 3→2 returns to Calendar and Details panels.
+        await tester.tap(find.text('Back'));
+        await tester.pumpAndSettle();
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
@@ -2300,11 +2330,23 @@ void main() {
         await tester.tap(onlineOption);
         await tester.pumpAndSettle();
 
-        // Back to the reservation step for the oscillation below.
-        final backToReservation = find.text('Back');
-        await tester.ensureVisible(backToReservation);
+        // Stepwise back to Details (4→3, mobile parity) for the
+        // oscillation below.
+        final backToDetails = find.text('Back');
+        await tester.ensureVisible(backToDetails);
         await tester.pumpAndSettle();
-        await tester.tap(backToReservation);
+        await tester.tap(backToDetails);
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('desktop_details_form_view')),
+          findsOneWidget,
+        );
+
+        // And 3→2 back to the schedule step.
+        final backToSchedule = find.text('Back');
+        await tester.ensureVisible(backToSchedule);
+        await tester.pumpAndSettle();
+        await tester.tap(backToSchedule);
         await tester.pumpAndSettle();
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
@@ -2344,11 +2386,24 @@ void main() {
             findsOneWidget,
           );
 
-          // C8: chip distilled — header Back (C6 _goToStep(2)) returns.
+          // C8: chip distilled — header Back steps back stepwise
+          // (4→3 Details, then 3→2 Schedule; mobile parity).
           final editSel = find.text('Back');
           await tester.ensureVisible(editSel);
           await tester.pumpAndSettle();
           await tester.tap(editSel);
+          await tester.pump(const Duration(milliseconds: 100));
+          expect(find.byType(FadeTransition), findsWidgets);
+          await tester.pumpAndSettle();
+          expect(
+            find.byKey(const Key('desktop_details_form_view')),
+            findsOneWidget,
+          );
+
+          final editSelAgain = find.text('Back');
+          await tester.ensureVisible(editSelAgain);
+          await tester.pumpAndSettle();
+          await tester.tap(editSelAgain);
           await tester.pump(const Duration(milliseconds: 100));
           expect(find.byType(FadeTransition), findsWidgets);
           await tester.pumpAndSettle();

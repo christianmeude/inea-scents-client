@@ -149,6 +149,24 @@ void main() {
       await tester.tap(back);
       await tester.pumpAndSettle();
 
+      // Stepwise back (mobile parity): 4→3 lands on the Details form
+      // with the selected date preserved in the flow.
+      expect(
+        container.read(bookingFlowProvider).selectedDate,
+        equals(target),
+      );
+      expect(
+        find.byKey(const Key('desktop_details_form_view')),
+        findsOneWidget,
+      );
+
+      // 3→2 returns to the schedule layout; the date survives there too.
+      final backAgain = find.text('Back');
+      await tester.ensureVisible(backAgain);
+      await tester.pumpAndSettle();
+      await tester.tap(backAgain);
+      await tester.pumpAndSettle();
+
       expect(
         container.read(bookingFlowProvider).selectedDate,
         equals(target),
