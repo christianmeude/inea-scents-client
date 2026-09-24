@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../config/theme.dart';
 import 'card_surfaces.dart';
 
 /// C42: one shared two-slot tab header (C41 spec §1–§3, pairing B).
 ///
 /// LEFT — title + count/subtitle. RIGHT — one reserved trailing slot that
 /// renders empty until a future ticket wires an action (zero actions now).
-/// Title 26px at/above [narrowBreakpoint], 22px below; count fixed 13px;
+/// Title 32px at/above [narrowBreakpoint], 28px below (script optical
+/// parity vs the old 26/22 sans); count fixed 13px;
 /// single-line ellipsis, step change only (no FittedBox).
 class TabHeader extends StatelessWidget {
   /// Viewport breakpoint matching the existing `< 768` checks (C41 §3).
   static const double narrowBreakpoint = 768;
-  static const double titleSizeWide = 26;
-  static const double titleSizeNarrow = 22;
+  static const double titleSizeWide = 32;
+  static const double titleSizeNarrow = 28;
   static const double countSize = 13;
-  static const double titleLetterSpacing = -0.3;
+  static const double titleLetterSpacing = 0;
 
-  /// C57: header title renders Josefin Sans (was Cormorant Garamond);
-  /// fallback stack is the single-source [AppTheme.brandFontFallback].
-  static const List<String> titleFallback = AppTheme.brandFontFallback;
+  /// C73: header title renders Great Vibes (was Josefin Sans, C57);
+  /// script-first offline-safe fallback (brand stack stays Josefin
+  /// for the INEA logo — out of scope, do not realias).
+  static const List<String> titleFallback = [
+    'Great Vibes',
+    'Segoe UI',
+    'Roboto',
+    'sans-serif',
+  ];
   static const List<String> bodyFallback = [
     'Figtree',
     '-apple-system',
@@ -52,12 +58,13 @@ class TabHeader extends StatelessWidget {
     // C41 §5 B: explicit fallback stacks hold with font-fetch disabled.
     // (copyWith AFTER the GoogleFonts call — the package overwrites
     // fontFamilyFallback internally.)
-    final titleStyle = GoogleFonts.josefinSans(
+    // C73: Great Vibes ships Regular 400 only — w400 (no synthetic
+    // bold), neutral tracking (scripts kern naturally), natural line
+    // height (script descenders clip under the old 1.15 override).
+    final titleStyle = GoogleFonts.greatVibes(
       fontSize: titleSizeFor(MediaQuery.sizeOf(context).width),
-      fontWeight: FontWeight.w600,
+      fontWeight: FontWeight.w400,
       letterSpacing: titleLetterSpacing,
-      // Josefin's taller caps never wrap where the old serif fit.
-      height: 1.15,
       color: CardSurfaces.title(context),
     ).copyWith(fontFamilyFallback: titleFallback);
     final countStyle = GoogleFonts.figtree(
