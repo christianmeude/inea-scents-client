@@ -36,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
         // Expanded logo zone that centers the muted mark in the
         // card-edge-to-screen-bottom space instead of scrolling.
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,20 +82,14 @@ class ProfileScreen extends ConsumerWidget {
                     );
                   }
 
-                  return Center(
-                    child: ConstrainedBox(
-                      // C56: match the 1200 shell cap like every other
-                      // tab screen (was 600, narrower than the shell).
-                      constraints: const BoxConstraints(maxWidth: 1200),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: profile),
-                          const SizedBox(width: 16),
-                          Expanded(child: settings),
-                        ],
-                      ),
-                    ),
+                  // C72: full-bleed (exempt from the 1200 shell cap).
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: profile),
+                      const SizedBox(width: 16),
+                      Expanded(child: settings),
+                    ],
                   );
                 },
               ),
