@@ -55,42 +55,19 @@ class ProfileScreen extends ConsumerWidget {
               // C60: Q9 retired.
 
               // ==================================================
-              // PROFILE + SETTINGS (P7 impeccable adapt: stacked
-              // on mobile, side-by-side on web)
+              // PROFILE + SETTINGS (C71: stacked single column
+              // on all breakpoints)
               // ==================================================
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final settings = _SettingsColumn(
-                    onLogout: () {
-                      ref.read(authProvider.notifier).logout();
-                      context.go('/login');
-                    },
-                  );
-                  final profile = _ProfileCard(
-                    userName: userName,
-                    userEmail: userEmail,
-                    firstLetter: firstLetter,
-                  );
-                  // C29: Upcoming Booking section removed from profile only;
-                  // /bookings/:id route + detail screen intact (C11).
-                  // C37: inline form card removed (supersedes C29 scaffold).
-                  if (constraints.maxWidth <=
-                      ResponsiveAppShell.tabletBreakpoint) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [profile, const SizedBox(height: 12), settings],
-                    );
-                  }
-
-                  // C72: full-bleed (exempt from the 1200 shell cap).
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: profile),
-                      const SizedBox(width: 16),
-                      Expanded(child: settings),
-                    ],
-                  );
+              _ProfileCard(
+                userName: userName,
+                userEmail: userEmail,
+                firstLetter: firstLetter,
+              ),
+              const SizedBox(height: 12),
+              _SettingsColumn(
+                onLogout: () {
+                  ref.read(authProvider.notifier).logout();
+                  context.go('/login');
                 },
               ),
 
@@ -123,7 +100,7 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 // ============================================================================
-// PROFILE CARD (P7: shared by stacked + side-by-side compositions)
+// PROFILE CARD (P7: single-column composition)
 // ============================================================================
 
 class _ProfileCard extends StatelessWidget {
@@ -269,7 +246,7 @@ class _ProfileCard extends StatelessWidget {
 }
 
 // ============================================================================
-// SETTINGS COLUMN (P7: header + card, shared by both compositions)
+// SETTINGS COLUMN (P7: header + card, single-column composition)
 // ============================================================================
 
 class _SettingsColumn extends StatelessWidget {

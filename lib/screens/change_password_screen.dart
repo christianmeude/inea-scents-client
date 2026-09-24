@@ -167,108 +167,103 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _FieldLabel(
-                          text: 'Current password',
-                          color: textColor,
-                        ),
-                        const SizedBox(height: 4),
-                        CustomTextField(
+                        TextFormField(
                           key: const Key('change_password_current'),
                           controller: _currentController,
                           obscureText: _obscureCurrent,
                           textInputAction: TextInputAction.next,
                           autofillHints: const [AutofillHints.password],
-                          onChanged: (_) => _touch('current'),
-                          suffixIcon: IconButton(
-                            mouseCursor: SystemMouseCursors.click,
-                            onPressed: () => setState(
-                              () => _obscureCurrent = !_obscureCurrent,
-                            ),
-                            icon: Icon(
-                              _obscureCurrent
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.white.withValues(alpha: 0.7),
-                              size: 18,
+                          decoration: InputDecoration(
+                            labelText: 'Current password',
+                            suffixIcon: IconButton(
+                              mouseCursor: SystemMouseCursors.click,
+                              onPressed: () => setState(
+                                () => _obscureCurrent = !_obscureCurrent,
+                              ),
+                              icon: Icon(
+                                _obscureCurrent
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                size: 18,
+                              ),
                             ),
                           ),
+                          onChanged: (_) => _touch('current'),
                         ),
                         InlineFieldError(
                           key: const Key('change_password_current_error'),
                           message: currentError,
                         ),
                         const SizedBox(height: 16),
-                        _FieldLabel(text: 'New password', color: textColor),
-                        const SizedBox(height: 4),
-                        CustomTextField(
+                        TextFormField(
                           key: const Key('change_password_new'),
                           controller: _newController,
                           obscureText: _obscureNew,
                           textInputAction: TextInputAction.next,
                           autofillHints: const [AutofillHints.newPassword],
+                          decoration: InputDecoration(
+                            labelText: 'New password',
+                            suffixIcon: IconButton(
+                              mouseCursor: SystemMouseCursors.click,
+                              onPressed: () => setState(
+                                () => _obscureNew = !_obscureNew,
+                              ),
+                              icon: Icon(
+                                _obscureNew
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                size: 18,
+                              ),
+                            ),
+                          ),
                           onChanged: (_) {
                             _touch('new');
                             if (_touched['confirm'] == true) setState(() {});
                           },
-                          suffixIcon: IconButton(
-                            mouseCursor: SystemMouseCursors.click,
-                            onPressed: () => setState(
-                              () => _obscureNew = !_obscureNew,
-                            ),
-                            icon: Icon(
-                              _obscureNew
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.white.withValues(alpha: 0.7),
-                              size: 18,
-                            ),
-                          ),
                         ),
                         InlineFieldError(
                           key: const Key('change_password_new_error'),
                           message: newError,
                         ),
                         const SizedBox(height: 16),
-                        _FieldLabel(
-                          text: 'Confirm new password',
-                          color: textColor,
-                        ),
-                        const SizedBox(height: 4),
-                        CustomTextField(
+                        TextFormField(
                           key: const Key('change_password_confirm'),
                           controller: _confirmController,
                           obscureText: _obscureConfirm,
                           textInputAction: TextInputAction.next,
                           autofillHints: const [AutofillHints.newPassword],
-                          onChanged: (_) => _touch('confirm'),
-                          suffixIcon: IconButton(
-                            mouseCursor: SystemMouseCursors.click,
-                            onPressed: () => setState(
-                              () => _obscureConfirm = !_obscureConfirm,
-                            ),
-                            icon: Icon(
-                              _obscureConfirm
-                                  ? Icons.visibility_outlined
-                                  : Icons.visibility_off_outlined,
-                              color: Colors.white.withValues(alpha: 0.7),
-                              size: 18,
+                          decoration: InputDecoration(
+                            labelText: 'Confirm new password',
+                            suffixIcon: IconButton(
+                              mouseCursor: SystemMouseCursors.click,
+                              onPressed: () => setState(
+                                () => _obscureConfirm = !_obscureConfirm,
+                              ),
+                              icon: Icon(
+                                _obscureConfirm
+                                    ? Icons.visibility_outlined
+                                    : Icons.visibility_off_outlined,
+                                size: 18,
+                              ),
                             ),
                           ),
+                          onChanged: (_) => _touch('confirm'),
                         ),
                         InlineFieldError(
                           key: const Key('change_password_confirm_error'),
                           message: confirmError,
                         ),
                         const SizedBox(height: 16),
-                        _FieldLabel(text: '6-digit code', color: textColor),
-                        const SizedBox(height: 4),
-                        CustomTextField(
+                        TextFormField(
                           key: const Key('change_password_code'),
                           controller: _codeController,
                           keyboardType: TextInputType.number,
                           textInputAction: TextInputAction.done,
                           autofillHints: const [AutofillHints.oneTimeCode],
-                          hintText: '123456',
+                          decoration: const InputDecoration(
+                            labelText: '6-digit code',
+                            hintText: '123456',
+                          ),
                           onChanged: (_) => _touch('code'),
                         ),
                         InlineFieldError(
@@ -310,28 +305,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FieldLabel extends StatelessWidget {
-  final String text;
-  final Color color;
-
-  const _FieldLabel({required this.text, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
         ),
       ),
     );
