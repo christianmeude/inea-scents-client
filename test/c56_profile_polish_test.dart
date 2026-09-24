@@ -9,7 +9,7 @@ import 'package:inea_scents_client/widgets/index.dart';
 
 import 'helpers/fake_api.dart';
 
-/// C56: profile polish — 1200 shell cap, enlarged footer logo, toggle renders.
+/// C56: profile polish — single-column layout, enlarged footer logo, toggle renders.
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;

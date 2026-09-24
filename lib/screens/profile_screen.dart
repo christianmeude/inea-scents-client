@@ -58,7 +58,6 @@ class ProfileScreen extends ConsumerWidget {
               // PROFILE + SETTINGS (C71: stacked single column
               // on all breakpoints)
               // ==================================================
-              // C71: single column on all breakpoints.
               _ProfileCard(
                 userName: userName,
                 userEmail: userEmail,
@@ -101,7 +100,7 @@ class ProfileScreen extends ConsumerWidget {
 }
 
 // ============================================================================
-// PROFILE CARD (P7: shared by stacked + side-by-side compositions)
+// PROFILE CARD (P7: single-column composition)
 // ============================================================================
 
 class _ProfileCard extends StatelessWidget {
@@ -247,7 +246,7 @@ class _ProfileCard extends StatelessWidget {
 }
 
 // ============================================================================
-// SETTINGS COLUMN (P7: header + card, shared by both compositions)
+// SETTINGS COLUMN (P7: header + card, single-column composition)
 // ============================================================================
 
 class _SettingsColumn extends StatelessWidget {
