@@ -35,63 +35,72 @@ class ProfileScreen extends ConsumerWidget {
         // C9: no-scroll fit at 360x800 — fixed header/cards plus an
         // Expanded logo zone that centers the muted mark in the
         // card-edge-to-screen-bottom space instead of scrolling.
-        child: Padding(
-          padding: ResponsiveAppShell.screenHeaderPadding.copyWith(bottom: 12),
-
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ==================================================
-              // PAGE TITLE (C42: unified header, trailing empty —
-              // C35: dark-aware via CardSurfaces, never per-screen hex)
-              // ==================================================
-              const TabHeader(
-                title: 'My Profile',
-                count: 'Manage your account and preferences.',
+        // C81: Center > ConstrainedBox cap mirrors home/bookings; the
+        // header padding lives INSIDE the cap. C71 single-column stack
+        // kept; no 600 card constraint (that's C82).
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveAppShell.maxContentWidth,
+            ),
+            child: Padding(
+              padding: ResponsiveAppShell.screenHeaderPadding.copyWith(
+                bottom: 12,
               ),
 
-              const SizedBox(height: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ==================================================
+                  // PAGE TITLE (C42: unified header, trailing empty —
+                  // C35: dark-aware via CardSurfaces, never per-screen hex)
+                  // ==================================================
+                  const TabHeader(
+                    title: 'My Profile',
+                    count: 'Manage your account and preferences.',
+                  ),
 
-              // C60: Q9 retired.
+                  const SizedBox(height: 12),
 
-              // ==================================================
-              // PROFILE + SETTINGS (C71: stacked single column
-              // on all breakpoints)
-              // ==================================================
-              _ProfileCard(
-                userName: userName,
-                userEmail: userEmail,
-                firstLetter: firstLetter,
-              ),
-              const SizedBox(height: 12),
-              _SettingsColumn(
-                onLogout: () {
-                  ref.read(authProvider.notifier).logout();
-                  context.go('/login');
-                },
-              ),
+                  // C60: Q9 retired.
 
-              // ==================================================
-              // BRAND FOOTER (C9: muted mark optically centered in
-              // the card-edge-to-screen-bottom zone; SizedBox
-              // bounds the AppLogo FittedBox so its layout box
-              // stays compact — Transform.scale kept the full-size
-              // box and pushed 360x800 into scroll/overflow).
-              Expanded(
-                child: Center(
-                  child: Opacity(
-                    opacity: 0.3,
-                    // C56: enlarged footer mark (was 120) so the brand
-                    // reads at desktop widths; still bounded so the
-                    // 360x800 no-scroll fit holds.
-                    child: SizedBox(
-                      width: 180,
-                      child: const AppLogo(),
+                  // ==================================================
+                  // PROFILE + SETTINGS (C71: stacked single column
+                  // on all breakpoints)
+                  // ==================================================
+                  _ProfileCard(
+                    userName: userName,
+                    userEmail: userEmail,
+                    firstLetter: firstLetter,
+                  ),
+                  const SizedBox(height: 12),
+                  _SettingsColumn(
+                    onLogout: () {
+                      ref.read(authProvider.notifier).logout();
+                      context.go('/login');
+                    },
+                  ),
+
+                  // ==================================================
+                  // BRAND FOOTER (C9: muted mark optically centered in
+                  // the card-edge-to-screen-bottom zone; SizedBox
+                  // bounds the AppLogo FittedBox so its layout box
+                  // stays compact — Transform.scale kept the full-size
+                  // box and pushed 360x800 into scroll/overflow).
+                  Expanded(
+                    child: Center(
+                      child: Opacity(
+                        opacity: 0.3,
+                        // C56: enlarged footer mark (was 120) so the brand
+                        // reads at desktop widths; still bounded so the
+                        // 360x800 no-scroll fit holds.
+                        child: SizedBox(width: 180, child: const AppLogo()),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
