@@ -2412,10 +2412,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             hintStyle: TextStyle(fontSize: 13, color: _body),
             prefixIcon: Icon(icon, size: 20, color: _body),
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 14,
-              horizontal: 12,
-            ),
           ),
         ),
       ],
