@@ -59,7 +59,25 @@ void main() {
             .length;
         expect(gaps, 2);
 
-        // C26: 20px screen edge padding around header + every card.
+        // C26/C72: 20px screen edges — header carries the shared token
+        // (fromLTRB 20,18,20,0: 20px edges, 18 top), cards keep
+        // symmetric horizontal 20.
+        final headerPaddings = tester
+            .widgetList<Padding>(find.byWidgetPredicate(
+              (w) =>
+                  w is Padding &&
+                  w.padding ==
+                      ResponsiveAppShell.screenHeaderPadding
+                          .copyWith(bottom: 0),
+            ))
+            .toList();
+        expect(headerPaddings.length, 1);
+        final headerInsets = headerPaddings.single.padding as EdgeInsets;
+        expect(headerInsets.left, 20);
+        expect(headerInsets.right, 20);
+        expect(headerInsets.top, 18);
+        expect(headerInsets.bottom, 0);
+
         final edges = tester
             .widgetList<Padding>(find.byWidgetPredicate(
               (w) =>
@@ -67,7 +85,7 @@ void main() {
                   w.padding == const EdgeInsets.symmetric(horizontal: 20),
             ))
             .length;
-        expect(edges, 4);
+        expect(edges, 3);
       });
     }
   });
