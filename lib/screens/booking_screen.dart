@@ -64,7 +64,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   Color get _surfaceBorder => CardSurfaces.cardBorder(context);
   Color get _title => CardSurfaces.title(context);
   Color get _body => CardSurfaces.body(context);
-  Color get _chip => CardSurfaces.chipBg(context);
 
   /// P4 state shape: selections are owned by [bookingFlowProvider].
   /// The screen watches (see build) and dispatches — no local mirror.
@@ -2396,8 +2395,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
     required TextInputType textInputType,
     required ValueChanged<String> onChanged,
   }) {
-    // P7 (Q4): enabled/focused borders share width 1.0 — only the
-    // color changes, so focus never shifts layout.
+    // Borders/fill inherit InputDecorationTheme (radius 12).
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2417,16 +2415,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             contentPadding: const EdgeInsets.symmetric(
               vertical: 14,
               horizontal: 12,
-            ),
-            filled: true,
-            fillColor: _chip,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _surfaceBorder),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: _title, width: 1.0),
             ),
           ),
         ),
