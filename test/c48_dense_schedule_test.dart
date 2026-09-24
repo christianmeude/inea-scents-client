@@ -81,7 +81,7 @@ void main() {
   });
 
   group('c48 dense schedule shape', () {
-    testWidgets('desktop grid: calendar + time/pax columns with sticky rail, §1 retired', (
+    testWidgets('desktop stack: pax header + full-width calendar, then time/pax + event recap, sticky rail, §1 retired', (
       WidgetTester tester,
     ) async {
       addTearDown(tester.view.resetPhysicalSize);
@@ -90,8 +90,10 @@ void main() {
       addTearDown(container.dispose);
       await _pump(tester, container, const Size(1280, 800));
 
+      // C76: ColB dissolved beside the calendar — the schedule step is a
+      // vertical stack in the flow column.
       expect(
-        find.byKey(const Key('desktop_reservation_columns_view')),
+        find.byKey(const Key('desktop_schedule_stack_view')),
         findsOneWidget,
       );
       expect(
@@ -102,27 +104,50 @@ void main() {
         find.byKey(const Key('reservation_details_panel')),
         findsOneWidget,
       );
+      expect(find.byKey(const Key('schedule_pax_header')), findsOneWidget);
+      expect(find.byKey(const Key('schedule_event_summary')), findsOneWidget);
       expect(
         find.byKey(const Key('order_summary_side_panel')),
         findsOneWidget,
       );
 
-      // COL A left of COL B left of rail (flex ratio + gaps unchanged).
-      final calLeft = tester
+      // Stack order: Pax header above calendar above details above the
+      // event recap; the rail stays right of the flow column.
+      final headerTop = tester
+          .getTopLeft(find.byKey(const Key('schedule_pax_header')))
+          .dy;
+      final calTop = tester
           .getTopLeft(find.byKey(const Key('reservation_calendar_panel')))
+          .dy;
+      final detTop = tester
+          .getTopLeft(find.byKey(const Key('reservation_details_panel')))
+          .dy;
+      final recapTop = tester
+          .getTopLeft(find.byKey(const Key('schedule_event_summary')))
+          .dy;
+      final railLeft = tester
+          .getTopLeft(find.byKey(const Key('order_summary_side_panel')))
           .dx;
       final detLeft = tester
           .getTopLeft(find.byKey(const Key('reservation_details_panel')))
           .dx;
-      final railLeft = tester
-          .getTopLeft(find.byKey(const Key('order_summary_side_panel')))
-          .dx;
-      expect(calLeft, lessThan(detLeft));
+      expect(headerTop, lessThan(calTop));
+      expect(calTop, lessThan(detTop));
+      expect(detTop, lessThan(recapTop));
       expect(detLeft, lessThan(railLeft));
 
-      // COL B keeps time + pax keys with the in-flow Change path.
+      // Calendar spans the full flow-column width (no side-by-side ColB).
+      final stackWidth = tester
+          .getRect(find.byKey(const Key('desktop_schedule_stack_view')))
+          .width;
+      final calWidth = tester
+          .getRect(find.byKey(const Key('reservation_calendar_panel')))
+          .width;
+      expect(calWidth, moreOrLessEquals(stackWidth, epsilon: 2.0));
+
+      // Pax locked: readonly row stays, Change affordance is gone (C76).
       expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-      expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
+      expect(find.byKey(const Key('pax_change_link')), findsNothing);
       expect(find.byKey(const Key('event_time_picker_button')), findsOneWidget);
 
       // §1 package card retired from the schedule step on both panels.
@@ -160,7 +185,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('tablet keeps stacked flow + rail with §1 retired', (
+    testWidgets('tablet keeps stacked flow + rail with §1 retired, pax locked', (
       WidgetTester tester,
     ) async {
       addTearDown(tester.view.resetPhysicalSize);
@@ -171,10 +196,14 @@ void main() {
 
       expect(find.byKey(const Key('tablet_calendar_panel')), findsOneWidget);
       expect(find.byKey(const Key('tablet_details_panel')), findsOneWidget);
+      expect(find.byKey(const Key('schedule_pax_header')), findsOneWidget);
+      expect(find.byKey(const Key('schedule_event_summary')), findsOneWidget);
       expect(
         find.byKey(const Key('tablet_order_summary_panel')),
         findsOneWidget,
       );
+      // C76: no Change affordance anywhere on the schedule step.
+      expect(find.byKey(const Key('pax_change_link')), findsNothing);
       expect(
         find.descendant(
           of: find.byKey(const Key('tablet_details_panel')),
@@ -185,7 +214,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('mobile stack order: calendar, time, pax, collapsed summary', (
+    testWidgets('mobile stack order: pax header, calendar, time, event recap, collapsed summary', (
       WidgetTester tester,
     ) async {
       addTearDown(tester.view.resetPhysicalSize);
@@ -194,31 +223,38 @@ void main() {
       addTearDown(container.dispose);
       await _pump(tester, container, const Size(360, 740));
 
+      expect(find.byKey(const Key('schedule_pax_header')), findsNothing);
       expect(find.byKey(const Key('mobile_inea_calendar')), findsOneWidget);
       expect(find.byKey(const Key('event_time_picker_button')), findsOneWidget);
+      // C76: the mobile pax block IS the locked header (no Change link).
       expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-      expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
+      expect(find.byKey(const Key('pax_change_link')), findsNothing);
+      expect(find.byKey(const Key('schedule_event_summary')), findsOneWidget);
       expect(
         find.byKey(const Key('mobile_schedule_collapsed_summary')),
         findsOneWidget,
       );
 
-      // Date + time adjacent (densify intent): time sits above pax.
+      // Pax header first, then calendar, time, event recap, collapsed.
+      final paxTop = tester
+          .getTopLeft(find.byKey(const Key('pax_readonly_row')))
+          .dy;
       final calTop = tester
           .getTopLeft(find.byKey(const Key('mobile_inea_calendar')))
           .dy;
       final timeTop = tester
           .getTopLeft(find.byKey(const Key('event_time_picker_button')))
           .dy;
-      final paxTop = tester
-          .getTopLeft(find.byKey(const Key('pax_readonly_row')))
+      final recapTop = tester
+          .getTopLeft(find.byKey(const Key('schedule_event_summary')))
           .dy;
       final collapsedTop = tester
           .getTopLeft(find.byKey(const Key('mobile_schedule_collapsed_summary')))
           .dy;
+      expect(paxTop, lessThan(calTop));
       expect(calTop, lessThan(timeTop));
-      expect(timeTop, lessThan(paxTop));
-      expect(paxTop, lessThan(collapsedTop));
+      expect(timeTop, lessThan(recapTop));
+      expect(recapTop, lessThan(collapsedTop));
       expect(tester.takeException(), isNull);
     });
 

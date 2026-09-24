@@ -15,8 +15,11 @@ class ReservationDetailsPanel extends StatelessWidget {
   final Package package;
   final int? selectedPax;
 
-  /// C6: requests the in-flow pax edit (booking step 2); the
-  /// package-details router jump is dropped. Null hides the Change action.
+  /// C76: locked Pax display — the headcount step was chosen on the
+  /// packages grid (`?pax=`) and never re-picked here. Null hides the
+  /// Change action; the schedule step always passes null (C6 in-flow
+  /// edit retired). Non-null callers (direct-panel usages/tests) keep
+  /// the legacy link.
   final VoidCallback? onChangePax;
   final String? selectedTime;
   final ValueChanged<String> onTimeSelected;
@@ -145,6 +148,9 @@ class ReservationDetailsPanel extends StatelessWidget {
         // ========================================================
         // 2. YOUR PACKAGE (P6: read-only — the headcount step was
         // chosen on the packages grid and travels via `?pax=`).
+        // C76: schedule render is display-only; the Change affordance
+        // renders only for non-null [onChangePax] (direct-panel
+        // usages) — the schedule step passes null.
         // ========================================================
         Builder(
           builder: (context) {
