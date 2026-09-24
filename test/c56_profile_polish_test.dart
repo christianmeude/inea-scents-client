@@ -9,7 +9,7 @@ import 'package:inea_scents_client/widgets/index.dart';
 
 import 'helpers/fake_api.dart';
 
-/// C56: profile polish — 1200 shell cap, enlarged footer logo, toggle renders.
+/// C56: profile polish — single-column layout, enlarged footer logo, toggle renders.
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
@@ -36,17 +36,14 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('desktop profile caps at 1200 shell width', (tester) async {
+  testWidgets('desktop profile renders single column', (tester) async {
     await pumpProfile(tester, const Size(1280, 800));
-    final box = tester.widget<ConstrainedBox>(
-      find
-          .descendant(
-            of: find.byType(LayoutBuilder),
-            matching: find.byType(ConstrainedBox),
-          )
-          .first,
+    final rows = tester.widgetList<Row>(find.byType(Row));
+    final twoExpanded = rows.where(
+      (r) => r.children.whereType<Expanded>().length == 2,
     );
-    expect(box.constraints.maxWidth, 1200);
+    expect(twoExpanded, isEmpty);
+    expect(find.text('My Profile'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
