@@ -16,8 +16,9 @@ class ResponsiveAppShell extends StatelessWidget {
   static const double mobileBreakpoint = 768.0;
   static const double tabletBreakpoint = 1024.0;
   static const double maxContentWidth = 1200.0;
-  // C72: shared screen header insets — home + packages read this token
-  // instead of hardcoding `fromLTRB(20, 18, 20, 30)` per screen.
+  // C72: shared screen header insets — home, packages, bookings and
+  // calendar read this token instead of hardcoding per-screen insets
+  // (profile uses it with its own bottom via copyWith).
   static const EdgeInsets screenHeaderPadding =
       EdgeInsets.fromLTRB(20, 18, 20, 30);
 
