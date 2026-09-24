@@ -154,26 +154,26 @@ void main() {
       return tester.widget<Text>(find.text('T')).style!;
     }
 
-    testWidgets('360px -> 22px title, 13px count', (tester) async {
+    testWidgets('360px -> 28px title, 13px count', (tester) async {
       final title = await pumpTitleStyle(tester, 360);
       expect(title.fontSize, TabHeader.titleSizeNarrow);
-      expect(title.fontSize, 22);
+      expect(title.fontSize, 28);
       final count = tester.widget<Text>(find.text('C')).style!;
       expect(count.fontSize, 13);
     });
 
-    testWidgets('768px boundary -> 26px title, 13px count', (tester) async {
+    testWidgets('768px boundary -> 32px title, 13px count', (tester) async {
       final title = await pumpTitleStyle(tester, 768);
       expect(title.fontSize, TabHeader.titleSizeWide);
-      expect(title.fontSize, 26);
+      expect(title.fontSize, 32);
       final count = tester.widget<Text>(find.text('C')).style!;
       expect(count.fontSize, 13);
     });
 
     test('titleSizeFor steps without FittedBox scaling', () {
-      expect(TabHeader.titleSizeFor(767), 22);
-      expect(TabHeader.titleSizeFor(768), 26);
-      expect(TabHeader.titleSizeFor(1200), 26);
+      expect(TabHeader.titleSizeFor(767), 28);
+      expect(TabHeader.titleSizeFor(768), 32);
+      expect(TabHeader.titleSizeFor(1200), 32);
     });
   });
 
@@ -196,10 +196,10 @@ void main() {
       expect(tester.takeException(), isNull);
 
       final title = tester.widget<Text>(find.text('My Bookings'));
-      expect(title.style?.fontWeight, FontWeight.w600);
-      expect(title.style?.letterSpacing, -0.3);
+      expect(title.style?.fontWeight, FontWeight.w400);
+      expect(title.style?.letterSpacing, 0);
       expect(title.style?.fontFamilyFallback, TabHeader.titleFallback);
-      expect(title.style?.fontFamilyFallback, contains('Josefin Sans'));
+      expect(title.style?.fontFamilyFallback, contains('Great Vibes'));
       expect(title.maxLines, 1);
       expect(title.overflow, TextOverflow.ellipsis);
       expect(

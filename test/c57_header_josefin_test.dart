@@ -4,15 +4,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:inea_scents_client/config/theme.dart';
 import 'package:inea_scents_client/widgets/index.dart';
 
-/// C57: header/brand text renders Josefin Sans (web + mobile) with the
-/// single-source offline-safe fallback stack.
+/// C57: brand/logo text renders Josefin Sans (web + mobile) with the
+/// single-source offline-safe fallback stack (C73: tab titles moved
+/// to Great Vibes with their own script-first stack).
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
   group('c57 header Josefin Sans', () {
-    testWidgets('TabHeader title renders Josefin Sans family', (tester) async {
+    testWidgets('TabHeader title renders Great Vibes family', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(body: TabHeader(title: 'My Bookings', count: 'C')),
@@ -21,13 +22,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       final style = tester.widget<Text>(find.text('My Bookings')).style!;
-      // google_fonts names the family 'JosefinSans_<weight>' at runtime;
-      // the human-readable 'Josefin Sans' leads the fallback stack.
-      expect(style.fontFamily, contains('JosefinSans'));
-      expect(style.fontFamilyFallback, AppTheme.brandFontFallback);
-      expect(style.fontFamilyFallback!.first, 'Josefin Sans');
-      // Readable weight in both modes (w600 on CardSurfaces title token).
-      expect(style.fontWeight, FontWeight.w600);
+      // google_fonts names the family 'GreatVibes' at runtime;
+      // the human-readable 'Great Vibes' leads the fallback stack.
+      expect(style.fontFamily, contains('GreatVibes'));
+      expect(style.fontFamilyFallback, TabHeader.titleFallback);
+      expect(style.fontFamilyFallback!.first, 'Great Vibes');
+      // Script ships Regular 400 only (no synthetic bold).
+      expect(style.fontWeight, FontWeight.w400);
     });
 
     testWidgets('TopNavBar brand INEA renders Josefin Sans family', (
@@ -84,7 +85,9 @@ void main() {
     test('brand fallback stack is Josefin-first, offline-safe', () {
       expect(AppTheme.brandFontFallback.first, 'Josefin Sans');
       expect(AppTheme.brandFontFallback, contains('sans-serif'));
-      expect(TabHeader.titleFallback, AppTheme.brandFontFallback);
+      // C73: tab titles split off to a Great-Vibes-first stack;
+      // the brand stack stays Josefin-first for the INEA logo.
+      expect(TabHeader.titleFallback.first, 'Great Vibes');
     });
   });
 }
