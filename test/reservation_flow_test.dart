@@ -58,22 +58,6 @@ void main() {
     );
   }
 
-  /// Fills the full contact section shown inside DesktopPaymentPanel.
-  Future<void> fillPaymentContacts(WidgetTester tester) async {
-    const fields = {
-      'payment_customer_name': 'Maria Clara',
-      'payment_customer_email': 'maria@example.com',
-      'payment_customer_phone': '+639171234567',
-      'payment_venue_address': 'The Peninsula Manila',
-    };
-    for (final entry in fields.entries) {
-      final finder = find.byKey(Key(entry.key));
-      await tester.ensureVisible(finder);
-      await tester.enterText(finder, entry.value);
-      await tester.pump();
-    }
-  }
-
   /// Fills the contact fields on the mobile Step 3 (Details) view.
   Future<void> fillMobileContacts(WidgetTester tester) async {
     const fields = {
@@ -476,8 +460,7 @@ void main() {
           paymentViewKey: 'desktop_payment_panel_view',
         );
 
-        // Fill contact & venue information required for submission
-        await fillPaymentContacts(tester);
+        // C77: contact details already filled at step 3 (driveWebToPayment).
 
         // Tap 'Confirm & Pay' on payment step
         final confirmButtonFinder = find.textContaining('Confirm & Pay');
@@ -1280,8 +1263,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(confirmBtn, findsOneWidget);
 
-        // Fill contact & venue information required for submission
-        await fillPaymentContacts(tester);
+        // C77: contact details already filled at step 3 (driveWebToPayment).
 
         await tester.ensureVisible(confirmBtn);
         await tester.pumpAndSettle();
@@ -1787,8 +1769,12 @@ void main() {
           paymentViewKey: 'desktop_payment_panel_view',
         );
 
-        // 1. Initial method is Online: explainer, no card capture, no retired methods — order summary distilled (label-value rows, no payment chip)
-        expect(find.text('Online Checkout'), findsOneWidget);
+        // 1. Initial method is Online: C77 headers distilled — the PayMongo
+        // reminder sits directly below the options, no card capture, no
+        // retired methods — order summary distilled (label-value rows, no
+        // payment chip)
+        expect(find.text('Online Checkout'), findsNothing);
+        expect(find.text('Offline Payment Instructions'), findsNothing);
         expect(find.text('Your Booking'), findsOneWidget);
         expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
         expect(
@@ -1805,14 +1791,21 @@ void main() {
         await tester.tap(cashMethodFinder.first);
         await tester.pumpAndSettle();
 
-        expect(find.text('Offline Payment Instructions'), findsOneWidget);
+        // C77: no header — cash reminder shows directly, same brand box.
+        expect(find.text('Offline Payment Instructions'), findsNothing);
+        expect(
+          find.text(
+            'You will pay in cash on the event day. Our team will confirm your booking shortly.',
+          ),
+          findsOneWidget,
+        );
         expect(find.text('Your Booking'), findsOneWidget);
         expect(find.byKey(const Key('summary_value_pax')), findsOneWidget);
       },
     );
 
     testWidgets(
-      'DesktopPaymentPanel contact text input fields accept keyboard entries cleanly',
+      'DesktopPaymentPanel carries no contact fields (editing lives in step 3)',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -1841,27 +1834,12 @@ void main() {
         );
         expect(find.text('Card Number'), findsNothing);
 
-        // Enter customer & venue details
-        await tester.enterText(
-          find.byKey(const Key('payment_customer_name')),
-          'Maria Clara',
-        );
-        await tester.enterText(
-          find.byKey(const Key('payment_customer_email')),
-          'maria@example.com',
-        );
-        await tester.enterText(
-          find.byKey(const Key('payment_customer_phone')),
-          '+63 917 123 4567',
-        );
-        await tester.enterText(
-          find.byKey(const Key('payment_venue_address')),
-          'The Peninsula Manila',
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('Maria Clara'), findsWidgets);
-        expect(find.text('The Peninsula Manila'), findsWidgets);
+        // C77: contact editing lives in step 3 — the panel owns no fields.
+        expect(find.byKey(const Key('payment_customer_name')), findsNothing);
+        expect(find.byKey(const Key('payment_customer_email')), findsNothing);
+        expect(find.byKey(const Key('payment_customer_phone')), findsNothing);
+        expect(find.byKey(const Key('payment_venue_address')), findsNothing);
+        expect(find.byType(TextField), findsNothing);
         expect(tester.takeException(), isNull);
       },
     );
@@ -1891,8 +1869,7 @@ void main() {
         final confirmBtn = find.textContaining('Confirm & Pay');
         expect(confirmBtn, findsOneWidget);
 
-        // Fill contact & venue information required for submission
-        await fillPaymentContacts(tester);
+        // C77: contact details already filled at step 3.
 
         await tester.tap(confirmBtn);
         await tester.pumpAndSettle();
@@ -2020,8 +1997,7 @@ void main() {
         );
         expect(find.textContaining('Confirm & Pay'), findsOneWidget);
 
-        // Fill contact & venue information required for submission
-        await fillPaymentContacts(tester);
+        // C77: contact details already filled at step 3 (Details).
 
         // Confirm & Pay completes tablet flow
         final confirmBtn = find.textContaining('Confirm & Pay');
@@ -2176,7 +2152,7 @@ void main() {
     );
 
     testWidgets(
-      'DesktopPaymentPanel captures no card details: Online shows explainer and contact fields accept input',
+      'DesktopPaymentPanel captures no card details: Online shows explainer, contact editing lives in step 3',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -2207,19 +2183,15 @@ void main() {
         expect(find.byKey(const Key('payment_card_cvv')), findsNothing);
         expect(find.byKey(const Key('payment_card_expiry')), findsNothing);
 
-        // Contact email still accepts free text
-        final emailField = find.byKey(const Key('payment_customer_email'));
-        await tester.enterText(emailField, 'maria@example.com');
-        await tester.pumpAndSettle();
-
-        final TextField emailWidget = tester.widget(emailField);
-        expect(emailWidget.controller?.text, equals('maria@example.com'));
+        // C77: contact editing lives in step 3 — the panel owns no fields.
+        expect(find.byKey(const Key('payment_customer_email')), findsNothing);
+        expect(find.byType(TextField), findsNothing);
         expect(tester.takeException(), isNull);
       },
     );
 
     testWidgets(
-      'DesktopPaymentPanel contact fields expose proper TextInputAction for keyboard navigation',
+      'DesktopPaymentPanel captures no text input (method + reminder only)',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -2239,17 +2211,13 @@ void main() {
           paymentViewKey: 'desktop_payment_panel_view',
         );
 
-        final nameField = find.byKey(const Key('payment_customer_name'));
-        final TextField nameWidget = tester.widget(nameField);
-        expect(nameWidget.textInputAction, equals(TextInputAction.next));
-
-        final emailField = find.byKey(const Key('payment_customer_email'));
-        final TextField emailWidget = tester.widget(emailField);
-        expect(emailWidget.textInputAction, equals(TextInputAction.next));
-
-        final addressField = find.byKey(const Key('payment_venue_address'));
-        final TextField addressWidget = tester.widget(addressField);
-        expect(addressWidget.textInputAction, equals(TextInputAction.done));
+        // C77: step-3 contact fields persist; the payment panel itself
+        // owns no TextFields.
+        expect(find.byKey(const Key('payment_customer_name')), findsNothing);
+        expect(find.byKey(const Key('payment_customer_email')), findsNothing);
+        expect(find.byKey(const Key('payment_venue_address')), findsNothing);
+        expect(find.byType(TextField), findsNothing);
+        expect(tester.takeException(), isNull);
       },
     );
 
@@ -2455,7 +2423,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(finalProceedAgain);
         await tester.pumpAndSettle();
-        await fillPaymentContacts(tester);
+        // C77: contact details already filled at step 3.
         final finalConfirm = find.textContaining('Confirm & Pay');
         await tester.ensureVisible(finalConfirm);
         await tester.pumpAndSettle();
@@ -2500,8 +2468,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // C8: header distilled — panel starts at payment method selection.
+        // C77: method headers distilled too — reminder sits below options.
         expect(find.text('Payment & Checkout Details'), findsNothing);
-        expect(find.text('Online Checkout'), findsOneWidget);
+        expect(find.text('Online Checkout'), findsNothing);
         expect(
           find.byKey(const Key('online_checkout_explainer')),
           findsOneWidget,

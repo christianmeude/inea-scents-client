@@ -39,9 +39,8 @@ Color _blend(Color fg, Color bg, double a) {
   return Color.fromARGB(255, r, g, b);
 }
 
-const _plum = Color(0xFF6A4053); // desktop online method color
-const _green = Color(0xFF16A34A); // cash method color
-const _red = Color(0xFFEB001B); // mobile online method color
+const _plum = Color(0xFF6A4053); // desktop method color (online + cash, C77)
+const _red = Color(0xFFEB001B); // mobile method color (online + cash, C77)
 const _cardLight = Colors.white;
 const _cardDark = Color(0xFF1C1618);
 const _chipLight = Color(0xFFFDF4F5);
@@ -66,7 +65,7 @@ void main() {
     for (final dark in [false, true]) {
       final mode = dark ? 'dark' : 'light';
       final title = dark ? _titleDark : _titleLight;
-      for (final entry in {'online': _plum, 'cash': _green}.entries) {
+      for (final entry in {'online': _plum, 'cash': _plum}.entries) {
         for (final selected in [false, true]) {
           final state = selected ? 'selected' : 'unselected';
           test('desktop ${entry.key} $state $mode: label>=4.5 sublabel>=7', () {
@@ -76,7 +75,7 @@ void main() {
           });
         }
       }
-      for (final entry in {'online': _red, 'cash': _green}.entries) {
+      for (final entry in {'online': _red, 'cash': _red}.entries) {
         for (final selected in [false, true]) {
           final state = selected ? 'selected' : 'unselected';
           test('mobile ${entry.key} $state $mode: label>=4.5', () {
@@ -147,7 +146,7 @@ void main() {
           }
 
           // Method + state icons carry the same token.
-          final methodColor = method == 'online' ? _plum : _green;
+          final methodColor = _plum;
           final selectedBg = _desktopBg(methodColor, dark, true);
           final unselectedBg = _desktopBg(methodColor, dark, false);
           expect(_ratio(title, selectedBg), greaterThanOrEqualTo(4.5));

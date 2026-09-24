@@ -145,7 +145,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Offline Payment Instructions'), findsOneWidget);
+      expect(find.text('Offline Payment Instructions'), findsNothing);
       expect(find.textContaining('confirm your booking'), findsOneWidget);
     });
   });
