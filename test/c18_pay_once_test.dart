@@ -55,7 +55,6 @@ void main() {
             body: SingleChildScrollView(
               child: DesktopPaymentPanel(
                 package: _payOncePackage(),
-                selectedPax: 70,
                 paymentMethod: 'online',
                 onPaymentMethodSelected: (m) => picked = m,
               ),

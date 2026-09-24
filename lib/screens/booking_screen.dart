@@ -709,38 +709,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   'desktop_payment_panel_view',
                                 ),
                                 package: package,
-                                selectedDate: _selectedDate,
-                                selectedTime: _selectedTime,
-                                selectedPax: _selectedPax,
                                 paymentMethod: _paymentMethod,
-                                customerName: _customerNameController.text,
-                                customerEmail: _customerEmailController.text,
-                                customerPhone: _customerPhoneController.text,
-                                venueAddress: _venueAddressController.text,
-                                onCustomerNameChanged: (v) {
-                                  _customerNameController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setCustomerName(v);
-                                },
-                                onCustomerEmailChanged: (v) {
-                                  _customerEmailController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setCustomerEmail(v);
-                                },
-                                onCustomerPhoneChanged: (v) {
-                                  _customerPhoneController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setCustomerPhone(v);
-                                },
-                                onVenueAddressChanged: (v) {
-                                  _venueAddressController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setVenueAddress(v);
-                                },
                                 onPaymentMethodSelected: (method) {
                                   ref
                                       .read(bookingFlowProvider.notifier)
@@ -907,38 +876,7 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                   'tablet_payment_panel_view',
                                 ),
                                 package: package,
-                                selectedDate: _selectedDate,
-                                selectedTime: _selectedTime,
-                                selectedPax: _selectedPax,
                                 paymentMethod: _paymentMethod,
-                                customerName: _customerNameController.text,
-                                customerEmail: _customerEmailController.text,
-                                customerPhone: _customerPhoneController.text,
-                                venueAddress: _venueAddressController.text,
-                                onCustomerNameChanged: (v) {
-                                  _customerNameController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setCustomerName(v);
-                                },
-                                onCustomerEmailChanged: (v) {
-                                  _customerEmailController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setCustomerEmail(v);
-                                },
-                                onCustomerPhoneChanged: (v) {
-                                  _customerPhoneController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setCustomerPhone(v);
-                                },
-                                onVenueAddressChanged: (v) {
-                                  _venueAddressController.text = v;
-                                  ref
-                                      .read(bookingFlowProvider.notifier)
-                                      .setVenueAddress(v);
-                                },
                                 onPaymentMethodSelected: (method) {
                                   ref
                                       .read(bookingFlowProvider.notifier)
@@ -2579,7 +2517,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                         {
                           'id': 'cash',
                           'label': 'Cash',
-                          'color': const Color(0xFF16A34A),
+                          // C77: same brand treatment as the online chip.
+                          'color': const Color(0xFFEB001B),
                         },
                       ].map((m) {
                         final isSel = _paymentMethod == m['id'];

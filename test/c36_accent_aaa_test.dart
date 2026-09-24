@@ -76,7 +76,7 @@ void main() {
     });
 
     test('title vs explainer tint fills hits text bar both modes', () {
-      // Plum (online) + green (cash) info fills at panel alphas.
+      // C77: both reminders share the plum brand tint (no green).
       final plumTintL = _over(
         const Color(0xFF6A4053).withValues(alpha: 0.06),
         _cardLight,
@@ -85,18 +85,8 @@ void main() {
         const Color(0xFF6A4053).withValues(alpha: 0.06),
         _cardDark,
       );
-      final greenTintL = _over(
-        const Color(0xFF16A34A).withValues(alpha: 0.08),
-        _cardLight,
-      );
-      final greenTintD = _over(
-        const Color(0xFF16A34A).withValues(alpha: 0.08),
-        _cardDark,
-      );
       expect(_ratio(_titleLight, plumTintL), greaterThanOrEqualTo(7.0));
       expect(_ratio(_titleDark, plumTintD), greaterThanOrEqualTo(7.0));
-      expect(_ratio(_titleLight, greenTintL), greaterThanOrEqualTo(7.0));
-      expect(_ratio(_titleDark, greenTintD), greaterThanOrEqualTo(7.0));
     });
 
     test('title vs chip fill hits text bar both modes', () {
