@@ -183,7 +183,7 @@ void main() {
           find.byKey(const Key('order_summary_side_panel')),
         );
 
-        expect(calendarPos.dx, lessThan(detailsPos.dx));
+        expect(calendarPos.dy, lessThan(detailsPos.dy));
         expect(detailsPos.dx, lessThan(summaryPos.dx));
 
         // Verify contents inside the flow column (Calendar)
@@ -327,8 +327,8 @@ void main() {
 
     testWidgets(
       // P6: headcount is chosen on the packages grid and travels via
-      // `?pax=`; booking renders it read-only with a Change link.
-      'Pax preselection renders read-only with Change link on desktop',
+      // `?pax=`; booking renders it read-only with no Change link.
+      'Pax preselection renders locked with no Change link on desktop',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
@@ -351,7 +351,7 @@ void main() {
           ),
           findsOneWidget,
         );
-        expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
+        expect(find.byKey(const Key('pax_change_link')), findsNothing);
 
         // No in-flow pax selectors remain (the summary echo of the
         // locked step is expected).
@@ -745,7 +745,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // P6: pax is read-only (locked step + Change link). C18 pay-once:
+        // C76: pax is locked (readonly row, no Change link). C18 pay-once:
         // the schedule step carries no payment picker.
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(
@@ -976,7 +976,7 @@ void main() {
 
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
         expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-        expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
+        expect(find.byKey(const Key('pax_change_link')), findsNothing);
         expect(find.text('30 PAX'), findsNothing);
 
         // Tap Proceed (sticky bottom bar, outside the scroll) for Step 3.

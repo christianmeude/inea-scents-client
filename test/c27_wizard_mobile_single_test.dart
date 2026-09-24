@@ -84,7 +84,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('desktop reservation columns intact at 1280px', (
+    testWidgets('desktop schedule stack intact at 1280px', (
       WidgetTester tester,
     ) async {
       addTearDown(tester.view.resetPhysicalSize);
@@ -93,18 +93,23 @@ void main() {
       addTearDown(container.dispose);
       await _pump(tester, container, const Size(1280, 800));
 
-      // Multi-column reservation view untouched: calendar left of details.
+      // C76: stacked schedule view — locked Pax header above the
+      // full-width calendar above the details/time panel.
       expect(
-        find.byKey(const Key('desktop_reservation_columns_view')),
+        find.byKey(const Key('desktop_schedule_stack_view')),
         findsOneWidget,
       );
-      final calLeft = tester
+      final headerTop = tester
+          .getTopLeft(find.byKey(const Key('schedule_pax_header')))
+          .dy;
+      final calTop = tester
           .getTopLeft(find.byKey(const Key('reservation_calendar_panel')))
-          .dx;
-      final detLeft = tester
+          .dy;
+      final detTop = tester
           .getTopLeft(find.byKey(const Key('reservation_details_panel')))
-          .dx;
-      expect(calLeft, lessThan(detLeft));
+          .dy;
+      expect(headerTop, lessThan(calTop));
+      expect(calTop, lessThan(detTop));
 
       // Unified timeline labels, exactly once each.
       expect(find.text('Schedule'), findsOneWidget);

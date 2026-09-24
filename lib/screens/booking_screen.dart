@@ -759,48 +759,51 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 viewKey: 'desktop_details_form_view',
                                 keyPrefix: 'desktop',
                               )
-                            : Row(
+                            : Column(
                                 key: const ValueKey(
-                                  'desktop_reservation_columns_view',
+                                  'desktop_schedule_stack_view',
                                 ),
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.stretch,
                                 children: [
-                                  // FLOW: CALENDAR and DETAILS side-by-side
-                                  Expanded(
-                                    child: ReservationCalendarPanel(
-                                      key: const Key(
-                                        'reservation_calendar_panel',
-                                      ),
-                                      selectedDate: _selectedDate,
-                                      onDateSelected: (date) {
-                                        ref
-                                            .read(bookingFlowProvider.notifier)
-                                            .setSelectedDate(date);
-                                      },
+                                  // C76: locked Pax header, full-width
+                                  // calendar, then time + event/contact
+                                  // recap (ColB dissolved beside it).
+                                  _buildSchedulePaxHeader(package),
+                                  const SizedBox(height: 16),
+                                  ReservationCalendarPanel(
+                                    key: const Key(
+                                      'reservation_calendar_panel',
                                     ),
+                                    selectedDate: _selectedDate,
+                                    onDateSelected: (date) {
+                                      ref
+                                          .read(bookingFlowProvider.notifier)
+                                          .setSelectedDate(date);
+                                    },
                                   ),
-                                  const SizedBox(width: 24),
-                                  Expanded(
-                                    child: ReservationDetailsPanel(
-                                      key: const Key(
-                                        'reservation_details_panel',
-                                      ),
-                                      package: package,
-                                      selectedPax: _selectedPax,
-                                      // C48: schedule grid COL B carries time +
-                                      // pax only; the §1 package card stays
-                                      // retired (the rail owns that line).
-                                      showPackageSummary: false,
-                                      // C6: in-flow pax edit (step 2); no router jump.
-                                      onChangePax: () => _goToStep(2),
-                                      selectedTime: _selectedTime,
-                                      onTimeSelected: (time) {
-                                        ref
-                                            .read(bookingFlowProvider.notifier)
-                                            .setSelectedTime(time);
-                                      },
+                                  const SizedBox(height: 16),
+                                  ReservationDetailsPanel(
+                                    key: const Key(
+                                      'reservation_details_panel',
                                     ),
+                                    package: package,
+                                    selectedPax: _selectedPax,
+                                    // C48: schedule grid carries time +
+                                    // pax only; the §1 package card stays
+                                    // retired (the rail owns that line).
+                                    showPackageSummary: false,
+                                    // C76: Pax locked — no Change affordance.
+                                    onChangePax: null,
+                                    selectedTime: _selectedTime,
+                                    onTimeSelected: (time) {
+                                      ref
+                                          .read(bookingFlowProvider.notifier)
+                                          .setSelectedTime(time);
+                                    },
                                   ),
+                                  const SizedBox(height: 16),
+                                  _buildScheduleEventSummary(),
                                 ],
                               ),
                       ),
@@ -954,7 +957,14 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 keyPrefix: 'tablet',
                               )
                             : Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.stretch,
                                 children: [
+                                  // C76: locked Pax header, full-width
+                                  // calendar, then time + event/contact
+                                  // recap (stack order unchanged).
+                                  _buildSchedulePaxHeader(package),
+                                  const SizedBox(height: 14),
                                   ReservationCalendarPanel(
                                     key: const Key('tablet_calendar_panel'),
                                     selectedDate: _selectedDate,
@@ -972,8 +982,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                     // C48: §1 package card retired from the
                                     // schedule step (rail owns that line).
                                     showPackageSummary: false,
-                                    // C6: in-flow pax edit (step 2); no router jump.
-                                    onChangePax: () => _goToStep(2),
+                                    // C76: Pax locked — no Change affordance.
+                                    onChangePax: null,
                                     selectedTime: _selectedTime,
                                     onTimeSelected: (time) {
                                       ref
@@ -981,6 +991,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                           .setSelectedTime(time);
                                     },
                                   ),
+                                  const SizedBox(height: 14),
+                                  _buildScheduleEventSummary(),
                                 ],
                               ),
                       ),
@@ -1119,6 +1131,137 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
             icon: Icons.location_on_outlined,
             textInputType: TextInputType.streetAddress,
             onChanged: (v) => notifier.setVenueAddress(v),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================================================
+  // C76 SCHEDULE: locked Pax header + display-only event/contact summary
+  // ==========================================================================
+
+  /// C76: prominent non-editable Pax header atop the schedule step on all
+  /// breakpoints. The headcount was chosen on the packages grid (`?pax=`
+  /// via [BookingScreen.initialPax]); there is no Change affordance here.
+  Widget _buildSchedulePaxHeader(Package package) {
+    final options = package.options;
+    final paxEntries = options.isNotEmpty
+        ? options.map((t) => t.pax).toList()
+        : (package.paxOptions ?? const <int>[]);
+    final effectivePax =
+        _selectedPax ?? (paxEntries.isNotEmpty ? paxEntries.first : null);
+    final priceLabel = (effectivePax != null && options.isNotEmpty)
+        ? ' · ${formatPeso(package.priceForPax(effectivePax))}'
+        : '';
+    return Container(
+      key: const Key('schedule_pax_header'),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: _surface,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: _surfaceBorder),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle_rounded, size: 20, color: _title),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              effectivePax == null
+                  ? 'Headcount to be confirmed'
+                  : '$effectivePax PAX$priceLabel',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: _title,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// One display-only label/value row inside [_buildScheduleEventSummary].
+  Widget _scheduleSummaryRow(String keyName, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        key: Key(keyName),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 72,
+            child: Text(label, style: TextStyle(fontSize: 12, color: _body)),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: _title,
+                height: 1.35,
+              ),
+              softWrap: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// C76: display-only event/contact recap below the schedule pickers.
+  /// Shows the selected date/time/venue/contact when provided, neutral
+  /// prompts otherwise. Editing stays in step 3 — no TextFields here.
+  Widget _buildScheduleEventSummary() {
+    final flow = ref.read(bookingFlowProvider);
+    final venue = (flow.venueAddress ?? '').trim();
+    final contact = (flow.customerName ?? '').trim();
+    return Container(
+      key: const Key('schedule_event_summary'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: _surface,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: _surfaceBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Event Summary',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: _title,
+            ),
+          ),
+          const SizedBox(height: 8),
+          _scheduleSummaryRow(
+            'schedule_event_date',
+            'Date',
+            _shortDate(flow.selectedDate),
+          ),
+          _scheduleSummaryRow(
+            'schedule_event_time',
+            'Time',
+            TimeSlot.display(flow.selectedTime),
+          ),
+          _scheduleSummaryRow(
+            'schedule_event_venue',
+            'Venue',
+            venue.isEmpty ? 'Add venue in step 3' : venue,
+          ),
+          _scheduleSummaryRow(
+            'schedule_event_contact',
+            'Contact',
+            contact.isEmpty ? 'Add contact in step 3' : contact,
           ),
         ],
       ),
@@ -1843,6 +1986,52 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // C76: locked Pax header first — prominent, non-editable,
+          // no Change affordance (headcount came via `?pax=`).
+          Builder(
+            builder: (context) {
+              final effectivePax =
+                  _selectedPax ??
+                  (paxEntries.isNotEmpty ? paxEntries.first : null);
+              final priceLabel = (effectivePax != null && options.isNotEmpty)
+                  ? ' · ${formatPeso(package.priceForPax(effectivePax))}'
+                  : '';
+              return Container(
+                key: const Key('pax_readonly_row'),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                decoration: BoxDecoration(
+                  color: _surface,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: _surfaceBorder),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle_rounded, size: 20, color: _title),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        effectivePax == null
+                            ? 'Headcount to be confirmed'
+                            : '$effectivePax PAX$priceLabel',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: _title,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 15),
           Text(
             'Please Choose Available Schedule',
             // C36: title token (was plum, fails 7:1 on tinted fills).
@@ -1919,6 +2108,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          // C76: display-only event/contact recap (editing stays in step 3).
+          _buildScheduleEventSummary(),
           const SizedBox(height: 25),
           // Proper-noun header (grill Q3a): the flow step already says
           // what this is; the product name carries the weight.
@@ -1931,69 +2123,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               fontWeight: FontWeight.w700,
               color: _title,
             ),
-          ),
-          const SizedBox(height: 10),
-          // C6: read-only — the headcount step was chosen on the
-          // packages grid (`?pax=`); Change stays in-flow on step 2.
-          Builder(
-            builder: (context) {
-              final effectivePax =
-                  _selectedPax ??
-                  (paxEntries.isNotEmpty ? paxEntries.first : null);
-              final priceLabel = (effectivePax != null && options.isNotEmpty)
-                  ? ' · ${formatPeso(package.priceForPax(effectivePax))}'
-                  : '';
-              return Container(
-                key: const Key('pax_readonly_row'),
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: _surface,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: _surfaceBorder),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle_rounded, size: 16, color: _title),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        effectivePax == null
-                            ? 'Headcount to be confirmed'
-                            : '$effectivePax PAX$priceLabel',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: _title,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    GestureDetector(
-                      key: const Key('pax_change_link'),
-                      // C6: in-flow pax edit (step 2); no router jump.
-                      onTap: () => _goToStep(2),
-                      child: MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: Text(
-                          'Change',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: _title,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
           ),
           const SizedBox(height: 16),
           _buildMobileScheduleCollapsedSummary(package, paxEntries),
