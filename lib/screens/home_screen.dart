@@ -19,38 +19,45 @@ class HomeScreen extends StatelessWidget {
           physics: MobileClampScroll.physicsOf(context),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
-              child: const Column(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveAppShell.maxContentWidth,
+              ),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // C42: unified header (mobile logo row retired — brand
                   // lives in TopNavBar on tablet/desktop).
-                  SizedBox(height: 18),
+                  // C72: shared header token; bottom 0 preserves the exact
+                  // prior visuals (SizedBox h18 + horizontal 20, gap below
+                  // stays the SizedBox h20).
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: TabHeader(
+                    padding:
+                        ResponsiveAppShell.screenHeaderPadding.copyWith(
+                      bottom: 0,
+                    ),
+                    child: const TabHeader(
                       title: 'Home',
                       count: 'Plan your scent experience.',
                     ),
                   ),
                   // C60: Q9 retired — the flow itself resumes the draft
                   // at its stored stage.
-                  SizedBox(height: 20),
-                  Padding(
+                  const SizedBox(height: 20),
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: NextStepCard(),
                   ),
-                  SizedBox(height: 16),
-                  Padding(
+                  const SizedBox(height: 16),
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: UpcomingBookingSection(),
                   ),
-                  SizedBox(height: 16),
-                  Padding(
+                  const SizedBox(height: 16),
+                  const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: _OfferingTeaser(),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

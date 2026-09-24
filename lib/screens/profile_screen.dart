@@ -36,7 +36,7 @@ class ProfileScreen extends ConsumerWidget {
         // Expanded logo zone that centers the muted mark in the
         // card-edge-to-screen-bottom space instead of scrolling.
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+          padding: ResponsiveAppShell.screenHeaderPadding.copyWith(bottom: 12),
 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
