@@ -47,9 +47,11 @@ class MyBookingsScreen extends ConsumerWidget {
             if (bookings.isEmpty) {
               return Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 1200),
+                  constraints: const BoxConstraints(
+                    maxWidth: ResponsiveAppShell.maxContentWidth,
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                    padding: ResponsiveAppShell.screenHeaderPadding,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -76,9 +78,11 @@ class MyBookingsScreen extends ConsumerWidget {
                 physics: MobileClampScroll.physicsOf(context),
                 child: Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1200),
+                    constraints: const BoxConstraints(
+                      maxWidth: ResponsiveAppShell.maxContentWidth,
+                    ),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                      padding: ResponsiveAppShell.screenHeaderPadding,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [

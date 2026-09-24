@@ -82,7 +82,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             return SkeletonCrossfade(
               isLoading: isInitialLoading,
               skeleton: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                padding: ResponsiveAppShell.screenHeaderPadding,
                 children: const [
                   TabHeader(
                     title: 'Availability',
@@ -188,10 +188,12 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             return Center(
               child: ConstrainedBox(
                 // C42: header aligns to the 1200 shell cap (was 1000).
-                constraints: const BoxConstraints(maxWidth: 1200),
+                constraints: const BoxConstraints(
+                  maxWidth: ResponsiveAppShell.maxContentWidth,
+                ),
                 child: ListView(
                   // C40: desktop surface — platform default untouched.
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+                  padding: ResponsiveAppShell.screenHeaderPadding,
                   children: [
                     titleContent,
                     // C60: Q9 retired.
@@ -221,7 +223,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             // (stretch Android / bounce iOS) displaced content past edge.
             // Desktop/web physics untouched (null = platform default).
             physics: MobileClampScroll.physicsForWidth(constraints.maxWidth),
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+            padding: ResponsiveAppShell.screenHeaderPadding,
             children: [
               titleContent,
               // C60: Q9 retired.

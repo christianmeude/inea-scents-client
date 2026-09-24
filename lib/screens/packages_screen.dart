@@ -47,11 +47,15 @@ class _PackagesScreenState extends ConsumerState<PackagesScreen> {
           // Desktop/web physics untouched (null = platform default).
           physics: MobileClampScroll.physicsOf(context),
 
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+          // C72: shared header token (was hardcoded fromLTRB(20, 18, 20, 30)).
+          padding: ResponsiveAppShell.screenHeaderPadding,
 
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
+              // C72: shared max-width token (was hardcoded 1200).
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveAppShell.maxContentWidth,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
