@@ -71,7 +71,9 @@ class ProfileScreen extends ConsumerWidget {
                   // ==================================================
                   Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 600),
+                      constraints: const BoxConstraints(
+                        maxWidth: ResponsiveAppShell.maxCardWidth,
+                      ),
                       child: Column(
                         children: [
                           _ProfileCard(

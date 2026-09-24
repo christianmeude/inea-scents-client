@@ -21,6 +21,9 @@ class ResponsiveAppShell extends StatelessWidget {
   // (profile uses it with its own bottom via copyWith).
   static const EdgeInsets screenHeaderPadding =
       EdgeInsets.fromLTRB(20, 18, 20, 30);
+  // C82: inner profile cards cap (600 centered) — named here so the
+  // profile cap reads as a shared token, not a raw literal.
+  static const double maxCardWidth = 600.0;
 
   final Widget child;
   final double maxWidth;
