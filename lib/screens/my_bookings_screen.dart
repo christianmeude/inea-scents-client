@@ -71,6 +71,85 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
     });
   }
 
+  void _openFilters(BuildContext context, List<String> statuses) {
+    final wide =
+        MediaQuery.of(context).size.width >=
+        ResponsiveAppShell.mobileBreakpoint;
+    // Panel reads live parent state at build time; both setState calls
+    // keep the list below and the open panel in sync.
+    Widget buildPanel(StateSetter setPanel) => _BookingsFilterPanel(
+      query: _query,
+      sort: _sort,
+      descending: _descending,
+      statusFilter: _statusFilter,
+      statuses: statuses,
+      onQueryChanged: (value) => setState(() {
+        _query = value;
+        _searchController.text = value;
+        _searchController.selection = TextSelection.fromPosition(
+          TextPosition(offset: _searchController.text.length),
+        );
+      }),
+      onSelectSort: (key) {
+        setState(() => _selectSort(key));
+        setPanel(() {});
+      },
+      onSelectStatus: (s) {
+        setState(() => _statusFilter = s);
+        setPanel(() {});
+      },
+      onReset: () {
+        setState(() {
+          _sort = _BookingsSort.recent;
+          _descending = true;
+          _statusFilter = 'All';
+          _query = '';
+          _searchController.clear();
+        });
+        setPanel(() {});
+      },
+    );
+    if (wide) {
+      // C87: web/tablet (≥768px) opens a popover-style dialog panel.
+      showDialog<void>(
+        context: context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setPanel) => Dialog(
+            key: const Key('bookings_filter_dialog'),
+            insetPadding: const EdgeInsets.all(24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: buildPanel(setPanel),
+            ),
+          ),
+        ),
+      );
+    } else {
+      // C87: mobile (<768px) opens a bottom sheet with the same panel.
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, setPanel) => SafeArea(
+            child: buildPanel(setPanel),
+          ),
+        ),
+      );
+    }
+  }
+
+  bool get _hasActiveFilters =>
+      _sort != _BookingsSort.recent ||
+      _descending != true ||
+      _statusFilter != 'All' ||
+      _query.trim().isNotEmpty;
+
   double? _priceOf(Booking b) =>
       b.package == null ? null : b.package!.priceForPax(b.pax);
 
@@ -201,67 +280,67 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
                           const SizedBox(height: 20),
 
                           // ==================================================
-                          // CONTROLS (C78: search + sort + status filter,
-                          // all below the header)
+                          // CONTROLS (C87: search row below the header —
+                          // search field + trailing filter button at its
+                          // right; sort + status live inside the
+                          // popover (≥768px) / bottom sheet (<768px),
+                          // zero bare chips in the main layout)
                           // ==================================================
-                          TextField(
-                            controller: _searchController,
-                            decoration: const InputDecoration(
-                              hintText:
-                                  'Search reference, name, or package',
-                              prefixIcon:
-                                  Icon(Icons.search_outlined),
-                            ),
-                            onChanged: (value) =>
-                                setState(() => _query = value),
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
+                          Row(
                             children: [
-                              for (final key
-                                  in _BookingsSort.values)
-                                ChoiceChip(
-                                  label: Row(
-                                    mainAxisSize:
-                                        MainAxisSize.min,
-                                    children: [
-                                      Text(_sortLabels[key]!),
-                                      if (_sort == key)
-                                        Icon(
-                                          _descending
-                                              ? Icons
-                                                  .arrow_downward_outlined
-                                              : Icons
-                                                  .arrow_upward_outlined,
-                                          size: 14,
-                                        ),
-                                    ],
+                              Expanded(
+                                child: TextField(
+                                  key: const Key(
+                                    'bookings_search_field',
                                   ),
-                                  selected: _sort == key,
-                                  onSelected: (_) =>
-                                      _selectSort(key),
+                                  controller: _searchController,
+                                  decoration: const InputDecoration(
+                                    hintText:
+                                        'Search reference, name, or package',
+                                    prefixIcon: Icon(
+                                      Icons.search_outlined,
+                                    ),
+                                  ),
+                                  onChanged: (value) => setState(
+                                    () => _query = value,
+                                  ),
                                 ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 8),
-
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              for (final s in statuses)
-                                FilterChip(
-                                  label: Text(s),
-                                  selected:
-                                      _statusFilter == s,
-                                  onSelected: (_) => setState(
-                                      () => _statusFilter = s),
-                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              // C87: filter affordance sits at the search
+                              // bar's right — never at header level.
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  IconButton(
+                                    key: const Key(
+                                      'bookings_filter_button',
+                                    ),
+                                    tooltip: 'Filter bookings',
+                                    icon: const Icon(
+                                      Icons.filter_list_outlined,
+                                    ),
+                                    onPressed: () => _openFilters(
+                                      context,
+                                      statuses,
+                                    ),
+                                  ),
+                                  if (_hasActiveFilters)
+                                    Positioned(
+                                      right: 10,
+                                      top: 10,
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: MyBookingsScreen
+                                              .primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ],
                           ),
 
@@ -366,6 +445,164 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// BOOKINGS FILTER PANEL (C87: sort + status + search re-housed here;
+// C78 semantics preserved — parent owns state, panel only forwards)
+// Wide (≥768px): shown in a Dialog popover. Narrow: bottom sheet.
+// ============================================================================
+
+class _BookingsFilterPanel extends StatefulWidget {
+  final String query;
+  final _BookingsSort sort;
+  final bool descending;
+  final String statusFilter;
+  final List<String> statuses;
+  final ValueChanged<String> onQueryChanged;
+  final ValueChanged<_BookingsSort> onSelectSort;
+  final ValueChanged<String> onSelectStatus;
+  final VoidCallback onReset;
+
+  const _BookingsFilterPanel({
+    required this.query,
+    required this.sort,
+    required this.descending,
+    required this.statusFilter,
+    required this.statuses,
+    required this.onQueryChanged,
+    required this.onSelectSort,
+    required this.onSelectStatus,
+    required this.onReset,
+  });
+
+  @override
+  State<_BookingsFilterPanel> createState() => _BookingsFilterPanelState();
+}
+
+class _BookingsFilterPanelState extends State<_BookingsFilterPanel> {
+  late final TextEditingController _panelSearchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _panelSearchController = TextEditingController(text: widget.query);
+  }
+
+  @override
+  void dispose() {
+    _panelSearchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  'Filter bookings',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Close filters',
+                icon: const Icon(Icons.close_outlined),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            key: const Key('filter_panel_search'),
+            controller: _panelSearchController,
+            decoration: const InputDecoration(
+              hintText: 'Search reference, name, or package',
+              prefixIcon: Icon(Icons.search_outlined),
+            ),
+            onChanged: widget.onQueryChanged,
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Sort by',
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final key in _BookingsSort.values)
+                ChoiceChip(
+                  label: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _MyBookingsScreenState._sortLabels[key]!,
+                      ),
+                      if (widget.sort == key)
+                        Icon(
+                          widget.descending
+                              ? Icons.arrow_downward_outlined
+                              : Icons.arrow_upward_outlined,
+                          size: 14,
+                        ),
+                    ],
+                  ),
+                  selected: widget.sort == key,
+                  onSelected: (_) => setState(
+                    () => widget.onSelectSort(key),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Booking status',
+            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final s in widget.statuses)
+                FilterChip(
+                  label: Text(s),
+                  selected: widget.statusFilter == s,
+                  onSelected: (_) => setState(
+                    () => widget.onSelectStatus(s),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              TextButton(
+                onPressed: () => setState(widget.onReset),
+                child: const Text('Reset'),
+              ),
+              const Spacer(),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Show results'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

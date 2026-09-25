@@ -95,6 +95,12 @@ void main() {
     return [for (final e in sorted) e.key];
   }
 
+  /// C87: sort + status chips live inside the filter panel — open it first.
+  Future<void> openFilters(WidgetTester tester) async {
+    await tester.tap(find.byKey(const Key('bookings_filter_button')));
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('defaults to most recent first', (tester) async {
     await pumpBookings(tester, three());
 
@@ -131,6 +137,7 @@ void main() {
 
   testWidgets('status chip filters the list', (tester) async {
     await pumpBookings(tester, three());
+    await openFilters(tester);
 
     await tester.tap(find.text('cancelled'));
     await tester.pumpAndSettle();
@@ -143,6 +150,7 @@ void main() {
 
   testWidgets('price sort toggles ascending then descending', (tester) async {
     await pumpBookings(tester, three());
+    await openFilters(tester);
 
     await tester.tap(find.text('Price'));
     await tester.pumpAndSettle();
@@ -156,6 +164,7 @@ void main() {
 
   testWidgets('event date sort orders chronologically', (tester) async {
     await pumpBookings(tester, three());
+    await openFilters(tester);
 
     await tester.tap(find.text('Event date'));
     await tester.pumpAndSettle();
@@ -165,6 +174,7 @@ void main() {
 
   testWidgets('status sort toggles ascending then descending', (tester) async {
     await pumpBookings(tester, three());
+    await openFilters(tester);
 
     await tester.tap(find.text('Status'));
     await tester.pumpAndSettle();
@@ -234,6 +244,7 @@ void main() {
           id: 3, status: 'confirmed', price: 8799, date: DateTime(2026, 10, 1)),
     ];
     await pumpBookings(tester, bookings);
+    await openFilters(tester);
 
     await tester.tap(find.text('Price'));
     await tester.pumpAndSettle();
