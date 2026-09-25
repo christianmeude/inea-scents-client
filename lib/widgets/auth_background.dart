@@ -2,11 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-/// C59: shared auth backdrop — light-mode gradient + mesh blobs.
+/// C88: shared auth backdrop — restored old diagonal gradient + mesh blobs.
 ///
-/// Light mode paints a NEW warm-blush vertical gradient variant (not the
-/// pre-C45 restore) with the C45 AAA-checked blob alphas over it. Dark mode
-/// keeps the flat night base + existing mesh, untouched.
+/// Light mode paints the pre-C59 old gradient recovered from e130957
+/// (topLeft → bottomRight, no stops) with the C45 AAA-checked blob alphas
+/// over it. Dark mode keeps the flat night base + existing mesh, untouched.
 ///
 /// Blob geometry is the C45 mesh; below 640px the blobs shrink
 /// ([blobScaleForWidth]) and the off-screen-anchored pair is pulled inward
@@ -21,20 +21,19 @@ class AuthBackground extends StatelessWidget {
 
   static const Color darkBase = Color(0xFF151012);
 
-  /// C59 light gradient stops, top → bottom. Plum copy (0xFF6A4053) reads
-  /// 7.87 / 7.21 / 6.73 on the bare stops and >= 6.2 under worst-case full
-  /// blob coverage — inside the light >= 5.7 budget with margin.
+  /// C88 restored old gradient stops, top → bottom (from e130957).
+  /// Plum copy (0xFF6A4053) reads 7.17 / 4.39 / 2.93 on the bare stops —
+  /// mid + bottom fall below the light >= 5.7 budget (reported, not restyled).
   static const List<Color> lightStops = <Color>[
-    Color(0xFFFDF4F5),
-    Color(0xFFF8E9E9),
-    Color(0xFFF5E0E1),
+    Color(0xFFF8E9DF),
+    Color(0xFFD8B0BA),
+    Color(0xFFB78C9C),
   ];
 
   static const LinearGradient lightGradient = LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
     colors: lightStops,
-    stops: <double>[0.0, 0.55, 1.0],
   );
 
   /// C45 AAA-checked light blob alphas (0x14 pale / 0x0D plum), unchanged.
