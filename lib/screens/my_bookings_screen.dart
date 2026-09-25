@@ -78,18 +78,10 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
     // Panel reads live parent state at build time; both setState calls
     // keep the list below and the open panel in sync.
     Widget buildPanel(StateSetter setPanel) => _BookingsFilterPanel(
-      query: _query,
       sort: _sort,
       descending: _descending,
       statusFilter: _statusFilter,
       statuses: statuses,
-      onQueryChanged: (value) => setState(() {
-        _query = value;
-        _searchController.text = value;
-        _searchController.selection = TextSelection.fromPosition(
-          TextPosition(offset: _searchController.text.length),
-        );
-      }),
       onSelectSort: (key) {
         setState(() => _selectSort(key));
         setPanel(() {});
@@ -451,29 +443,26 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
 }
 
 // ============================================================================
-// BOOKINGS FILTER PANEL (C87: sort + status + search re-housed here;
+// BOOKINGS FILTER PANEL (C87: sort + status re-housed here; C90: search
+// lives only in the in-row field below the header, never in this panel;
 // C78 semantics preserved — parent owns state, panel only forwards)
 // Wide (≥768px): shown in a Dialog popover. Narrow: bottom sheet.
 // ============================================================================
 
 class _BookingsFilterPanel extends StatefulWidget {
-  final String query;
   final _BookingsSort sort;
   final bool descending;
   final String statusFilter;
   final List<String> statuses;
-  final ValueChanged<String> onQueryChanged;
   final ValueChanged<_BookingsSort> onSelectSort;
   final ValueChanged<String> onSelectStatus;
   final VoidCallback onReset;
 
   const _BookingsFilterPanel({
-    required this.query,
     required this.sort,
     required this.descending,
     required this.statusFilter,
     required this.statuses,
-    required this.onQueryChanged,
     required this.onSelectSort,
     required this.onSelectStatus,
     required this.onReset,
@@ -484,20 +473,6 @@ class _BookingsFilterPanel extends StatefulWidget {
 }
 
 class _BookingsFilterPanelState extends State<_BookingsFilterPanel> {
-  late final TextEditingController _panelSearchController;
-
-  @override
-  void initState() {
-    super.initState();
-    _panelSearchController = TextEditingController(text: widget.query);
-  }
-
-  @override
-  void dispose() {
-    _panelSearchController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -525,16 +500,6 @@ class _BookingsFilterPanelState extends State<_BookingsFilterPanel> {
             ],
           ),
           const SizedBox(height: 8),
-          TextField(
-            key: const Key('filter_panel_search'),
-            controller: _panelSearchController,
-            decoration: const InputDecoration(
-              hintText: 'Search reference, name, or package',
-              prefixIcon: Icon(Icons.search_outlined),
-            ),
-            onChanged: widget.onQueryChanged,
-          ),
-          const SizedBox(height: 16),
           const Text(
             'Sort by',
             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),

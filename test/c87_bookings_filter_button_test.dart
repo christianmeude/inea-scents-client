@@ -10,8 +10,9 @@ import 'package:inea_scents_client/screens/my_bookings_screen.dart';
 
 /// C87: Bookings filter button sits at the search bar's RIGHT (below the
 /// header, never header level); it opens a popover panel on web (≥768px)
-/// and a bottom sheet on mobile. Sort + status + search live inside the
-/// panel; the main layout shows zero bare chips.
+/// and a bottom sheet on mobile. Sort + status live inside the
+/// panel (C90: search lives only in the in-row field below the header);
+/// the main layout shows zero bare chips.
 void main() {
   setUpAll(() {
     GoogleFonts.config.allowRuntimeFetching = false;
@@ -126,8 +127,8 @@ void main() {
     // Mobile (<768px) → bottom sheet, never a dialog popover.
     expect(find.byType(BottomSheet), findsOneWidget);
     expect(find.byType(Dialog), findsNothing);
-    // Sort + status + search all live inside the panel.
-    expect(find.byKey(const Key('filter_panel_search')), findsOneWidget);
+    // Sort + status live inside the panel; search lives only in-row.
+    expect(find.byKey(const Key('filter_panel_search')), findsNothing);
     expect(find.text('Sort by'), findsOneWidget);
     expect(find.text('Booking status'), findsOneWidget);
     expect(find.byType(ChoiceChip), findsWidgets);
@@ -145,8 +146,8 @@ void main() {
     // Web (≥768px) → dialog popover, never a bottom sheet.
     expect(find.byKey(const Key('bookings_filter_dialog')), findsOneWidget);
     expect(find.byType(BottomSheet), findsNothing);
-    // Sort + status + search all live inside the panel.
-    expect(find.byKey(const Key('filter_panel_search')), findsOneWidget);
+    // Sort + status live inside the panel; search lives only in-row.
+    expect(find.byKey(const Key('filter_panel_search')), findsNothing);
     expect(find.text('Sort by'), findsOneWidget);
     expect(find.text('Booking status'), findsOneWidget);
     expect(find.byType(ChoiceChip), findsWidgets);
@@ -192,16 +193,20 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('390px: panel search filters the list', (tester) async {
+  testWidgets('390px: in-row search is the sole search', (tester) async {
     await pumpBookings(tester, size: const Size(390, 844));
     await openFilters(tester);
 
+    // C90: no search slot inside the panel (web popover + mobile sheet).
+    expect(find.byKey(const Key('filter_panel_search')), findsNothing);
+    await tester.tap(find.text('Show results'));
+    await tester.pumpAndSettle();
+
+    // The in-row field below the header remains the only search.
     await tester.enterText(
-      find.byKey(const Key('filter_panel_search')),
+      find.byKey(const Key('bookings_search_field')),
       'ben',
     );
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Show results'));
     await tester.pumpAndSettle();
 
     expect(find.text('REF-2'), findsOneWidget);

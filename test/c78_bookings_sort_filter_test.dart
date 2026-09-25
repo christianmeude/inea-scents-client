@@ -114,7 +114,7 @@ void main() {
     await pumpBookings(tester, three());
 
     await tester.enterText(
-        find.byType(TextField), 'ben');
+        find.byKey(const Key('bookings_search_field')), 'ben');
     await tester.pumpAndSettle();
 
     expect(find.text('REF-2'), findsOneWidget);
@@ -127,7 +127,7 @@ void main() {
     await pumpBookings(tester, three());
 
     await tester.enterText(
-        find.byType(TextField), 'zzz-no-one');
+        find.byKey(const Key('bookings_search_field')), 'zzz-no-one');
     await tester.pumpAndSettle();
 
     expect(
@@ -213,14 +213,16 @@ void main() {
     ];
     await pumpBookings(tester, bookings);
 
-    await tester.enterText(find.byType(TextField), 'oud');
+    await tester.enterText(
+        find.byKey(const Key('bookings_search_field')), 'oud');
     await tester.pumpAndSettle();
     expect(find.text('Royal Oud Bar'), findsOneWidget);
     expect(find.text('Essential 10ml'), findsNothing);
 
     // Reference search: assert via the card's package name to avoid
     // matching the query text still shown inside the search field.
-    await tester.enterText(find.byType(TextField), 'REF-1');
+    await tester.enterText(
+        find.byKey(const Key('bookings_search_field')), 'REF-1');
     await tester.pumpAndSettle();
     expect(find.text('Essential 10ml'), findsOneWidget);
     expect(find.text('Royal Oud Bar'), findsNothing);
