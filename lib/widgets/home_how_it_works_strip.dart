@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'card_surfaces.dart';
 
-/// C91: minimal How-it-works strip for Home (Browse → Schedule → Pay).
-/// DRAFT copy — owner approval required (UX delta).
+/// C91: minimal How-it-works strip for Home (Browse → Schedule).
 class HomeHowItWorksStrip extends StatelessWidget {
   const HomeHowItWorksStrip({super.key});
 
@@ -15,10 +14,6 @@ class HomeHowItWorksStrip extends StatelessWidget {
     (
       title: 'Schedule',
       body: 'Check your date on the availability calendar.',
-    ),
-    (
-      title: 'Pay',
-      body: 'Confirm your details and pay securely.',
     ),
   ];
 
@@ -94,7 +89,7 @@ class HomeHowItWorksStrip extends StatelessWidget {
   }
 }
 
-/// Narrower than the app shell tablet breakpoint so the three steps stack
+/// Narrower than the app shell tablet breakpoint so the two steps stack
 /// on phones even inside the padded home column.
 abstract final class _HowItWorksBreakpoints {
   static const double twoCol = 600.0;

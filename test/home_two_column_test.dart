@@ -67,7 +67,7 @@ void main() {
       expect(find.text('How it works'), findsOneWidget);
       expect(find.text('Browse'), findsOneWidget);
       expect(find.text('Schedule'), findsOneWidget);
-      expect(find.text('Pay'), findsOneWidget);
+      expect(find.text('Pay'), findsNothing);
       // No catalog grid returns to Home.
       expect(find.byType(PackageCard), findsNothing);
       expect(find.byType(GridView), findsNothing);
