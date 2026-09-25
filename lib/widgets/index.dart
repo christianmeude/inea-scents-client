@@ -8,6 +8,7 @@ export 'skeleton_crossfade.dart';
 export 'skeleton_bookings_list.dart';
 export 'skeleton_booking_flow.dart';
 export 'next_step_card.dart';
+export 'home_how_it_works_strip.dart';
 export 'app_logo.dart';
 export 'custom_text_field.dart';
 export 'order_summary_panel.dart';

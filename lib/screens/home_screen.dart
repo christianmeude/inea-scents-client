@@ -43,19 +43,61 @@ class HomeScreen extends StatelessWidget {
                   // C60: Q9 retired — the flow itself resumes the draft
                   // at its stored stage.
                   const SizedBox(height: 20),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: NextStepCard(),
+                  // C91: two-column concierge body on tablet/desktop
+                  // (screen width ≥ mobileBreakpoint 768), stacked on
+                  // mobile. Col 1: upcoming Booking; col 2: next step +
+                  // teaser. MediaQuery (not LayoutBuilder constraints) so
+                  // the 768px breakpoint matches the repo tablet token
+                  // exactly — padded content width would shift it to 808.
+                  // No catalog grid lives here.
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Builder(
+                      builder: (context) {
+                        final wide = MediaQuery.sizeOf(context).width >=
+                            ResponsiveAppShell.mobileBreakpoint;
+                        if (!wide) {
+                          return const Column(
+                            key: Key('home_stacked'),
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              UpcomingBookingSection(),
+                              SizedBox(height: 16),
+                              NextStepCard(),
+                              SizedBox(height: 16),
+                              _OfferingTeaser(),
+                            ],
+                          );
+                        }
+                        return const Row(
+                          key: Key('home_two_col'),
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: UpcomingBookingSection(),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  NextStepCard(),
+                                  SizedBox(height: 16),
+                                  _OfferingTeaser(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(height: 16),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: UpcomingBookingSection(),
-                  ),
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: _OfferingTeaser(),
+                    child: HomeHowItWorksStrip(),
                   ),
                   const SizedBox(height: 20),
                 ],
