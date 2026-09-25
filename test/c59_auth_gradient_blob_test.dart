@@ -14,7 +14,8 @@ import 'package:inea_scents_client/widgets/auth_background.dart';
 import 'helpers/fake_api.dart';
 
 /// C59: auth light-mode gradient (NEW variant, not the pre-C45 restore) +
-/// mobile blob reposition.
+/// mobile blob reposition. C88 restored the old e130957 diagonal gradient,
+/// so the two contrast tests below pin the restored reality instead.
 ///
 /// Budgets (C32-C36 precedent): light text/UI pairs hold >= 5.7 on every
 /// gradient stop even under worst-case full blob coverage; button token and
@@ -61,29 +62,38 @@ void main() {
   });
 
   group('c59 light gradient contrast (WCAG math)', () {
-    test('plum copy holds >= 5.7 on every bare gradient stop', () {
-      for (final stop in AuthBackground.lightStops) {
-        expect(
-          _ratio(_plum, stop),
-          greaterThanOrEqualTo(5.7),
-          reason: 'stop $stop falls below light text budget',
-        );
-      }
+    test('C88 restored old gradient: top passes, mid/bottom miss reported', () {
+      // C88: old e130957 stops restored (7.17 / 4.39 / 2.93 vs 5.7).
+      // Mid + bottom miss is reported per ticket, never restyled.
+      final stops = AuthBackground.lightStops;
+      expect(stops, hasLength(3));
+      expect(
+        _ratio(_plum, stops[0]),
+        greaterThanOrEqualTo(5.7),
+        reason: 'top stop $stops must hold light text budget',
+      );
+      expect(
+        _ratio(_plum, stops[1]),
+        lessThan(5.7),
+        reason: 'mid stop unexpectedly meets budget',
+      );
+      expect(
+        _ratio(_plum, stops[2]),
+        lessThan(5.7),
+        reason: 'bottom stop unexpectedly meets budget',
+      );
     });
 
-    test('plum copy holds >= 5.7 under full blob coverage on deepest stop', () {
+    test('C88 deepest stop under blob coverage stays below budget (reported)', () {
+      // C88: deepest old stop (2.93 bare) stays below 5.7 under every
+      // blob tint — reported per ticket, never restyled.
       final deepest = AuthBackground.lightStops.last;
       for (final blob in AuthBackground.lightBlobs) {
         final surface = _over(blob, deepest);
         expect(
           _ratio(_plum, surface),
-          greaterThanOrEqualTo(5.7),
-          reason: 'blob $blob over $deepest falls below budget',
-        );
-        expect(
-          _ratio(_plum, surface),
-          greaterThanOrEqualTo(4.5),
-          reason: 'blob $blob over $deepest fails UI 4.5:1',
+          lessThan(5.7),
+          reason: 'blob $blob over $deepest unexpectedly meets budget',
         );
       }
     });
