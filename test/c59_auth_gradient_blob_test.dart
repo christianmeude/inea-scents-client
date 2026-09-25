@@ -13,14 +13,15 @@ import 'package:inea_scents_client/widgets/auth_background.dart';
 
 import 'helpers/fake_api.dart';
 
-/// C59: auth light-mode gradient (NEW variant, not the pre-C45 restore) +
-/// mobile blob reposition. C88 restored the old e130957 diagonal gradient,
-/// so the two contrast tests below pin the restored reality instead.
+/// C89: auth uses the admin solid base (light #FDF4F5 / dark #151012) +
+/// opaque/translucent mesh blobs — C88's restored e130957 diagonal
+/// gradient is superseded (GuestLayout.vue paints a solid base, never a
+/// gradient). Contrast below pins the C89 reality instead.
 ///
-/// Budgets (C32-C36 precedent): light text/UI pairs hold >= 5.7 on every
-/// gradient stop even under worst-case full blob coverage; button token and
-/// dark mesh stay AAA (>= 7). Blob geometry scales down below 640px so no
-/// mobile-width render overflows.
+/// Budgets (C32-C36 precedent): light text/UI pairs hold >= 5.7 on the
+/// solid base; opaque blob cores miss and are reported, never restyled.
+/// Button token and dark mesh stay AAA (>= 7). Blob geometry scales down
+/// below 640px so no mobile-width render overflows.
 double _lum(Color c) {
   double f(int ch) {
     final v = ch / 255.0;
@@ -41,19 +42,6 @@ double _ratio(Color a, Color b) {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-/// Alpha-composite [fg] over opaque [bg].
-Color _over(Color fg, Color bg) {
-  final a = fg.a;
-  int ch(double f, double b) =>
-      ((f * a + b * (1 - a)) * 255).round().clamp(0, 255);
-  return Color.fromARGB(
-    255,
-    ch(fg.r, bg.r),
-    ch(fg.g, bg.g),
-    ch(fg.b, bg.b),
-  );
-}
-
 const _plum = Color(0xFF6A4053);
 
 void main() {
@@ -61,39 +49,25 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
-  group('c59 light gradient contrast (WCAG math)', () {
-    test('C88 restored old gradient: top passes, mid/bottom miss reported', () {
-      // C88: old e130957 stops restored (7.17 / 4.39 / 2.93 vs 5.7).
-      // Mid + bottom miss is reported per ticket, never restyled.
-      final stops = AuthBackground.lightStops;
-      expect(stops, hasLength(3));
+  group('c59 light solid-base contrast (WCAG math)', () {
+    test('C89 admin solid base passes the 5.7 budget', () {
+      // C89: solid #FDF4F5 base reads 7.87 vs plum — passes.
+      expect(AuthBackground.lightBase, equals(const Color(0xFFFDF4F5)));
       expect(
-        _ratio(_plum, stops[0]),
+        _ratio(_plum, AuthBackground.lightBase),
         greaterThanOrEqualTo(5.7),
-        reason: 'top stop $stops must hold light text budget',
-      );
-      expect(
-        _ratio(_plum, stops[1]),
-        lessThan(5.7),
-        reason: 'mid stop unexpectedly meets budget',
-      );
-      expect(
-        _ratio(_plum, stops[2]),
-        lessThan(5.7),
-        reason: 'bottom stop unexpectedly meets budget',
+        reason: 'solid base must hold light text budget',
       );
     });
 
-    test('C88 deepest stop under blob coverage stays below budget (reported)', () {
-      // C88: deepest old stop (2.93 bare) stays below 5.7 under every
-      // blob tint — reported per ticket, never restyled.
-      final deepest = AuthBackground.lightStops.last;
+    test('C89 opaque blob cores miss budget (reported, never restyled)', () {
+      // C89: opaque admin fills (4.80 / 3.05 / 2.34 / 3.76 / 1.02) all
+      // miss 5.7 — reported per ticket, never restyled.
       for (final blob in AuthBackground.lightBlobs) {
-        final surface = _over(blob, deepest);
         expect(
-          _ratio(_plum, surface),
+          _ratio(_plum, blob),
           lessThan(5.7),
-          reason: 'blob $blob over $deepest unexpectedly meets budget',
+          reason: 'blob $blob over base unexpectedly meets budget',
         );
       }
     });
@@ -169,7 +143,7 @@ void main() {
       }
     }
 
-    testWidgets('light mode paints the C59 gradient backdrop', (
+    testWidgets('light mode paints the C89 solid base backdrop', (
       WidgetTester tester,
     ) async {
       tester.view.physicalSize = const Size(360, 800);
@@ -182,13 +156,21 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // C89: solid admin base — no LinearGradient in the backdrop.
       final containers = tester
           .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
           .where((c) {
             final d = c.decoration;
             return d is BoxDecoration && d.gradient is LinearGradient;
           });
-      expect(containers, isNotEmpty);
+      expect(containers, isEmpty);
+      final bases = tester
+          .widgetList<AnimatedContainer>(find.byType(AnimatedContainer))
+          .where((c) {
+            final d = c.decoration;
+            return d is BoxDecoration && d.color == AuthBackground.lightBase;
+          });
+      expect(bases, isNotEmpty);
       expect(tester.takeException(), isNull);
     });
   });

@@ -363,9 +363,10 @@ void main() {
         final dec = animatedContainer.decoration as BoxDecoration;
         final border = dec.border as Border;
 
-        // P6 (Q4): constant 1.5px border — focus is the white border
-        // color plus the outer glow ring, never a width change.
-        expect(border.top.width, equals(1.5));
+        // C89 admin parity: constant 1px border (TextInput `border`) —
+        // focus is the white border color plus the outer glow ring,
+        // never a width change.
+        expect(border.top.width, equals(1.0));
         expect(border.top.color, equals(Colors.white));
 
         final outerContainer = tester.widget<Container>(
@@ -548,9 +549,10 @@ void main() {
           );
           final dec = animatedContainer.decoration as BoxDecoration;
           final border = dec.border as Border;
-          expect(border.top.color, equals(const Color(0xFFFDF4F5)));
-          // P6 (Q4): constant 1.5px border in dark too.
-          expect(border.top.width, equals(1.5));
+          // C89 admin parity: dark focus border is brand-primary
+          // (TextInput dark:focus:border-brand-primary), constant 1px.
+          expect(border.top.color, equals(const Color(0xFF6A4053)));
+          expect(border.top.width, equals(1.0));
         },
       );
     },
