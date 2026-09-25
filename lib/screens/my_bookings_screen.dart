@@ -153,10 +153,18 @@ class MyBookingsScreen extends ConsumerWidget {
           // ======================================================
           // LOADING
           // ======================================================
-          loading: () => const Center(
-            child: CircularProgressIndicator(
-              color: primaryColor,
-              strokeWidth: 2.5,
+          loading: () => SingleChildScrollView(
+            physics: MobileClampScroll.physicsOf(context),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: ResponsiveAppShell.maxContentWidth,
+                ),
+                child: Padding(
+                  padding: ResponsiveAppShell.screenHeaderPadding,
+                  child: const SkeletonBookingsList(),
+                ),
+              ),
             ),
           ),
 

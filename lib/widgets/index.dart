@@ -5,6 +5,8 @@ export 'responsive_app_shell.dart';
 export 'skeleton_package_card.dart';
 export 'skeleton_calendar.dart';
 export 'skeleton_crossfade.dart';
+export 'skeleton_bookings_list.dart';
+export 'skeleton_booking_flow.dart';
 export 'next_step_card.dart';
 export 'app_logo.dart';
 export 'custom_text_field.dart';

@@ -646,8 +646,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                     },
                   );
                 },
-                loading: () =>
-                    const Center(child: CircularProgressIndicator(color: plum)),
+                loading: () => const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 14, 20, 16),
+                  child: SkeletonBookingFlow(),
+                ),
                 // P6 (Q6/Q8): shared friendly card; raw errors stay
                 // in logs, never on screen.
                 error: (e, s) => Center(
