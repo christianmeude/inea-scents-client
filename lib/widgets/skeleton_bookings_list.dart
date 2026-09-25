@@ -7,6 +7,7 @@ import 'package:shimmer/shimmer.dart';
 /// Mirrors [_BookingCard] in my_bookings_screen.dart: top row (48px icon
 /// box + reference bars + status pill), divider, 18px package line,
 /// 3 detail rows (34px icon box + 2 text bars), price chip row.
+/// C84: single parent Shimmer — children are plain Containers.
 class SkeletonBookingsList extends StatelessWidget {
   /// Number of card placeholders to render.
   final int cardCount;
@@ -28,31 +29,23 @@ class SkeletonBookingsList extends StatelessWidget {
       required double width,
       double radius = 6,
     }) {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(radius),
-          ),
+      return Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(radius),
         ),
       );
     }
 
     Widget box({required double width, required double height, double radius = 10}) {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(radius),
-          ),
+      return Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(radius),
         ),
       );
     }
@@ -112,27 +105,19 @@ class SkeletonBookingsList extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Shimmer.fromColors(
-                  baseColor: base,
-                  highlightColor: highlight,
-                  child: Container(
-                    width: 72,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                Container(
+                  width: 72,
+                  height: 26,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 18),
             // Divider.
-            Shimmer.fromColors(
-              baseColor: base,
-              highlightColor: highlight,
-              child: Container(height: 1, color: Colors.white),
-            ),
+            Container(height: 1, color: Colors.white),
             const SizedBox(height: 17),
             // Package name line (18px).
             bar(height: 18, width: double.infinity, radius: 6),
@@ -144,32 +129,28 @@ class SkeletonBookingsList extends StatelessWidget {
             ],
             const SizedBox(height: 18),
             // Price chip row (12px label + price bar).
-            Shimmer.fromColors(
-              baseColor: base,
-              highlightColor: highlight,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    Container(height: 12, width: 90, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          height: 16,
-                          width: 80,
-                          color: Colors.white,
-                        ),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Container(height: 12, width: 90, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        height: 16,
+                        width: 80,
+                        color: Colors.white,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -177,17 +158,21 @@ class SkeletonBookingsList extends StatelessWidget {
       );
     }
 
-    return Column(
-      key: const Key('skeleton_bookings_list'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // TabHeader-height title bar (32px) + booking count line.
-        bar(height: 32, width: 200, radius: 8),
-        const SizedBox(height: 5),
-        bar(height: 13, width: 100, radius: 6),
-        const SizedBox(height: 20),
-        for (int i = 0; i < cardCount; i++) bookingCard(i),
-      ],
+    return Shimmer.fromColors(
+      baseColor: base,
+      highlightColor: highlight,
+      child: Column(
+        key: const Key('skeleton_bookings_list'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // TabHeader-height title bar (32px) + booking count line.
+          bar(height: 32, width: 200, radius: 8),
+          const SizedBox(height: 5),
+          bar(height: 13, width: 100, radius: 6),
+          const SizedBox(height: 20),
+          for (int i = 0; i < cardCount; i++) bookingCard(i),
+        ],
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'responsive_app_shell.dart';
 /// C83: teases the real layout — radius24 calendarCard (pads 12,14,12,14)
 /// with month-nav chrome + weekday header + month grid, desktop 7:4
 /// calendar|agenda Row, agenda ending in the 48px Continue pill CTA.
+/// C84: single parent Shimmer — children are plain Containers.
 class SkeletonCalendar extends StatelessWidget {
   const SkeletonCalendar({super.key});
 
@@ -26,61 +27,45 @@ class SkeletonCalendar extends StatelessWidget {
       required double width,
       double radius = 6,
     }) {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(radius),
-          ),
+      return Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(radius),
         ),
       );
     }
 
     Widget dayCell() {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          width: 36,
-          height: 36,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
+      return Container(
+        width: 36,
+        height: 36,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
         ),
       );
     }
 
     Widget navButton() {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          width: 28,
-          height: 28,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
+      return Container(
+        width: 28,
+        height: 28,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
         ),
       );
     }
 
     Widget weekdayLabel() {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          height: 10,
-          width: 20,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
+      return Container(
+        height: 10,
+        width: 20,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
         ),
       );
     }
@@ -141,52 +126,52 @@ class SkeletonCalendar extends StatelessWidget {
           bar(height: 12, width: 220),
           const SizedBox(height: 12),
           // Continue pill CTA tease: full-width 48px pill.
-          Shimmer.fromColors(
+          Container(
             key: const Key('skeleton_agenda_pill'),
-            baseColor: base,
-            highlightColor: highlight,
-            child: Container(
-              height: 48,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(9999),
-              ),
+            height: 48,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(9999),
             ),
           ),
         ],
       );
     }
 
-    return Column(
-      key: const Key('skeleton_calendar'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final isDesktop = constraints.maxWidth >=
-                ResponsiveAppShell.tabletBreakpoint;
-            if (isDesktop) {
-              return Row(
+    return Shimmer.fromColors(
+      baseColor: base,
+      highlightColor: highlight,
+      child: Column(
+        key: const Key('skeleton_calendar'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isDesktop = constraints.maxWidth >=
+                  ResponsiveAppShell.tabletBreakpoint;
+              if (isDesktop) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 7, child: calendarCard()),
+                    const SizedBox(width: 24),
+                    Expanded(flex: 4, child: agendaColumn()),
+                  ],
+                );
+              }
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 7, child: calendarCard()),
-                  const SizedBox(width: 24),
-                  Expanded(flex: 4, child: agendaColumn()),
+                  calendarCard(),
+                  const SizedBox(height: 20),
+                  agendaColumn(),
                 ],
               );
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                calendarCard(),
-                const SizedBox(height: 20),
-                agendaColumn(),
-              ],
-            );
-          },
-        ),
-      ],
+            },
+          ),
+        ],
+      ),
     );
   }
 }

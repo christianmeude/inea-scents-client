@@ -13,6 +13,7 @@ import 'responsive_app_shell.dart';
 /// mirrors the schedule recap rows (Date/Time/Venue/Contact); right rail
 /// teases the order-summary block (5 rows + CTA bar). Viewports >=768
 /// render a Row with the rail (tablet + desktop); narrower stack.
+/// C84: single parent Shimmer — children are plain Containers.
 class SkeletonBookingFlow extends StatelessWidget {
   const SkeletonBookingFlow({super.key});
 
@@ -31,46 +32,34 @@ class SkeletonBookingFlow extends StatelessWidget {
       required double width,
       double radius = 6,
     }) {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(radius),
-          ),
+      return Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(radius),
         ),
       );
     }
 
     Widget circle(double size) {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          width: size,
-          height: size,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
+      return Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
         ),
       );
     }
 
     Widget weekdayLabel() {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          height: 10,
-          width: 20,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
+      return Container(
+        height: 10,
+        width: 20,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
         ),
       );
     }
@@ -139,16 +128,12 @@ class SkeletonBookingFlow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Pax pill row (§2 readonly row).
-            Shimmer.fromColors(
-              baseColor: base,
-              highlightColor: highlight,
-              child: Container(
-                height: 38,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(9999),
-                ),
+            Container(
+              height: 38,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(9999),
               ),
             ),
             const SizedBox(height: 14),
@@ -163,16 +148,12 @@ class SkeletonBookingFlow extends StatelessWidget {
             const SizedBox(height: 8),
             bar(height: 12, width: 150, radius: 6),
             const SizedBox(height: 12),
-            Shimmer.fromColors(
-              baseColor: base,
-              highlightColor: highlight,
-              child: Container(
-                height: 44,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
+            Container(
+              height: 44,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           ],
@@ -249,17 +230,13 @@ class SkeletonBookingFlow extends StatelessWidget {
             ],
             const SizedBox(height: 4),
             // CTA bar.
-            Shimmer.fromColors(
+            Container(
               key: const Key('skeleton_flow_cta'),
-              baseColor: base,
-              highlightColor: highlight,
-              child: Container(
-                height: 48,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(9999),
-                ),
+              height: 48,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(9999),
               ),
             ),
           ],
@@ -267,76 +244,80 @@ class SkeletonBookingFlow extends StatelessWidget {
       );
     }
 
-    return Column(
-      key: const Key('skeleton_booking_flow'),
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // Pax header bar.
-        Container(
-          key: const Key('skeleton_flow_pax_header'),
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1618) : Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: isDark
-                  ? const Color(0xFF36222C)
-                  : const Color(0x4D99868C),
+    return Shimmer.fromColors(
+      baseColor: base,
+      highlightColor: highlight,
+      child: Column(
+        key: const Key('skeleton_booking_flow'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Pax header bar.
+          Container(
+            key: const Key('skeleton_flow_pax_header'),
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1C1618) : Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: isDark
+                    ? const Color(0xFF36222C)
+                    : const Color(0x4D99868C),
+              ),
+            ),
+            child: Row(
+              children: [
+                circle(20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: bar(height: 18, width: double.infinity, radius: 6),
+                ),
+              ],
             ),
           ),
-          child: Row(
-            children: [
-              circle(20),
-              const SizedBox(width: 10),
-              Expanded(
-                child: bar(height: 18, width: double.infinity, radius: 6),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final stack =
-                constraints.maxWidth < ResponsiveAppShell.mobileBreakpoint;
-            if (!stack) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        calendarCard(),
-                        const SizedBox(height: 16),
-                        detailsBlock(),
-                        const SizedBox(height: 16),
-                        eventSummaryBlock(),
-                      ],
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final stack =
+                  constraints.maxWidth < ResponsiveAppShell.mobileBreakpoint;
+              if (!stack) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          calendarCard(),
+                          const SizedBox(height: 16),
+                          detailsBlock(),
+                          const SizedBox(height: 16),
+                          eventSummaryBlock(),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(flex: 1, child: summaryRail()),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 1, child: summaryRail()),
+                  ],
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  calendarCard(),
+                  const SizedBox(height: 16),
+                  detailsBlock(),
+                  const SizedBox(height: 16),
+                  eventSummaryBlock(),
+                  const SizedBox(height: 16),
+                  summaryRail(),
                 ],
               );
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                calendarCard(),
-                const SizedBox(height: 16),
-                detailsBlock(),
-                const SizedBox(height: 16),
-                eventSummaryBlock(),
-                const SizedBox(height: 16),
-                summaryRail(),
-              ],
-            );
-          },
-        ),
-      ],
+            },
+          ),
+        ],
+      ),
     );
   }
 }
