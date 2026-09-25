@@ -4,9 +4,9 @@ import 'package:shimmer/shimmer.dart';
 /// C79: bookings-list loading skeleton — teases the My Bookings layout
 /// (TabHeader + booking cards) so loading never flashes a spinner.
 ///
-/// Mirrors [_BookingCard] in my_bookings_screen.dart: top row (48px icon
-/// box + reference bars + status pill), divider, 18px package line,
-/// 3 detail rows (34px icon box + 2 text bars), price chip row.
+/// C86: detail rows stack label-over-value (9px label bar, 2px gap,
+/// 12px value bar — mirrors _BookingDetailRow); header teases the
+/// TabHeader title+count pairing (32px title bar, 5px gap, 13px count).
 /// C84: single parent Shimmer — children are plain Containers.
 class SkeletonBookingsList extends StatelessWidget {
   /// Number of card placeholders to render.
@@ -28,8 +28,10 @@ class SkeletonBookingsList extends StatelessWidget {
       required double height,
       required double width,
       double radius = 6,
+      Key? key,
     }) {
       return Container(
+        key: key,
         height: height,
         width: width,
         decoration: BoxDecoration(
@@ -61,9 +63,23 @@ class SkeletonBookingsList extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                bar(height: 9, width: 70, radius: 4),
-                const SizedBox(height: 4),
-                bar(height: 12, width: double.infinity, radius: 6),
+                bar(
+                  height: 9,
+                  width: 70,
+                  radius: 4,
+                  key: Key(
+                    'skeleton_booking_card_${card}_detail_${row}_label',
+                  ),
+                ),
+                const SizedBox(height: 2),
+                bar(
+                  height: 12,
+                  width: double.infinity,
+                  radius: 6,
+                  key: Key(
+                    'skeleton_booking_card_${card}_detail_${row}_value',
+                  ),
+                ),
               ],
             ),
           ),
@@ -165,10 +181,34 @@ class SkeletonBookingsList extends StatelessWidget {
         key: const Key('skeleton_bookings_list'),
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // TabHeader-height title bar (32px) + booking count line.
-          bar(height: 32, width: 200, radius: 8),
-          const SizedBox(height: 5),
-          bar(height: 13, width: 100, radius: 6),
+          // TabHeader tease: title-over-count pairing (32px title bar,
+          // 5px gap, 13px count bar — mirrors TabHeader sizes).
+          Row(
+            key: const Key('skeleton_bookings_header'),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    bar(
+                      height: 32,
+                      width: 200,
+                      radius: 8,
+                      key: const Key('skeleton_bookings_header_title'),
+                    ),
+                    const SizedBox(height: 5),
+                    bar(
+                      height: 13,
+                      width: 100,
+                      radius: 6,
+                      key: const Key('skeleton_bookings_header_count'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 20),
           for (int i = 0; i < cardCount; i++) bookingCard(i),
         ],
