@@ -21,6 +21,7 @@ void main() {
     required double price,
     required DateTime date,
     String name = 'Customer',
+    String packageName = 'Essential 10ml',
   }) =>
       Booking(
         id: id,
@@ -29,7 +30,7 @@ void main() {
         customerName: name,
         pax: 50,
         eventDate: date,
-        package: Package(id: 1, name: 'Essential 10ml', price: price),
+        package: Package(id: 1, name: packageName, price: price),
       );
 
   List<Booking> three() => [
@@ -159,6 +160,88 @@ void main() {
     await tester.tap(find.text('Event date'));
     await tester.pumpAndSettle();
     expect(referenceOrder(tester), ['REF-2', 'REF-3', 'REF-1']);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('status sort toggles ascending then descending', (tester) async {
+    await pumpBookings(tester, three());
+
+    await tester.tap(find.text('Status'));
+    await tester.pumpAndSettle();
+    // Ascending: cancelled first.
+    expect(referenceOrder(tester).first, 'REF-2');
+
+    await tester.tap(find.text('Status'));
+    await tester.pumpAndSettle();
+    // Descending: cancelled last, confirmed pair on top in either order.
+    final order = referenceOrder(tester);
+    expect(order.last, 'REF-2');
+    expect(order.sublist(0, 2).toSet(), {'REF-1', 'REF-3'});
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('search matches package, reference, and id', (tester) async {
+    final bookings = [
+      sample(
+          id: 1,
+          status: 'confirmed',
+          price: 4499,
+          date: DateTime(2026, 10, 3),
+          packageName: 'Essential 10ml'),
+      sample(
+          id: 2,
+          status: 'confirmed',
+          price: 6399,
+          date: DateTime(2026, 10, 1),
+          packageName: 'Royal Oud Bar'),
+      sample(
+          id: 3,
+          status: 'confirmed',
+          price: 8799,
+          date: DateTime(2026, 10, 2),
+          packageName: 'Essential 10ml'),
+    ];
+    await pumpBookings(tester, bookings);
+
+    await tester.enterText(find.byType(TextField), 'oud');
+    await tester.pumpAndSettle();
+    expect(find.text('Royal Oud Bar'), findsOneWidget);
+    expect(find.text('Essential 10ml'), findsNothing);
+
+    // Reference search: assert via the card's package name to avoid
+    // matching the query text still shown inside the search field.
+    await tester.enterText(find.byType(TextField), 'REF-1');
+    await tester.pumpAndSettle();
+    expect(find.text('Essential 10ml'), findsOneWidget);
+    expect(find.text('Royal Oud Bar'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('nulls sort last in both directions', (tester) async {
+    final bookings = [
+      sample(
+          id: 1, status: 'confirmed', price: 4499, date: DateTime(2026, 10, 3)),
+      Booking(
+        id: 2,
+        bookingReference: 'REF-2',
+        status: 'confirmed',
+        customerName: 'Ben',
+        pax: 50,
+        eventDate: null,
+        package: null,
+      ),
+      sample(
+          id: 3, status: 'confirmed', price: 8799, date: DateTime(2026, 10, 1)),
+    ];
+    await pumpBookings(tester, bookings);
+
+    await tester.tap(find.text('Price'));
+    await tester.pumpAndSettle();
+    expect(referenceOrder(tester).last, 'REF-2');
+
+    await tester.tap(find.text('Price'));
+    await tester.pumpAndSettle();
+    expect(referenceOrder(tester).last, 'REF-2');
     expect(tester.takeException(), isNull);
   });
 }

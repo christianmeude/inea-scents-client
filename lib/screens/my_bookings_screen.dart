@@ -71,10 +71,11 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
     });
   }
 
-  double _priceOf(Booking b) =>
-      b.package == null ? -1 : b.package!.priceForPax(b.pax);
+  double? _priceOf(Booking b) =>
+      b.package == null ? null : b.package!.priceForPax(b.pax);
 
   // C78: Booking has no createdAt — most recent first = highest id first.
+  // Nulls always sort last, in both directions.
   List<Booking> _visible(List<Booking> bookings) {
     final q = _query.trim().toLowerCase();
     final list = bookings.where((b) {
@@ -90,25 +91,37 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
       return haystack.contains(q);
     }).toList();
     int cmp(Booking a, Booking b) {
+      int directed(int c) => _descending ? -c : c;
       switch (_sort) {
         case _BookingsSort.recent:
-          return (a.id ?? -1).compareTo(b.id ?? -1);
+          final ia = a.id;
+          final ib = b.id;
+          if (ia == null && ib == null) return 0;
+          if (ia == null) return 1;
+          if (ib == null) return -1;
+          return directed(ia.compareTo(ib));
         case _BookingsSort.status:
-          return (a.status ?? '').compareTo(b.status ?? '');
+          return directed(
+              (a.status ?? '').compareTo(b.status ?? ''));
         case _BookingsSort.price:
-          return _priceOf(a).compareTo(_priceOf(b));
+          final pa = _priceOf(a);
+          final pb = _priceOf(b);
+          if (pa == null && pb == null) return 0;
+          if (pa == null) return 1;
+          if (pb == null) return -1;
+          return directed(pa.compareTo(pb));
         case _BookingsSort.eventDate:
           final da = a.eventDate;
           final db = b.eventDate;
           if (da == null && db == null) return 0;
           if (da == null) return 1;
           if (db == null) return -1;
-          return da.compareTo(db);
+          return directed(da.compareTo(db));
       }
     }
 
     list.sort(cmp);
-    return _descending ? list.reversed.toList() : list;
+    return list;
   }
 
   @override
