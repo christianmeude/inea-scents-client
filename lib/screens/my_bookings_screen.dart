@@ -7,7 +7,10 @@ import '../models/index.dart';
 import '../utils/peso.dart';
 import '../widgets/index.dart';
 
-class MyBookingsScreen extends ConsumerWidget {
+// C78: sort keys for the bookings list (below header).
+enum _BookingsSort { recent, status, price, eventDate }
+
+class MyBookingsScreen extends ConsumerStatefulWidget {
   const MyBookingsScreen({super.key});
 
   // ============================================================
@@ -29,7 +32,87 @@ class MyBookingsScreen extends ConsumerWidget {
   static const Color borderColor = Color(0xFFE4CBD2);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyBookingsScreen> createState() =>
+      _MyBookingsScreenState();
+}
+
+// ============================================================================
+// BOOKINGS LIST STATE (C78: sort / filter / search, all below header)
+// ============================================================================
+
+class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
+  _BookingsSort _sort = _BookingsSort.recent;
+  bool _descending = true;
+  String _statusFilter = 'All';
+  String _query = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  static const Map<_BookingsSort, String> _sortLabels = {
+    _BookingsSort.recent: 'Most recent',
+    _BookingsSort.status: 'Status',
+    _BookingsSort.price: 'Price',
+    _BookingsSort.eventDate: 'Event date',
+  };
+
+  void _selectSort(_BookingsSort key) {
+    setState(() {
+      if (_sort == key) {
+        _descending = !_descending;
+      } else {
+        _sort = key;
+        _descending = key == _BookingsSort.recent;
+      }
+    });
+  }
+
+  double _priceOf(Booking b) =>
+      b.package == null ? -1 : b.package!.priceForPax(b.pax);
+
+  // C78: Booking has no createdAt — most recent first = highest id first.
+  List<Booking> _visible(List<Booking> bookings) {
+    final q = _query.trim().toLowerCase();
+    final list = bookings.where((b) {
+      if (_statusFilter != 'All' &&
+          (b.status ?? 'Unknown') != _statusFilter) {
+        return false;
+      }
+      if (q.isEmpty) return true;
+      final haystack =
+          '${b.bookingReference ?? ''} ${b.customerName ?? ''} '
+          '${b.package?.name ?? ''} ${b.id ?? ''}'
+              .toLowerCase();
+      return haystack.contains(q);
+    }).toList();
+    int cmp(Booking a, Booking b) {
+      switch (_sort) {
+        case _BookingsSort.recent:
+          return (a.id ?? -1).compareTo(b.id ?? -1);
+        case _BookingsSort.status:
+          return (a.status ?? '').compareTo(b.status ?? '');
+        case _BookingsSort.price:
+          return _priceOf(a).compareTo(_priceOf(b));
+        case _BookingsSort.eventDate:
+          final da = a.eventDate;
+          final db = b.eventDate;
+          if (da == null && db == null) return 0;
+          if (da == null) return 1;
+          if (db == null) return -1;
+          return da.compareTo(db);
+      }
+    }
+
+    list.sort(cmp);
+    return _descending ? list.reversed.toList() : list;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final bookingsAsync = ref.watch(bookingsProvider);
     // C43: header is title+count only (book-another removed);
     // empty state keeps its own CTA to /packages.
@@ -44,6 +127,12 @@ class MyBookingsScreen extends ConsumerWidget {
       body: SafeArea(
         child: bookingsAsync.when(
           data: (bookings) {
+            final visible = _visible(bookings);
+            final statuses = <String>['All'];
+            for (final b in bookings) {
+              final s = b.status ?? 'Unknown';
+              if (!statuses.contains(s)) statuses.add(s);
+            }
             if (bookings.isEmpty) {
               return Center(
                 child: ConstrainedBox(
@@ -69,7 +158,7 @@ class MyBookingsScreen extends ConsumerWidget {
             }
 
             return RefreshIndicator(
-              color: primaryColor,
+              color: MyBookingsScreen.primaryColor,
               onRefresh: () => ref.refresh(bookingsProvider.future),
               child: SingleChildScrollView(
                 // C40: clamp overscroll on mobile (<768px); SDK default
@@ -92,24 +181,100 @@ class MyBookingsScreen extends ConsumerWidget {
                           // ==================================================
                           TabHeader(
                             title: 'My Bookings',
-                            count: '${bookings.length} '
-                                '${bookings.length == 1 ? 'booking' : 'bookings'}',
+                            count: '${visible.length} '
+                                '${visible.length == 1 ? 'booking' : 'bookings'}',
                           ),
 
                           const SizedBox(height: 20),
 
                           // ==================================================
-                          // BOOKING CARDS (P7 impeccable adapt: single
-                          // column on mobile, pairs on web — rows size to
-                          // the tallest card, so nothing overflows)
+                          // CONTROLS (C78: search + sort + status filter,
+                          // all below the header)
                           // ==================================================
+                          TextField(
+                            controller: _searchController,
+                            decoration: const InputDecoration(
+                              hintText:
+                                  'Search reference, name, or package',
+                              prefixIcon:
+                                  Icon(Icons.search_outlined),
+                            ),
+                            onChanged: (value) =>
+                                setState(() => _query = value),
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final key
+                                  in _BookingsSort.values)
+                                ChoiceChip(
+                                  label: Row(
+                                    mainAxisSize:
+                                        MainAxisSize.min,
+                                    children: [
+                                      Text(_sortLabels[key]!),
+                                      if (_sort == key)
+                                        Icon(
+                                          _descending
+                                              ? Icons
+                                                  .arrow_downward_outlined
+                                              : Icons
+                                                  .arrow_upward_outlined,
+                                          size: 14,
+                                        ),
+                                    ],
+                                  ),
+                                  selected: _sort == key,
+                                  onSelected: (_) =>
+                                      _selectSort(key),
+                                ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              for (final s in statuses)
+                                FilterChip(
+                                  label: Text(s),
+                                  selected:
+                                      _statusFilter == s,
+                                  onSelected: (_) => setState(
+                                      () => _statusFilter = s),
+                                ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          if (visible.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 32),
+                              child: Center(
+                                child: Text(
+                                  'No bookings match your filters.',
+                                ),
+                              ),
+                            )
+                          else
                           LayoutBuilder(
                             builder: (context, constraints) {
-                              final cards = bookings
+                              final cards = visible
                                   .map(
                                     (booking) => _BookingCard(booking: booking),
                                   )
                                   .toList();
+
+                          // Cards below render `visible` (filtered + sorted).
+
                               if (constraints.maxWidth <=
                                   ResponsiveAppShell.tabletBreakpoint) {
                                 return Column(children: cards);
@@ -155,7 +320,7 @@ class MyBookingsScreen extends ConsumerWidget {
           // ======================================================
           loading: () => const Center(
             child: CircularProgressIndicator(
-              color: primaryColor,
+              color: MyBookingsScreen.primaryColor,
               strokeWidth: 2.5,
             ),
           ),
