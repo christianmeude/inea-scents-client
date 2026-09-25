@@ -14,10 +14,16 @@ class ReservationCalendarPanel extends StatelessWidget {
   final DateTime? selectedDate;
   final ValueChanged<DateTime> onDateSelected;
 
+  /// When false, renders the month grid only — no "Select Date" header
+  /// and no selection caption (the host card owns that chrome). C92
+  /// desktop passes false inside the "Select Date & Time" card.
+  final bool showChrome;
+
   const ReservationCalendarPanel({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
+    this.showChrome = true,
   });
 
   @override
@@ -25,6 +31,7 @@ class ReservationCalendarPanel extends StatelessWidget {
     return IneaCalendar(
       selectedDate: selectedDate,
       onDateSelected: onDateSelected,
+      showChrome: showChrome,
     );
   }
 }

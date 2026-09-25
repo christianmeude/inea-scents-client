@@ -3,11 +3,12 @@ import '../models/index.dart';
 import '../utils/peso.dart';
 import 'card_surfaces.dart';
 
-/// Middle Column / Panel for INEA Scents reservation flow on desktop.
-/// Handles Package variation overview, the locked Pax summary (P6: the
-/// headcount step is chosen on the packages grid, never re-picked here),
-/// and Time slot selection. Payment Method is picked once at the payment
-/// step (C18 pay-once); this panel carries no picker.
+/// Middle Column / Panel for INEA Scents reservation flow on tablet.
+/// Handles Package variation overview and Time slot selection. Payment
+/// Method is picked once at the payment step (C18 pay-once); this panel
+/// carries no picker. C92: Pax UI retired (the headcount step is chosen
+/// on the packages grid and echoed by the summary rail) — [selectedPax]
+/// and [onChangePax] stay as ignored compatibility params.
 /// Included-info lives in the booking summary's InclusionsList (C7).
 // C6: Reservation* class name kept per ADR 0008 (zero-ripple rule);
 // customer-facing copy uses Booking / Pax Choice.
@@ -15,11 +16,9 @@ class ReservationDetailsPanel extends StatelessWidget {
   final Package package;
   final int? selectedPax;
 
-  /// C76: locked Pax display — the headcount step was chosen on the
-  /// packages grid (`?pax=`) and never re-picked here. Null hides the
-  /// Change action; the schedule step always passes null (C6 in-flow
-  /// edit retired). Non-null callers (direct-panel usages/tests) keep
-  /// the legacy link.
+  /// C76: locked Pax display — RETIRED (C92: the rail owns the
+  /// headcount echo). Kept as an ignored compatibility param so
+  /// tablet/mobile call sites and direct-panel usages keep compiling.
   final VoidCallback? onChangePax;
   final String? selectedTime;
   final ValueChanged<String> onTimeSelected;
@@ -52,11 +51,6 @@ class ReservationDetailsPanel extends StatelessWidget {
     final paxList = options.isNotEmpty
         ? options.map((t) => t.pax).toList()
         : (package.paxOptions ?? const <int>[]);
-
-    String? optionPriceLabel(int pax) {
-      if (options.isEmpty) return null;
-      return formatPeso(package.priceForPax(pax));
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,98 +140,7 @@ class ReservationDetailsPanel extends StatelessWidget {
         ],
 
         // ========================================================
-        // 2. YOUR PACKAGE (P6: read-only — the headcount step was
-        // chosen on the packages grid and travels via `?pax=`).
-        // C76: schedule render is display-only; the Change affordance
-        // renders only for non-null [onChangePax] (direct-panel
-        // usages) — the schedule step passes null.
-        // ========================================================
-        Builder(
-          builder: (context) {
-            final effectivePax =
-                selectedPax ?? (paxList.isNotEmpty ? paxList.first : null);
-            final price = effectivePax == null
-                ? null
-                : optionPriceLabel(effectivePax);
-            return Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // No generic label (grill Q3a) — the proper-noun card
-                  // above already says what this is.
-                  Container(
-                    key: const Key('pax_readonly_row'),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: chipColor,
-                      borderRadius: BorderRadius.circular(9999),
-                      border: Border.all(color: surfaceBorder, width: 1.0),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.check_circle_rounded,
-                          size: 14,
-                          color: titleColor,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            effectivePax == null
-                                ? 'Headcount to be confirmed'
-                                : (price == null
-                                      ? '$effectivePax PAX'
-                                      : '$effectivePax PAX · $price'),
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: titleColor,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (onChangePax != null)
-                          Flexible(
-                            child: GestureDetector(
-                              key: const Key('pax_change_link'),
-                              onTap: onChangePax,
-                              child: MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: Text(
-                                  'Change',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    // C31: title token both modes (was
-                                    // plum-on-night in dark).
-                                    color: titleColor,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-
-        const SizedBox(height: 14),
-
-        // ========================================================
-        // 3. SELECT TIME SLOT
+        // 2. SELECT TIME SLOT
         // ========================================================
         Container(
           width: double.infinity,

@@ -604,73 +604,90 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       orElse: () => null,
     );
 
+    // C92: desktop Schedule (step 2) is fixed — the 3-col card + rail
+    // fit the viewport with no page-level scroll. Details/Payment keep
+    // the single page scroll (taller forms, 2x-scale safe), as do the
+    // loading/error states (the skeleton mimics the old tall stack).
+    // Extreme text scaling (>1.5x) also keeps the scroll: fixed columns
+    // cannot grow, so scrolling stays the overflow-safe fallback there.
+    // Tablet + mobile always keep the scroll (unchanged tree below).
+    final isDesktopSchedule =
+        MediaQuery.of(context).size.width >
+            ResponsiveAppShell.tabletBreakpoint &&
+        _currentStep == 2 &&
+        packageAsync.hasValue &&
+        MediaQuery.textScalerOf(context).scale(1.0) <= 1.5;
+    final Widget flowContent = Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        child: Column(
+          children: [
+            packageAsync.when(
+              data: (package) {
+                if (_currentStep == 5) {
+                  return _buildCheckoutScreen();
+                }
+
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    final width = constraints.maxWidth;
+
+                    if (width > ResponsiveAppShell.tabletBreakpoint) {
+                      // Desktop 2-Column Split View (>1024px, P6)
+                      return _buildDesktopThreeColumnLayout(package);
+                    } else if (width >= ResponsiveAppShell.mobileBreakpoint) {
+                      // Tablet 2-Column Layout (768px - 1024px)
+                      return _buildTabletTwoColumnLayout(package);
+                    } else {
+                      // Mobile 1-Column Layout (<768px)
+                      return _buildMobileLayout(package);
+                    }
+                  },
+                );
+              },
+              loading: () => const Padding(
+                padding: EdgeInsets.fromLTRB(20, 14, 20, 16),
+                child: SkeletonBookingFlow(),
+              ),
+              // P6 (Q6/Q8): shared friendly card; raw errors stay
+              // in logs, never on screen.
+              error: (e, s) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: ErrorStateCard(
+                    title: "We couldn't open this booking",
+                    message:
+                        'Check your connection and try again. '
+                        'Nothing has been charged.',
+                    onRetry: () =>
+                        ref.refresh(packageDetailsProvider(widget.packageId)),
+                  ),
+                ),
+              ),
+            ), // when
+          ],
+        ),
+      ), // ConstrainedBox
+    ); // Center
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       bottomNavigationBar: (isMobileWidth && barPackage != null)
           ? _buildMobileBottomBar(barPackage)
           : null,
       body: SafeArea(
-        child: SingleChildScrollView(
-          key: const Key(
-            'app_shell_scroll_view',
-          ), // Keep this key so tests pass
-          // C40: clamp overscroll on mobile (<768px); SDK default
-          // (stretch Android / bounce iOS) displaced content past edge.
-          // Desktop/web physics untouched (null = platform default).
-          physics: MobileClampScroll.physicsOf(context),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1200),
-              child: Column(
-                children: [
-                  packageAsync.when(
-                data: (package) {
-                  if (_currentStep == 5) {
-                    return _buildCheckoutScreen();
-                  }
-
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth;
-
-                      if (width > ResponsiveAppShell.tabletBreakpoint) {
-                        // Desktop 2-Column Split View (>1024px, P6)
-                        return _buildDesktopThreeColumnLayout(package);
-                      } else if (width >= ResponsiveAppShell.mobileBreakpoint) {
-                        // Tablet 2-Column Layout (768px - 1024px)
-                        return _buildTabletTwoColumnLayout(package);
-                      } else {
-                        // Mobile 1-Column Layout (<768px)
-                        return _buildMobileLayout(package);
-                      }
-                    },
-                  );
-                },
-                loading: () => const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 14, 20, 16),
-                  child: SkeletonBookingFlow(),
-                ),
-                // P6 (Q6/Q8): shared friendly card; raw errors stay
-                // in logs, never on screen.
-                error: (e, s) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: ErrorStateCard(
-                      title: "We couldn't open this booking",
-                      message:
-                          'Check your connection and try again. '
-                          'Nothing has been charged.',
-                      onRetry: () =>
-                          ref.refresh(packageDetailsProvider(widget.packageId)),
-                    ),
-                  ),
-                ),
-              ), // when
-                ],
-              ),
-            ), // ConstrainedBox
-          ), // Center
-        ), // SingleChildScrollView
+        child: isDesktopSchedule
+            ? flowContent
+            : SingleChildScrollView(
+                key: const Key(
+                  'app_shell_scroll_view',
+                ), // Keep this key so tests pass
+                // C40: clamp overscroll on mobile (<768px); SDK default
+                // (stretch Android / bounce iOS) displaced content past edge.
+                // Desktop/web physics untouched (null = platform default).
+                physics: MobileClampScroll.physicsOf(context),
+                child: flowContent,
+              ), // SingleChildScrollView
       ), // SafeArea
     ); // Scaffold
   }
@@ -737,44 +754,10 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 crossAxisAlignment:
                                     CrossAxisAlignment.stretch,
                                 children: [
-                                  // C76: locked Pax header, full-width
-                                  // calendar, then time + event/contact
-                                  // recap (ColB dissolved beside it).
-                                  _buildSchedulePaxHeader(package),
-                                  const SizedBox(height: 16),
-                                  ReservationCalendarPanel(
-                                    key: const Key(
-                                      'reservation_calendar_panel',
-                                    ),
-                                    selectedDate: _selectedDate,
-                                    onDateSelected: (date) {
-                                      ref
-                                          .read(bookingFlowProvider.notifier)
-                                          .setSelectedDate(date);
-                                    },
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ReservationDetailsPanel(
-                                    key: const Key(
-                                      'reservation_details_panel',
-                                    ),
-                                    package: package,
-                                    selectedPax: _selectedPax,
-                                    // C48: schedule grid carries time +
-                                    // pax only; the §1 package card stays
-                                    // retired (the rail owns that line).
-                                    showPackageSummary: false,
-                                    // C76: Pax locked — no Change affordance.
-                                    onChangePax: null,
-                                    selectedTime: _selectedTime,
-                                    onTimeSelected: (time) {
-                                      ref
-                                          .read(bookingFlowProvider.notifier)
-                                          .setSelectedTime(time);
-                                    },
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _buildScheduleEventSummary(),
+                                  // C92: one "Select Date & Time" card —
+                                  // calendar (inner col 1) + time (inner
+                                  // col 2); the rail (col 3) owns booking.
+                                  _buildScheduleDateTimeCard(),
                                 ],
                               ),
                       ),
@@ -900,11 +883,9 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                 crossAxisAlignment:
                                     CrossAxisAlignment.stretch,
                                 children: [
-                                  // C76: locked Pax header, full-width
-                                  // calendar, then time + event/contact
-                                  // recap (stack order unchanged).
-                                  _buildSchedulePaxHeader(package),
-                                  const SizedBox(height: 14),
+                                  // C92: Pax header + event recap retired
+                                  // (rail owns booking); calendar + time
+                                  // only, page scroll retained on tablet.
                                   ReservationCalendarPanel(
                                     key: const Key('tablet_calendar_panel'),
                                     selectedDate: _selectedDate,
@@ -922,7 +903,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                     // C48: §1 package card retired from the
                                     // schedule step (rail owns that line).
                                     showPackageSummary: false,
-                                    // C76: Pax locked — no Change affordance.
                                     onChangePax: null,
                                     selectedTime: _selectedTime,
                                     onTimeSelected: (time) {
@@ -931,8 +911,6 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
                                           .setSelectedTime(time);
                                     },
                                   ),
-                                  const SizedBox(height: 14),
-                                  _buildScheduleEventSummary(),
                                 ],
                               ),
                       ),
@@ -1078,92 +1056,16 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
   }
 
   // ==========================================================================
-  // C76 SCHEDULE: locked Pax header + display-only event/contact summary
+  // C92 SCHEDULE: single "Select Date & Time" card (desktop)
   // ==========================================================================
 
-  /// C76: prominent non-editable Pax header atop the schedule step on all
-  /// breakpoints. The headcount was chosen on the packages grid (`?pax=`
-  /// via [BookingScreen.initialPax]); there is no Change affordance here.
-  Widget _buildSchedulePaxHeader(Package package) {
-    final options = package.options;
-    final paxEntries = options.isNotEmpty
-        ? options.map((t) => t.pax).toList()
-        : (package.paxOptions ?? const <int>[]);
-    final effectivePax =
-        _selectedPax ?? (paxEntries.isNotEmpty ? paxEntries.first : null);
-    final priceLabel = (effectivePax != null && options.isNotEmpty)
-        ? ' · ${formatPeso(package.priceForPax(effectivePax))}'
-        : '';
+  /// C92: one card holding the calendar (inner col 1) + the event-time
+  /// picker (inner col 2). No Pax UI, no event recap — the `Your Booking`
+  /// rail (col 3) owns that line. Desktop-only; tablet keeps its stacked
+  /// calendar + details panel, mobile keeps its own step flow.
+  Widget _buildScheduleDateTimeCard() {
     return Container(
-      key: const Key('schedule_pax_header'),
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: _surface,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: _surfaceBorder),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle_rounded, size: 20, color: _title),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              effectivePax == null
-                  ? 'Headcount to be confirmed'
-                  : '$effectivePax PAX$priceLabel',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: _title,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// One display-only label/value row inside [_buildScheduleEventSummary].
-  Widget _scheduleSummaryRow(String keyName, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        key: Key(keyName),
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 72,
-            child: Text(label, style: TextStyle(fontSize: 12, color: _body)),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: _title,
-                height: 1.35,
-              ),
-              softWrap: true,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// C76: display-only event/contact recap below the schedule pickers.
-  /// Shows the selected date/time/venue/contact when provided, neutral
-  /// prompts otherwise. Editing stays in step 3 — no TextFields here.
-  Widget _buildScheduleEventSummary() {
-    final flow = ref.watch(bookingFlowProvider);
-    final venue = (flow.venueAddress ?? '').trim();
-    final contact = (flow.customerName ?? '').trim();
-    return Container(
-      key: const Key('schedule_event_summary'),
+      key: const Key('schedule_datetime_card'),
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1175,33 +1077,100 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Event Summary',
+            'Select Date & Time',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: _title,
             ),
           ),
-          const SizedBox(height: 8),
-          _scheduleSummaryRow(
-            'schedule_event_date',
-            'Date',
-            _shortDate(flow.selectedDate),
-          ),
-          _scheduleSummaryRow(
-            'schedule_event_time',
-            'Time',
-            TimeSlot.display(flow.selectedTime),
-          ),
-          _scheduleSummaryRow(
-            'schedule_event_venue',
-            'Venue',
-            venue.isEmpty ? 'Add venue in step 3' : venue,
-          ),
-          _scheduleSummaryRow(
-            'schedule_event_contact',
-            'Contact',
-            contact.isEmpty ? 'Add contact in step 3' : contact,
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Inner col 1: calendar (grid only — the card owns the
+              // "Select Date & Time" chrome, C92).
+              Expanded(
+                child: ReservationCalendarPanel(
+                  key: const Key('reservation_calendar_panel'),
+                  selectedDate: _selectedDate,
+                  showChrome: false,
+                  onDateSelected: (date) {
+                    ref
+                        .read(bookingFlowProvider.notifier)
+                        .setSelectedDate(date);
+                  },
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Inner col 2: event time.
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Choose Event Time',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: _title,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'One booking lasts 3–4 hrs.',
+                      style: TextStyle(fontSize: 12, color: _body),
+                    ),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      key: const Key('event_time_picker_button'),
+                      onTap: () => _pickEventTime(),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDF4F5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: _surfaceBorder),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.schedule_rounded,
+                              size: 18,
+                              color: plum,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _selectedTime == null
+                                    ? 'Select time'
+                                    : TimeSlot.display(_selectedTime),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: _selectedTime == null
+                                      ? FontWeight.normal
+                                      : FontWeight.w700,
+                                  color: _title,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.access_time_rounded,
+                              size: 18,
+                              color: plum,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -1926,52 +1895,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // C76: locked Pax header first — prominent, non-editable,
-          // no Change affordance (headcount came via `?pax=`).
-          Builder(
-            builder: (context) {
-              final effectivePax =
-                  _selectedPax ??
-                  (paxEntries.isNotEmpty ? paxEntries.first : null);
-              final priceLabel = (effectivePax != null && options.isNotEmpty)
-                  ? ' · ${formatPeso(package.priceForPax(effectivePax))}'
-                  : '';
-              return Container(
-                key: const Key('pax_readonly_row'),
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: _surface,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: _surfaceBorder),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle_rounded, size: 20, color: _title),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        effectivePax == null
-                            ? 'Headcount to be confirmed'
-                            : '$effectivePax PAX$priceLabel',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: _title,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 15),
+          // C92: no Pax header in Schedule (headcount came via `?pax=`;
+          // the collapsed summary below carries the PAX one-liner).
           Text(
             'Please Choose Available Schedule',
             // C36: title token (was plum, fails 7:1 on tinted fills).
@@ -2048,10 +1973,8 @@ class _BookingScreenState extends ConsumerState<BookingScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          // C76: display-only event/contact recap (editing stays in step 3).
-          _buildScheduleEventSummary(),
           const SizedBox(height: 25),
+          // C92: event recap retired (editing stays in step 3).
           // Proper-noun header (grill Q3a): the flow step already says
           // what this is; the product name carries the weight.
           // C48: survives only as the mobile stack section label (the

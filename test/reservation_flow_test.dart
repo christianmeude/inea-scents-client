@@ -121,8 +121,9 @@ void main() {
 
   group('Issue #44: 3-Column Reservation Flow Layout Tests', () {
     testWidgets(
-      // P6: desktop is a 2-column flow (calendar → details stacked) +
-      // sticky summary; the 3-column split was retired as too noisy.
+      // C92: desktop schedule is one "Select Date & Time" card (calendar
+      // inner col 1 + time inner col 2) + sticky summary rail (col 3);
+      // no Pax UI, no event recap — the rail owns that line.
       'R1: Desktop Split View renders 2-column layout on 1200x800 viewport (>1024px)',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
@@ -137,11 +138,15 @@ void main() {
 
         // Verify flow column + summary column are rendered
         expect(
+          find.byKey(const Key('schedule_datetime_card')),
+          findsOneWidget,
+        );
+        expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('event_time_picker_button')),
           findsOneWidget,
         );
         expect(
@@ -156,28 +161,30 @@ void main() {
         expect(find.text('Payment'), findsOneWidget);
 
         // Layout coordinate verification:
-        // Calendar above Details in the flow column; summary to the right.
-        final calendarPos = tester.getTopLeft(
+        // Calendar left of time inside the card; both left of the rail.
+        final calendarRect = tester.getRect(
           find.byKey(const Key('reservation_calendar_panel')),
         );
-        final detailsPos = tester.getTopLeft(
-          find.byKey(const Key('reservation_details_panel')),
+        final timeRect = tester.getRect(
+          find.byKey(const Key('event_time_picker_button')),
         );
         final summaryPos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
 
-        expect(calendarPos.dy, lessThan(detailsPos.dy));
-        expect(detailsPos.dx, lessThan(summaryPos.dx));
+        expect(calendarRect.left, lessThan(timeRect.left));
+        expect(timeRect.right, lessThanOrEqualTo(summaryPos.dx));
 
-        // Verify contents inside the flow column (Calendar)
-        expect(find.text('Select Date'), findsOneWidget);
+        // Verify contents inside the flow column (Calendar + time)
+        expect(find.text('Select Date & Time'), findsOneWidget);
         expect(find.text('Available'), findsNothing);
         expect(find.text('Booked'), findsNothing);
 
-        // Verify contents inside the flow column (Details, PAX read-only)
+        // C92: no Pax UI, no event recap in Schedule (rail owns it).
+        expect(find.byKey(const Key('schedule_pax_header')), findsNothing);
+        expect(find.byKey(const Key('schedule_event_summary')), findsNothing);
+        expect(find.byKey(const Key('pax_readonly_row')), findsNothing);
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
-        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
         expect(find.text('Choose Event Time'), findsOneWidget);
         // C18 pay-once: schedule step carries no payment picker.
         expect(find.text('Payment Method'), findsNothing);
@@ -192,52 +199,45 @@ void main() {
     );
 
     testWidgets(
-      // C75: sticky rail — the summary caps at viewport height with an
-      // internal scroll, so a drag starting on the rail is absorbed
-      // internally and the rail holds position; the CTA stays reachable
-      // through the page scroll.
-      'R1: Sticky summary rail holds position while the page scrolls on desktop',
+      // C92: desktop Schedule is fixed — no page-level scroll. The rail
+      // holds position trivially (nothing scrolls) and the CTA is
+      // reachable without scrolling.
+      'R1: Sticky summary rail holds position with no page scroll on desktop',
       (WidgetTester tester) async {
-        tester.view.physicalSize = const Size(1200, 500);
+        tester.view.physicalSize = const Size(1200, 800);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
 
         await tester.pumpWidget(
-          createBookingScreenWidget(screenSize: const Size(1200, 500)),
+          createBookingScreenWidget(screenSize: const Size(1200, 800)),
         );
         await tester.pumpAndSettle();
 
-        // Single page-level scroll (no nested column scrolls remain).
+        // C92: desktop Schedule carries no page-level scroll.
         final pageScrollFinder = find.byKey(const Key('app_shell_scroll_view'));
-        expect(pageScrollFinder, findsOneWidget);
+        expect(pageScrollFinder, findsNothing);
 
         // Check initial position of Order Summary panel
         final initialSummaryPos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
 
-        // Drag from the summary side: the rail's capped internal scroll
-        // absorbs the gesture (center of the page scroll sits over the
-        // horizontal calendar PageView, which would steal a pure-vertical
-        // drag's hit).
+        // A drag on the rail goes nowhere — the layout is fixed.
         final summaryCenter = tester.getCenter(
           find.byKey(const Key('order_summary_side_panel')),
         );
         await tester.dragFrom(summaryCenter, const Offset(0, -300));
         await tester.pumpAndSettle();
 
-        // Sticky rail holds position instead of traveling with the page.
+        // Rail holds position; CTA stays reachable with no scroll.
         final scrolledSummaryPos = tester.getTopLeft(
           find.byKey(const Key('order_summary_side_panel')),
         );
         expect(scrolledSummaryPos.dy, equals(initialSummaryPos.dy));
         expect(scrolledSummaryPos.dx, equals(initialSummaryPos.dx));
-
-        // CTA stays reachable through the page scroll.
-        await tester.ensureVisible(find.text('Proceed to Payment'));
-        await tester.pumpAndSettle();
         expect(find.text('Proceed to Payment'), findsOneWidget);
+        expect(tester.takeException(), isNull);
       },
     );
 
@@ -310,8 +310,9 @@ void main() {
     );
 
     testWidgets(
-      // P6: headcount is chosen on the packages grid and travels via
-      // `?pax=`; booking renders it read-only with no Change link.
+      // C92: headcount is chosen on the packages grid and travels via
+      // `?pax=`; the Schedule step carries no Pax UI at all — the rail
+      // owns the locked headcount echo.
       'Pax preselection renders locked with no Change link on desktop',
       (WidgetTester tester) async {
         tester.view.physicalSize = const Size(1200, 800);
@@ -324,25 +325,26 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Read-only row carries the locked headcount step (silent
-        // first-option fallback: no `?pax=` was passed, so 20 wins).
+        // No Pax UI left in Schedule (silent first-option fallback: no
+        // `?pax=` was passed, so the rail echoes 20).
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
-        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
+        expect(find.byKey(const Key('schedule_pax_header')), findsNothing);
+        expect(find.byKey(const Key('pax_readonly_row')), findsNothing);
+        expect(find.byKey(const Key('pax_change_link')), findsNothing);
         expect(
           find.descendant(
-            of: find.byKey(const Key('pax_readonly_row')),
+            of: find.byKey(const Key('order_summary_side_panel')),
             matching: find.text('20 PAX'),
           ),
           findsOneWidget,
         );
-        expect(find.byKey(const Key('pax_change_link')), findsNothing);
 
         // No in-flow pax selectors remain (the summary echo of the
         // locked step is expected).
         expect(find.text('2. Choose Available Pax'), findsNothing);
         expect(
           find.descendant(
-            of: find.byKey(const Key('reservation_details_panel')),
+            of: find.byKey(const Key('schedule_datetime_card')),
             matching: find.textContaining('Guests'),
           ),
           findsNothing,
@@ -402,11 +404,11 @@ void main() {
         // Retired method is gone from every picker (owner Q14-B).
         expect(find.text('Bank Transfer'), findsNothing);
 
-        // C18 pay-once: schedule step carries no picker — pick once
-        // at the payment step instead.
+        // C92: schedule step carries no picker and no Pax UI — pick
+        // once at the payment step instead.
         expect(
           find.descendant(
-            of: find.byKey(const Key('reservation_details_panel')),
+            of: find.byKey(const Key('schedule_datetime_card')),
             matching: find.text('Cash'),
           ),
           findsNothing,
@@ -634,11 +636,15 @@ void main() {
 
         // Verify no crashes occur and layout renders
         expect(
+          find.byKey(const Key('schedule_datetime_card')),
+          findsOneWidget,
+        );
+        expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('event_time_picker_button')),
           findsOneWidget,
         );
         expect(
@@ -655,24 +661,29 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
         addTearDown(tester.view.resetDevicePixelRatio);
 
-        // 1. 1025px (>1024px) -> Desktop 2-Column (P6)
+        // 1. 1025px (>1024px) -> Desktop fixed schedule card (C92)
         tester.view.physicalSize = const Size(1025, 800);
         await tester.pumpWidget(
           createBookingScreenWidget(screenSize: const Size(1025, 800)),
         );
         await tester.pumpAndSettle();
         expect(
+          find.byKey(const Key('schedule_datetime_card')),
+          findsOneWidget,
+        );
+        expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('event_time_picker_button')),
           findsOneWidget,
         );
         expect(
           find.byKey(const Key('order_summary_side_panel')),
           findsOneWidget,
         );
+        expect(find.byKey(const Key('app_shell_scroll_view')), findsNothing);
 
         // 2. 1024px (== tabletBreakpoint) -> Tablet 2-Column
         tester.view.physicalSize = const Size(1024, 800);
@@ -728,12 +739,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // C76: pax is locked (readonly row, no Change link). C18 pay-once:
-        // the schedule step carries no payment picker.
-        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
+        // C92: no Pax UI in Schedule — the rail echoes the locked step.
+        // C18 pay-once: the schedule step carries no payment picker.
+        expect(find.byKey(const Key('pax_readonly_row')), findsNothing);
+        expect(find.byKey(const Key('pax_change_link')), findsNothing);
         expect(
           find.descendant(
-            of: find.byKey(const Key('pax_readonly_row')),
+            of: find.byKey(const Key('order_summary_side_panel')),
             matching: find.text('20 PAX'),
           ),
           findsOneWidget,
@@ -744,7 +756,7 @@ void main() {
 
         expect(
           find.descendant(
-            of: find.byKey(const Key('reservation_details_panel')),
+            of: find.byKey(const Key('schedule_datetime_card')),
             matching: find.text('Cash'),
           ),
           findsNothing,
@@ -955,10 +967,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Step 2: Schedule & locked Pax
+        // Step 2: Schedule (C92: date + time pickers, no Pax UI)
 
         expect(find.text('Dior Women Luxury Experience'), findsWidgets);
-        expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
+        expect(find.byKey(const Key('pax_readonly_row')), findsNothing);
         expect(find.byKey(const Key('pax_change_link')), findsNothing);
         expect(find.text('30 PAX'), findsNothing);
 
@@ -1183,7 +1195,7 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('reservation_details_panel')),
+        find.byKey(const Key('schedule_datetime_card')),
         findsOneWidget,
       );
       expect(find.byKey(const Key('order_summary_side_panel')), findsOneWidget);
@@ -1339,13 +1351,17 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Initially on Step 2 (Reservation layout)
+        // Initially on Step 2 (Schedule card layout)
+        expect(
+          find.byKey(const Key('schedule_datetime_card')),
+          findsOneWidget,
+        );
         expect(
           find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('event_time_picker_button')),
           findsOneWidget,
         );
         expect(
@@ -1366,13 +1382,13 @@ void main() {
         // Complete transition
         await tester.pumpAndSettle();
 
-        // Schedule columns are replaced by the Details form, not Payment.
+        // Schedule card is replaced by the Details form, not Payment.
         expect(
-          find.byKey(const Key('reservation_calendar_panel')),
+          find.byKey(const Key('schedule_datetime_card')),
           findsNothing,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('reservation_calendar_panel')),
           findsNothing,
         );
         expect(
@@ -1679,15 +1695,15 @@ void main() {
           findsNothing,
         );
 
-        // Back again: 3→2 returns to the 2-column reservation layout (P6)
+        // Back again: 3→2 returns to the schedule card (C92)
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
         expect(
-          find.byKey(const Key('reservation_calendar_panel')),
+          find.byKey(const Key('schedule_datetime_card')),
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
         );
         expect(find.text('Proceed to Payment'), findsOneWidget);
@@ -1730,15 +1746,15 @@ void main() {
           findsNothing,
         );
 
-        // 3→2 returns to Calendar and Details panels.
+        // 3→2 returns to the schedule card.
         await tester.tap(find.text('Back'));
         await tester.pumpAndSettle();
         expect(
-          find.byKey(const Key('reservation_calendar_panel')),
+          find.byKey(const Key('schedule_datetime_card')),
           findsOneWidget,
         );
         expect(
-          find.byKey(const Key('reservation_details_panel')),
+          find.byKey(const Key('reservation_calendar_panel')),
           findsOneWidget,
         );
         expect(
@@ -1894,7 +1910,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Step 2: Schedule & Pax (C48: sticky bottom bar owns conversion)
+        // Step 2: Schedule (C92: no Pax UI; rail owns the echo)
 
         expect(find.text('Proceed'), findsOneWidget);
 
@@ -2286,18 +2302,19 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // P6: pax is read-only. C18 pay-once: no picker on the
-        // reservation step — pick Online once at the payment step.
+        // C92: no Pax UI in Schedule (rail echoes the locked step).
+        // C18 pay-once: no picker on the schedule step — pick Online
+        // once at the payment step.
         expect(
           find.descendant(
-            of: find.byKey(const Key('pax_readonly_row')),
+            of: find.byKey(const Key('order_summary_side_panel')),
             matching: find.text('20 PAX'),
           ),
           findsOneWidget,
         );
         expect(
           find.descendant(
-            of: find.byKey(const Key('reservation_details_panel')),
+            of: find.byKey(const Key('schedule_datetime_card')),
             matching: find.text('Online'),
           ),
           findsNothing,
@@ -2540,7 +2557,7 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Payment Successful'), findsNothing);
-        expect(find.text('Select Date'), findsOneWidget);
+        expect(find.text('Select Date & Time'), findsOneWidget);
         expect(tester.takeException(), isNull);
       },
     );

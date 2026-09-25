@@ -84,7 +84,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('desktop schedule stack intact at 1280px', (
+    testWidgets('desktop schedule card intact at 1280px', (
       WidgetTester tester,
     ) async {
       addTearDown(tester.view.resetPhysicalSize);
@@ -93,23 +93,24 @@ void main() {
       addTearDown(container.dispose);
       await _pump(tester, container, const Size(1280, 800));
 
-      // C76: stacked schedule view — locked Pax header above the
-      // full-width calendar above the details/time panel.
+      // C92: one datetime card — calendar (inner col 1) beside time
+      // (inner col 2), no Pax header, no event recap, desktop fixed.
       expect(
         find.byKey(const Key('desktop_schedule_stack_view')),
         findsOneWidget,
       );
-      final headerTop = tester
-          .getTopLeft(find.byKey(const Key('schedule_pax_header')))
-          .dy;
-      final calTop = tester
-          .getTopLeft(find.byKey(const Key('reservation_calendar_panel')))
-          .dy;
-      final detTop = tester
-          .getTopLeft(find.byKey(const Key('reservation_details_panel')))
-          .dy;
-      expect(headerTop, lessThan(calTop));
-      expect(calTop, lessThan(detTop));
+      expect(find.byKey(const Key('schedule_datetime_card')), findsOneWidget);
+      expect(find.text('Select Date & Time'), findsOneWidget);
+      final calRect = tester.getRect(
+        find.byKey(const Key('reservation_calendar_panel')),
+      );
+      final timeRect = tester.getRect(
+        find.byKey(const Key('event_time_picker_button')),
+      );
+      expect(calRect.left, lessThan(timeRect.left));
+      expect(find.byKey(const Key('schedule_pax_header')), findsNothing);
+      expect(find.byKey(const Key('schedule_event_summary')), findsNothing);
+      expect(find.byKey(const Key('app_shell_scroll_view')), findsNothing);
 
       // Unified timeline labels, exactly once each.
       expect(find.text('Schedule'), findsOneWidget);

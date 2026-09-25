@@ -118,10 +118,9 @@ void main() {
   });
 
   group('ux_polish read-only pax', () {
-    testWidgets('details panel shows locked row with Change, no selector', (
+    testWidgets('details panel is time-only: no pax row, no selector', (
       WidgetTester tester,
     ) async {
-      var changed = false;
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.lightTheme,
@@ -130,7 +129,7 @@ void main() {
               child: ReservationDetailsPanel(
                 package: _cardPackage(),
                 selectedPax: 70,
-                onChangePax: () => changed = true,
+                onChangePax: () {},
                 selectedTime: '14:00:00',
                 onTimeSelected: (_) {},
               ),
@@ -140,16 +139,18 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // C92: Pax UI retired from the panel (rail owns the headcount) —
+      // package summary + time picker remain, no selector anywhere.
       expect(find.text('Unified Celebration Bar'), findsOneWidget);
-      expect(find.byKey(const Key('pax_readonly_row')), findsOneWidget);
-      expect(find.text('70 PAX · ₱6,399.00'), findsOneWidget);
-      expect(find.byKey(const Key('pax_change_link')), findsOneWidget);
+      expect(find.byKey(const Key('pax_readonly_row')), findsNothing);
+      expect(find.text('70 PAX · ₱6,399.00'), findsNothing);
+      expect(find.byKey(const Key('pax_change_link')), findsNothing);
       expect(find.text('2. Choose Available Pax'), findsNothing);
       expect(find.text('70 Guests'), findsNothing);
-
-      await tester.tap(find.byKey(const Key('pax_change_link')));
-      await tester.pumpAndSettle();
-      expect(changed, isTrue);
+      expect(find.text('Choose Event Time'), findsOneWidget);
+      expect(find.text('2:00 PM'), findsOneWidget);
+      expect(find.byKey(const Key('event_time_picker_button')), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('missing pax falls back quietly without crashing', (
@@ -173,9 +174,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // First option wins silently; no Change link without a callback.
-      expect(find.text('50 PAX · ₱4,499.00'), findsOneWidget);
+      // C92: no Pax text at all; the time picker idles on its prompt.
+      expect(find.text('50 PAX · ₱4,499.00'), findsNothing);
       expect(find.byKey(const Key('pax_change_link')), findsNothing);
+      expect(find.text('Select time'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
@@ -319,7 +321,9 @@ void main() {
         find.byType(ReservationDetailsPanel),
       );
       expect(panel.selectedPax, equals(70));
-      expect(find.text('70 PAX · ₱6,399.00'), findsOneWidget);
+      // C92: Pax UI retired from the panel — time picker carries the step.
+      expect(find.byKey(const Key('pax_readonly_row')), findsNothing);
+      expect(find.text('2:00 PM'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
