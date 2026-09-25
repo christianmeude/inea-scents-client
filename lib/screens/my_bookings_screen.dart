@@ -331,10 +331,18 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen> {
           // ======================================================
           // LOADING
           // ======================================================
-          loading: () => const Center(
-            child: CircularProgressIndicator(
-              color: MyBookingsScreen.primaryColor,
-              strokeWidth: 2.5,
+          loading: () => SingleChildScrollView(
+            physics: MobileClampScroll.physicsOf(context),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: ResponsiveAppShell.maxContentWidth,
+                ),
+                child: Padding(
+                  padding: ResponsiveAppShell.screenHeaderPadding,
+                  child: const SkeletonBookingsList(),
+                ),
+              ),
             ),
           ),
 

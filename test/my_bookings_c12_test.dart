@@ -10,7 +10,7 @@ import 'package:inea_scents_client/models/index.dart';
 import 'package:inea_scents_client/providers/index.dart';
 import 'package:inea_scents_client/screens/my_bookings_screen.dart';
 import 'package:inea_scents_client/src/providers/core_providers.dart';
-import 'package:inea_scents_client/widgets/error_state_card.dart';
+import 'package:inea_scents_client/widgets/index.dart';
 
 import 'helpers/fake_api.dart';
 
@@ -159,8 +159,8 @@ void main() {
   testWidgets('loading state shows no book-another action', (
     WidgetTester tester,
   ) async {
-    // Never-resolving-until-teardown future stays in the spinner (pump,
-    // not pumpAndSettle — the spinner animation never settles). Completed
+    // C79: never-resolving-until-teardown future stays in the skeleton
+    // (pump, not pumpAndSettle — shimmer never settles). Completed
     // at the end so no timer is pending when the tree is disposed.
     final loadingRouter = buildRouter();
     final loadingCompleter = Completer<List<Booking>>();
@@ -180,7 +180,10 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    // C79: loading teases the bookings layout, never a spinner.
+    expect(find.byType(SkeletonBookingsList), findsOneWidget);
+    expect(find.byKey(const Key('skeleton_bookings_list')), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.byTooltip('Book another Pax Choice'), findsNothing);
     expect(find.text('Book another Pax Choice'), findsNothing);
     expect(find.text('Book another'), findsNothing);
