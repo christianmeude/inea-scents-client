@@ -6,6 +6,7 @@ class SkeletonPackageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // P6 (Q1): dark-aware shimmer so loading states never flash white.
+    // C84: single parent Shimmer — children are plain Containers.
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final base = isDark
         ? const Color(0xFF36222C)
@@ -13,71 +14,56 @@ class SkeletonPackageCard extends StatelessWidget {
     final highlight = isDark
         ? const Color(0xFF5A4450)
         : const Color(0xFFE8DEE2);
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1618) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0x4D99868C),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image skeleton
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              ),
-              child: Shimmer.fromColors(
-                baseColor: base,
-                highlightColor: highlight,
-                child: Container(width: double.infinity, color: Colors.white),
+    return Shimmer.fromColors(
+      baseColor: base,
+      highlightColor: highlight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1618) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0x4D99868C),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image skeleton
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                child:
+                    Container(width: double.infinity, color: Colors.white),
               ),
             ),
-          ),
-          // Content skeleton
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Shimmer.fromColors(
-                  baseColor: base,
-                  highlightColor: highlight,
-                  child: Container(
+            // Content skeleton
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Container(
                     height: 16,
                     width: double.infinity,
                     color: Colors.white,
                   ),
-                ),
-                const SizedBox(height: 8),
-                // Rating
-                Shimmer.fromColors(
-                  baseColor: base,
-                  highlightColor: highlight,
-                  child: Container(height: 14, width: 100, color: Colors.white),
-                ),
-                const SizedBox(height: 12),
-                // Price
-                Shimmer.fromColors(
-                  baseColor: base,
-                  highlightColor: highlight,
-                  child: Container(height: 16, width: 80, color: Colors.white),
-                ),
-                const SizedBox(height: 12),
-                // Button
-                Shimmer.fromColors(
-                  baseColor: base,
-                  highlightColor: highlight,
-                  child: Container(
+                  const SizedBox(height: 8),
+                  // Rating
+                  Container(height: 14, width: 100, color: Colors.white),
+                  const SizedBox(height: 12),
+                  // Price
+                  Container(height: 16, width: 80, color: Colors.white),
+                  const SizedBox(height: 12),
+                  // Button
+                  Container(
                     height: 30,
                     width: double.infinity,
                     decoration: BoxDecoration(
@@ -85,11 +71,11 @@ class SkeletonPackageCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -97,6 +83,7 @@ class SkeletonPackageCard extends StatelessWidget {
 
 /// C58: packages loading skeleton — mirrors the Offering hero + Pax
 /// Choice rows so loading never teases the retired card grid.
+/// C84: single parent Shimmer — children are plain Containers.
 class SkeletonPackagesLoading extends StatelessWidget {
   const SkeletonPackagesLoading({super.key});
 
@@ -115,100 +102,92 @@ class SkeletonPackagesLoading extends StatelessWidget {
       required double width,
       double radius = 6,
     }) {
-      return Shimmer.fromColors(
-        baseColor: base,
-        highlightColor: highlight,
-        child: Container(
-          height: height,
-          width: width,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(radius),
-          ),
+      return Container(
+        height: height,
+        width: width,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(radius),
         ),
       );
     }
 
-    return Column(
-      key: const Key('skeleton_packages_loading'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Hero mirror: 200px banner (mobile) with thumb + text block.
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 768;
-            final bannerHeight = wide ? 240.0 : 200.0;
-            final imageWidth = wide ? 340.0 : 132.0;
-            return Container(
-              key: const Key('skeleton_offering_hero'),
-              width: double.infinity,
-              height: bannerHeight,
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1618) : Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Shimmer.fromColors(
-                    baseColor: base,
-                    highlightColor: highlight,
-                    child: Container(
+    return Shimmer.fromColors(
+      baseColor: base,
+      highlightColor: highlight,
+      child: Column(
+        key: const Key('skeleton_packages_loading'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Hero mirror: 200px banner (mobile) with thumb + text block.
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 768;
+              final bannerHeight = wide ? 240.0 : 200.0;
+              final imageWidth = wide ? 340.0 : 132.0;
+              return Container(
+                key: const Key('skeleton_offering_hero'),
+                width: double.infinity,
+                height: bannerHeight,
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1C1618) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
                       width: imageWidth,
                       height: bannerHeight,
                       color: Colors.white,
                     ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          bar(height: 18, width: double.infinity, radius: 6),
-                          const SizedBox(height: 8),
-                          bar(height: 14, width: 140, radius: 6),
-                          const SizedBox(height: 8),
-                          bar(height: 12, width: double.infinity, radius: 6),
-                        ],
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            bar(height: 18, width: double.infinity, radius: 6),
+                            const SizedBox(height: 8),
+                            bar(height: 14, width: 140, radius: 6),
+                            const SizedBox(height: 8),
+                            bar(height: 12, width: double.infinity, radius: 6),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-        const SizedBox(height: 20),
-        bar(height: 18, width: 200, radius: 6),
-        const SizedBox(height: 12),
-        for (int i = 0; i < 3; i++) ...[
-          Container(
-            key: Key('skeleton_pax_row_$i'),
-            width: double.infinity,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1618) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      bar(height: 15, width: 140, radius: 6),
-                      const SizedBox(height: 6),
-                      bar(height: 13, width: 90, radius: 6),
-                    ],
-                  ),
+                  ],
                 ),
-                Shimmer.fromColors(
-                  baseColor: base,
-                  highlightColor: highlight,
-                  child: Container(
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+          bar(height: 18, width: 200, radius: 6),
+          const SizedBox(height: 12),
+          for (int i = 0; i < 3; i++) ...[
+            Container(
+              key: Key('skeleton_pax_row_$i'),
+              width: double.infinity,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1C1618) : Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        bar(height: 15, width: 140, radius: 6),
+                        const SizedBox(height: 6),
+                        bar(height: 13, width: 90, radius: 6),
+                      ],
+                    ),
+                  ),
+                  Container(
                     width: 20,
                     height: 20,
                     decoration: BoxDecoration(
@@ -216,13 +195,13 @@ class SkeletonPackagesLoading extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          if (i < 2) const SizedBox(height: 10),
+            if (i < 2) const SizedBox(height: 10),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
