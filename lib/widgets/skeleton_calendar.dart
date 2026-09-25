@@ -7,7 +7,10 @@ import 'responsive_app_shell.dart';
 /// agenda column so loading never flashes a spinner or stale chrome.
 /// C83: teases the real layout — radius24 calendarCard (pads 12,14,12,14)
 /// with month-nav chrome + weekday header + month grid, desktop 7:4
-/// calendar|agenda Row, agenda ending in the 48px Continue pill CTA.
+/// calendar|agenda Row, agenda teasing the text-only empty state.
+/// C85: grid mirrors TableCalendar (Monday-start, outsideDaysVisible false)
+/// — leading blanks for the real month; agenda teases the empty state
+/// (no pill CTA — real empty state is text-only, CTA needs a date).
 /// C84: single parent Shimmer — children are plain Containers.
 class SkeletonCalendar extends StatelessWidget {
   const SkeletonCalendar({super.key});
@@ -37,14 +40,25 @@ class SkeletonCalendar extends StatelessWidget {
       );
     }
 
-    Widget dayCell() {
+    Widget dayCell(int day) {
       return Container(
+        key: Key('skeleton_day_cell_$day'),
         width: 36,
         height: 36,
         decoration: const BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
         ),
+      );
+    }
+
+    // C85: empty leading cell — mirrors TableCalendar blank slots
+    // (outsideDaysVisible false, Monday-start) before day 1.
+    Widget leadingCell(int slot) {
+      return SizedBox(
+        key: Key('skeleton_leading_cell_$slot'),
+        width: 36,
+        height: 36,
       );
     }
 
@@ -71,6 +85,21 @@ class SkeletonCalendar extends StatelessWidget {
     }
 
     Widget calendarCard() {
+      // C85: leading blanks for the real month (Monday-start, matching
+      // TableCalendar default; outside days hidden).
+      final now = DateTime.now();
+      final leading =
+          DateTime(now.year, now.month, 1).weekday - DateTime.monday;
+      final daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+      final totalCells = leading + daysInMonth;
+      final paddedCells = ((totalCells + 6) ~/ 7) * 7;
+      final cells = <Widget>[
+        for (int s = 0; s < leading; s++) leadingCell(s),
+        for (int d = 1; d <= daysInMonth; d++) dayCell(d),
+        for (int t = totalCells; t < paddedCells; t++)
+          const SizedBox(width: 36, height: 36),
+      ];
+      final rowCount = paddedCells ~/ 7;
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
@@ -104,37 +133,26 @@ class SkeletonCalendar extends StatelessWidget {
               children: [for (int i = 0; i < 7; i++) weekdayLabel()],
             ),
             const SizedBox(height: 6),
-            for (int row = 0; row < 5; row++) ...[
+            for (int row = 0; row < rowCount; row++) ...[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [for (int i = 0; i < 7; i++) dayCell()],
+                children: cells.sublist(row * 7, row * 7 + 7),
               ),
-              if (row < 4) const SizedBox(height: 10),
+              if (row < rowCount - 1) const SizedBox(height: 10),
             ],
           ],
         ),
       );
     }
 
+    // C85: empty-state tease — real empty agenda is text-only
+    // ('Select a date to see details.'); no pill CTA without a date.
     Widget agendaColumn() {
       return Column(
         key: const Key('skeleton_agenda'),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          bar(height: 16, width: 180),
-          const SizedBox(height: 8),
           bar(height: 12, width: 220),
-          const SizedBox(height: 12),
-          // Continue pill CTA tease: full-width 48px pill.
-          Container(
-            key: const Key('skeleton_agenda_pill'),
-            height: 48,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(9999),
-            ),
-          ),
         ],
       );
     }
